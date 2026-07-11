@@ -1,0 +1,306 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { apiFetch } from "@/lib/api";
+import { MargenBadge } from "@/components/MargenBadge";
+import type { Categoria, RecetaDetail, Ingrediente, Receta, LineaRecetaInput } from "@/lib/types";
+import Link from "next/link";
+
+const UNIDADES = ["kg", "g", "mg", "litro", "ml", "cl", "unidad"];
+
+export default function RecetaDetailPage() {
+  const params = useParams();
+  const router = useRouter();
+  const id = params.id as string;
+
+  const [receta, setReceta] = useState<RecetaDetail | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [editing, setEditing] = useState(false);
+
+  // Edit state
+  const [categorias, setCategorias] = useState<Categoria[]>([]);
+  const [ingredientes, setIngredientes] = useState<Ingrediente[]>([]);
+  const [subrecetas, setSubrecetas] = useState<Receta[]>([]);
+  const [editForm, setEditForm] = useState({
+    nombre: "",
+    categoria_id: 0,
+    porciones_por_lote: 1,
+    precio_venta: null as number | null,
+    es_subreceta: false,
+    notas: "",
+    lineas: [] as LineaRecetaInput[],
+  });
+
+  const fetchReceta = () => {
+    setLoading(true);
+    apiFetch<RecetaDetail>(`/api/recetas/${id}`)
+      .then(setReceta)
+      .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    fetchReceta();
+  }, [id]);
+
+  const startEditing = async () => {
+    if (!receta) return;
+    const [cats, ings, subs] = await Promise.all([
+      apiFetch<Categoria[]>("/api/categorias?tipo=receta"),
+      apiFetch<Ingrediente[]>("/api/ingredientes"),
+      apiFetch<Receta[]>("/api/recetas?es_subreceta=true"),
+    ]);
+    setCategorias(cats);
+    setIngredientes(ings);
+    setSubrecetas(subs.filter((s) => s.id !== receta.id));
+    setEditForm({
+      nombre: receta.nombre,
+      categoria_id: receta.categoria_id,
+      porciones_por_lote: receta.porciones_por_lote,
+      precio_venta: receta.precio_venta,
+      es_subreceta: receta.es_subreceta,
+      notas: receta.notas || "",
+      lineas: receta.lineas.map((l) => ({
+        ingrediente_id: l.ingrediente_id,
+        subreceta_id: l.subreceta_id,
+        cantidad: l.cantidad,
+        unidad: l.unidad,
+      })),
+    });
+    setEditing(true);
+  };
+
+  const handleSave = async () => {
+    await apiFetch(`/api/recetas/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(editForm),
+    });
+    setEditing(false);
+    fetchReceta();
+  };
+
+  const handleDelete = async () => {
+    if (!confirm("¿Eliminar esta receta?")) return;
+    try {
+      await apiFetch(`/api/recetas/${id}`, { method: "DELETE" });
+      router.push("/recetas");
+    } catch (err: any) {
+      alert(err.message);
+    }
+  };
+
+  const addLinea = (tipo: "ingrediente" | "subreceta") => {
+    setEditForm({
+      ...editForm,
+      lineas: [
+        ...editForm.lineas,
+        {
+          ingrediente_id: tipo === "ingrediente" ? (ingredientes[0]?.id || null) : null,
+          subreceta_id: tipo === "subreceta" ? (subrecetas[0]?.id || null) : null,
+          cantidad: 1,
+          unidad: "g",
+        },
+      ],
+    });
+  };
+
+  const removeLinea = (index: number) => {
+    setEditForm({
+      ...editForm,
+      lineas: editForm.lineas.filter((_, i) => i !== index),
+    });
+  };
+
+  const updateLinea = (index: number, field: string, value: any) => {
+    const lineas = [...editForm.lineas];
+    (lineas[index] as any)[field] = value;
+    setEditForm({ ...editForm, lineas });
+  };
+
+  if (loading) return <p className="text-slate-500 py-10 text-center">Cargando...</p>;
+  if (!receta) return <p className="text-red-500 py-10 text-center">Receta no encontrada</p>;
+
+  if (editing) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold">Editar Receta</h1>
+          <div className="flex gap-2">
+            <button onClick={() => setEditing(false)} className="px-4 py-2 rounded-lg text-sm border border-slate-300 hover:bg-slate-50">Cancelar</button>
+            <button onClick={handleSave} className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700">Guardar</button>
+          </div>
+        </div>
+
+        <div className="bg-white border border-slate-200 rounded-lg p-4 space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-xs text-slate-500 mb-1">Nombre</label>
+              <input value={editForm.nombre} onChange={(e) => setEditForm({ ...editForm, nombre: e.target.value })} className="w-full border border-slate-300 rounded px-3 py-2 text-sm" />
+            </div>
+            <div>
+              <label className="block text-xs text-slate-500 mb-1">Categoría</label>
+              <select value={editForm.categoria_id} onChange={(e) => setEditForm({ ...editForm, categoria_id: parseInt(e.target.value) })} className="w-full border border-slate-300 rounded px-3 py-2 text-sm">
+                {categorias.map((c) => <option key={c.id} value={c.id}>{c.nombre}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs text-slate-500 mb-1">Porciones por lote</label>
+              <input type="number" min="1" value={editForm.porciones_por_lote} onChange={(e) => setEditForm({ ...editForm, porciones_por_lote: parseInt(e.target.value) || 1 })} className="w-full border border-slate-300 rounded px-3 py-2 text-sm" />
+            </div>
+            <div>
+              <label className="block text-xs text-slate-500 mb-1">Precio venta (CHF)</label>
+              <input type="number" step="any" value={editForm.precio_venta ?? ""} onChange={(e) => setEditForm({ ...editForm, precio_venta: e.target.value ? parseFloat(e.target.value) : null })} className="w-full border border-slate-300 rounded px-3 py-2 text-sm" />
+            </div>
+            <div className="flex items-center gap-2 pt-5">
+              <input type="checkbox" checked={editForm.es_subreceta} onChange={(e) => setEditForm({ ...editForm, es_subreceta: e.target.checked })} />
+              <label className="text-sm">Es sub-receta</label>
+            </div>
+          </div>
+          <div>
+            <label className="block text-xs text-slate-500 mb-1">Notas</label>
+            <textarea value={editForm.notas} onChange={(e) => setEditForm({ ...editForm, notas: e.target.value })} className="w-full border border-slate-300 rounded px-3 py-2 text-sm" rows={2} />
+          </div>
+        </div>
+
+        {/* Edit lines */}
+        <div className="bg-white border border-slate-200 rounded-lg p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <h3 className="font-semibold">Ingredientes de la receta</h3>
+            <div className="flex gap-2">
+              <button onClick={() => addLinea("ingrediente")} className="text-sm text-blue-600 hover:text-blue-800">+ Ingrediente</button>
+              {subrecetas.length > 0 && (
+                <button onClick={() => addLinea("subreceta")} className="text-sm text-purple-600 hover:text-purple-800">+ Sub-receta</button>
+              )}
+            </div>
+          </div>
+          {editForm.lineas.length === 0 ? (
+            <p className="text-sm text-slate-400">Añade ingredientes a la receta</p>
+          ) : (
+            <div className="space-y-2">
+              {editForm.lineas.map((linea, i) => (
+                <div key={i} className="flex flex-wrap items-center gap-2 p-2 bg-slate-50 rounded">
+                  {linea.subreceta_id ? (
+                    <select value={linea.subreceta_id ?? ""} onChange={(e) => updateLinea(i, "subreceta_id", parseInt(e.target.value))} className="border border-slate-300 rounded px-2 py-1 text-sm flex-1 min-w-[150px]">
+                      {subrecetas.map((s) => <option key={s.id} value={s.id}>{s.nombre} (sub)</option>)}
+                    </select>
+                  ) : (
+                    <select value={linea.ingrediente_id ?? ""} onChange={(e) => updateLinea(i, "ingrediente_id", parseInt(e.target.value))} className="border border-slate-300 rounded px-2 py-1 text-sm flex-1 min-w-[150px]">
+                      {ingredientes.map((ing) => <option key={ing.id} value={ing.id}>{ing.nombre}</option>)}
+                    </select>
+                  )}
+                  <input type="number" step="any" value={linea.cantidad} onChange={(e) => updateLinea(i, "cantidad", parseFloat(e.target.value) || 0)} className="w-20 border border-slate-300 rounded px-2 py-1 text-sm" />
+                  <select value={linea.unidad} onChange={(e) => updateLinea(i, "unidad", e.target.value)} className="border border-slate-300 rounded px-2 py-1 text-sm">
+                    {UNIDADES.map((u) => <option key={u} value={u}>{u}</option>)}
+                  </select>
+                  <button onClick={() => removeLinea(i)} className="text-red-500 text-sm hover:text-red-700">×</button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <Link href="/recetas" className="text-sm text-blue-600 hover:underline">← Volver a recetas</Link>
+          <h1 className="text-2xl font-bold mt-1">{receta.nombre}</h1>
+        </div>
+        <div className="flex gap-2">
+          <button onClick={startEditing} className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700">Editar</button>
+          <button onClick={handleDelete} className="bg-red-100 text-red-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-200">Eliminar</button>
+        </div>
+      </div>
+
+      {/* Summary */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="bg-white border border-slate-200 rounded-lg p-4">
+          <p className="text-xs text-slate-500">Coste total</p>
+          <p className="text-xl font-bold">{receta.coste_total.toFixed(2)} CHF</p>
+        </div>
+        <div className="bg-white border border-slate-200 rounded-lg p-4">
+          <p className="text-xs text-slate-500">
+            Coste/{receta.unidad_rendimiento || "ración"}
+          </p>
+          <p className="text-xl font-bold">{receta.coste_por_porcion.toFixed(2)} CHF</p>
+        </div>
+        <div className="bg-white border border-slate-200 rounded-lg p-4">
+          <p className="text-xs text-slate-500">Precio venta</p>
+          <p className="text-xl font-bold">{receta.precio_venta ? `${receta.precio_venta.toFixed(2)} CHF` : "—"}</p>
+        </div>
+        <div className="bg-white border border-slate-200 rounded-lg p-4">
+          <p className="text-xs text-slate-500">Margen</p>
+          <div className="mt-1"><MargenBadge margen={receta.margen_real} /></div>
+        </div>
+      </div>
+
+      {/* Info */}
+      <div className="flex flex-wrap gap-4 text-sm text-slate-500">
+        <span>Categoría: <strong className="text-slate-700">{receta.categoria_nombre}</strong></span>
+        <span>Porciones/lote: <strong className="text-slate-700">{receta.porciones_por_lote}</strong></span>
+        {receta.es_subreceta && <span className="px-2 py-0.5 rounded bg-purple-100 text-purple-700 text-xs">Sub-receta</span>}
+      </div>
+
+      {/* Lines table */}
+      <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="bg-slate-50 text-left text-slate-500 border-b border-slate-200">
+              <th className="px-4 py-2 font-medium">Ingrediente</th>
+              <th className="px-4 py-2 font-medium text-right">Cantidad</th>
+              <th className="px-4 py-2 font-medium">Unidad</th>
+              <th className="px-4 py-2 font-medium text-right">CHF/kg</th>
+              <th className="px-4 py-2 font-medium text-right">Coste</th>
+            </tr>
+          </thead>
+          <tbody>
+            {receta.lineas.map((l) => (
+              <tr key={l.id} className="border-b border-slate-100">
+                <td className="px-4 py-2">
+                  {l.nombre_subreceta ? (
+                    <span>
+                      <span className="text-purple-600 text-xs mr-1">SUB</span>
+                      <Link href={`/recetas/${l.subreceta_id}`} className="text-blue-600 hover:underline">{l.nombre_subreceta}</Link>
+                    </span>
+                  ) : (
+                    l.nombre_ingrediente
+                  )}
+                </td>
+                <td className="px-4 py-2 text-right">
+                  {(l.unidad === "kg" || l.unidad === "litro") && l.cantidad < 1
+                    ? l.unidad === "kg" ? Math.round(l.cantidad * 1000) : Math.round(l.cantidad * 1000)
+                    : l.cantidad}
+                </td>
+                <td className="px-4 py-2">
+                  {(l.unidad === "kg" || l.unidad === "litro") && l.cantidad < 1
+                    ? l.unidad === "kg" ? "g" : "ml"
+                    : l.unidad}
+                </td>
+                <td className="px-4 py-2 text-right text-slate-500">
+                  {l.cantidad > 0 ? (l.coste_linea / l.cantidad * (l.unidad === "kg" ? 1 : l.unidad === "g" ? 1000 : l.unidad === "litro" ? 1 : 1)).toFixed(2) : "—"}
+                </td>
+                <td className="px-4 py-2 text-right font-medium">{l.coste_linea.toFixed(2)} CHF</td>
+              </tr>
+            ))}
+          </tbody>
+          <tfoot>
+            <tr className="bg-slate-50 font-semibold">
+              <td className="px-4 py-2" colSpan={4}>Total</td>
+              <td className="px-4 py-2 text-right">{receta.coste_total.toFixed(2)} CHF</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      {receta.notas && (
+        <div className="bg-white border border-slate-200 rounded-lg p-4">
+          <h3 className="text-sm font-semibold mb-1">Notas</h3>
+          <p className="text-sm text-slate-600 whitespace-pre-wrap">{receta.notas}</p>
+        </div>
+      )}
+    </div>
+  );
+}
