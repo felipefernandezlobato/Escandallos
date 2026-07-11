@@ -12,8 +12,7 @@ venv/
 .venv/
 env/
 
-# SQLite
-*.db
+# SQLite journals (not the DB itself — we track it for data snapshots)
 *.db-journal
 *.db-wal
 *.db-shm
