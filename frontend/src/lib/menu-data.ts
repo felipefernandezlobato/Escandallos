@@ -12,6 +12,41 @@ export interface MenuSection {
   items: MenuItem[];
 }
 
+export function getMultiColor(multi: number | null, section: string): string {
+  if (multi === null) return "text-slate-400";
+
+  const s = section.toUpperCase();
+
+  if (s === "COFFEE" || s === "NOT COFFEE") {
+    if (multi >= 12) return "text-green-600 font-medium";
+    if (multi >= 8) return "text-orange-500";
+    return "text-red-600 font-medium";
+  }
+
+  if (s === "SWEET") {
+    if (multi >= 9) return "text-green-600 font-medium";
+    if (multi >= 4) return "text-orange-500";
+    return "text-red-600 font-medium";
+  }
+
+  if (s === "BOWLS" || s === "TOASTS" || s === "SANDWICHES" || s === "LUNCH" || s === "SNACKS") {
+    if (multi >= 8) return "text-green-600 font-medium";
+    if (multi >= 5) return "text-orange-500";
+    return "text-red-600 font-medium";
+  }
+
+  if (s === "DRINKS" || s === "WINE" || s === "BEER") {
+    if (multi >= 4) return "text-green-600 font-medium";
+    if (multi >= 3.5) return "text-orange-500";
+    return "text-red-600 font-medium";
+  }
+
+  // Default (cocktails, etc.)
+  if (multi >= 5) return "text-green-600 font-medium";
+  if (multi >= 3.5) return "text-orange-500";
+  return "text-red-600 font-medium";
+}
+
 export const MENU: MenuSection[] = [
   {
     title: "COFFEE",

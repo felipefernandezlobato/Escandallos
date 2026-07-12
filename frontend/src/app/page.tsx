@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api";
-import { MENU } from "@/lib/menu-data";
+import { MENU, getMultiColor } from "@/lib/menu-data";
 import type { Receta } from "@/lib/types";
 import Link from "next/link";
 
@@ -147,13 +147,7 @@ export default function Dashboard() {
                 </thead>
                 <tbody>
                   {sectionItems.map((item, i) => {
-                    let multiColor = "text-slate-300";
-                    if (item.multi !== null) {
-                      if (item.multi >= 8) multiColor = "text-green-600 font-medium";
-                      else if (item.multi >= 5) multiColor = "text-green-500";
-                      else if (item.multi >= 3) multiColor = "text-yellow-600";
-                      else multiColor = "text-red-600 font-medium";
-                    }
+                    const multiColor = item.multi !== null ? getMultiColor(item.multi, section.title) : "text-slate-300";
                     return (
                       <tr key={i} className="border-b border-slate-50 hover:bg-slate-50">
                         <td className="px-3 py-1">

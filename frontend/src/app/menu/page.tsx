@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api";
-import { MENU } from "@/lib/menu-data";
+import { MENU, getMultiColor } from "@/lib/menu-data";
 import type { Receta } from "@/lib/types";
 import Link from "next/link";
 
@@ -80,13 +80,7 @@ export default function MenuPage() {
                   const pvp = item.pvp;
                   const multi = coste !== undefined && pvp && coste > 0 ? pvp / coste : null;
 
-                  const multiColor = (m: number | null) => {
-                    if (m === null) return "text-slate-400";
-                    if (m >= 8) return "text-green-600 font-medium";
-                    if (m >= 5) return "text-green-500";
-                    if (m >= 3) return "text-yellow-600";
-                    return "text-red-600 font-medium";
-                  };
+                  const multiColor = (m: number | null) => getMultiColor(m, section.title);
 
                   if (isWine) {
                     const bottleRecipe = item.recipeNameBottle ? recipeMap[item.recipeNameBottle] : undefined;
