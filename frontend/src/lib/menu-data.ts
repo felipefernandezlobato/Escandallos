@@ -168,7 +168,7 @@ export const MENU: MenuSection[] = [
   {
     title: "DRINKS",
     items: [
-      { name: "Water Bottle BWT", pvp: 3.9 },
+      { name: "BWT Water (sin/con gas)", pvp: 3.9, recipeName: "BWT Water" },
       { name: "Evian 50cl Glass", pvp: 4.9, ingredientName: "Evian 50cl" },
       { name: "San Pellegrino 50cl", pvp: 4.9, ingredientName: "San Pellegrino 50cl" },
       { name: "Evian", pvp: 3.9 },
