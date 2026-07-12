@@ -155,7 +155,7 @@ const MENU: MenuSection[] = [
     ],
   },
   {
-    title: "WINE",
+    title: "WINE — Copa (150ml)",
     items: [
       { name: "Moscatel de Alejandría", pvp: 4.9, recipeName: "Moscatel de Alejandría Copa" },
       { name: "Garnacha Blanca Nativa", pvp: 4.9, recipeName: "Garnacha Blanca Nativa Copa" },
@@ -166,6 +166,19 @@ const MENU: MenuSection[] = [
       { name: "Garnacha Finca Bancales", pvp: 7.9, recipeName: "Finca Bancales Copa" },
       { name: "Brut Cariñena", pvp: 5.9, recipeName: "Brut Cariñena Copa" },
       { name: "Mimosa", pvp: 8.9, recipeName: "Mimosa" },
+    ],
+  },
+  {
+    title: "WINE — Botella (750ml)",
+    items: [
+      { name: "Moscatel de Alejandría", pvp: null, recipeName: "Moscatel de Alejandría Botella" },
+      { name: "Garnacha Blanca Nativa", pvp: null, recipeName: "Garnacha Blanca Nativa Botella" },
+      { name: "Chardonnay", pvp: null, recipeName: "Chardonnay Botella" },
+      { name: "Garnacha Blanca Barrel-Fermented", pvp: null, recipeName: "Garnacha Blanca Barrel Fermented Botella" },
+      { name: "Tempranillo Rosé", pvp: null, recipeName: "Rosado Botella" },
+      { name: "Care Nouveau", pvp: null, recipeName: "Nouveau Botella" },
+      { name: "Garnacha Finca Bancales", pvp: null, recipeName: "Finca Bancales Botella" },
+      { name: "Brut Cariñena", pvp: null, recipeName: "Brut Cariñena Botella" },
     ],
   },
   {
