@@ -22,7 +22,7 @@ const MENU: MenuSection[] = [
     title: "COFFEE",
     items: [
       { name: "Espresso", pvp: 2.9, recipeName: "Espresso" },
-      { name: "Doppio", pvp: 3.9, recipeName: "Espresso" },
+      { name: "Doppio", pvp: 3.9, recipeName: "Doppio" },
       { name: "Americano", pvp: 4.9, recipeName: "Americano" },
       { name: "Batch Brü", pvp: 3.9, recipeName: "Batch Brü" },
       { name: "Pour-over", pvp: 7.9 },
