@@ -83,7 +83,6 @@ const MENU: MenuSection[] = [
     items: [
       { name: "Avo Toast", pvp: 15.9, recipeName: "Avo Toast" },
       { name: "Brü Toast", pvp: 16.9, recipeName: "Brü Toast" },
-      { name: "Cherry Tomato Toast", pvp: 17.9, recipeName: "Cherry Toast" },
       { name: "Salmon Toast", pvp: 19.9, recipeName: "Salmon Toast" },
       { name: "Benedict Toast", pvp: 21.9, recipeName: "Benedict Toast" },
       { name: "Pancakes Savory", pvp: 22.9, recipeName: "Pancakes Savory" },
