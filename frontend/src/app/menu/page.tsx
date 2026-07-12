@@ -54,19 +54,19 @@ export default function MenuPage() {
                   <th className="px-4 py-2 font-medium">Item</th>
                   {isWine ? (
                     <>
-                      <th className="px-4 py-2 font-medium text-right w-16">Copa</th>
-                      <th className="px-4 py-2 font-medium text-right w-16">Botella</th>
-                      <th className="px-4 py-2 font-medium text-right w-16">PVP Copa</th>
-                      <th className="px-4 py-2 font-medium text-right w-16">PVP Bot.</th>
-                      <th className="px-4 py-2 font-medium text-right w-14">x Copa</th>
-                      <th className="px-4 py-2 font-medium text-right w-14">x Bot.</th>
+                      <th className="px-4 py-2 font-medium text-right w-20">Copa</th>
+                      <th className="px-4 py-2 font-medium text-right w-20">Botella</th>
+                      <th className="px-4 py-2 font-medium text-right w-20">PVP Copa</th>
+                      <th className="px-4 py-2 font-medium text-right w-20">PVP Bot.</th>
+                      <th className="px-4 py-2 font-medium text-right w-20">x Copa</th>
+                      <th className="px-4 py-2 font-medium text-right w-20">x Bot.</th>
                     </>
                   ) : (
                     <>
-                      <th className="px-4 py-2 font-medium text-right w-24">Coste</th>
-                      <th className="px-4 py-2 font-medium text-right w-24">PVP</th>
-                      <th className="px-4 py-2 font-medium text-right w-24">Margen</th>
-                      <th className="px-4 py-2 font-medium text-right w-16">x</th>
+                      <th className="px-4 py-2 font-medium text-right w-20">Coste</th>
+                      <th className="px-4 py-2 font-medium text-right w-20">PVP</th>
+                      <th className="px-4 py-2 font-medium text-right w-20">Margen</th>
+                      <th className="px-4 py-2 font-medium text-right w-20">x</th>
                     </>
                   )}
                 </tr>
@@ -95,12 +95,12 @@ export default function MenuPage() {
                             <Link href={`/recetas/${recipeId}`} className="text-blue-600 hover:underline">{item.name}</Link>
                           ) : item.name}
                         </td>
-                        <td className="px-4 py-1.5 text-right font-mono text-xs">{coste !== undefined ? coste.toFixed(2) : "—"}</td>
-                        <td className="px-4 py-1.5 text-right font-mono text-xs">{costeBottle !== undefined ? costeBottle.toFixed(2) : "—"}</td>
-                        <td className="px-4 py-1.5 text-right">{pvp ? pvp.toFixed(1) : "—"}</td>
-                        <td className="px-4 py-1.5 text-right">{pvpBottle ? pvpBottle.toFixed(1) : "—"}</td>
-                        <td className={`px-4 py-1.5 text-right font-mono ${multiColor(multi)}`}>{multi !== null ? `x${multi.toFixed(1)}` : "—"}</td>
-                        <td className={`px-4 py-1.5 text-right font-mono ${multiColor(multiBottle)}`}>{multiBottle !== null ? `x${multiBottle.toFixed(1)}` : "—"}</td>
+                        <td className="px-4 py-1.5 text-right text-sm">{coste !== undefined ? coste.toFixed(2) : "—"}</td>
+                        <td className="px-4 py-1.5 text-right text-sm">{costeBottle !== undefined ? costeBottle.toFixed(2) : "—"}</td>
+                        <td className="px-4 py-1.5 text-right text-sm">{pvp ? pvp.toFixed(1) : "—"}</td>
+                        <td className="px-4 py-1.5 text-right text-sm">{pvpBottle ? pvpBottle.toFixed(1) : "—"}</td>
+                        <td className={`px-4 py-1.5 text-right text-sm ${multiColor(multi)}`}>{multi !== null ? `x${multi.toFixed(1)}` : "—"}</td>
+                        <td className={`px-4 py-1.5 text-right text-sm ${multiColor(multiBottle)}`}>{multiBottle !== null ? `x${multiBottle.toFixed(1)}` : "—"}</td>
                       </tr>
                     );
                   }
@@ -119,16 +119,16 @@ export default function MenuPage() {
                           item.name
                         )}
                       </td>
-                      <td className="px-4 py-1.5 text-right font-mono text-xs">
+                      <td className="px-4 py-1.5 text-right text-sm">
                         {coste !== undefined ? coste.toFixed(2) : "—"}
                       </td>
-                      <td className="px-4 py-1.5 text-right">
+                      <td className="px-4 py-1.5 text-right text-sm">
                         {pvp ? pvp.toFixed(2) : "—"}
                       </td>
-                      <td className="px-4 py-1.5 text-right font-mono text-xs">
+                      <td className="px-4 py-1.5 text-right text-sm">
                         {coste !== undefined && pvp ? (pvp - coste).toFixed(2) : "—"}
                       </td>
-                      <td className={`px-4 py-1.5 text-right font-mono ${multiColor(multi)}`}>
+                      <td className={`px-4 py-1.5 text-right text-sm ${multiColor(multi)}`}>
                         {multi !== null ? `x${multi.toFixed(1)}` : "—"}
                       </td>
                     </tr>
