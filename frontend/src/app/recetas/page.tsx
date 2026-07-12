@@ -78,48 +78,78 @@ export default function RecetasPage() {
         </label>
       </div>
 
-      {/* Recipe cards */}
+      {/* Recipe sections by category */}
       {loading ? (
         <p className="text-slate-500 text-center py-10">Cargando...</p>
       ) : recetas.length === 0 ? (
         <p className="text-slate-500 text-center py-10">No hay recetas. Crea una para empezar.</p>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {recetas.map((r) => (
-            <Link
-              key={r.id}
-              href={`/recetas/${r.id}`}
-              className="bg-white border border-slate-200 rounded-lg p-4 hover:shadow-md transition-shadow"
-            >
-              <div className="flex items-start justify-between mb-2">
-                <h3 className="font-semibold">{r.nombre}</h3>
-                {r.precio_venta && r.coste_por_porcion > 0 ? (
-                  <span className={`text-sm font-mono font-medium ${
-                    r.precio_venta / r.coste_por_porcion >= 8 ? "text-green-600" :
-                    r.precio_venta / r.coste_por_porcion >= 5 ? "text-orange-500" :
-                    "text-red-600"
-                  }`}>
-                    x{(r.precio_venta / r.coste_por_porcion).toFixed(1)}
-                  </span>
-                ) : (
-                  <span className="text-xs text-slate-400">—</span>
-                )}
-              </div>
-              <div className="text-xs text-slate-500 space-y-1">
-                <p>Categoría: {r.categoria_nombre}</p>
-                <p>Coste/{r.unidad_rendimiento || "ración"}: <span className="font-medium text-slate-700">{r.coste_por_porcion.toFixed(2)} CHF</span></p>
-                {r.precio_venta && (
-                  <p>Precio venta: <span className="font-medium text-slate-700">{r.precio_venta.toFixed(2)} CHF</span></p>
-                )}
-                <p>Porciones/lote: {r.porciones_por_lote}</p>
-              </div>
-              {r.es_subreceta && (
-                <span className="inline-block mt-2 px-2 py-0.5 rounded bg-purple-100 text-purple-700 text-xs">
-                  Sub-receta
-                </span>
-              )}
-            </Link>
-          ))}
+        <div className="space-y-6">
+          {categorias
+            .filter((cat) => recetas.some((r) => r.categoria_nombre === cat.nombre))
+            .map((cat) => {
+              const catRecetas = recetas.filter((r) => r.categoria_nombre === cat.nombre);
+              return (
+                <section key={cat.id}>
+                  <h2 className="text-lg font-bold bg-slate-800 text-white px-4 py-2 rounded-t-lg">
+                    {cat.nombre} <span className="text-slate-400 font-normal text-sm">({catRecetas.length})</span>
+                  </h2>
+                  <div className="bg-white border border-slate-200 rounded-b-lg overflow-hidden">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="bg-slate-50 text-left text-slate-500 border-b border-slate-200">
+                          <th className="px-4 py-2 font-medium">Receta</th>
+                          <th className="px-4 py-2 font-medium text-right w-24">Coste</th>
+                          <th className="px-4 py-2 font-medium text-right w-24">PVP</th>
+                          <th className="px-4 py-2 font-medium text-right w-20">Margen</th>
+                          <th className="px-4 py-2 font-medium text-right w-16">x</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {catRecetas.map((r) => {
+                          const multi = r.precio_venta && r.coste_por_porcion > 0
+                            ? r.precio_venta / r.coste_por_porcion
+                            : null;
+                          const multiColor = multi === null ? "text-slate-400"
+                            : multi >= 8 ? "text-green-600 font-medium"
+                            : multi >= 5 ? "text-orange-500"
+                            : "text-red-600 font-medium";
+
+                          return (
+                            <tr key={r.id} className="border-b border-slate-100 hover:bg-slate-50">
+                              <td className="px-4 py-1.5">
+                                <Link href={`/recetas/${r.id}`} className="text-blue-600 hover:underline">
+                                  {r.nombre}
+                                </Link>
+                                {r.es_subreceta && (
+                                  <span className="ml-2 px-1.5 py-0.5 rounded bg-purple-100 text-purple-700 text-xs">
+                                    sub
+                                  </span>
+                                )}
+                              </td>
+                              <td className="px-4 py-1.5 text-right font-mono text-xs">
+                                {r.coste_por_porcion.toFixed(2)}
+                              </td>
+                              <td className="px-4 py-1.5 text-right">
+                                {r.precio_venta ? r.precio_venta.toFixed(2) : "—"}
+                              </td>
+                              <td className="px-4 py-1.5 text-right font-mono text-xs">
+                                {r.precio_venta && r.coste_por_porcion > 0
+                                  ? (r.precio_venta - r.coste_por_porcion).toFixed(2)
+                                  : "—"}
+                              </td>
+                              <td className={`px-4 py-1.5 text-right font-mono ${multiColor}`}>
+                                {multi !== null ? `x${multi.toFixed(1)}` : "—"}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </section>
+              );
+            })}
         </div>
       )}
     </div>
