@@ -35,7 +35,7 @@ export default function ProveedoresPage() {
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">Comparador de Proveedores</h1>
       <p className="text-sm text-slate-500">
-        {data.length} ingredientes con precios de proveedores. El más barato aparece en verde.
+        {data.filter(d => d.proveedores.length > 1).length} ingredientes con múltiples proveedores. El más barato tiene borde verde.
       </p>
 
       <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
@@ -50,7 +50,7 @@ export default function ProveedoresPage() {
             </tr>
           </thead>
           <tbody>
-            {data.map((item) => {
+            {data.filter(d => d.proveedores.length > 1).map((item) => {
               const best = item.proveedores[0];
               const worst = item.proveedores[item.proveedores.length - 1];
               const ahorro =
