@@ -54,12 +54,12 @@ export default function MenuPage() {
                   <th className="px-4 py-2 font-medium">Item</th>
                   {isWine ? (
                     <>
-                      <th className="px-4 py-2 font-medium text-right w-20">Copa</th>
-                      <th className="px-4 py-2 font-medium text-right w-20">PVP</th>
-                      <th className="px-4 py-2 font-medium text-right w-14">x</th>
-                      <th className="px-4 py-2 font-medium text-right w-20">Botella</th>
-                      <th className="px-4 py-2 font-medium text-right w-20">PVP</th>
-                      <th className="px-4 py-2 font-medium text-right w-14">x</th>
+                      <th className="px-4 py-2 font-medium text-right w-16">Copa</th>
+                      <th className="px-4 py-2 font-medium text-right w-16">Botella</th>
+                      <th className="px-4 py-2 font-medium text-right w-16">PVP Copa</th>
+                      <th className="px-4 py-2 font-medium text-right w-16">PVP Bot.</th>
+                      <th className="px-4 py-2 font-medium text-right w-14">x Copa</th>
+                      <th className="px-4 py-2 font-medium text-right w-14">x Bot.</th>
                     </>
                   ) : (
                     <>
@@ -96,10 +96,10 @@ export default function MenuPage() {
                           ) : item.name}
                         </td>
                         <td className="px-4 py-1.5 text-right font-mono text-xs">{coste !== undefined ? coste.toFixed(2) : "—"}</td>
-                        <td className="px-4 py-1.5 text-right">{pvp ? pvp.toFixed(1) : "—"}</td>
-                        <td className={`px-4 py-1.5 text-right font-mono ${multiColor(multi)}`}>{multi !== null ? `x${multi.toFixed(1)}` : "—"}</td>
                         <td className="px-4 py-1.5 text-right font-mono text-xs">{costeBottle !== undefined ? costeBottle.toFixed(2) : "—"}</td>
+                        <td className="px-4 py-1.5 text-right">{pvp ? pvp.toFixed(1) : "—"}</td>
                         <td className="px-4 py-1.5 text-right">{pvpBottle ? pvpBottle.toFixed(1) : "—"}</td>
+                        <td className={`px-4 py-1.5 text-right font-mono ${multiColor(multi)}`}>{multi !== null ? `x${multi.toFixed(1)}` : "—"}</td>
                         <td className={`px-4 py-1.5 text-right font-mono ${multiColor(multiBottle)}`}>{multiBottle !== null ? `x${multiBottle.toFixed(1)}` : "—"}</td>
                       </tr>
                     );
