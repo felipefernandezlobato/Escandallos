@@ -246,7 +246,6 @@ export default function MenuPage() {
                   <th className="px-4 py-2 font-medium">Item</th>
                   <th className="px-4 py-2 font-medium text-right w-24">Coste</th>
                   <th className="px-4 py-2 font-medium text-right w-24">PVP</th>
-                  <th className="px-4 py-2 font-medium text-right w-24">Margen</th>
                   <th className="px-4 py-2 font-medium text-right w-16">x</th>
                 </tr>
               </thead>
@@ -256,17 +255,14 @@ export default function MenuPage() {
                   const coste = recipe?.coste;
                   const recipeId = recipe?.id;
                   const pvp = item.pvp;
-                  const margen =
-                    coste !== undefined && pvp
-                      ? ((pvp - coste) / pvp) * 100
-                      : null;
+                  const multi = coste !== undefined && pvp && coste > 0 ? pvp / coste : null;
 
-                  let margenColor = "text-slate-400";
-                  if (margen !== null) {
-                    if (margen >= 80) margenColor = "text-green-600 font-medium";
-                    else if (margen >= 70) margenColor = "text-green-600";
-                    else if (margen >= 60) margenColor = "text-yellow-600";
-                    else margenColor = "text-red-600 font-medium";
+                  let multiColor = "text-slate-400";
+                  if (multi !== null) {
+                    if (multi >= 8) multiColor = "text-green-600 font-medium";
+                    else if (multi >= 5) multiColor = "text-green-500";
+                    else if (multi >= 3) multiColor = "text-yellow-600";
+                    else multiColor = "text-red-600 font-medium";
                   }
 
                   return (
@@ -284,20 +280,13 @@ export default function MenuPage() {
                         )}
                       </td>
                       <td className="px-4 py-1.5 text-right font-mono text-xs">
-                        {coste !== undefined
-                          ? `${coste.toFixed(2)}`
-                          : "—"}
+                        {coste !== undefined ? coste.toFixed(2) : "—"}
                       </td>
                       <td className="px-4 py-1.5 text-right">
-                        {pvp ? `${pvp.toFixed(2)}` : "—"}
+                        {pvp ? pvp.toFixed(2) : "—"}
                       </td>
-                      <td className={`px-4 py-1.5 text-right ${margenColor}`}>
-                        {margen !== null ? `${margen.toFixed(0)}%` : "—"}
-                      </td>
-                      <td className="px-4 py-1.5 text-right font-mono text-xs text-slate-500">
-                        {coste !== undefined && pvp && coste > 0
-                          ? `${(pvp / coste).toFixed(1)}`
-                          : "—"}
+                      <td className={`px-4 py-1.5 text-right font-mono ${multiColor}`}>
+                        {multi !== null ? `x${multi.toFixed(1)}` : "—"}
                       </td>
                     </tr>
                   );

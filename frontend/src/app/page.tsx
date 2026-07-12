@@ -172,8 +172,8 @@ export default function Dashboard() {
   // Compute summary stats
   let totalItems = 0;
   let withCost = 0;
-  let lowMargin = 0;
-  const alerts: { name: string; margen: number; section: string }[] = [];
+  let lowMulti = 0;
+  const alerts: { name: string; multi: number; section: string }[] = [];
 
   for (const section of MENU) {
     for (const item of section.items) {
@@ -181,11 +181,11 @@ export default function Dashboard() {
       const coste = item.recipeName ? recipeMap[item.recipeName]?.coste : undefined;
       if (coste !== undefined) {
         withCost++;
-        if (item.pvp) {
-          const m = ((item.pvp - coste) / item.pvp) * 100;
-          if (m < 70) {
-            lowMargin++;
-            alerts.push({ name: item.name, margen: m, section: section.title });
+        if (item.pvp && coste > 0) {
+          const m = item.pvp / coste;
+          if (m < 5) {
+            lowMulti++;
+            alerts.push({ name: item.name, multi: m, section: section.title });
           }
         }
       }
@@ -211,9 +211,9 @@ export default function Dashboard() {
           <p className="text-2xl font-bold text-slate-400">{totalItems - withCost}</p>
         </div>
         <div className="bg-white border border-slate-200 rounded-lg p-4">
-          <p className="text-xs text-slate-500">Margen &lt; 70%</p>
-          <p className={`text-2xl font-bold ${lowMargin > 0 ? "text-red-600" : "text-green-600"}`}>
-            {lowMargin}
+          <p className="text-xs text-slate-500">Multi &lt; x5</p>
+          <p className={`text-2xl font-bold ${lowMulti > 0 ? "text-red-600" : "text-green-600"}`}>
+            {lowMulti}
           </p>
         </div>
       </div>
@@ -221,22 +221,22 @@ export default function Dashboard() {
       {/* Alerts */}
       {alerts.length > 0 && (
         <section>
-          <h2 className="text-lg font-semibold mb-3">Alertas de margen</h2>
+          <h2 className="text-lg font-semibold mb-3">Multiplicador bajo (&lt; x5)</h2>
           <div className="space-y-2">
             {alerts
-              .sort((a, b) => a.margen - b.margen)
+              .sort((a, b) => a.multi - b.multi)
               .map((a, i) => (
                 <div
                   key={i}
                   className={`rounded-lg p-3 text-sm border ${
-                    a.margen < 60
+                    a.multi < 3
                       ? "bg-red-50 border-red-200 text-red-700"
                       : "bg-yellow-50 border-yellow-200 text-yellow-700"
                   }`}
                 >
                   <span className="font-medium">{a.name}</span>
                   <span className="text-xs ml-2">({a.section})</span>
-                  <span className="float-right font-mono">{a.margen.toFixed(1)}%</span>
+                  <span className="float-right font-mono">x{a.multi.toFixed(1)}</span>
                 </div>
               ))}
           </div>
@@ -274,18 +274,17 @@ export default function Dashboard() {
                     <th className="px-3 py-1.5 font-medium">Item</th>
                     <th className="px-3 py-1.5 font-medium text-right">Coste</th>
                     <th className="px-3 py-1.5 font-medium text-right">PVP</th>
-                    <th className="px-3 py-1.5 font-medium text-right">Margen</th>
                     <th className="px-3 py-1.5 font-medium text-right">x</th>
                   </tr>
                 </thead>
                 <tbody>
                   {sectionItems.map((item, i) => {
-                    let margenColor = "text-slate-300";
-                    if (item.margen !== null) {
-                      if (item.margen >= 80) margenColor = "text-green-600";
-                      else if (item.margen >= 70) margenColor = "text-green-500";
-                      else if (item.margen >= 60) margenColor = "text-yellow-600";
-                      else margenColor = "text-red-600 font-medium";
+                    let multiColor = "text-slate-300";
+                    if (item.multi !== null) {
+                      if (item.multi >= 8) multiColor = "text-green-600 font-medium";
+                      else if (item.multi >= 5) multiColor = "text-green-500";
+                      else if (item.multi >= 3) multiColor = "text-yellow-600";
+                      else multiColor = "text-red-600 font-medium";
                     }
                     return (
                       <tr key={i} className="border-b border-slate-50 hover:bg-slate-50">
@@ -302,11 +301,8 @@ export default function Dashboard() {
                         <td className="px-3 py-1 text-right">
                           {item.pvp ? item.pvp.toFixed(2) : "—"}
                         </td>
-                        <td className={`px-3 py-1 text-right ${margenColor}`}>
-                          {item.margen !== null ? `${item.margen.toFixed(0)}%` : "—"}
-                        </td>
-                        <td className="px-3 py-1 text-right font-mono text-xs text-slate-500">
-                          {item.multi !== null ? `${item.multi.toFixed(1)}` : "—"}
+                        <td className={`px-3 py-1 text-right font-mono ${multiColor}`}>
+                          {item.multi !== null ? `x${item.multi.toFixed(1)}` : "—"}
                         </td>
                       </tr>
                     );
