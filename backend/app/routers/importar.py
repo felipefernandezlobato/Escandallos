@@ -1,7 +1,9 @@
+import io
 from datetime import date
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException
+import pdfplumber
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -16,6 +18,20 @@ from app.schemas import (
 from app.services.costes import recetas_afectadas_por_ingrediente, coste_total_receta, coste_por_racion
 
 router = APIRouter(prefix="/api/importar", tags=["importar"])
+
+
+@router.post("/pdf")
+async def extraer_pdf(file: UploadFile = File(...)):
+    if not file.filename or not file.filename.lower().endswith(".pdf"):
+        raise HTTPException(400, "Solo se aceptan ficheros PDF")
+    content = await file.read()
+    text_pages = []
+    with pdfplumber.open(io.BytesIO(content)) as pdf:
+        for page in pdf.pages:
+            text = page.extract_text()
+            if text:
+                text_pages.append(text)
+    return {"texto": "\n\n".join(text_pages), "paginas": len(text_pages)}
 
 
 def _find_match(nombre: str, db: Session) -> Optional[Ingrediente]:

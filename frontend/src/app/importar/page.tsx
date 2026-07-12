@@ -18,11 +18,39 @@ const EJEMPLO_JSON = `{
   ]
 }`;
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
 export default function ImportarPage() {
   const [jsonInput, setJsonInput] = useState("");
+  const [pdfTexto, setPdfTexto] = useState("");
   const [preview, setPreview] = useState<ImportarPreview | null>(null);
   const [resultado, setResultado] = useState<{ actualizados: number; creados: number } | null>(null);
   const [error, setError] = useState("");
+  const [uploading, setUploading] = useState(false);
+
+  const handlePdfUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    setError("");
+    setPdfTexto("");
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch(`${API_BASE}/api/importar/pdf`, {
+        method: "POST",
+        body: formData,
+      });
+      if (!res.ok) throw new Error(await res.text());
+      const data = await res.json();
+      setPdfTexto(data.texto);
+    } catch (err: any) {
+      setError(err.message || "Error al procesar PDF");
+    } finally {
+      setUploading(false);
+      e.target.value = "";
+    }
+  };
 
   const handlePreview = async () => {
     setError("");
@@ -68,19 +96,48 @@ export default function ImportarPage() {
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">Importar Datos de Factura</h1>
 
+      {/* Step 1: PDF Upload */}
       <div className="bg-white border border-slate-200 rounded-lg p-4 space-y-4">
-        <div>
-          <p className="text-sm text-slate-600 mb-2">
-            Pega aquí el JSON extraído de tu factura con Claude. Usa el prompt template que aparece abajo.
-          </p>
-          <textarea
-            value={jsonInput}
-            onChange={(e) => setJsonInput(e.target.value)}
-            placeholder="Pega el JSON aquí..."
-            className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm font-mono"
-            rows={10}
-          />
+        <h3 className="font-semibold">1. Sube la factura (PDF)</h3>
+        <div className="flex gap-3 items-center">
+          <label className="bg-slate-800 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-700 cursor-pointer transition-colors">
+            {uploading ? "Procesando..." : "Subir PDF"}
+            <input type="file" accept=".pdf" className="hidden" onChange={handlePdfUpload} disabled={uploading} />
+          </label>
+          <span className="text-xs text-slate-400">Se extrae el texto automáticamente</span>
         </div>
+
+        {pdfTexto && (
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <p className="text-xs text-slate-500">Texto extraído del PDF:</p>
+              <button
+                onClick={() => navigator.clipboard.writeText(pdfTexto)}
+                className="text-xs text-blue-600 hover:underline"
+              >
+                Copiar texto
+              </button>
+            </div>
+            <pre className="bg-slate-50 border border-slate-200 rounded-lg p-3 text-xs font-mono whitespace-pre-wrap max-h-60 overflow-y-auto">
+              {pdfTexto}
+            </pre>
+          </div>
+        )}
+      </div>
+
+      {/* Step 2: JSON */}
+      <div className="bg-white border border-slate-200 rounded-lg p-4 space-y-4">
+        <h3 className="font-semibold">2. Pega el JSON de Claude</h3>
+        <p className="text-xs text-slate-500">
+          Copia el texto del PDF + el prompt template de abajo a Claude. Pega el JSON resultante aquí.
+        </p>
+        <textarea
+          value={jsonInput}
+          onChange={(e) => setJsonInput(e.target.value)}
+          placeholder="Pega el JSON aquí..."
+          className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm font-mono"
+          rows={8}
+        />
         <div className="flex gap-3">
           <button
             onClick={handlePreview}
