@@ -10,6 +10,7 @@ export default function IngredientesPage() {
   const [ingredientes, setIngredientes] = useState<Ingrediente[]>([]);
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [filtroCategoria, setFiltroCategoria] = useState("");
+  const [filtroProveedor, setFiltroProveedor] = useState("");
   const [buscar, setBuscar] = useState("");
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -33,7 +34,7 @@ export default function IngredientesPage() {
     setLoading(true);
     Promise.all([
       apiFetch<Ingrediente[]>(
-        `/api/ingredientes?${filtroCategoria ? `categoria_id=${filtroCategoria}&` : ""}${buscar ? `buscar=${encodeURIComponent(buscar)}` : ""}`
+        `/api/ingredientes?${buscar ? `buscar=${encodeURIComponent(buscar)}` : ""}`
       ),
       apiFetch<Categoria[]>("/api/categorias?tipo=ingrediente"),
     ])
@@ -49,7 +50,23 @@ export default function IngredientesPage() {
 
   useEffect(() => {
     fetchData();
-  }, [filtroCategoria, buscar]);
+  }, [buscar]);
+
+  // Derive unique proveedores from the full ingredient list
+  const proveedores = Array.from(
+    new Set(
+      ingredientes
+        .map((i) => i.proveedor)
+        .filter((p): p is string => !!p)
+    )
+  ).sort((a, b) => a.localeCompare(b, "es"));
+
+  // Apply client-side filters for categoría and proveedor
+  const ingredientesFiltrados = ingredientes.filter((ing) => {
+    if (filtroCategoria && String(ing.categoria_id) !== filtroCategoria) return false;
+    if (filtroProveedor && ing.proveedor !== filtroProveedor) return false;
+    return true;
+  });
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -123,6 +140,18 @@ export default function IngredientesPage() {
           {categorias.map((c) => (
             <option key={c.id} value={c.id}>
               {c.nombre}
+            </option>
+          ))}
+        </select>
+        <select
+          value={filtroProveedor}
+          onChange={(e) => setFiltroProveedor(e.target.value)}
+          className="border border-slate-300 rounded-lg px-3 py-2 text-sm"
+        >
+          <option value="">Todos los proveedores</option>
+          {proveedores.map((p) => (
+            <option key={p} value={p}>
+              {p}
             </option>
           ))}
         </select>
@@ -238,8 +267,12 @@ export default function IngredientesPage() {
       {/* Table */}
       {loading ? (
         <p className="text-slate-500 text-center py-10">Cargando...</p>
-      ) : ingredientes.length === 0 ? (
-        <p className="text-slate-500 text-center py-10">No hay ingredientes. Crea uno para empezar.</p>
+      ) : ingredientesFiltrados.length === 0 ? (
+        <p className="text-slate-500 text-center py-10">
+          {ingredientes.length === 0
+            ? "No hay ingredientes. Crea uno para empezar."
+            : "No hay ingredientes que coincidan con los filtros."}
+        </p>
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
@@ -256,7 +289,7 @@ export default function IngredientesPage() {
               </tr>
             </thead>
             <tbody>
-              {ingredientes.map((ing) => (
+              {ingredientesFiltrados.map((ing) => (
                 <tr key={ing.id} className="border-b border-slate-100 hover:bg-slate-50">
                   <td className="py-2 font-medium">{ing.nombre}</td>
                   <td className="py-2 text-slate-500">{ing.categoria_nombre}</td>
