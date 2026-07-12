@@ -195,10 +195,14 @@ export default function ConfiguracionPage() {
                       if (!file) return;
                       const formData = new FormData();
                       formData.append("file", file);
-                      await fetch(`${API_BASE}/api/backup/restaurar`, {
+                      const res = await fetch(`${API_BASE}/api/backup/restaurar`, {
                         method: "POST",
                         body: formData,
                       });
+                      if (!res.ok) {
+                        alert("Error al restaurar backup");
+                        return;
+                      }
                       alert("Backup restaurado. Recarga la página.");
                       window.location.reload();
                     }}

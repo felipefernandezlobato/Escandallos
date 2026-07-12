@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.models import Categoria
+from app.models import Categoria, Ingrediente, Receta
 from app.schemas import CategoriaCreate, CategoriaOut, CategoriaUpdate
 
 router = APIRouter(prefix="/api/categorias", tags=["categorias"])
@@ -57,6 +57,16 @@ def eliminar_categoria(categoria_id: int, db: Session = Depends(get_db)):
     cat = db.get(Categoria, categoria_id)
     if not cat:
         raise HTTPException(404, "Categoría no encontrada")
+    tiene_ingredientes = (
+        db.query(Ingrediente).filter(Ingrediente.categoria_id == categoria_id).first()
+    )
+    tiene_recetas = (
+        db.query(Receta).filter(Receta.categoria_id == categoria_id).first()
+    )
+    if tiene_ingredientes or tiene_recetas:
+        raise HTTPException(
+            400, "No se puede eliminar: hay ingredientes o recetas en esta categoría"
+        )
     db.delete(cat)
     db.commit()
     return {"ok": True}

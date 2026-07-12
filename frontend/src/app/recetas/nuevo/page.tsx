@@ -67,11 +67,15 @@ export default function NuevaRecetaPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const result = await apiFetch<any>("/api/recetas", {
-      method: "POST",
-      body: JSON.stringify(form),
-    });
-    router.push(`/recetas/${result.id}`);
+    try {
+      const result = await apiFetch<any>("/api/recetas", {
+        method: "POST",
+        body: JSON.stringify(form),
+      });
+      router.push(`/recetas/${result.id}`);
+    } catch (err) {
+      alert("Error al crear: " + (err as Error).message);
+    }
   };
 
   if (loading) return <p className="text-[#6B5E52] py-10 text-center">Cargando...</p>;

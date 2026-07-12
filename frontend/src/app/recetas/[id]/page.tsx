@@ -28,6 +28,7 @@ export default function RecetaDetailPage() {
     porciones_por_lote: 1,
     precio_venta: null as number | null,
     es_subreceta: false,
+    unidad_rendimiento: null as string | null,
     notas: "",
     lineas: [] as LineaRecetaInput[],
   });
@@ -59,6 +60,7 @@ export default function RecetaDetailPage() {
       porciones_por_lote: receta.porciones_por_lote,
       precio_venta: receta.precio_venta,
       es_subreceta: receta.es_subreceta,
+      unidad_rendimiento: receta.unidad_rendimiento || null,
       notas: receta.notas || "",
       lineas: receta.lineas.map((l) => ({
         ingrediente_id: l.ingrediente_id,
@@ -71,12 +73,16 @@ export default function RecetaDetailPage() {
   };
 
   const handleSave = async () => {
-    await apiFetch(`/api/recetas/${id}`, {
-      method: "PUT",
-      body: JSON.stringify(editForm),
-    });
-    setEditing(false);
-    fetchReceta();
+    try {
+      await apiFetch(`/api/recetas/${id}`, {
+        method: "PUT",
+        body: JSON.stringify(editForm),
+      });
+      setEditing(false);
+      fetchReceta();
+    } catch (err) {
+      alert("Error al guardar: " + (err as Error).message);
+    }
   };
 
   const handleDelete = async () => {
@@ -155,6 +161,17 @@ export default function RecetaDetailPage() {
               <input type="checkbox" checked={editForm.es_subreceta} onChange={(e) => setEditForm({ ...editForm, es_subreceta: e.target.checked })} />
               <label className="text-sm">Es sub-receta</label>
             </div>
+            {editForm.es_subreceta && (
+              <div>
+                <label className="block text-xs text-[#6B5E52] mb-1">Unidad de rendimiento</label>
+                <select value={editForm.unidad_rendimiento ?? ""} onChange={(e) => setEditForm({ ...editForm, unidad_rendimiento: e.target.value || null })} className="w-full border border-[#D4C4A8] rounded px-3 py-2 text-sm">
+                  <option value="">ración</option>
+                  <option value="kg">kg</option>
+                  <option value="litro">litro</option>
+                  <option value="unidad">unidad</option>
+                </select>
+              </div>
+            )}
           </div>
           <div>
             <label className="block text-xs text-[#6B5E52] mb-1">Notas</label>

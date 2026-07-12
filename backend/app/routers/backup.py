@@ -4,9 +4,10 @@ import shutil
 import tempfile
 from pathlib import Path
 
-from fastapi import APIRouter, Depends, File, UploadFile
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from fastapi.responses import FileResponse, StreamingResponse
 from sqlalchemy.orm import Session, joinedload
+from starlette.background import BackgroundTask
 
 from app.database import get_db
 from app.models import Ingrediente, LineaReceta, Receta
@@ -23,16 +24,22 @@ def descargar_backup():
         return {"error": "Base de datos no encontrada"}
     tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".db")
     shutil.copy2(DB_PATH, tmp.name)
+    tmp_path = tmp.name
+    tmp.close()
     return FileResponse(
-        tmp.name,
+        tmp_path,
         filename="escandallos_backup.db",
         media_type="application/octet-stream",
+        background=BackgroundTask(lambda: Path(tmp_path).unlink(missing_ok=True)),
     )
 
 
 @router.post("/backup/restaurar")
 async def restaurar_backup(file: UploadFile = File(...)):
     content = await file.read()
+    # Validate SQLite magic header (first 16 bytes)
+    if content[:16] != b"SQLite format 3\000":
+        raise HTTPException(400, "El archivo no es una base de datos SQLite válida")
     DB_PATH.parent.mkdir(parents=True, exist_ok=True)
     with open(DB_PATH, "wb") as f:
         f.write(content)

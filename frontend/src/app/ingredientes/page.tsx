@@ -92,12 +92,17 @@ export default function IngredientesPage() {
   const handlePriceUpdate = async (id: number) => {
     const price = parseFloat(editPriceValue);
     if (isNaN(price)) return;
-    await apiFetch(`/api/ingredientes/${id}`, {
-      method: "PUT",
-      body: JSON.stringify({ precio_compra: price }),
-    });
-    setEditingPrice(null);
-    fetchData();
+    try {
+      await apiFetch(`/api/ingredientes/${id}`, {
+        method: "PUT",
+        body: JSON.stringify({ precio_compra: price }),
+      });
+      fetchData();
+    } catch (err) {
+      alert("Error al actualizar precio: " + (err as Error).message);
+    } finally {
+      setEditingPrice(null);
+    }
   };
 
   const handleDelete = async (id: number) => {

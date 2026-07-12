@@ -35,10 +35,10 @@ class IngredienteBase(BaseModel):
     nombre: str
     categoria_id: int
     unidad_compra: str
-    cantidad_compra: float
+    cantidad_compra: float = Field(default=1, gt=0)
     precio_compra: float
     unidad_uso: str
-    merma_porcentaje: float = 0.0
+    merma_porcentaje: float = Field(default=0, ge=0, lt=100)
     proveedor: Optional[str] = None
     notas: Optional[str] = None
 
@@ -108,7 +108,7 @@ class LineaRecetaOut(LineaRecetaBase):
 class RecetaBase(BaseModel):
     nombre: str
     categoria_id: int
-    porciones_por_lote: float = 1
+    porciones_por_lote: float = Field(default=1, gt=0)
     precio_venta: Optional[float] = None
     es_subreceta: bool = False
     unidad_rendimiento: Optional[str] = None

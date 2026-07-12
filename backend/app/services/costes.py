@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import List
+from typing import List, Optional, Set
 
 from sqlalchemy.orm import Session
 
@@ -14,13 +14,20 @@ def coste_por_unidad_uso(ingrediente: Ingrediente) -> float:
         ingrediente.unidad_compra,
         ingrediente.unidad_uso,
     )
+    if cantidad_uso <= 0:
+        return 0.0
     factor_merma = 1 - (ingrediente.merma_porcentaje / 100)
     if factor_merma <= 0:
         raise ValueError(f"Merma no puede ser 100% o más para '{ingrediente.nombre}'")
     return (ingrediente.precio_compra / cantidad_uso) / factor_merma
 
 
-def coste_linea(linea: LineaReceta, db: Session) -> float:
+def coste_linea(
+    linea: LineaReceta, db: Session, visited: Optional[Set[int]] = None
+) -> float:
+    if visited is None:
+        visited = set()
+
     if linea.ingrediente_id is not None:
         ingrediente = linea.ingrediente_rel
         cpu = coste_por_unidad_uso(ingrediente)
@@ -29,17 +36,24 @@ def coste_linea(linea: LineaReceta, db: Session) -> float:
 
     if linea.subreceta_id is not None:
         sub = linea.subreceta_rel
+        if sub.id in visited:
+            return 0.0
         porciones = sub.porciones_por_lote if sub.porciones_por_lote > 0 else 1
-        coste_por_porcion = coste_total_receta(sub, db) / porciones
+        coste_por_porcion = coste_total_receta(sub, db, visited) / porciones
         return coste_por_porcion * linea.cantidad
 
     return 0.0
 
 
-def coste_total_receta(receta: Receta, db: Session) -> float:
+def coste_total_receta(
+    receta: Receta, db: Session, visited: Optional[Set[int]] = None
+) -> float:
+    if visited is None:
+        visited = set()
+    visited = visited | {receta.id}
     total = 0.0
     for linea in receta.lineas:
-        total += coste_linea(linea, db)
+        total += coste_linea(linea, db, visited)
     return total
 
 
