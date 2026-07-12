@@ -9,6 +9,7 @@ interface MenuItem {
   name: string;
   pvp: number | null;
   recipeName?: string;
+  ingredientName?: string;
 }
 
 interface MenuSection {
@@ -140,19 +141,19 @@ const MENU: MenuSection[] = [
     title: "DRINKS",
     items: [
       { name: "Water Bottle BWT", pvp: 3.9 },
-      { name: "Evian 50cl Glass", pvp: 4.9 },
-      { name: "San Pellegrino 50cl", pvp: 4.9 },
+      { name: "Evian 50cl Glass", pvp: 4.9, ingredientName: "Evian 50cl" },
+      { name: "San Pellegrino 50cl", pvp: 4.9, ingredientName: "San Pellegrino 50cl" },
       { name: "Evian", pvp: 3.9 },
-      { name: "Coca Cola / Zero", pvp: 3.9 },
-      { name: "Vivi Kola / Zero", pvp: 4.9 },
-      { name: "Vivi Soda Zitrone", pvp: 5.9 },
-      { name: "Vivi Soda Apfelschorle", pvp: 5.9 },
-      { name: "Vivi Soda Mate", pvp: 5.9 },
-      { name: "LemonAID Blutorange", pvp: 5.9 },
-      { name: "LemonAID Maracuja", pvp: 5.9 },
-      { name: "LemonAID Limette", pvp: 5.9 },
-      { name: "LemonAID Ingwer", pvp: 5.9 },
-      { name: "ChariTea", pvp: 5.9 },
+      { name: "Coca Cola / Zero", pvp: 3.9, ingredientName: "Coca Cola" },
+      { name: "Vivi Kola / Zero", pvp: 4.9, ingredientName: "Vivi Kola" },
+      { name: "Vivi Soda Zitrone", pvp: 5.9, ingredientName: "Vivi Soda Zitrone" },
+      { name: "Vivi Soda Apfelschorle", pvp: 5.9, ingredientName: "Vivi Soda Apfelschorle" },
+      { name: "Vivi Soda Mate", pvp: 5.9, ingredientName: "Vivi Soda Mate" },
+      { name: "LemonAID Blutorange", pvp: 5.9, ingredientName: "LemonAID Blutorange" },
+      { name: "LemonAID Maracuja", pvp: 5.9, ingredientName: "LemonAID Maracuja" },
+      { name: "LemonAID Limette", pvp: 5.9, ingredientName: "LemonAID Limette" },
+      { name: "LemonAID Ingwer", pvp: 5.9, ingredientName: "LemonAID Ingwer" },
+      { name: "ChariTea", pvp: 5.9, ingredientName: "ChariTea" },
     ],
   },
   {
@@ -203,16 +204,25 @@ const MENU: MenuSection[] = [
 
 export default function MenuPage() {
   const [recipeMap, setRecipeMap] = useState<Record<string, { coste: number; id: number }>>({});
+  const [ingredientMap, setIngredientMap] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    apiFetch<Receta[]>("/api/recetas")
-      .then((recetas) => {
-        const map: Record<string, { coste: number; id: number }> = {};
+    Promise.all([
+      apiFetch<Receta[]>("/api/recetas"),
+      apiFetch<any[]>("/api/ingredientes"),
+    ])
+      .then(([recetas, ingredientes]) => {
+        const rMap: Record<string, { coste: number; id: number }> = {};
         for (const r of recetas) {
-          map[r.nombre] = { coste: r.coste_por_porcion, id: r.id };
+          rMap[r.nombre] = { coste: r.coste_por_porcion, id: r.id };
         }
-        setRecipeMap(map);
+        setRecipeMap(rMap);
+        const iMap: Record<string, number> = {};
+        for (const i of ingredientes) {
+          iMap[i.nombre] = i.precio_compra;
+        }
+        setIngredientMap(iMap);
       })
       .finally(() => setLoading(false));
   }, []);
@@ -244,7 +254,8 @@ export default function MenuPage() {
               <tbody>
                 {section.items.map((item, i) => {
                   const recipe = item.recipeName ? recipeMap[item.recipeName] : undefined;
-                  const coste = recipe?.coste;
+                  const ingCoste = item.ingredientName ? ingredientMap[item.ingredientName] : undefined;
+                  const coste = recipe?.coste ?? ingCoste;
                   const recipeId = recipe?.id;
                   const pvp = item.pvp;
                   const multi = coste !== undefined && pvp && coste > 0 ? pvp / coste : null;

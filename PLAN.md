@@ -433,7 +433,8 @@ escandallos/
 
 ## Backlog (v2+)
 
-- **Página de Menú completo** — Vista simplificada con solo: nombre del plato, coste, precio de venta. Para ver el menú de un vistazo sin detalles de escandallo
+- ~~**Página de Menú completo**~~ — HECHO
+- **Ajustar rendimiento Cold Brew** — Pesar exactamente cuánto rinde la receta (actualmente estimado en 3.5L)
 - **Simulador de impacto de precios** — "Si la leche sube a X, cuanto cambian los margenes?"
 - **Backups automaticos a la nube** — Copia diaria a Google Drive o Dropbox
 - **Fotos de platos** — Subir foto del plato terminado a cada receta
