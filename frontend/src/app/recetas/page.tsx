@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api";
-import { MargenBadge } from "@/components/MargenBadge";
 import type { Categoria, Receta } from "@/lib/types";
 import Link from "next/link";
 
@@ -94,7 +93,17 @@ export default function RecetasPage() {
             >
               <div className="flex items-start justify-between mb-2">
                 <h3 className="font-semibold">{r.nombre}</h3>
-                <MargenBadge margen={r.margen_real} />
+                {r.precio_venta && r.coste_por_porcion > 0 ? (
+                  <span className={`text-sm font-mono font-medium ${
+                    r.precio_venta / r.coste_por_porcion >= 8 ? "text-green-600" :
+                    r.precio_venta / r.coste_por_porcion >= 5 ? "text-orange-500" :
+                    "text-red-600"
+                  }`}>
+                    x{(r.precio_venta / r.coste_por_porcion).toFixed(1)}
+                  </span>
+                ) : (
+                  <span className="text-xs text-slate-400">—</span>
+                )}
               </div>
               <div className="text-xs text-slate-500 space-y-1">
                 <p>Categoría: {r.categoria_nombre}</p>
