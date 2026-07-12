@@ -41,7 +41,7 @@ const MENU: MenuSection[] = [
   {
     title: "NOT COFFEE",
     items: [
-      { name: "Tea", pvp: 4.9 },
+      { name: "Tea", pvp: 4.9, recipeName: "Tea" },
       { name: "Matcha Tea", pvp: 4.9, recipeName: "Matcha Tea" },
       { name: "Matcha Latte", pvp: 5.9, recipeName: "Matcha Latte" },
       { name: "Hojicha Latte", pvp: 5.9, recipeName: "Hojicha Latte" },
