@@ -121,9 +121,6 @@ def actualizar_ingrediente(
     ing.fecha_actualizacion = date.today()
     db.commit()
 
-    if precio_cambio or "merma_porcentaje" in updates or "cantidad_compra" in updates:
-        _recalcular_cascada(ing.id, db)
-
     db.refresh(ing)
     return _to_out(ing, db)
 
@@ -188,11 +185,3 @@ def recetas_con_ingrediente(ingrediente_id: int, db: Session = Depends(get_db)):
     return result
 
 
-def _recalcular_cascada(ingrediente_id: int, db: Session):
-    recetas = recetas_afectadas_por_ingrediente(ingrediente_id, db)
-    for receta in recetas:
-        ct = coste_total_receta(receta, db)
-        cpp = coste_por_racion(receta, db)
-        receta.coste_total = ct
-        receta.coste_por_porcion = cpp
-    db.commit()

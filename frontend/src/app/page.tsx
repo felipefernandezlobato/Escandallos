@@ -167,7 +167,7 @@ export default function Dashboard() {
                           {item.pvp ? item.pvp.toFixed(2) : "—"}
                         </td>
                         <td className="px-3 py-1 text-right font-mono text-xs">
-                          {item.coste !== undefined && item.pvp ? (item.pvp - item.coste).toFixed(2) : "—"}
+                          {item.margen !== null ? `${item.margen.toFixed(0)}%` : "—"}
                         </td>
                         <td className={`px-3 py-1 text-right font-mono ${multiColor}`}>
                           {item.multi !== null ? `x${item.multi.toFixed(1)}` : "—"}

@@ -42,12 +42,13 @@ def obtener_alertas(db: Session = Depends(get_db)):
 
     cambios_recientes = (
         db.query(HistorialPrecio)
+        .options(joinedload(HistorialPrecio.ingrediente_rel))
         .order_by(HistorialPrecio.fecha_cambio.desc())
         .limit(10)
         .all()
     )
     for h in cambios_recientes:
-        ing = db.get(Ingrediente, h.ingrediente_id)
+        ing = h.ingrediente_rel
         if ing:
             diff = ((h.precio_nuevo - h.precio_anterior) / h.precio_anterior * 100) if h.precio_anterior else 0
             alertas.append(AlertaOut(
@@ -105,14 +106,16 @@ def obtener_tendencias(
     ingrediente_id: int | None = None,
     db: Session = Depends(get_db),
 ):
-    q = db.query(HistorialPrecio).order_by(HistorialPrecio.fecha_cambio.asc())
+    q = db.query(HistorialPrecio).options(
+        joinedload(HistorialPrecio.ingrediente_rel)
+    ).order_by(HistorialPrecio.fecha_cambio.asc())
     if ingrediente_id:
         q = q.filter(HistorialPrecio.ingrediente_id == ingrediente_id)
     historial = q.limit(200).all()
 
     items = []
     for h in historial:
-        ing = db.get(Ingrediente, h.ingrediente_id)
+        ing = h.ingrediente_rel
         nombre = ing.nombre if ing else "?"
         items.append(TendenciaItem(
             fecha=str(h.fecha_cambio) if h.fecha_cambio else "",

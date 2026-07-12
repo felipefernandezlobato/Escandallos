@@ -134,13 +134,6 @@ def crear_receta(data: RecetaCreate, db: Session = Depends(get_db)):
         .first()
     )
 
-    ct = coste_total_receta(r, db)
-    cpp = coste_por_racion(r, db)
-    r.coste_total = ct
-    r.coste_por_porcion = cpp
-    db.commit()
-    db.refresh(r)
-
     out = _receta_to_out(r, db)
     out["lineas"] = [_linea_to_out(l, db) for l in r.lineas]
     return out
@@ -178,13 +171,6 @@ def actualizar_receta(
         .filter(Receta.id == receta_id)
         .first()
     )
-
-    ct = coste_total_receta(r, db)
-    cpp = coste_por_racion(r, db)
-    r.coste_total = ct
-    r.coste_por_porcion = cpp
-    db.commit()
-    db.refresh(r)
 
     out = _receta_to_out(r, db)
     out["lineas"] = [_linea_to_out(l, db) for l in r.lineas]

@@ -4,6 +4,7 @@ from typing import Optional
 
 import pdfplumber
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -15,7 +16,6 @@ from app.schemas import (
     ImportarPreviewOut,
     ImportarRequest,
 )
-from app.services.costes import recetas_afectadas_por_ingrediente, coste_total_receta, coste_por_racion
 
 router = APIRouter(prefix="/api/importar", tags=["importar"])
 
@@ -45,6 +45,7 @@ def _find_match(nombre: str, db: Session) -> Optional[Ingrediente]:
     partial = (
         db.query(Ingrediente)
         .filter(Ingrediente.nombre.ilike(f"%{nombre}%"))
+        .order_by(func.length(Ingrediente.nombre))
         .first()
     )
     return partial
@@ -118,13 +119,6 @@ def confirmar_importacion(data: ImportarConfirmRequest, db: Session = Depends(ge
             ing.proveedor = data.proveedor
             ing.fecha_actualizacion = date.today()
             actualizados += 1
-
-            recetas = recetas_afectadas_por_ingrediente(ing.id, db)
-            for receta in recetas:
-                ct = coste_total_receta(receta, db)
-                cpp = coste_por_racion(receta, db)
-                receta.coste_total = ct
-                receta.coste_por_porcion = cpp
 
     db.commit()
     return {"actualizados": actualizados, "creados": creados}
