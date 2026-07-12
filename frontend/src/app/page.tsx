@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api";
 import type { Receta } from "@/lib/types";
+import Link from "next/link";
 
 interface MenuItem {
   name: string;
@@ -149,17 +150,17 @@ const MENU: MenuSection[] = [
 ];
 
 export default function Dashboard() {
-  const [costes, setCostes] = useState<Record<string, number>>({});
+  const [recipeMap, setRecipeMap] = useState<Record<string, { coste: number; id: number }>>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    apiFetch<Receta[]>("/api/recetas?es_subreceta=false")
+    apiFetch<Receta[]>("/api/recetas")
       .then((recetas) => {
-        const map: Record<string, number> = {};
+        const map: Record<string, { coste: number; id: number }> = {};
         for (const r of recetas) {
-          map[r.nombre] = r.coste_por_porcion;
+          map[r.nombre] = { coste: r.coste_por_porcion, id: r.id };
         }
-        setCostes(map);
+        setRecipeMap(map);
       })
       .finally(() => setLoading(false));
   }, []);
@@ -177,7 +178,7 @@ export default function Dashboard() {
   for (const section of MENU) {
     for (const item of section.items) {
       totalItems++;
-      const coste = item.recipeName ? costes[item.recipeName] : undefined;
+      const coste = item.recipeName ? recipeMap[item.recipeName]?.coste : undefined;
       if (coste !== undefined) {
         withCost++;
         if (item.pvp) {
@@ -246,13 +247,16 @@ export default function Dashboard() {
       {MENU.map((section) => {
         const sectionItems = section.items
           .map((item) => {
-            const coste = item.recipeName ? costes[item.recipeName] : undefined;
+            const recipe = item.recipeName ? recipeMap[item.recipeName] : undefined;
+            const coste = recipe?.coste;
+            const recipeId = recipe?.id;
             const pvp = item.pvp;
             const margen =
               coste !== undefined && pvp
                 ? ((pvp - coste) / pvp) * 100
                 : null;
-            return { ...item, coste, margen };
+            const multi = coste && pvp && coste > 0 ? pvp / coste : null;
+            return { ...item, coste, recipeId, margen, multi };
           })
           .filter((item) => item.coste !== undefined || item.pvp);
 
@@ -271,6 +275,7 @@ export default function Dashboard() {
                     <th className="px-3 py-1.5 font-medium text-right">Coste</th>
                     <th className="px-3 py-1.5 font-medium text-right">PVP</th>
                     <th className="px-3 py-1.5 font-medium text-right">Margen</th>
+                    <th className="px-3 py-1.5 font-medium text-right">x</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -284,7 +289,13 @@ export default function Dashboard() {
                     }
                     return (
                       <tr key={i} className="border-b border-slate-50 hover:bg-slate-50">
-                        <td className="px-3 py-1">{item.name}</td>
+                        <td className="px-3 py-1">
+                          {item.recipeId ? (
+                            <Link href={`/recetas/${item.recipeId}`} className="text-blue-600 hover:underline">
+                              {item.name}
+                            </Link>
+                          ) : item.name}
+                        </td>
                         <td className="px-3 py-1 text-right font-mono text-xs">
                           {item.coste !== undefined ? item.coste.toFixed(2) : "—"}
                         </td>
@@ -293,6 +304,9 @@ export default function Dashboard() {
                         </td>
                         <td className={`px-3 py-1 text-right ${margenColor}`}>
                           {item.margen !== null ? `${item.margen.toFixed(0)}%` : "—"}
+                        </td>
+                        <td className="px-3 py-1 text-right font-mono text-xs text-slate-500">
+                          {item.multi !== null ? `${item.multi.toFixed(1)}` : "—"}
                         </td>
                       </tr>
                     );

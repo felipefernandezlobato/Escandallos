@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api";
 import type { Receta } from "@/lib/types";
+import Link from "next/link";
 
 interface MenuItem {
   name: string;
@@ -210,17 +211,17 @@ const MENU: MenuSection[] = [
 ];
 
 export default function MenuPage() {
-  const [costes, setCostes] = useState<Record<string, number>>({});
+  const [recipeMap, setRecipeMap] = useState<Record<string, { coste: number; id: number }>>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    apiFetch<Receta[]>("/api/recetas?es_subreceta=false")
+    apiFetch<Receta[]>("/api/recetas")
       .then((recetas) => {
-        const map: Record<string, number> = {};
+        const map: Record<string, { coste: number; id: number }> = {};
         for (const r of recetas) {
-          map[r.nombre] = r.coste_por_porcion;
+          map[r.nombre] = { coste: r.coste_por_porcion, id: r.id };
         }
-        setCostes(map);
+        setRecipeMap(map);
       })
       .finally(() => setLoading(false));
   }, []);
@@ -246,11 +247,14 @@ export default function MenuPage() {
                   <th className="px-4 py-2 font-medium text-right w-24">Coste</th>
                   <th className="px-4 py-2 font-medium text-right w-24">PVP</th>
                   <th className="px-4 py-2 font-medium text-right w-24">Margen</th>
+                  <th className="px-4 py-2 font-medium text-right w-16">x</th>
                 </tr>
               </thead>
               <tbody>
                 {section.items.map((item, i) => {
-                  const coste = item.recipeName ? costes[item.recipeName] : undefined;
+                  const recipe = item.recipeName ? recipeMap[item.recipeName] : undefined;
+                  const coste = recipe?.coste;
+                  const recipeId = recipe?.id;
                   const pvp = item.pvp;
                   const margen =
                     coste !== undefined && pvp
@@ -270,7 +274,15 @@ export default function MenuPage() {
                       key={i}
                       className="border-b border-slate-100 hover:bg-slate-50"
                     >
-                      <td className="px-4 py-1.5">{item.name}</td>
+                      <td className="px-4 py-1.5">
+                        {recipeId ? (
+                          <Link href={`/recetas/${recipeId}`} className="text-blue-600 hover:underline">
+                            {item.name}
+                          </Link>
+                        ) : (
+                          item.name
+                        )}
+                      </td>
                       <td className="px-4 py-1.5 text-right font-mono text-xs">
                         {coste !== undefined
                           ? `${coste.toFixed(2)}`
@@ -281,6 +293,11 @@ export default function MenuPage() {
                       </td>
                       <td className={`px-4 py-1.5 text-right ${margenColor}`}>
                         {margen !== null ? `${margen.toFixed(0)}%` : "—"}
+                      </td>
+                      <td className="px-4 py-1.5 text-right font-mono text-xs text-slate-500">
+                        {coste !== undefined && pvp && coste > 0
+                          ? `${(pvp / coste).toFixed(1)}`
+                          : "—"}
                       </td>
                     </tr>
                   );
