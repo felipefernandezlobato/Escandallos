@@ -169,9 +169,9 @@ export const MENU: MenuSection[] = [
     title: "DRINKS",
     items: [
       { name: "BWT Water (sin/con gas)", pvp: 3.9, recipeName: "BWT Water" },
-      { name: "Evian 50cl Cristal", pvp: 4.9, ingredientName: "Evian 50cl Cristal" },
+      { name: "Evian 50cl Cristal", pvp: 3.9, ingredientName: "Evian 50cl Cristal" },
       { name: "Evian 50cl PET", pvp: 3.9, ingredientName: "Evian 50cl PET" },
-      { name: "San Pellegrino 50cl Cristal", pvp: 4.9, ingredientName: "San Pellegrino 50cl Cristal" },
+      { name: "San Pellegrino 50cl Cristal", pvp: 3.9, ingredientName: "San Pellegrino 50cl Cristal" },
       { name: "San Pellegrino 50cl PET", pvp: 3.9, ingredientName: "San Pellegrino 50cl PET" },
       { name: "Coca Cola / Zero", pvp: 3.9, ingredientName: "Coca Cola" },
       { name: "Vivi Kola / Zero", pvp: 4.9, ingredientName: "Vivi Kola" },
