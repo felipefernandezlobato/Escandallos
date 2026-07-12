@@ -10,6 +10,8 @@ interface MenuItem {
   pvp: number | null;
   recipeName?: string;
   ingredientName?: string;
+  pvpBottle?: number | null;
+  recipeNameBottle?: string;
 }
 
 interface MenuSection {
@@ -155,30 +157,17 @@ const MENU: MenuSection[] = [
     ],
   },
   {
-    title: "WINE — Copa (150ml)",
+    title: "WINE",
     items: [
-      { name: "Moscatel de Alejandría", pvp: 4.9, recipeName: "Moscatel de Alejandría Copa" },
-      { name: "Garnacha Blanca Nativa", pvp: 4.9, recipeName: "Garnacha Blanca Nativa Copa" },
-      { name: "Chardonnay", pvp: 5.9, recipeName: "Chardonnay Copa" },
-      { name: "Garnacha Blanca Barrel-Fermented", pvp: 8.9, recipeName: "Garnacha Blanca Barrel Fermented Copa" },
-      { name: "Tempranillo Rosé", pvp: 4.9, recipeName: "Rosado Copa" },
-      { name: "Care Nouveau", pvp: 4.9, recipeName: "Nouveau Copa" },
-      { name: "Garnacha Finca Bancales", pvp: 7.9, recipeName: "Finca Bancales Copa" },
-      { name: "Brut Cariñena", pvp: 5.9, recipeName: "Brut Cariñena Copa" },
+      { name: "Moscatel de Alejandría", pvp: 4.9, recipeName: "Moscatel de Alejandría Copa", pvpBottle: 19.6, recipeNameBottle: "Moscatel de Alejandría Botella" },
+      { name: "Garnacha Blanca Nativa", pvp: 4.9, recipeName: "Garnacha Blanca Nativa Copa", pvpBottle: 19.6, recipeNameBottle: "Garnacha Blanca Nativa Botella" },
+      { name: "Chardonnay", pvp: 5.9, recipeName: "Chardonnay Copa", pvpBottle: 23.6, recipeNameBottle: "Chardonnay Botella" },
+      { name: "Garnacha Blanca Barrel-Fermented", pvp: 8.9, recipeName: "Garnacha Blanca Barrel Fermented Copa", pvpBottle: 35.6, recipeNameBottle: "Garnacha Blanca Barrel Fermented Botella" },
+      { name: "Tempranillo Rosé", pvp: 4.9, recipeName: "Rosado Copa", pvpBottle: 19.6, recipeNameBottle: "Rosado Botella" },
+      { name: "Care Nouveau", pvp: 4.9, recipeName: "Nouveau Copa", pvpBottle: 19.6, recipeNameBottle: "Nouveau Botella" },
+      { name: "Garnacha Finca Bancales", pvp: 7.9, recipeName: "Finca Bancales Copa", pvpBottle: 31.6, recipeNameBottle: "Finca Bancales Botella" },
+      { name: "Brut Cariñena", pvp: 5.9, recipeName: "Brut Cariñena Copa", pvpBottle: 23.6, recipeNameBottle: "Brut Cariñena Botella" },
       { name: "Mimosa", pvp: 8.9, recipeName: "Mimosa" },
-    ],
-  },
-  {
-    title: "WINE — Botella (750ml)",
-    items: [
-      { name: "Moscatel de Alejandría", pvp: null, recipeName: "Moscatel de Alejandría Botella" },
-      { name: "Garnacha Blanca Nativa", pvp: null, recipeName: "Garnacha Blanca Nativa Botella" },
-      { name: "Chardonnay", pvp: null, recipeName: "Chardonnay Botella" },
-      { name: "Garnacha Blanca Barrel-Fermented", pvp: null, recipeName: "Garnacha Blanca Barrel Fermented Botella" },
-      { name: "Tempranillo Rosé", pvp: null, recipeName: "Rosado Botella" },
-      { name: "Care Nouveau", pvp: null, recipeName: "Nouveau Botella" },
-      { name: "Garnacha Finca Bancales", pvp: null, recipeName: "Finca Bancales Botella" },
-      { name: "Brut Cariñena", pvp: null, recipeName: "Brut Cariñena Botella" },
     ],
   },
   {
@@ -248,7 +237,10 @@ export default function MenuPage() {
     <div className="space-y-8">
       <h1 className="text-2xl font-bold">Menú BRÜ</h1>
 
-      {MENU.map((section) => (
+      {MENU.map((section) => {
+        const isWine = section.title === "WINE";
+
+        return (
         <section key={section.title}>
           <h2 className="text-lg font-bold bg-slate-800 text-white px-4 py-2 rounded-t-lg">
             {section.title}
@@ -258,10 +250,23 @@ export default function MenuPage() {
               <thead>
                 <tr className="bg-slate-50 text-left text-slate-500 border-b border-slate-200">
                   <th className="px-4 py-2 font-medium">Item</th>
-                  <th className="px-4 py-2 font-medium text-right w-24">Coste</th>
-                  <th className="px-4 py-2 font-medium text-right w-24">PVP</th>
-                  <th className="px-4 py-2 font-medium text-right w-24">Margen</th>
-                  <th className="px-4 py-2 font-medium text-right w-16">x</th>
+                  {isWine ? (
+                    <>
+                      <th className="px-4 py-2 font-medium text-right w-20">Copa</th>
+                      <th className="px-4 py-2 font-medium text-right w-20">PVP</th>
+                      <th className="px-4 py-2 font-medium text-right w-14">x</th>
+                      <th className="px-4 py-2 font-medium text-right w-20">Botella</th>
+                      <th className="px-4 py-2 font-medium text-right w-20">PVP</th>
+                      <th className="px-4 py-2 font-medium text-right w-14">x</th>
+                    </>
+                  ) : (
+                    <>
+                      <th className="px-4 py-2 font-medium text-right w-24">Coste</th>
+                      <th className="px-4 py-2 font-medium text-right w-24">PVP</th>
+                      <th className="px-4 py-2 font-medium text-right w-24">Margen</th>
+                      <th className="px-4 py-2 font-medium text-right w-16">x</th>
+                    </>
+                  )}
                 </tr>
               </thead>
               <tbody>
@@ -273,12 +278,35 @@ export default function MenuPage() {
                   const pvp = item.pvp;
                   const multi = coste !== undefined && pvp && coste > 0 ? pvp / coste : null;
 
-                  let multiColor = "text-slate-400";
-                  if (multi !== null) {
-                    if (multi >= 8) multiColor = "text-green-600 font-medium";
-                    else if (multi >= 5) multiColor = "text-green-500";
-                    else if (multi >= 3) multiColor = "text-yellow-600";
-                    else multiColor = "text-red-600 font-medium";
+                  const multiColor = (m: number | null) => {
+                    if (m === null) return "text-slate-400";
+                    if (m >= 8) return "text-green-600 font-medium";
+                    if (m >= 5) return "text-green-500";
+                    if (m >= 3) return "text-yellow-600";
+                    return "text-red-600 font-medium";
+                  };
+
+                  if (isWine) {
+                    const bottleRecipe = item.recipeNameBottle ? recipeMap[item.recipeNameBottle] : undefined;
+                    const costeBottle = bottleRecipe?.coste;
+                    const pvpBottle = item.pvpBottle;
+                    const multiBottle = costeBottle !== undefined && pvpBottle && costeBottle > 0 ? pvpBottle / costeBottle : null;
+
+                    return (
+                      <tr key={i} className="border-b border-slate-100 hover:bg-slate-50">
+                        <td className="px-4 py-1.5">
+                          {recipeId ? (
+                            <Link href={`/recetas/${recipeId}`} className="text-blue-600 hover:underline">{item.name}</Link>
+                          ) : item.name}
+                        </td>
+                        <td className="px-4 py-1.5 text-right font-mono text-xs">{coste !== undefined ? coste.toFixed(2) : "—"}</td>
+                        <td className="px-4 py-1.5 text-right">{pvp ? pvp.toFixed(1) : "—"}</td>
+                        <td className={`px-4 py-1.5 text-right font-mono ${multiColor(multi)}`}>{multi !== null ? `x${multi.toFixed(1)}` : "—"}</td>
+                        <td className="px-4 py-1.5 text-right font-mono text-xs">{costeBottle !== undefined ? costeBottle.toFixed(2) : "—"}</td>
+                        <td className="px-4 py-1.5 text-right">{pvpBottle ? pvpBottle.toFixed(1) : "—"}</td>
+                        <td className={`px-4 py-1.5 text-right font-mono ${multiColor(multiBottle)}`}>{multiBottle !== null ? `x${multiBottle.toFixed(1)}` : "—"}</td>
+                      </tr>
+                    );
                   }
 
                   return (
@@ -304,7 +332,7 @@ export default function MenuPage() {
                       <td className="px-4 py-1.5 text-right font-mono text-xs">
                         {coste !== undefined && pvp ? (pvp - coste).toFixed(2) : "—"}
                       </td>
-                      <td className={`px-4 py-1.5 text-right font-mono ${multiColor}`}>
+                      <td className={`px-4 py-1.5 text-right font-mono ${multiColor(multi)}`}>
                         {multi !== null ? `x${multi.toFixed(1)}` : "—"}
                       </td>
                     </tr>
@@ -314,7 +342,8 @@ export default function MenuPage() {
             </table>
           </div>
         </section>
-      ))}
+        );
+      })}
     </div>
   );
 }
