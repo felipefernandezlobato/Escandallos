@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session, joinedload
 
 from app.auth import get_current_user
 from app.database import get_db
-from app.models import Categoria, HistorialPrecio, Ingrediente, LineaReceta, Receta
+from app.models import Categoria, HistorialPrecio, Ingrediente, LineaReceta, PrecioProveedor, Proveedor, Receta
 from app.schemas import (
     HistorialPrecioOut,
     IngredienteCreate,
@@ -60,7 +60,22 @@ def listar_ingredientes(
     if buscar:
         q = q.filter(Ingrediente.nombre.ilike(f"%{buscar}%"))
     ingredientes = q.order_by(Ingrediente.nombre).all()
-    return [_to_out(ing, db) for ing in ingredientes]
+
+    all_precios = (
+        db.query(PrecioProveedor)
+        .options(joinedload(PrecioProveedor.proveedor_rel))
+        .all()
+    )
+    precios_por_ing: dict[int, dict[str, float]] = {}
+    for pp in all_precios:
+        precios_por_ing.setdefault(pp.ingrediente_id, {})[pp.proveedor_rel.nombre] = pp.precio_por_unidad
+
+    result = []
+    for ing in ingredientes:
+        out = _to_out(ing, db)
+        out["precios_proveedores"] = precios_por_ing.get(ing.id, {})
+        result.append(out)
+    return result
 
 
 @router.get("/{ingrediente_id}", response_model=IngredienteOut)

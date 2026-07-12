@@ -65,6 +65,7 @@ class IngredienteOut(IngredienteBase):
     coste_por_unidad_uso: float = 0.0
     num_recetas: int = 0
     categoria_nombre: str = ""
+    precios_proveedores: dict[str, float] = {}
 
     model_config = {"from_attributes": True}
 

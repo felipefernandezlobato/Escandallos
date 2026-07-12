@@ -288,8 +288,6 @@ export default function IngredientesPage() {
                 <th className="pb-2 font-medium">Categoría</th>
                 <th className="pb-2 font-medium">Proveedor</th>
                 <th className="pb-2 font-medium text-right">Precio Compra</th>
-                <th className="pb-2 font-medium text-right">Merma</th>
-                <th className="pb-2 font-medium text-right">Coste/{"{"}u. uso{"}"}</th>
                 <th className="pb-2 font-medium text-right">Recetas</th>
                 <th className="pb-2 font-medium text-right">Acciones</th>
               </tr>
@@ -335,13 +333,9 @@ export default function IngredientesPage() {
                         className="hover:text-[#8B1A2B] cursor-pointer"
                         title="Click para editar precio"
                       >
-                        {ing.precio_compra.toFixed(2)} CHF/{ing.unidad_compra}
+                        {ing.precio_compra.toFixed(2)}
                       </button>
                     )}
-                  </td>
-                  <td className="py-2 text-right">{ing.merma_porcentaje}%</td>
-                  <td className="py-2 text-right font-mono text-xs">
-                    {ing.coste_por_unidad_uso.toFixed(4)} CHF/{ing.unidad_uso}
                   </td>
                   <td className="py-2 text-right text-[#6B5E52]">{ing.num_recetas}</td>
                   <td className="py-2 text-right">

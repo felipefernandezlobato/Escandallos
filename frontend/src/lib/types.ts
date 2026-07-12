@@ -20,6 +20,7 @@ export interface Ingrediente {
   coste_por_unidad_uso: number;
   num_recetas: number;
   categoria_nombre: string;
+  precios_proveedores?: Record<string, number>;
 }
 
 export interface LineaReceta {

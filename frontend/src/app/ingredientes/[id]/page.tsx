@@ -6,6 +6,19 @@ import { apiFetch } from "@/lib/api";
 import type { Ingrediente, HistorialPrecio, Receta } from "@/lib/types";
 import Link from "next/link";
 
+interface PrecioProveedor {
+  proveedor: string;
+  precio: number;
+  cantidad: number;
+  unidad: string;
+  precio_por_unidad: number;
+}
+
+interface ComparacionProveedores {
+  ingrediente: { id: number; nombre: string; precio_actual: number };
+  precios: PrecioProveedor[];
+}
+
 export default function IngredienteDetailPage() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
@@ -14,6 +27,7 @@ export default function IngredienteDetailPage() {
   const [ingrediente, setIngrediente] = useState<Ingrediente | null>(null);
   const [historial, setHistorial] = useState<HistorialPrecio[]>([]);
   const [recetas, setRecetas] = useState<Receta[]>([]);
+  const [preciosProveedores, setPreciosProveedores] = useState<PrecioProveedor[]>([]);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
 
@@ -23,11 +37,13 @@ export default function IngredienteDetailPage() {
       apiFetch<Ingrediente>(`/api/ingredientes/${id}`),
       apiFetch<HistorialPrecio[]>(`/api/ingredientes/${id}/historial`),
       apiFetch<Receta[]>(`/api/ingredientes/${id}/recetas`),
+      apiFetch<ComparacionProveedores>(`/api/proveedores/comparar/${id}`).catch(() => ({ ingrediente: { id: 0, nombre: "", precio_actual: 0 }, precios: [] })),
     ])
-      .then(([ing, hist, rec]) => {
+      .then(([ing, hist, rec, comp]) => {
         setIngrediente(ing);
         setHistorial(hist);
         setRecetas(rec);
+        setPreciosProveedores(comp.precios);
       })
       .catch(() => setNotFound(true))
       .finally(() => setLoading(false));
@@ -121,6 +137,49 @@ export default function IngredienteDetailPage() {
             <strong className="text-[#1A1A1A]">{formatFecha(ingrediente.fecha_actualizacion)}</strong>
           </span>
         </div>
+      </div>
+
+      {/* Precios por Proveedor */}
+      <div className="bg-white border border-[#E8DFD3] rounded-lg overflow-hidden">
+        <h2 className="text-lg font-semibold px-4 pt-4 pb-2">Precios por Proveedor</h2>
+        {preciosProveedores.length === 0 ? (
+          <p className="text-sm text-[#6B5E52]/70 px-4 pb-4">Sin precios de proveedores registrados</p>
+        ) : (
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="bg-[#F5F0E8] text-left text-[#6B5E52] border-b border-[#E8DFD3]">
+                <th className="px-4 py-2 font-medium">Proveedor</th>
+                <th className="px-4 py-2 font-medium text-right">Precio</th>
+                <th className="px-4 py-2 font-medium text-right">Unidad</th>
+                <th className="px-4 py-2 font-medium text-right">CHF/unidad</th>
+              </tr>
+            </thead>
+            <tbody>
+              {(() => {
+                const minPrecio = Math.min(...preciosProveedores.map((p) => p.precio_por_unidad));
+                return preciosProveedores.map((p) => {
+                  const isCheapest = preciosProveedores.length > 1 && p.precio_por_unidad === minPrecio;
+                  return (
+                    <tr key={p.proveedor} className="border-b border-[#E8DFD3]/50">
+                      <td className={`px-4 py-2 ${isCheapest ? "text-green-600 font-medium" : ""}`}>
+                        {p.proveedor}
+                      </td>
+                      <td className={`px-4 py-2 text-right ${isCheapest ? "text-green-600 font-medium" : ""}`}>
+                        {p.precio.toFixed(2)} CHF
+                      </td>
+                      <td className={`px-4 py-2 text-right ${isCheapest ? "text-green-600 font-medium" : "text-[#6B5E52]"}`}>
+                        {p.cantidad} {p.unidad}
+                      </td>
+                      <td className={`px-4 py-2 text-right ${isCheapest ? "text-green-600 font-medium" : ""}`}>
+                        {p.precio_por_unidad.toFixed(2)}
+                      </td>
+                    </tr>
+                  );
+                });
+              })()}
+            </tbody>
+          </table>
+        )}
       </div>
 
       {/* Historial de Precios */}
