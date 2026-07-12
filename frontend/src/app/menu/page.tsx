@@ -45,7 +45,7 @@ const MENU: MenuSection[] = [
       { name: "Matcha Tea", pvp: 4.9, recipeName: "Matcha Tea" },
       { name: "Matcha Latte", pvp: 5.9, recipeName: "Matcha Latte" },
       { name: "Hojicha Latte", pvp: 5.9, recipeName: "Hojicha Latte" },
-      { name: "Strawberry Matcha Latte", pvp: 6.9 },
+      { name: "Strawberry Matcha Latte", pvp: 6.9, recipeName: "Iced Strawberry Matcha Latte" },
       { name: "Chai Latte", pvp: 5.9, recipeName: "Chai Latte" },
       { name: "Hot / Iced Chocolate", pvp: 5.9, recipeName: "Hot Chocolate" },
       { name: "Fresh Orange Juice", pvp: 6.9 },
