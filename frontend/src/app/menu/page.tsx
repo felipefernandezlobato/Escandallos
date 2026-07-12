@@ -138,6 +138,7 @@ const MENU: MenuSection[] = [
       { name: "Guacamole", pvp: 11.9, recipeName: "Guacamole (plato)" },
       { name: "Tortilla", pvp: 11.9, recipeName: "Tortilla" },
       { name: "Croquetas x4", pvp: 11.9, recipeName: "Croquetas Ración" },
+      { name: "Croqueta Wednesday (promo)", pvp: 1.0, recipeName: "Croqueta Wednesday" },
       { name: "Pimientos del Padrón", pvp: null },
       { name: "Punto de Tortilla x3", pvp: 11.9 },
       { name: "Cheese Platter S/L", pvp: 32.0, recipeName: "Cheese Platter" },
