@@ -5,8 +5,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 
 const NAV_ITEMS = [
-  { href: "/", label: "Panel" },
-  { href: "/menu", label: "Menú" },
+  { href: "/", label: "Menú" },
   { href: "/recetas", label: "Recetas" },
   { href: "/ingredientes", label: "Ingredientes" },
   { href: "/proveedores", label: "Proveedores" },
@@ -44,6 +43,17 @@ export function Sidebar() {
           );
         })}
       </nav>
+      <div className="p-4 border-t border-white/20">
+        <button
+          onClick={() => {
+            localStorage.removeItem("bru_token");
+            window.location.href = "/login";
+          }}
+          className="text-white/50 hover:text-white text-sm transition-colors"
+        >
+          Cerrar sesion
+        </button>
+      </div>
     </aside>
   );
 }

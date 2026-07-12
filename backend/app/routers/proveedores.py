@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy.orm import Session, joinedload
 
+from app.auth import get_current_user
 from app.database import get_db
 from app.models import Ingrediente, Proveedor, PrecioProveedor
 
@@ -25,13 +26,13 @@ class PrecioCreate(BaseModel):
 
 
 @router.get("")
-def listar_proveedores(db: Session = Depends(get_db)):
+def listar_proveedores(db: Session = Depends(get_db), user=Depends(get_current_user)):
     provs = db.query(Proveedor).order_by(Proveedor.nombre).all()
     return [{"id": p.id, "nombre": p.nombre, "notas": p.notas, "num_precios": len(p.precios)} for p in provs]
 
 
 @router.post("", status_code=201)
-def crear_proveedor(data: ProveedorCreate, db: Session = Depends(get_db)):
+def crear_proveedor(data: ProveedorCreate, db: Session = Depends(get_db), user=Depends(get_current_user)):
     existing = db.query(Proveedor).filter(Proveedor.nombre == data.nombre).first()
     if existing:
         return {"id": existing.id, "nombre": existing.nombre}
@@ -43,7 +44,7 @@ def crear_proveedor(data: ProveedorCreate, db: Session = Depends(get_db)):
 
 
 @router.delete("/{proveedor_id}")
-def eliminar_proveedor(proveedor_id: int, db: Session = Depends(get_db)):
+def eliminar_proveedor(proveedor_id: int, db: Session = Depends(get_db), user=Depends(get_current_user)):
     p = db.get(Proveedor, proveedor_id)
     if not p:
         raise HTTPException(404, "Proveedor no encontrado")
@@ -53,7 +54,7 @@ def eliminar_proveedor(proveedor_id: int, db: Session = Depends(get_db)):
 
 
 @router.post("/precios", status_code=201)
-def crear_precio(data: PrecioCreate, db: Session = Depends(get_db)):
+def crear_precio(data: PrecioCreate, db: Session = Depends(get_db), user=Depends(get_current_user)):
     ing = db.get(Ingrediente, data.ingrediente_id)
     if not ing:
         raise HTTPException(400, "Ingrediente no encontrado")
@@ -91,7 +92,7 @@ def crear_precio(data: PrecioCreate, db: Session = Depends(get_db)):
 
 
 @router.get("/comparar/{ingrediente_id}")
-def comparar_precios(ingrediente_id: int, db: Session = Depends(get_db)):
+def comparar_precios(ingrediente_id: int, db: Session = Depends(get_db), user=Depends(get_current_user)):
     ing = db.get(Ingrediente, ingrediente_id)
     if not ing:
         raise HTTPException(404, "Ingrediente no encontrado")
@@ -121,7 +122,7 @@ def comparar_precios(ingrediente_id: int, db: Session = Depends(get_db)):
 
 
 @router.get("/comparar")
-def comparar_todos(db: Session = Depends(get_db)):
+def comparar_todos(db: Session = Depends(get_db), user=Depends(get_current_user)):
     precios = (
         db.query(PrecioProveedor)
         .options(

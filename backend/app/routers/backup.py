@@ -9,6 +9,7 @@ from fastapi.responses import FileResponse, StreamingResponse
 from sqlalchemy.orm import Session, joinedload
 from starlette.background import BackgroundTask
 
+from app.auth import get_current_user
 from app.database import get_db
 from app.models import Ingrediente, LineaReceta, Receta
 from app.services.costes import coste_por_racion, coste_total_receta, margen_real
@@ -19,7 +20,7 @@ DB_PATH = Path("data/escandallos.db")
 
 
 @router.get("/backup/descargar")
-def descargar_backup():
+def descargar_backup(user=Depends(get_current_user)):
     if not DB_PATH.exists():
         return {"error": "Base de datos no encontrada"}
     tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".db")
@@ -35,7 +36,7 @@ def descargar_backup():
 
 
 @router.post("/backup/restaurar")
-async def restaurar_backup(file: UploadFile = File(...)):
+async def restaurar_backup(file: UploadFile = File(...), user=Depends(get_current_user)):
     content = await file.read()
     # Validate SQLite magic header (first 16 bytes)
     if content[:16] != b"SQLite format 3\000":
@@ -47,7 +48,7 @@ async def restaurar_backup(file: UploadFile = File(...)):
 
 
 @router.get("/export/ingredientes")
-def exportar_ingredientes(db: Session = Depends(get_db)):
+def exportar_ingredientes(db: Session = Depends(get_db), user=Depends(get_current_user)):
     ingredientes = db.query(Ingrediente).order_by(Ingrediente.nombre).all()
     output = io.StringIO()
     writer = csv.writer(output)
@@ -71,7 +72,7 @@ def exportar_ingredientes(db: Session = Depends(get_db)):
 
 
 @router.get("/export/recetas")
-def exportar_recetas(db: Session = Depends(get_db)):
+def exportar_recetas(db: Session = Depends(get_db), user=Depends(get_current_user)):
     recetas = (
         db.query(Receta)
         .options(

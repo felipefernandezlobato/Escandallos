@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session, joinedload
 
+from app.auth import get_current_user
 from app.database import get_db
 from app.models import Categoria, HistorialPrecio, Ingrediente, LineaReceta, Receta
 from app.schemas import AlertaOut, RankingItem, TendenciaItem
@@ -10,7 +11,7 @@ router = APIRouter(prefix="/api/dashboard", tags=["dashboard"])
 
 
 @router.get("/alertas", response_model=list[AlertaOut])
-def obtener_alertas(db: Session = Depends(get_db)):
+def obtener_alertas(db: Session = Depends(get_db), user=Depends(get_current_user)):
     alertas: list[AlertaOut] = []
 
     recetas = (
@@ -65,6 +66,7 @@ def obtener_rankings(
     categoria_id: int | None = None,
     orden: str = "margen_desc",
     db: Session = Depends(get_db),
+    user=Depends(get_current_user),
 ):
     q = db.query(Receta).options(
         joinedload(Receta.categoria_rel),
@@ -105,6 +107,7 @@ def obtener_rankings(
 def obtener_tendencias(
     ingrediente_id: int | None = None,
     db: Session = Depends(get_db),
+    user=Depends(get_current_user),
 ):
     q = db.query(HistorialPrecio).options(
         joinedload(HistorialPrecio.ingrediente_rel)

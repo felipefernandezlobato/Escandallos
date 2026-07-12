@@ -1,6 +1,18 @@
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
+from dotenv import load_dotenv
+load_dotenv()
 
+import os
+
+from fastapi import Depends, FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+
+from app.auth import (
+    AUTH_PASSWORD_HASH,
+    create_token,
+    get_current_user,
+    verify_password,
+)
 from app.database import Base, engine, get_db, SessionLocal
 from app.routers import categorias, ingredientes, recetas, importar, dashboard, backup, proveedores
 from app.models import Categoria
@@ -13,13 +25,32 @@ app = FastAPI(
     version="1.0.0",
 )
 
+cors_origins = os.environ.get("CORS_ORIGINS", "http://localhost:3000").split(",")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+class LoginRequest(BaseModel):
+    password: str
+
+
+@app.post("/api/auth/login")
+def login(req: LoginRequest):
+    if not verify_password(req.password, AUTH_PASSWORD_HASH):
+        raise HTTPException(401, "Contraseña incorrecta")
+    return {"token": create_token()}
+
+
+@app.get("/api/auth/check")
+def check_auth(user=Depends(get_current_user)):
+    return {"ok": True}
+
 
 app.include_router(categorias.router)
 app.include_router(ingredientes.router)

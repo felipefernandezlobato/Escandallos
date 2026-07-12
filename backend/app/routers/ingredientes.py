@@ -4,6 +4,7 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session, joinedload
 
+from app.auth import get_current_user
 from app.database import get_db
 from app.models import Categoria, HistorialPrecio, Ingrediente, LineaReceta, Receta
 from app.schemas import (
@@ -51,6 +52,7 @@ def listar_ingredientes(
     categoria_id: Optional[int] = None,
     buscar: Optional[str] = None,
     db: Session = Depends(get_db),
+    user=Depends(get_current_user),
 ):
     q = db.query(Ingrediente).options(joinedload(Ingrediente.categoria_rel))
     if categoria_id:
@@ -62,7 +64,7 @@ def listar_ingredientes(
 
 
 @router.get("/{ingrediente_id}", response_model=IngredienteOut)
-def obtener_ingrediente(ingrediente_id: int, db: Session = Depends(get_db)):
+def obtener_ingrediente(ingrediente_id: int, db: Session = Depends(get_db), user=Depends(get_current_user)):
     ing = (
         db.query(Ingrediente)
         .options(joinedload(Ingrediente.categoria_rel))
@@ -75,7 +77,7 @@ def obtener_ingrediente(ingrediente_id: int, db: Session = Depends(get_db)):
 
 
 @router.post("", response_model=IngredienteOut, status_code=201)
-def crear_ingrediente(data: IngredienteCreate, db: Session = Depends(get_db)):
+def crear_ingrediente(data: IngredienteCreate, db: Session = Depends(get_db), user=Depends(get_current_user)):
     cat = db.get(Categoria, data.categoria_id)
     if not cat:
         raise HTTPException(400, "Categoría no encontrada")
@@ -94,7 +96,7 @@ def crear_ingrediente(data: IngredienteCreate, db: Session = Depends(get_db)):
 
 @router.put("/{ingrediente_id}", response_model=IngredienteOut)
 def actualizar_ingrediente(
-    ingrediente_id: int, data: IngredienteUpdate, db: Session = Depends(get_db)
+    ingrediente_id: int, data: IngredienteUpdate, db: Session = Depends(get_db), user=Depends(get_current_user),
 ):
     ing = (
         db.query(Ingrediente)
@@ -126,7 +128,7 @@ def actualizar_ingrediente(
 
 
 @router.delete("/{ingrediente_id}")
-def eliminar_ingrediente(ingrediente_id: int, db: Session = Depends(get_db)):
+def eliminar_ingrediente(ingrediente_id: int, db: Session = Depends(get_db), user=Depends(get_current_user)):
     ing = db.get(Ingrediente, ingrediente_id)
     if not ing:
         raise HTTPException(404, "Ingrediente no encontrado")
@@ -146,7 +148,7 @@ def eliminar_ingrediente(ingrediente_id: int, db: Session = Depends(get_db)):
 
 
 @router.get("/{ingrediente_id}/historial", response_model=list[HistorialPrecioOut])
-def historial_precios(ingrediente_id: int, db: Session = Depends(get_db)):
+def historial_precios(ingrediente_id: int, db: Session = Depends(get_db), user=Depends(get_current_user)):
     ing = db.get(Ingrediente, ingrediente_id)
     if not ing:
         raise HTTPException(404, "Ingrediente no encontrado")
@@ -159,7 +161,7 @@ def historial_precios(ingrediente_id: int, db: Session = Depends(get_db)):
 
 
 @router.get("/{ingrediente_id}/recetas", response_model=list[RecetaOut])
-def recetas_con_ingrediente(ingrediente_id: int, db: Session = Depends(get_db)):
+def recetas_con_ingrediente(ingrediente_id: int, db: Session = Depends(get_db), user=Depends(get_current_user)):
     ing = db.get(Ingrediente, ingrediente_id)
     if not ing:
         raise HTTPException(404, "Ingrediente no encontrado")

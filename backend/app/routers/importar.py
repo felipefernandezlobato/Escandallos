@@ -7,6 +7,7 @@ from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
+from app.auth import get_current_user
 from app.database import get_db
 from app.models import Categoria, HistorialPrecio, Ingrediente
 from app.schemas import (
@@ -21,7 +22,7 @@ router = APIRouter(prefix="/api/importar", tags=["importar"])
 
 
 @router.post("/pdf")
-async def extraer_pdf(file: UploadFile = File(...)):
+async def extraer_pdf(file: UploadFile = File(...), user=Depends(get_current_user)):
     if not file.filename or not file.filename.lower().endswith(".pdf"):
         raise HTTPException(400, "Solo se aceptan ficheros PDF")
     content = await file.read()
@@ -52,7 +53,7 @@ def _find_match(nombre: str, db: Session) -> Optional[Ingrediente]:
 
 
 @router.post("/preview", response_model=ImportarPreviewOut)
-def preview_importacion(data: ImportarRequest, db: Session = Depends(get_db)):
+def preview_importacion(data: ImportarRequest, db: Session = Depends(get_db), user=Depends(get_current_user)):
     matches = []
     for item in data.items:
         ing = _find_match(item.nombre, db)
@@ -77,7 +78,7 @@ def preview_importacion(data: ImportarRequest, db: Session = Depends(get_db)):
 
 
 @router.post("/confirm")
-def confirmar_importacion(data: ImportarConfirmRequest, db: Session = Depends(get_db)):
+def confirmar_importacion(data: ImportarConfirmRequest, db: Session = Depends(get_db), user=Depends(get_current_user)):
     actualizados = 0
     creados = 0
 

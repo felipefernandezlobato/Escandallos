@@ -1,9 +1,14 @@
+import os
+
 from sqlalchemy import create_engine, event
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
-DATABASE_URL = "sqlite:///./data/escandallos.db"
+DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///data/escandallos.db")
 
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+engine = create_engine(
+    DATABASE_URL,
+    connect_args={"check_same_thread": False} if "sqlite" in DATABASE_URL else {},
+)
 
 
 @event.listens_for(engine, "connect")

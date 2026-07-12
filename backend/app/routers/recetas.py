@@ -3,6 +3,7 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session, joinedload
 
+from app.auth import get_current_user
 from app.database import get_db
 from app.models import Categoria, Ingrediente, LineaReceta, Receta
 from app.schemas import (
@@ -59,6 +60,7 @@ def listar_recetas(
     es_subreceta: Optional[bool] = None,
     buscar: Optional[str] = None,
     db: Session = Depends(get_db),
+    user=Depends(get_current_user),
 ):
     q = db.query(Receta).options(
         joinedload(Receta.categoria_rel),
@@ -76,7 +78,7 @@ def listar_recetas(
 
 
 @router.get("/{receta_id}", response_model=RecetaDetailOut)
-def obtener_receta(receta_id: int, db: Session = Depends(get_db)):
+def obtener_receta(receta_id: int, db: Session = Depends(get_db), user=Depends(get_current_user)):
     r = (
         db.query(Receta)
         .options(
@@ -95,7 +97,7 @@ def obtener_receta(receta_id: int, db: Session = Depends(get_db)):
 
 
 @router.post("", response_model=RecetaDetailOut, status_code=201)
-def crear_receta(data: RecetaCreate, db: Session = Depends(get_db)):
+def crear_receta(data: RecetaCreate, db: Session = Depends(get_db), user=Depends(get_current_user)):
     cat = db.get(Categoria, data.categoria_id)
     if not cat:
         raise HTTPException(400, "Categoría no encontrada")
@@ -141,7 +143,7 @@ def crear_receta(data: RecetaCreate, db: Session = Depends(get_db)):
 
 @router.put("/{receta_id}", response_model=RecetaDetailOut)
 def actualizar_receta(
-    receta_id: int, data: RecetaUpdate, db: Session = Depends(get_db)
+    receta_id: int, data: RecetaUpdate, db: Session = Depends(get_db), user=Depends(get_current_user),
 ):
     r = db.get(Receta, receta_id)
     if not r:
@@ -178,7 +180,7 @@ def actualizar_receta(
 
 
 @router.delete("/{receta_id}")
-def eliminar_receta(receta_id: int, db: Session = Depends(get_db)):
+def eliminar_receta(receta_id: int, db: Session = Depends(get_db), user=Depends(get_current_user)):
     r = db.get(Receta, receta_id)
     if not r:
         raise HTTPException(404, "Receta no encontrada")

@@ -6,7 +6,7 @@ import { MENU, getMultiColor } from "@/lib/menu-data";
 import type { Receta } from "@/lib/types";
 import Link from "next/link";
 
-export default function Dashboard() {
+export default function MenuPage() {
   const [recipeMap, setRecipeMap] = useState<Record<string, { coste: number; id: number }>>({});
   const [ingredientMap, setIngredientMap] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
@@ -32,153 +32,127 @@ export default function Dashboard() {
   }, []);
 
   if (loading) {
-    return <p className="text-[#6B5E52] py-10 text-center">Cargando...</p>;
-  }
-
-  // Compute summary stats
-  let totalItems = 0;
-  let withCost = 0;
-  let lowMulti = 0;
-  const alerts: { name: string; multi: number; section: string }[] = [];
-
-  for (const section of MENU) {
-    for (const item of section.items) {
-      totalItems++;
-      const recipeName = item.recipeName || item.recipeNameIced;
-      const pvp = item.pvp || item.pvpIced;
-      const coste = recipeName ? recipeMap[recipeName]?.coste : (item.ingredientName ? ingredientMap[item.ingredientName] : undefined);
-      if (coste !== undefined) {
-        withCost++;
-        if (pvp && coste > 0) {
-          const m = pvp / coste;
-          if (m < 5) {
-            lowMulti++;
-            alerts.push({ name: item.name, multi: m, section: section.title });
-          }
-        }
-      }
-    }
+    return <p className="text-[#6B5E52] py-10 text-center">Cargando menú...</p>;
   }
 
   return (
     <div className="space-y-8">
-      <h1 className="text-2xl font-bold">Panel Principal</h1>
+      <h1 className="text-2xl font-bold">Menú BRÜ</h1>
 
-      {/* Summary cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div className="bg-white border border-[#E8DFD3] rounded-lg p-4">
-          <p className="text-xs text-[#6B5E52]">Items en menú</p>
-          <p className="text-2xl font-bold">{totalItems}</p>
-        </div>
-        <div className="bg-white border border-[#E8DFD3] rounded-lg p-4">
-          <p className="text-xs text-[#6B5E52]">Con escandallo</p>
-          <p className="text-2xl font-bold">{withCost}</p>
-        </div>
-        <div className="bg-white border border-[#E8DFD3] rounded-lg p-4">
-          <p className="text-xs text-[#6B5E52]">Sin escandallo</p>
-          <p className="text-2xl font-bold text-[#6B5E52]/70">{totalItems - withCost}</p>
-        </div>
-        <div className="bg-white border border-[#E8DFD3] rounded-lg p-4">
-          <p className="text-xs text-[#6B5E52]">Multi &lt; x5</p>
-          <p className={`text-2xl font-bold ${lowMulti > 0 ? "text-red-600" : "text-green-600"}`}>
-            {lowMulti}
-          </p>
-        </div>
-      </div>
-
-      {/* Alerts */}
-      {alerts.length > 0 && (
-        <section>
-          <h2 className="text-lg font-semibold mb-3">Multiplicador bajo (&lt; x5)</h2>
-          <div className="space-y-2">
-            {alerts
-              .sort((a, b) => a.multi - b.multi)
-              .map((a, i) => (
-                <div
-                  key={i}
-                  className={`rounded-lg p-3 text-sm border ${
-                    a.multi < 3
-                      ? "bg-red-50 border-red-200 text-red-700"
-                      : "bg-yellow-50 border-yellow-200 text-yellow-700"
-                  }`}
-                >
-                  <span className="font-medium">{a.name}</span>
-                  <span className="text-xs ml-2">({a.section})</span>
-                  <span className="float-right font-mono">x{a.multi.toFixed(1)}</span>
-                </div>
-              ))}
-          </div>
-        </section>
-      )}
-
-      {/* Menu summary by section */}
       {MENU.map((section) => {
-        const sectionItems = section.items
-          .map((item) => {
-            const recipeName = item.recipeName || item.recipeNameIced;
-            const recipe = recipeName ? recipeMap[recipeName] : undefined;
-            const ingCoste = item.ingredientName ? ingredientMap[item.ingredientName] : undefined;
-            const coste = recipe?.coste ?? ingCoste;
-            const recipeId = recipe?.id;
-            const pvp = item.pvp || item.pvpIced;
-            const margen =
-              coste !== undefined && pvp
-                ? ((pvp - coste) / pvp) * 100
-                : null;
-            const multi = coste && pvp && coste > 0 ? pvp / coste : null;
-            return { ...item, coste, recipeId, margen, multi };
-          })
-          .filter((item) => item.coste !== undefined || item.pvp || item.pvpIced);
+        const isWine = section.title === "WINE";
+        const isDual = section.title === "COFFEE" || section.title === "NOT COFFEE";
+        const hasDualColumns = isWine || isDual;
 
-        if (sectionItems.length === 0) return null;
+        const dualLabels = isWine
+          ? { a: "Copa", b: "Botella", pvpA: "PVP Copa", pvpB: "PVP Bot.", xA: "x Copa", xB: "x Bot." }
+          : { a: "Normal", b: "Iced", pvpA: "PVP", pvpB: "PVP Iced", xA: "x", xB: "x Iced" };
 
         return (
-          <section key={section.title}>
-            <h2 className="text-sm font-bold text-[#6B5E52] uppercase tracking-wide mb-2">
-              {section.title}
-            </h2>
-            <div className="bg-white border border-[#E8DFD3] rounded-lg overflow-hidden">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="bg-[#F5F0E8] text-left text-[#6B5E52]/70 border-b border-[#E8DFD3] text-xs">
-                    <th className="px-3 py-1.5 font-medium">Item</th>
-                    <th className="px-3 py-1.5 font-medium text-right">Coste</th>
-                    <th className="px-3 py-1.5 font-medium text-right">PVP</th>
-                    <th className="px-3 py-1.5 font-medium text-right">Margen</th>
-                    <th className="px-3 py-1.5 font-medium text-right">x</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {sectionItems.map((item, i) => {
-                    const multiColor = item.multi !== null ? getMultiColor(item.multi, section.title) : "text-[#6B5E52]/50";
+        <section key={section.title}>
+          <h2 className="text-lg font-bold bg-[#8B1A2B] text-white px-4 py-2 rounded-t-lg">
+            {section.title}
+          </h2>
+          <div className="bg-white border border-[#E8DFD3] rounded-b-lg overflow-hidden">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-[#F5F0E8] text-left text-[#6B5E52] border-b border-[#E8DFD3]">
+                  <th className="px-4 py-2 font-medium">Item</th>
+                  {hasDualColumns ? (
+                    <>
+                      <th className="px-4 py-2 font-medium text-right w-20">{dualLabels.a}</th>
+                      <th className="px-4 py-2 font-medium text-right w-20">{dualLabels.b}</th>
+                      <th className="px-4 py-2 font-medium text-right w-20">{dualLabels.pvpA}</th>
+                      <th className="px-4 py-2 font-medium text-right w-20">{dualLabels.pvpB}</th>
+                      <th className="px-4 py-2 font-medium text-right w-20">{dualLabels.xA}</th>
+                      <th className="px-4 py-2 font-medium text-right w-20">{dualLabels.xB}</th>
+                    </>
+                  ) : (
+                    <>
+                      <th className="px-4 py-2 font-medium text-right w-20">Coste</th>
+                      <th className="px-4 py-2 font-medium text-right w-20">PVP</th>
+                      <th className="px-4 py-2 font-medium text-right w-20">Margen</th>
+                      <th className="px-4 py-2 font-medium text-right w-20">x</th>
+                    </>
+                  )}
+                </tr>
+              </thead>
+              <tbody>
+                {section.items.map((item, i) => {
+                  const recipe = item.recipeName ? recipeMap[item.recipeName] : undefined;
+                  const ingCoste = item.ingredientName ? ingredientMap[item.ingredientName] : undefined;
+                  const coste = recipe?.coste ?? ingCoste;
+                  const recipeId = recipe?.id;
+                  const pvp = item.pvp;
+                  const multi = coste !== undefined && pvp && coste > 0 ? pvp / coste : null;
+
+                  const multiColor = (m: number | null) => getMultiColor(m, section.title);
+
+                  if (hasDualColumns) {
+                    const secondRecipeName = isWine ? item.recipeNameBottle : item.recipeNameIced;
+                    const secondPvp = isWine ? item.pvpBottle : item.pvpIced;
+                    const secondRecipe = secondRecipeName ? recipeMap[secondRecipeName] : undefined;
+                    const costeSecond = secondRecipe?.coste;
+                    const multiSecond = costeSecond !== undefined && secondPvp && costeSecond > 0 ? secondPvp / costeSecond : null;
+
                     return (
                       <tr key={i} className="border-b border-[#E8DFD3]/50 hover:bg-[#F5F0E8]">
-                        <td className="px-3 py-1">
-                          {item.recipeId ? (
-                            <Link href={`/recetas/${item.recipeId}`} className="text-[#8B1A2B] hover:underline">
-                              {item.name}
-                            </Link>
+                        <td className="px-4 py-1.5">
+                          {recipeId ? (
+                            <Link href={`/recetas/${recipeId}`} className="text-[#8B1A2B] hover:underline">{item.name}</Link>
+                          ) : secondRecipe?.id ? (
+                            <Link href={`/recetas/${secondRecipe.id}`} className="text-[#8B1A2B] hover:underline">{item.name}</Link>
                           ) : item.name}
+                          {!isWine && recipeId && secondRecipe?.id && (
+                            <>
+                              <span className="text-[#6B5E52]/50"> / </span>
+                              <Link href={`/recetas/${secondRecipe.id}`} className="text-[#8B1A2B] hover:underline">{secondRecipeName}</Link>
+                            </>
+                          )}
                         </td>
-                        <td className="px-3 py-1 text-right font-mono text-xs">
-                          {item.coste !== undefined ? item.coste.toFixed(2) : "—"}
-                        </td>
-                        <td className="px-3 py-1 text-right">
-                          {item.pvp ? item.pvp.toFixed(2) : "—"}
-                        </td>
-                        <td className="px-3 py-1 text-right font-mono text-xs">
-                          {item.margen !== null ? `${item.margen.toFixed(0)}%` : "—"}
-                        </td>
-                        <td className={`px-3 py-1 text-right font-mono ${multiColor}`}>
-                          {item.multi !== null ? `x${item.multi.toFixed(1)}` : "—"}
-                        </td>
+                        <td className="px-4 py-1.5 text-right text-sm">{coste !== undefined ? coste.toFixed(2) : "—"}</td>
+                        <td className="px-4 py-1.5 text-right text-sm">{costeSecond !== undefined ? costeSecond.toFixed(2) : "—"}</td>
+                        <td className="px-4 py-1.5 text-right text-sm">{pvp ? pvp.toFixed(1) : "—"}</td>
+                        <td className="px-4 py-1.5 text-right text-sm">{secondPvp ? secondPvp.toFixed(1) : "—"}</td>
+                        <td className={`px-4 py-1.5 text-right text-sm ${multiColor(multi)}`}>{multi !== null ? `x${multi.toFixed(1)}` : "—"}</td>
+                        <td className={`px-4 py-1.5 text-right text-sm ${multiColor(multiSecond)}`}>{multiSecond !== null ? `x${multiSecond.toFixed(1)}` : "—"}</td>
                       </tr>
                     );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </section>
+                  }
+
+                  return (
+                    <tr
+                      key={i}
+                      className="border-b border-[#E8DFD3]/50 hover:bg-[#F5F0E8]"
+                    >
+                      <td className="px-4 py-1.5">
+                        {recipeId ? (
+                          <Link href={`/recetas/${recipeId}`} className="text-[#8B1A2B] hover:underline">
+                            {item.name}
+                          </Link>
+                        ) : (
+                          item.name
+                        )}
+                      </td>
+                      <td className="px-4 py-1.5 text-right text-sm">
+                        {coste !== undefined ? coste.toFixed(2) : "—"}
+                      </td>
+                      <td className="px-4 py-1.5 text-right text-sm">
+                        {pvp ? pvp.toFixed(2) : "—"}
+                      </td>
+                      <td className="px-4 py-1.5 text-right text-sm">
+                        {coste !== undefined && pvp ? (pvp - coste).toFixed(2) : "—"}
+                      </td>
+                      <td className={`px-4 py-1.5 text-right text-sm ${multiColor(multi)}`}>
+                        {multi !== null ? `x${multi.toFixed(1)}` : "—"}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </section>
         );
       })}
     </div>

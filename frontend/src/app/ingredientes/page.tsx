@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api";
 import type { Categoria, Ingrediente } from "@/lib/types";
+import Link from "next/link";
 
 const UNIDADES = ["kg", "g", "mg", "litro", "ml", "cl", "unidad"];
 
@@ -296,7 +297,11 @@ export default function IngredientesPage() {
             <tbody>
               {ingredientesFiltrados.map((ing) => (
                 <tr key={ing.id} className="border-b border-[#E8DFD3]/50 hover:bg-[#F5F0E8]">
-                  <td className="py-2 font-medium">{ing.nombre}</td>
+                  <td className="py-2 font-medium">
+                    <Link href={`/ingredientes/${ing.id}`} className="text-[#8B1A2B] hover:underline">
+                      {ing.nombre}
+                    </Link>
+                  </td>
                   <td className="py-2 text-[#6B5E52]">{ing.categoria_nombre}</td>
                   <td className="py-2 text-[#6B5E52]">{ing.proveedor || "—"}</td>
                   <td className="py-2 text-right">

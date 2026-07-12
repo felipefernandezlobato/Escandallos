@@ -4,8 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const MOBILE_ITEMS = [
-  { href: "/", label: "Panel", icon: "📊" },
-  { href: "/menu", label: "Menú", icon: "📖" },
+  { href: "/", label: "Menú", icon: "📖" },
   { href: "/recetas", label: "Recetas", icon: "📋" },
   { href: "/ingredientes", label: "Ingredientes", icon: "🥫" },
   { href: "/proveedores", label: "Proveedores", icon: "🏪" },
