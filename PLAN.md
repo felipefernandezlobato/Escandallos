@@ -433,16 +433,26 @@ escandallos/
 
 ## Backlog (v2+)
 
-- ~~**Página de Menú completo**~~ — HECHO
+### Prioridad alta (v1.1)
+- **Menú dinámico en base de datos** — Guardar items del menú, PVPs y links a recetas en la BD en vez de hardcoded. Editable desde la app
+- **Vista de historial de precios** — Frontend para ver el historial de cambios de precio por ingrediente (backend ya lo trackea)
 - **Ajustar rendimiento Cold Brew** — Pesar exactamente cuánto rinde la receta (actualmente estimado en 3.5L)
+- **Recetas que faltan** — Fresh Orange Juice, Croissant plain, Focaccias
+- **PVPs botellas de vino** — Confirmar precios de venta por botella (actualmente copa×4)
+
+### Prioridad media (v2)
 - **Simulador de impacto de precios** — "Si la leche sube a X, cuanto cambian los margenes?"
+- ~~**Comparador de proveedores**~~ — HECHO (Prodega/Rietschi/Covin/Denner)
+- **Integracion directa con Claude API** — Procesar facturas dentro de la app sin salir a claude.ai
+- **Fichas imprimibles** — Generar PDF del escandallo para colgar en la cocina
+- **Importar precios desde facturas PDF** — Automatizar la extracción y actualización de precios
+
+### Prioridad baja (v2+)
 - **Backups automaticos a la nube** — Copia diaria a Google Drive o Dropbox
 - **Fotos de platos** — Subir foto del plato terminado a cada receta
-- **Fichas imprimibles** — Generar PDF del escandallo para colgar en la cocina
 - **Historial de cambios en recetas** — Ver versiones anteriores de una receta
-- **Comparador de proveedores** — Si compras el mismo ingrediente a varios proveedores, comparar precios
-- **Integracion directa con Claude API** — Procesar facturas dentro de la app sin salir a claude.ai
 - **Multi-local** — Si abres mas cafeterias, gestionar escandallos por local
+- **Contabilizar CO2 cerveza** — Repartir coste de botella CO2 entre las cervezas de grifo
 
 ---
 
