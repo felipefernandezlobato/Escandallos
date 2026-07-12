@@ -173,12 +173,12 @@ const MENU: MenuSection[] = [
   {
     title: "BEER",
     items: [
-      { name: "Estrella Galicia 30cl", pvp: 4.5 },
-      { name: "Estrella Galicia 50cl", pvp: 7.0 },
-      { name: "1906 Reserva 30cl", pvp: 5.5 },
-      { name: "1906 Reserva 50cl", pvp: 8.0 },
-      { name: "Estrella GlutenFree 33cl", pvp: 5.5 },
-      { name: "Estrella 0,0 25cl", pvp: 4.9 },
+      { name: "Estrella Galicia 30cl", pvp: 4.5, recipeName: "Estrella Galicia 30cl" },
+      { name: "Estrella Galicia 50cl", pvp: 7.0, recipeName: "Estrella Galicia 50cl" },
+      { name: "1906 Reserva 30cl", pvp: 5.5, recipeName: "Estrella 1906 30cl" },
+      { name: "1906 Reserva 50cl", pvp: 8.0, recipeName: "Estrella 1906 50cl" },
+      { name: "Estrella GlutenFree 33cl", pvp: 5.5, recipeName: "Estrella Sin Gluten 33cl" },
+      { name: "Estrella 0,0 25cl", pvp: 4.9, recipeName: "Estrella 0.0 25cl" },
       { name: "Ueli Weizen 50cl", pvp: 9.0 },
       { name: "Ueli IPA 33cl", pvp: 7.5 },
       { name: "Unser Bier Amber 33cl", pvp: 7.5 },
@@ -198,6 +198,8 @@ const MENU: MenuSection[] = [
       { name: "Margarita", pvp: 16.9, recipeName: "Margarita" },
       { name: "Hugo Free", pvp: 12.9, recipeName: "Hugo Free" },
       { name: "Cucumber Cooler", pvp: 11.9, recipeName: "Cucumber Cooler" },
+      { name: "Sangría Copa", pvp: null, recipeName: "Sangría Copa" },
+      { name: "Sangría Jarra 1L", pvp: null, recipeName: "Sangría Jarra 1L" },
     ],
   },
 ];
