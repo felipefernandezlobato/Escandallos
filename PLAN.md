@@ -376,7 +376,7 @@ escandallos/
 - [x] 3.5 CRUD Recetas: GET, POST, PUT, DELETE /api/recetas
 - [x] 3.6 Detalle de receta con desglose de costes: GET /api/recetas/{id}
 - [x] 3.7 Endpoint de importacion: POST /api/importar/preview + /api/importar/confirm
-- [ ] 3.8 Tests de endpoints con datos de prueba
+- [x] 3.8 Tests de endpoints con datos de prueba (25 tests en test_endpoints.py)
 
 ### Fase 4 — Frontend: Layout y Navegacion
 - [x] 4.1 Layout principal con sidebar (desktop)
@@ -388,7 +388,7 @@ escandallos/
 - [x] 5.1 Pagina de listado de ingredientes (tabla con busqueda y filtros por categoria)
 - [x] 5.2 Edicion inline de precios (click → editar → guardar → cascada)
 - [x] 5.3 Formulario de nuevo ingrediente
-- [ ] 5.4 Vista de detalle de ingrediente (historial de precios, recetas que lo usan)
+- [x] 5.4 Vista de detalle de ingrediente (historial de precios, recetas que lo usan)
 - [x] 5.5 Indicador de cuantas recetas usan cada ingrediente
 
 ### Fase 6 — Frontend: Recetas
@@ -406,11 +406,11 @@ escandallos/
 - [x] 7.4 Confirmacion y actualizacion de precios con cascada
 - [x] 7.5 Documentar prompt template de Claude para extraccion de facturas
 
-### Fase 8 — Frontend: Dashboard (Panel Principal)
-- [x] 8.1 Seccion de alertas (margenes por debajo del objetivo, precios actualizados recientemente)
-- [x] 8.2 Rankings de rentabilidad (mas/menos rentables, filtro por categoria)
-- [ ] 8.3 Graficos de tendencias (evolucion de costes y margenes por categoria)
-- [x] 8.4 Endpoints de dashboard en backend: GET /api/dashboard/alertas, rankings, tendencias
+### Fase 8 — ~~Frontend: Dashboard (Panel Principal)~~ ELIMINADO
+- ~~[x] 8.1 Seccion de alertas~~ — Dashboard eliminado (redundante con Menú)
+- ~~[x] 8.2 Rankings de rentabilidad~~ — Dashboard eliminado
+- ~~[ ] 8.3 Graficos de tendencias~~ — Dashboard eliminado
+- [x] 8.4 Endpoints de dashboard en backend (se mantienen para uso futuro)
 
 ### Fase 9 — Frontend: Configuracion
 - [x] 9.1 Gestion de categorias (crear, editar, eliminar)
@@ -425,27 +425,31 @@ escandallos/
 - [x] 10.5 Botones de backup y export en la pagina de Configuracion
 - [x] 10.6 Manejo de errores y estados vacios en todo el frontend
 - [x] 10.7 Test final responsive (probar en movil real)
-- [ ] 10.8 Deploy frontend a Vercel
-- [ ] 10.9 Deploy backend a Render o Railway
-- [ ] 10.10 Verificacion end-to-end en produccion
+- [x] 10.8 Deploy frontend a Vercel (https://frontend-bruteam.vercel.app)
+- [x] 10.9 Deploy backend a Render (https://bru-escandallos-api.onrender.com)
+- [x] 10.10 Verificacion end-to-end en produccion
+- [x] 10.11 Autenticacion con password compartido (HMAC token, 7 dias)
+- [x] 10.12 Login page con branding BRÜ
+- [x] 10.13 Proteccion de todos los endpoints (31 endpoints)
 
 ---
 
 ## Backlog (v2+)
 
 ### Prioridad alta (v1.1)
+- **Mejorar importación de facturas** — Al importar, que actualice precios de ingredientes existentes automáticamente (overwrite). Flujo claro: pegar JSON → preview con precios antiguos vs nuevos → confirmar → actualiza todo con historial
 - **Menú dinámico en base de datos** — Guardar items del menú, PVPs y links a recetas en la BD en vez de hardcoded. Editable desde la app
-- **Vista de historial de precios** — Frontend para ver el historial de cambios de precio por ingrediente (backend ya lo trackea)
+- ~~**Vista de historial de precios**~~ — HECHO (página detalle de ingrediente /ingredientes/[id])
 - **Ajustar rendimiento Cold Brew** — Pesar exactamente cuánto rinde la receta (actualmente estimado en 3.5L)
 - **Recetas que faltan** — Fresh Orange Juice, Croissant plain, Focaccias
 - **PVPs botellas de vino** — Confirmar precios de venta por botella (actualmente copa×4)
 
 ### Prioridad media (v2)
 - **Simulador de impacto de precios** — "Si la leche sube a X, cuanto cambian los margenes?"
-- ~~**Comparador de proveedores**~~ — HECHO (Prodega/Rietschi/Covin/Denner)
+- ~~**Comparador de proveedores**~~ — HECHO (Prodega/Rietschi/Covin/Caporaso/Pfaff/Covin, agrupado por categoría)
 - **Integracion directa con Claude API** — Procesar facturas dentro de la app sin salir a claude.ai
 - **Fichas imprimibles** — Generar PDF del escandallo para colgar en la cocina
-- **Importar precios desde facturas PDF** — Automatizar la extracción y actualización de precios
+- ~~**Importar precios desde facturas PDF**~~ — Parcialmente HECHO (PDF upload + extracción de texto)
 
 ### Prioridad baja (v2+)
 - **Backups automaticos a la nube** — Copia diaria a Google Drive o Dropbox
