@@ -5,9 +5,9 @@ import { usePathname } from "next/navigation";
 
 const MOBILE_ITEMS = [
   { href: "/", label: "Panel", icon: "📊" },
+  { href: "/menu", label: "Menú", icon: "📖" },
   { href: "/recetas", label: "Recetas", icon: "📋" },
   { href: "/ingredientes", label: "Ingredientes", icon: "🥫" },
-  { href: "/importar", label: "Importar", icon: "📥" },
   { href: "/configuracion", label: "Config", icon: "⚙️" },
 ];
 
