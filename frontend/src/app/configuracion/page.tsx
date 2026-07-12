@@ -77,92 +77,92 @@ export default function ConfiguracionPage() {
           <h2 className="text-lg font-semibold">Categorías</h2>
           <button
             onClick={() => setShowForm(!showForm)}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700"
+            className="bg-[#8B1A2B] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#6B1420]"
           >
             {showForm ? "Cancelar" : "+ Nueva Categoría"}
           </button>
         </div>
 
         {showForm && (
-          <form onSubmit={handleCreate} className="bg-white border border-slate-200 rounded-lg p-4 flex flex-wrap gap-3 items-end">
+          <form onSubmit={handleCreate} className="bg-white border border-[#E8DFD3] rounded-lg p-4 flex flex-wrap gap-3 items-end">
             <div>
-              <label className="block text-xs text-slate-500 mb-1">Nombre</label>
-              <input required value={newCat.nombre} onChange={(e) => setNewCat({ ...newCat, nombre: e.target.value })} className="border border-slate-300 rounded px-3 py-2 text-sm" />
+              <label className="block text-xs text-[#6B5E52] mb-1">Nombre</label>
+              <input required value={newCat.nombre} onChange={(e) => setNewCat({ ...newCat, nombre: e.target.value })} className="border border-[#D4C4A8] rounded px-3 py-2 text-sm" />
             </div>
             <div>
-              <label className="block text-xs text-slate-500 mb-1">Tipo</label>
-              <select value={newCat.tipo} onChange={(e) => setNewCat({ ...newCat, tipo: e.target.value })} className="border border-slate-300 rounded px-3 py-2 text-sm">
+              <label className="block text-xs text-[#6B5E52] mb-1">Tipo</label>
+              <select value={newCat.tipo} onChange={(e) => setNewCat({ ...newCat, tipo: e.target.value })} className="border border-[#D4C4A8] rounded px-3 py-2 text-sm">
                 <option value="ingrediente">Ingrediente</option>
                 <option value="receta">Receta</option>
               </select>
             </div>
             {newCat.tipo === "receta" && (
               <div>
-                <label className="block text-xs text-slate-500 mb-1">Margen objetivo (%)</label>
-                <input type="number" step="any" value={newCat.margen_objetivo} onChange={(e) => setNewCat({ ...newCat, margen_objetivo: e.target.value })} className="w-24 border border-slate-300 rounded px-3 py-2 text-sm" />
+                <label className="block text-xs text-[#6B5E52] mb-1">Margen objetivo (%)</label>
+                <input type="number" step="any" value={newCat.margen_objetivo} onChange={(e) => setNewCat({ ...newCat, margen_objetivo: e.target.value })} className="w-24 border border-[#D4C4A8] rounded px-3 py-2 text-sm" />
               </div>
             )}
-            <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700">Crear</button>
+            <button type="submit" className="bg-[#8B1A2B] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#6B1420]">Crear</button>
           </form>
         )}
 
         {loading ? (
-          <p className="text-slate-500 text-center">Cargando...</p>
+          <p className="text-[#6B5E52] text-center">Cargando...</p>
         ) : (
           <div className="grid md:grid-cols-2 gap-6">
             {/* Ingredient categories */}
             <div>
-              <h3 className="text-sm font-medium text-slate-500 mb-2">Categorías de Ingredientes</h3>
-              <div className="bg-white border border-slate-200 rounded-lg divide-y divide-slate-100">
+              <h3 className="text-sm font-medium text-[#6B5E52] mb-2">Categorías de Ingredientes</h3>
+              <div className="bg-white border border-[#E8DFD3] rounded-lg divide-y divide-[#E8DFD3]/50">
                 {ingredienteCats.map((cat) => (
                   <div key={cat.id} className="flex items-center justify-between px-4 py-2">
                     {editingId === cat.id ? (
                       <span className="flex items-center gap-2">
-                        <input value={editName} onChange={(e) => setEditName(e.target.value)} className="border border-slate-300 rounded px-2 py-1 text-sm w-32" />
+                        <input value={editName} onChange={(e) => setEditName(e.target.value)} className="border border-[#D4C4A8] rounded px-2 py-1 text-sm w-32" />
                         <button onClick={() => handleUpdate(cat.id)} className="text-green-600 text-xs">Guardar</button>
-                        <button onClick={() => setEditingId(null)} className="text-slate-400 text-xs">Cancelar</button>
+                        <button onClick={() => setEditingId(null)} className="text-[#6B5E52]/70 text-xs">Cancelar</button>
                       </span>
                     ) : (
                       <span className="text-sm">{cat.nombre}</span>
                     )}
                     <span className="flex gap-2">
-                      <button onClick={() => { setEditingId(cat.id); setEditName(cat.nombre); setEditMargen(""); }} className="text-blue-600 text-xs hover:underline">Editar</button>
+                      <button onClick={() => { setEditingId(cat.id); setEditName(cat.nombre); setEditMargen(""); }} className="text-[#8B1A2B] text-xs hover:underline">Editar</button>
                       <button onClick={() => handleDelete(cat.id)} className="text-red-500 text-xs hover:underline">Eliminar</button>
                     </span>
                   </div>
                 ))}
-                {ingredienteCats.length === 0 && <p className="px-4 py-3 text-sm text-slate-400">Sin categorías</p>}
+                {ingredienteCats.length === 0 && <p className="px-4 py-3 text-sm text-[#6B5E52]/70">Sin categorías</p>}
               </div>
             </div>
 
             {/* Recipe categories */}
             <div>
-              <h3 className="text-sm font-medium text-slate-500 mb-2">Categorías de Recetas</h3>
-              <div className="bg-white border border-slate-200 rounded-lg divide-y divide-slate-100">
+              <h3 className="text-sm font-medium text-[#6B5E52] mb-2">Categorías de Recetas</h3>
+              <div className="bg-white border border-[#E8DFD3] rounded-lg divide-y divide-[#E8DFD3]/50">
                 {recetaCats.map((cat) => (
                   <div key={cat.id} className="flex items-center justify-between px-4 py-2">
                     {editingId === cat.id ? (
                       <span className="flex items-center gap-2">
-                        <input value={editName} onChange={(e) => setEditName(e.target.value)} className="border border-slate-300 rounded px-2 py-1 text-sm w-28" />
-                        <input type="number" step="any" placeholder="Margen %" value={editMargen} onChange={(e) => setEditMargen(e.target.value)} className="w-20 border border-slate-300 rounded px-2 py-1 text-sm" />
+                        <input value={editName} onChange={(e) => setEditName(e.target.value)} className="border border-[#D4C4A8] rounded px-2 py-1 text-sm w-28" />
+                        <input type="number" step="any" placeholder="Margen %" value={editMargen} onChange={(e) => setEditMargen(e.target.value)} className="w-20 border border-[#D4C4A8] rounded px-2 py-1 text-sm" />
                         <button onClick={() => handleUpdate(cat.id)} className="text-green-600 text-xs">Guardar</button>
-                        <button onClick={() => setEditingId(null)} className="text-slate-400 text-xs">Cancelar</button>
+                        <button onClick={() => setEditingId(null)} className="text-[#6B5E52]/70 text-xs">Cancelar</button>
                       </span>
                     ) : (
                       <span className="text-sm">
                         {cat.nombre}
                         {cat.margen_objetivo !== null && (
-                          <span className="ml-2 text-xs text-slate-400">({cat.margen_objetivo}%)</span>
+                          <span className="ml-2 text-xs text-[#6B5E52]/70">({cat.margen_objetivo}%)</span>
                         )}
                       </span>
                     )}
                     <span className="flex gap-2">
-                      <button onClick={() => { setEditingId(cat.id); setEditName(cat.nombre); setEditMargen(cat.margen_objetivo?.toString() || ""); }} className="text-blue-600 text-xs hover:underline">Editar</button>
+                      <button onClick={() => { setEditingId(cat.id); setEditName(cat.nombre); setEditMargen(cat.margen_objetivo?.toString() || ""); }} className="text-[#8B1A2B] text-xs hover:underline">Editar</button>
                       <button onClick={() => handleDelete(cat.id)} className="text-red-500 text-xs hover:underline">Eliminar</button>
                     </span>
                   </div>
                 ))}
-                {recetaCats.length === 0 && <p className="px-4 py-3 text-sm text-slate-400">Sin categorías</p>}
+                {recetaCats.length === 0 && <p className="px-4 py-3 text-sm text-[#6B5E52]/70">Sin categorías</p>}
               </div>
             </div>
           </div>
@@ -172,19 +172,19 @@ export default function ConfiguracionPage() {
       {/* Backup & Export */}
       <section className="space-y-4">
         <h2 className="text-lg font-semibold">Datos</h2>
-        <div className="bg-white border border-slate-200 rounded-lg p-4 space-y-4">
+        <div className="bg-white border border-[#E8DFD3] rounded-lg p-4 space-y-4">
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
               <h3 className="text-sm font-medium mb-2">Copia de Seguridad</h3>
               <div className="flex gap-2">
                 <a
                   href={`${API_BASE}/api/backup/descargar`}
-                  className="bg-slate-100 px-4 py-2 rounded-lg text-sm hover:bg-slate-200 transition-colors"
+                  className="bg-[#F5F0E8] px-4 py-2 rounded-lg text-sm hover:bg-[#E8DFD3] transition-colors"
                   download
                 >
                   Descargar Backup
                 </a>
-                <label className="bg-slate-100 px-4 py-2 rounded-lg text-sm hover:bg-slate-200 transition-colors cursor-pointer">
+                <label className="bg-[#F5F0E8] px-4 py-2 rounded-lg text-sm hover:bg-[#E8DFD3] transition-colors cursor-pointer">
                   Restaurar Backup
                   <input
                     type="file"
@@ -211,14 +211,14 @@ export default function ConfiguracionPage() {
               <div className="flex gap-2">
                 <a
                   href={`${API_BASE}/api/export/ingredientes`}
-                  className="bg-slate-100 px-4 py-2 rounded-lg text-sm hover:bg-slate-200 transition-colors"
+                  className="bg-[#F5F0E8] px-4 py-2 rounded-lg text-sm hover:bg-[#E8DFD3] transition-colors"
                   download
                 >
                   Exportar Ingredientes
                 </a>
                 <a
                   href={`${API_BASE}/api/export/recetas`}
-                  className="bg-slate-100 px-4 py-2 rounded-lg text-sm hover:bg-slate-200 transition-colors"
+                  className="bg-[#F5F0E8] px-4 py-2 rounded-lg text-sm hover:bg-[#E8DFD3] transition-colors"
                   download
                 >
                   Exportar Recetas
@@ -232,28 +232,28 @@ export default function ConfiguracionPage() {
       {/* Unit system */}
       <section className="space-y-4">
         <h2 className="text-lg font-semibold">Sistema de Unidades</h2>
-        <div className="bg-white border border-slate-200 rounded-lg p-4">
+        <div className="bg-white border border-[#E8DFD3] rounded-lg p-4">
           <div className="overflow-x-auto">
             <table className="text-sm">
               <thead>
-                <tr className="text-left text-slate-500">
+                <tr className="text-left text-[#6B5E52]">
                   <th className="pb-2 pr-8 font-medium">Familia</th>
                   <th className="pb-2 pr-8 font-medium">Unidades</th>
                   <th className="pb-2 font-medium">Conversiones</th>
                 </tr>
               </thead>
-              <tbody className="text-slate-700">
-                <tr className="border-t border-slate-100">
+              <tbody className="text-[#1A1A1A]">
+                <tr className="border-t border-[#E8DFD3]/50">
                   <td className="py-2 pr-8 font-medium">Peso</td>
                   <td className="py-2 pr-8">kg, g, mg</td>
                   <td className="py-2">1 kg = 1000 g = 1.000.000 mg</td>
                 </tr>
-                <tr className="border-t border-slate-100">
+                <tr className="border-t border-[#E8DFD3]/50">
                   <td className="py-2 pr-8 font-medium">Volumen</td>
                   <td className="py-2 pr-8">litro, ml, cl</td>
                   <td className="py-2">1 litro = 1000 ml = 100 cl</td>
                 </tr>
-                <tr className="border-t border-slate-100">
+                <tr className="border-t border-[#E8DFD3]/50">
                   <td className="py-2 pr-8 font-medium">Unidad</td>
                   <td className="py-2 pr-8">unidad</td>
                   <td className="py-2">Sin conversión</td>

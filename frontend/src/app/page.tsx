@@ -32,7 +32,7 @@ export default function Dashboard() {
   }, []);
 
   if (loading) {
-    return <p className="text-slate-500 py-10 text-center">Cargando...</p>;
+    return <p className="text-[#6B5E52] py-10 text-center">Cargando...</p>;
   }
 
   // Compute summary stats
@@ -44,11 +44,13 @@ export default function Dashboard() {
   for (const section of MENU) {
     for (const item of section.items) {
       totalItems++;
-      const coste = item.recipeName ? recipeMap[item.recipeName]?.coste : (item.ingredientName ? ingredientMap[item.ingredientName] : undefined);
+      const recipeName = item.recipeName || item.recipeNameIced;
+      const pvp = item.pvp || item.pvpIced;
+      const coste = recipeName ? recipeMap[recipeName]?.coste : (item.ingredientName ? ingredientMap[item.ingredientName] : undefined);
       if (coste !== undefined) {
         withCost++;
-        if (item.pvp && coste > 0) {
-          const m = item.pvp / coste;
+        if (pvp && coste > 0) {
+          const m = pvp / coste;
           if (m < 5) {
             lowMulti++;
             alerts.push({ name: item.name, multi: m, section: section.title });
@@ -64,20 +66,20 @@ export default function Dashboard() {
 
       {/* Summary cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div className="bg-white border border-slate-200 rounded-lg p-4">
-          <p className="text-xs text-slate-500">Items en menú</p>
+        <div className="bg-white border border-[#E8DFD3] rounded-lg p-4">
+          <p className="text-xs text-[#6B5E52]">Items en menú</p>
           <p className="text-2xl font-bold">{totalItems}</p>
         </div>
-        <div className="bg-white border border-slate-200 rounded-lg p-4">
-          <p className="text-xs text-slate-500">Con escandallo</p>
+        <div className="bg-white border border-[#E8DFD3] rounded-lg p-4">
+          <p className="text-xs text-[#6B5E52]">Con escandallo</p>
           <p className="text-2xl font-bold">{withCost}</p>
         </div>
-        <div className="bg-white border border-slate-200 rounded-lg p-4">
-          <p className="text-xs text-slate-500">Sin escandallo</p>
-          <p className="text-2xl font-bold text-slate-400">{totalItems - withCost}</p>
+        <div className="bg-white border border-[#E8DFD3] rounded-lg p-4">
+          <p className="text-xs text-[#6B5E52]">Sin escandallo</p>
+          <p className="text-2xl font-bold text-[#6B5E52]/70">{totalItems - withCost}</p>
         </div>
-        <div className="bg-white border border-slate-200 rounded-lg p-4">
-          <p className="text-xs text-slate-500">Multi &lt; x5</p>
+        <div className="bg-white border border-[#E8DFD3] rounded-lg p-4">
+          <p className="text-xs text-[#6B5E52]">Multi &lt; x5</p>
           <p className={`text-2xl font-bold ${lowMulti > 0 ? "text-red-600" : "text-green-600"}`}>
             {lowMulti}
           </p>
@@ -113,11 +115,12 @@ export default function Dashboard() {
       {MENU.map((section) => {
         const sectionItems = section.items
           .map((item) => {
-            const recipe = item.recipeName ? recipeMap[item.recipeName] : undefined;
+            const recipeName = item.recipeName || item.recipeNameIced;
+            const recipe = recipeName ? recipeMap[recipeName] : undefined;
             const ingCoste = item.ingredientName ? ingredientMap[item.ingredientName] : undefined;
             const coste = recipe?.coste ?? ingCoste;
             const recipeId = recipe?.id;
-            const pvp = item.pvp;
+            const pvp = item.pvp || item.pvpIced;
             const margen =
               coste !== undefined && pvp
                 ? ((pvp - coste) / pvp) * 100
@@ -125,19 +128,19 @@ export default function Dashboard() {
             const multi = coste && pvp && coste > 0 ? pvp / coste : null;
             return { ...item, coste, recipeId, margen, multi };
           })
-          .filter((item) => item.coste !== undefined || item.pvp);
+          .filter((item) => item.coste !== undefined || item.pvp || item.pvpIced);
 
         if (sectionItems.length === 0) return null;
 
         return (
           <section key={section.title}>
-            <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wide mb-2">
+            <h2 className="text-sm font-bold text-[#6B5E52] uppercase tracking-wide mb-2">
               {section.title}
             </h2>
-            <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
+            <div className="bg-white border border-[#E8DFD3] rounded-lg overflow-hidden">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="bg-slate-50 text-left text-slate-400 border-b border-slate-200 text-xs">
+                  <tr className="bg-[#F5F0E8] text-left text-[#6B5E52]/70 border-b border-[#E8DFD3] text-xs">
                     <th className="px-3 py-1.5 font-medium">Item</th>
                     <th className="px-3 py-1.5 font-medium text-right">Coste</th>
                     <th className="px-3 py-1.5 font-medium text-right">PVP</th>
@@ -147,12 +150,12 @@ export default function Dashboard() {
                 </thead>
                 <tbody>
                   {sectionItems.map((item, i) => {
-                    const multiColor = item.multi !== null ? getMultiColor(item.multi, section.title) : "text-slate-300";
+                    const multiColor = item.multi !== null ? getMultiColor(item.multi, section.title) : "text-[#6B5E52]/50";
                     return (
-                      <tr key={i} className="border-b border-slate-50 hover:bg-slate-50">
+                      <tr key={i} className="border-b border-[#E8DFD3]/50 hover:bg-[#F5F0E8]">
                         <td className="px-3 py-1">
                           {item.recipeId ? (
-                            <Link href={`/recetas/${item.recipeId}`} className="text-blue-600 hover:underline">
+                            <Link href={`/recetas/${item.recipeId}`} className="text-[#8B1A2B] hover:underline">
                               {item.name}
                             </Link>
                           ) : item.name}

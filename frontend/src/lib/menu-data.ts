@@ -5,6 +5,8 @@ export interface MenuItem {
   ingredientName?: string;
   pvpBottle?: number | null;
   recipeNameBottle?: string;
+  pvpIced?: number | null;
+  recipeNameIced?: string;
 }
 
 export interface MenuSection {
@@ -52,20 +54,18 @@ export const MENU: MenuSection[] = [
     title: "COFFEE",
     items: [
       { name: "Espresso", pvp: 2.9, recipeName: "Espresso" },
-      { name: "Doppio", pvp: 3.9, recipeName: "Doppio" },
-      { name: "Americano", pvp: 4.9, recipeName: "Americano" },
+      { name: "Doppio", pvp: 3.9, recipeName: "Doppio", pvpIced: 4.9, recipeNameIced: "Iced Espresso" },
+      { name: "Americano", pvp: 4.9, recipeName: "Americano", pvpIced: 5.9, recipeNameIced: "Iced Americano" },
       { name: "Batch Brü", pvp: 3.9, recipeName: "Batch Brü" },
       { name: "Pour-over", pvp: 7.9, recipeName: "Pour-over" },
       { name: "Cortado", pvp: 4.9, recipeName: "Cortado" },
-      { name: "Latte", pvp: 5.9, recipeName: "Latte" },
+      { name: "Latte", pvp: 5.9, recipeName: "Latte", pvpIced: 6.9, recipeNameIced: "Iced Latte" },
       { name: "Cappuccino", pvp: 5.9, recipeName: "Cappuccino" },
       { name: "Flat White", pvp: 5.9, recipeName: "Flat White" },
-      { name: "Espresso / Americano Freddo", pvp: 4.9, recipeName: "Espresso Freddo" },
-      { name: "Latte Freddo", pvp: 6.9, recipeName: "Latte Freddo" },
-      { name: "Cold Brü", pvp: 4.9, recipeName: "Cold Brü" },
-      { name: "Montblanc", pvp: 7.9, recipeName: "Mont Blanc" },
-      { name: "Espresso Tonic", pvp: 7.9, recipeName: "Espresso Tonic" },
-      { name: "Sunset at Brü", pvp: 7.9, recipeName: "Sunset at Brü" },
+      { name: "Cold Brü", pvp: null, pvpIced: 4.9, recipeNameIced: "Cold Brü" },
+      { name: "Montblanc", pvp: null, pvpIced: 7.9, recipeNameIced: "Mont Blanc" },
+      { name: "Espresso Tonic", pvp: null, pvpIced: 7.9, recipeNameIced: "Espresso Tonic" },
+      { name: "Sunset at Brü", pvp: null, pvpIced: 7.9, recipeNameIced: "Sunset at Brü" },
     ],
   },
   {
@@ -73,11 +73,12 @@ export const MENU: MenuSection[] = [
     items: [
       { name: "Tea", pvp: 4.9, recipeName: "Tea" },
       { name: "Matcha Tea", pvp: 4.9, recipeName: "Matcha Tea" },
-      { name: "Matcha Latte", pvp: 5.9, recipeName: "Matcha Latte" },
-      { name: "Hojicha Latte", pvp: 5.9, recipeName: "Hojicha Latte" },
-      { name: "Strawberry Matcha Latte", pvp: 6.9, recipeName: "Iced Strawberry Matcha Latte" },
-      { name: "Chai Latte", pvp: 5.9, recipeName: "Chai Latte" },
-      { name: "Hot / Iced Chocolate", pvp: 5.9, recipeName: "Hot Chocolate" },
+      { name: "Matcha Latte", pvp: 5.9, recipeName: "Matcha Latte", pvpIced: 6.9, recipeNameIced: "Iced Matcha Latte" },
+      { name: "Hojicha Latte", pvp: 5.9, recipeName: "Hojicha Latte", pvpIced: 6.9, recipeNameIced: "Iced Hojicha Latte" },
+      { name: "Iced Strawberry Matcha Latte", pvp: null, pvpIced: 6.9, recipeNameIced: "Iced Strawberry Matcha Latte" },
+      { name: "Iced Strawberry Hojicha Latte", pvp: null, pvpIced: 7.9, recipeNameIced: "Iced Strawberry Hojicha Latte" },
+      { name: "Chai Latte", pvp: 5.9, recipeName: "Chai Latte", pvpIced: 6.9, recipeNameIced: "Iced Chai Latte" },
+      { name: "Chocolate", pvp: 5.9, recipeName: "Hot Chocolate", pvpIced: 6.9, recipeNameIced: "Iced Chocolate" },
       { name: "Fresh Orange Juice", pvp: 6.9 },
     ],
   },
@@ -114,6 +115,7 @@ export const MENU: MenuSection[] = [
     items: [
       { name: "Avo Toast", pvp: 15.9, recipeName: "Avo Toast" },
       { name: "Brü Toast", pvp: 16.9, recipeName: "Brü Toast" },
+      { name: "Cherry Toast", pvp: 17.9, recipeName: "Cherry Toast" },
       { name: "Salmon Toast", pvp: 19.9, recipeName: "Salmon Toast" },
       { name: "Benedict Toast", pvp: 21.9, recipeName: "Benedict Toast" },
       { name: "Pancakes Savory", pvp: 22.9, recipeName: "Pancakes Savory" },

@@ -41,7 +41,7 @@ export default function RecetasPage() {
         <h1 className="text-2xl font-bold">Recetas</h1>
         <Link
           href="/recetas/nuevo"
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+          className="bg-[#8B1A2B] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#6B1420] transition-colors"
         >
           + Nueva Receta
         </Link>
@@ -54,12 +54,12 @@ export default function RecetasPage() {
           placeholder="Buscar receta..."
           value={buscar}
           onChange={(e) => setBuscar(e.target.value)}
-          className="border border-slate-300 rounded-lg px-3 py-2 text-sm flex-1 min-w-[200px]"
+          className="border border-[#D4C4A8] rounded-lg px-3 py-2 text-sm flex-1 min-w-[200px]"
         />
         <select
           value={filtroCategoria}
           onChange={(e) => setFiltroCategoria(e.target.value)}
-          className="border border-slate-300 rounded-lg px-3 py-2 text-sm"
+          className="border border-[#D4C4A8] rounded-lg px-3 py-2 text-sm"
         >
           <option value="">Todas las categorías</option>
           {categorias.map((c) => (
@@ -68,7 +68,7 @@ export default function RecetasPage() {
             </option>
           ))}
         </select>
-        <label className="flex items-center gap-2 text-sm text-slate-600">
+        <label className="flex items-center gap-2 text-sm text-[#6B5E52]">
           <input
             type="checkbox"
             checked={showSubrecetas}
@@ -80,12 +80,12 @@ export default function RecetasPage() {
 
       {/* Recipe cards grouped by category */}
       {loading ? (
-        <p className="text-slate-500 text-center py-10">Cargando...</p>
+        <p className="text-[#6B5E52] text-center py-10">Cargando...</p>
       ) : recetas.length === 0 ? (
-        <p className="text-slate-500 text-center py-10">No hay recetas. Crea una para empezar.</p>
+        <p className="text-[#6B5E52] text-center py-10">No hay recetas. Crea una para empezar.</p>
       ) : (
         <div className="space-y-8">
-          {["Cafetería", "Bebida", "Postre", "Brunch", "Snack"]
+          {["Cafetería", "Postre", "Brunch", "Snack", "Bebida"]
             .map((nombre) => categorias.find((c) => c.nombre === nombre))
             .filter((cat): cat is Categoria => cat !== undefined && recetas.some((r) => r.categoria_nombre === cat.nombre))
             .map((cat) => (
@@ -98,7 +98,7 @@ export default function RecetasPage() {
                     <Link
                       key={r.id}
                       href={`/recetas/${r.id}`}
-                      className="bg-white border border-slate-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+                      className="bg-white border border-[#E8DFD3] rounded-lg p-4 hover:shadow-md transition-shadow"
                     >
                       <div className="flex items-start justify-between mb-2">
                         <h3 className="font-semibold">{r.nombre}</h3>
@@ -111,18 +111,18 @@ export default function RecetasPage() {
                             x{(r.precio_venta / r.coste_por_porcion).toFixed(1)}
                           </span>
                         ) : (
-                          <span className="text-xs text-slate-400">—</span>
+                          <span className="text-xs text-[#6B5E52]/70">—</span>
                         )}
                       </div>
-                      <div className="text-xs text-slate-500 space-y-1">
-                        <p>Coste/{r.unidad_rendimiento || "ración"}: <span className="font-medium text-slate-700">{r.coste_por_porcion.toFixed(2)} CHF</span></p>
+                      <div className="text-xs text-[#6B5E52] space-y-1">
+                        <p>Coste/{r.unidad_rendimiento || "ración"}: <span className="font-medium text-[#1A1A1A]">{r.coste_por_porcion.toFixed(2)} CHF</span></p>
                         {r.precio_venta && (
-                          <p>Precio venta: <span className="font-medium text-slate-700">{r.precio_venta.toFixed(2)} CHF</span></p>
+                          <p>Precio venta: <span className="font-medium text-[#1A1A1A]">{r.precio_venta.toFixed(2)} CHF</span></p>
                         )}
                         <p>Porciones/lote: {r.porciones_por_lote}</p>
                       </div>
                       {r.es_subreceta && (
-                        <span className="inline-block mt-2 px-2 py-0.5 rounded bg-purple-100 text-purple-700 text-xs">
+                        <span className="inline-block mt-2 px-2 py-0.5 rounded bg-[#F2E8EA] text-[#8B1A2B] text-xs">
                           Sub-receta
                         </span>
                       )}

@@ -5,7 +5,7 @@ interface Props {
 
 export function MargenBadge({ margen, objetivo }: Props) {
   if (margen === null) {
-    return <span className="text-xs text-slate-400">Sin precio</span>;
+    return <span className="text-xs text-[#6B5E52]/70">Sin precio</span>;
   }
 
   let color = "bg-green-100 text-green-800";

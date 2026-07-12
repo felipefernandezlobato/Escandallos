@@ -8,6 +8,8 @@ const MOBILE_ITEMS = [
   { href: "/menu", label: "Menú", icon: "📖" },
   { href: "/recetas", label: "Recetas", icon: "📋" },
   { href: "/ingredientes", label: "Ingredientes", icon: "🥫" },
+  { href: "/proveedores", label: "Proveedores", icon: "🏪" },
+  { href: "/importar", label: "Importar", icon: "📥" },
   { href: "/configuracion", label: "Config", icon: "⚙️" },
 ];
 
@@ -15,7 +17,7 @@ export function MobileNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="md:hidden fixed bottom-0 inset-x-0 bg-white border-t border-slate-200 z-30 flex">
+    <nav className="md:hidden fixed bottom-0 inset-x-0 bg-white border-t border-[#E8DFD3] z-30 flex">
       {MOBILE_ITEMS.map((item) => {
         const active =
           item.href === "/"
@@ -27,8 +29,8 @@ export function MobileNav() {
             href={item.href}
             className={`flex-1 flex flex-col items-center py-2 text-xs transition-colors ${
               active
-                ? "text-blue-600 font-medium"
-                : "text-slate-500"
+                ? "text-[#8B1A2B] font-medium"
+                : "text-[#6B5E52]"
             }`}
           >
             <span className="text-lg">{item.icon}</span>

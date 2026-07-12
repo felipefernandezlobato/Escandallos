@@ -116,7 +116,7 @@ export default function IngredientesPage() {
         <h1 className="text-2xl font-bold">Ingredientes</h1>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+          className="bg-[#8B1A2B] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#6B1420] transition-colors"
         >
           {showForm ? "Cancelar" : "+ Nuevo Ingrediente"}
         </button>
@@ -129,12 +129,12 @@ export default function IngredientesPage() {
           placeholder="Buscar ingrediente..."
           value={buscar}
           onChange={(e) => setBuscar(e.target.value)}
-          className="border border-slate-300 rounded-lg px-3 py-2 text-sm flex-1 min-w-[200px]"
+          className="border border-[#D4C4A8] rounded-lg px-3 py-2 text-sm flex-1 min-w-[200px]"
         />
         <select
           value={filtroCategoria}
           onChange={(e) => setFiltroCategoria(e.target.value)}
-          className="border border-slate-300 rounded-lg px-3 py-2 text-sm"
+          className="border border-[#D4C4A8] rounded-lg px-3 py-2 text-sm"
         >
           <option value="">Todas las categorías</option>
           {categorias.map((c) => (
@@ -146,7 +146,7 @@ export default function IngredientesPage() {
         <select
           value={filtroProveedor}
           onChange={(e) => setFiltroProveedor(e.target.value)}
-          className="border border-slate-300 rounded-lg px-3 py-2 text-sm"
+          className="border border-[#D4C4A8] rounded-lg px-3 py-2 text-sm"
         >
           <option value="">Todos los proveedores</option>
           {proveedores.map((p) => (
@@ -161,25 +161,25 @@ export default function IngredientesPage() {
       {showForm && (
         <form
           onSubmit={handleCreate}
-          className="bg-white border border-slate-200 rounded-lg p-4 space-y-4"
+          className="bg-white border border-[#E8DFD3] rounded-lg p-4 space-y-4"
         >
           <h3 className="font-semibold">Nuevo Ingrediente</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <div>
-              <label className="block text-xs text-slate-500 mb-1">Nombre</label>
+              <label className="block text-xs text-[#6B5E52] mb-1">Nombre</label>
               <input
                 required
                 value={form.nombre}
                 onChange={(e) => setForm({ ...form, nombre: e.target.value })}
-                className="w-full border border-slate-300 rounded px-3 py-2 text-sm"
+                className="w-full border border-[#D4C4A8] rounded px-3 py-2 text-sm"
               />
             </div>
             <div>
-              <label className="block text-xs text-slate-500 mb-1">Categoría</label>
+              <label className="block text-xs text-[#6B5E52] mb-1">Categoría</label>
               <select
                 value={form.categoria_id}
                 onChange={(e) => setForm({ ...form, categoria_id: parseInt(e.target.value) })}
-                className="w-full border border-slate-300 rounded px-3 py-2 text-sm"
+                className="w-full border border-[#D4C4A8] rounded px-3 py-2 text-sm"
               >
                 {categorias.map((c) => (
                   <option key={c.id} value={c.id}>
@@ -189,19 +189,19 @@ export default function IngredientesPage() {
               </select>
             </div>
             <div>
-              <label className="block text-xs text-slate-500 mb-1">Proveedor</label>
+              <label className="block text-xs text-[#6B5E52] mb-1">Proveedor</label>
               <input
                 value={form.proveedor}
                 onChange={(e) => setForm({ ...form, proveedor: e.target.value })}
-                className="w-full border border-slate-300 rounded px-3 py-2 text-sm"
+                className="w-full border border-[#D4C4A8] rounded px-3 py-2 text-sm"
               />
             </div>
             <div>
-              <label className="block text-xs text-slate-500 mb-1">Unidad compra</label>
+              <label className="block text-xs text-[#6B5E52] mb-1">Unidad compra</label>
               <select
                 value={form.unidad_compra}
                 onChange={(e) => setForm({ ...form, unidad_compra: e.target.value })}
-                className="w-full border border-slate-300 rounded px-3 py-2 text-sm"
+                className="w-full border border-[#D4C4A8] rounded px-3 py-2 text-sm"
               >
                 {UNIDADES.map((u) => (
                   <option key={u} value={u}>{u}</option>
@@ -209,33 +209,33 @@ export default function IngredientesPage() {
               </select>
             </div>
             <div>
-              <label className="block text-xs text-slate-500 mb-1">Cantidad compra</label>
+              <label className="block text-xs text-[#6B5E52] mb-1">Cantidad compra</label>
               <input
                 type="number"
                 step="any"
                 required
                 value={form.cantidad_compra}
                 onChange={(e) => setForm({ ...form, cantidad_compra: parseFloat(e.target.value) || 0 })}
-                className="w-full border border-slate-300 rounded px-3 py-2 text-sm"
+                className="w-full border border-[#D4C4A8] rounded px-3 py-2 text-sm"
               />
             </div>
             <div>
-              <label className="block text-xs text-slate-500 mb-1">Precio compra (CHF)</label>
+              <label className="block text-xs text-[#6B5E52] mb-1">Precio compra (CHF)</label>
               <input
                 type="number"
                 step="any"
                 required
                 value={form.precio_compra}
                 onChange={(e) => setForm({ ...form, precio_compra: parseFloat(e.target.value) || 0 })}
-                className="w-full border border-slate-300 rounded px-3 py-2 text-sm"
+                className="w-full border border-[#D4C4A8] rounded px-3 py-2 text-sm"
               />
             </div>
             <div>
-              <label className="block text-xs text-slate-500 mb-1">Unidad uso</label>
+              <label className="block text-xs text-[#6B5E52] mb-1">Unidad uso</label>
               <select
                 value={form.unidad_uso}
                 onChange={(e) => setForm({ ...form, unidad_uso: e.target.value })}
-                className="w-full border border-slate-300 rounded px-3 py-2 text-sm"
+                className="w-full border border-[#D4C4A8] rounded px-3 py-2 text-sm"
               >
                 {UNIDADES.map((u) => (
                   <option key={u} value={u}>{u}</option>
@@ -243,7 +243,7 @@ export default function IngredientesPage() {
               </select>
             </div>
             <div>
-              <label className="block text-xs text-slate-500 mb-1">Merma (%)</label>
+              <label className="block text-xs text-[#6B5E52] mb-1">Merma (%)</label>
               <input
                 type="number"
                 step="any"
@@ -251,13 +251,13 @@ export default function IngredientesPage() {
                 max="99"
                 value={form.merma_porcentaje}
                 onChange={(e) => setForm({ ...form, merma_porcentaje: parseFloat(e.target.value) || 0 })}
-                className="w-full border border-slate-300 rounded px-3 py-2 text-sm"
+                className="w-full border border-[#D4C4A8] rounded px-3 py-2 text-sm"
               />
             </div>
           </div>
           <button
             type="submit"
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700"
+            className="bg-[#8B1A2B] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#6B1420]"
           >
             Crear Ingrediente
           </button>
@@ -266,9 +266,9 @@ export default function IngredientesPage() {
 
       {/* Table */}
       {loading ? (
-        <p className="text-slate-500 text-center py-10">Cargando...</p>
+        <p className="text-[#6B5E52] text-center py-10">Cargando...</p>
       ) : ingredientesFiltrados.length === 0 ? (
-        <p className="text-slate-500 text-center py-10">
+        <p className="text-[#6B5E52] text-center py-10">
           {ingredientes.length === 0
             ? "No hay ingredientes. Crea uno para empezar."
             : "No hay ingredientes que coincidan con los filtros."}
@@ -277,7 +277,7 @@ export default function IngredientesPage() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-slate-200 text-left text-slate-500">
+              <tr className="border-b border-[#E8DFD3] text-left text-[#6B5E52]">
                 <th className="pb-2 font-medium">Nombre</th>
                 <th className="pb-2 font-medium">Categoría</th>
                 <th className="pb-2 font-medium">Proveedor</th>
@@ -290,10 +290,10 @@ export default function IngredientesPage() {
             </thead>
             <tbody>
               {ingredientesFiltrados.map((ing) => (
-                <tr key={ing.id} className="border-b border-slate-100 hover:bg-slate-50">
+                <tr key={ing.id} className="border-b border-[#E8DFD3]/50 hover:bg-[#F5F0E8]">
                   <td className="py-2 font-medium">{ing.nombre}</td>
-                  <td className="py-2 text-slate-500">{ing.categoria_nombre}</td>
-                  <td className="py-2 text-slate-500">{ing.proveedor || "—"}</td>
+                  <td className="py-2 text-[#6B5E52]">{ing.categoria_nombre}</td>
+                  <td className="py-2 text-[#6B5E52]">{ing.proveedor || "—"}</td>
                   <td className="py-2 text-right">
                     {editingPrice === ing.id ? (
                       <span className="flex items-center justify-end gap-1">
@@ -306,7 +306,7 @@ export default function IngredientesPage() {
                             if (e.key === "Enter") handlePriceUpdate(ing.id);
                             if (e.key === "Escape") setEditingPrice(null);
                           }}
-                          className="w-20 border border-blue-400 rounded px-1 py-0.5 text-sm text-right"
+                          className="w-20 border border-[#8B1A2B] rounded px-1 py-0.5 text-sm text-right"
                           autoFocus
                         />
                         <button
@@ -322,7 +322,7 @@ export default function IngredientesPage() {
                           setEditingPrice(ing.id);
                           setEditPriceValue(String(ing.precio_compra));
                         }}
-                        className="hover:text-blue-600 cursor-pointer"
+                        className="hover:text-[#8B1A2B] cursor-pointer"
                         title="Click para editar precio"
                       >
                         {ing.precio_compra.toFixed(2)} CHF/{ing.unidad_compra}
@@ -333,7 +333,7 @@ export default function IngredientesPage() {
                   <td className="py-2 text-right font-mono text-xs">
                     {ing.coste_por_unidad_uso.toFixed(4)} CHF/{ing.unidad_uso}
                   </td>
-                  <td className="py-2 text-right text-slate-500">{ing.num_recetas}</td>
+                  <td className="py-2 text-right text-[#6B5E52]">{ing.num_recetas}</td>
                   <td className="py-2 text-right">
                     <button
                       onClick={() => handleDelete(ing.id)}

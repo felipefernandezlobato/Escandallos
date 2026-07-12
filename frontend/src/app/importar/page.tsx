@@ -97,28 +97,28 @@ export default function ImportarPage() {
       <h1 className="text-2xl font-bold">Importar Datos de Factura</h1>
 
       {/* Step 1: PDF Upload */}
-      <div className="bg-white border border-slate-200 rounded-lg p-4 space-y-4">
+      <div className="bg-white border border-[#E8DFD3] rounded-lg p-4 space-y-4">
         <h3 className="font-semibold">1. Sube la factura (PDF)</h3>
         <div className="flex gap-3 items-center">
-          <label className="bg-slate-800 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-700 cursor-pointer transition-colors">
+          <label className="bg-[#8B1A2B] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#6B1420] cursor-pointer transition-colors">
             {uploading ? "Procesando..." : "Subir PDF"}
             <input type="file" accept=".pdf" className="hidden" onChange={handlePdfUpload} disabled={uploading} />
           </label>
-          <span className="text-xs text-slate-400">Se extrae el texto automáticamente</span>
+          <span className="text-xs text-[#6B5E52]/70">Se extrae el texto automáticamente</span>
         </div>
 
         {pdfTexto && (
           <div>
             <div className="flex items-center justify-between mb-1">
-              <p className="text-xs text-slate-500">Texto extraído del PDF:</p>
+              <p className="text-xs text-[#6B5E52]">Texto extraído del PDF:</p>
               <button
                 onClick={() => navigator.clipboard.writeText(pdfTexto)}
-                className="text-xs text-blue-600 hover:underline"
+                className="text-xs text-[#8B1A2B] hover:underline"
               >
                 Copiar texto
               </button>
             </div>
-            <pre className="bg-slate-50 border border-slate-200 rounded-lg p-3 text-xs font-mono whitespace-pre-wrap max-h-60 overflow-y-auto">
+            <pre className="bg-[#F5F0E8] border border-[#E8DFD3] rounded-lg p-3 text-xs font-mono whitespace-pre-wrap max-h-60 overflow-y-auto">
               {pdfTexto}
             </pre>
           </div>
@@ -126,29 +126,29 @@ export default function ImportarPage() {
       </div>
 
       {/* Step 2: JSON */}
-      <div className="bg-white border border-slate-200 rounded-lg p-4 space-y-4">
+      <div className="bg-white border border-[#E8DFD3] rounded-lg p-4 space-y-4">
         <h3 className="font-semibold">2. Pega el JSON de Claude</h3>
-        <p className="text-xs text-slate-500">
+        <p className="text-xs text-[#6B5E52]">
           Copia el texto del PDF + el prompt template de abajo a Claude. Pega el JSON resultante aquí.
         </p>
         <textarea
           value={jsonInput}
           onChange={(e) => setJsonInput(e.target.value)}
           placeholder="Pega el JSON aquí..."
-          className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm font-mono"
+          className="w-full border border-[#D4C4A8] rounded-lg px-3 py-2 text-sm font-mono"
           rows={8}
         />
         <div className="flex gap-3">
           <button
             onClick={handlePreview}
             disabled={!jsonInput.trim()}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="bg-[#8B1A2B] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#6B1420] disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Vista Previa
           </button>
           <button
             onClick={() => setJsonInput(EJEMPLO_JSON)}
-            className="border border-slate-300 px-4 py-2 rounded-lg text-sm hover:bg-slate-50"
+            className="border border-[#D4C4A8] px-4 py-2 rounded-lg text-sm hover:bg-[#F5F0E8]"
           >
             Ejemplo
           </button>
@@ -172,11 +172,11 @@ export default function ImportarPage() {
       )}
 
       {preview && (
-        <div className="bg-white border border-slate-200 rounded-lg p-4 space-y-4">
+        <div className="bg-white border border-[#E8DFD3] rounded-lg p-4 space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <h3 className="font-semibold">Vista Previa — {preview.proveedor}</h3>
-              <p className="text-xs text-slate-500">Fecha: {preview.fecha}</p>
+              <p className="text-xs text-[#6B5E52]">Fecha: {preview.fecha}</p>
             </div>
             <button
               onClick={handleConfirm}
@@ -189,7 +189,7 @@ export default function ImportarPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-slate-200 text-left text-slate-500">
+                <tr className="border-b border-[#E8DFD3] text-left text-[#6B5E52]">
                   <th className="pb-2 font-medium">Producto</th>
                   <th className="pb-2 font-medium">Estado</th>
                   <th className="pb-2 font-medium text-right">Cantidad</th>
@@ -205,11 +205,11 @@ export default function ImportarPage() {
                       ? ((m.item.precio_unitario - m.precio_anterior) / m.precio_anterior) * 100
                       : null;
                   return (
-                    <tr key={i} className="border-b border-slate-100">
+                    <tr key={i} className="border-b border-[#E8DFD3]/50">
                       <td className="py-2">
                         <div>{m.item.nombre}</div>
                         {m.ingrediente_nombre && (
-                          <div className="text-xs text-slate-400">→ {m.ingrediente_nombre}</div>
+                          <div className="text-xs text-[#6B5E52]/70">→ {m.ingrediente_nombre}</div>
                         )}
                       </td>
                       <td className="py-2">
@@ -223,7 +223,7 @@ export default function ImportarPage() {
                         {m.item.cantidad} {m.item.unidad}
                       </td>
                       <td className="py-2 text-right">{m.item.precio_unitario.toFixed(2)} CHF</td>
-                      <td className="py-2 text-right text-slate-400">
+                      <td className="py-2 text-right text-[#6B5E52]/70">
                         {m.precio_anterior ? `${m.precio_anterior.toFixed(2)} CHF` : "—"}
                       </td>
                       <td className="py-2 text-right">
@@ -246,12 +246,12 @@ export default function ImportarPage() {
       )}
 
       {/* Prompt template */}
-      <details className="bg-white border border-slate-200 rounded-lg">
-        <summary className="px-4 py-3 text-sm font-medium cursor-pointer hover:bg-slate-50">
+      <details className="bg-white border border-[#E8DFD3] rounded-lg">
+        <summary className="px-4 py-3 text-sm font-medium cursor-pointer hover:bg-[#F5F0E8]">
           Prompt Template para Claude
         </summary>
         <div className="px-4 pb-4">
-          <pre className="bg-slate-50 rounded p-3 text-xs font-mono whitespace-pre-wrap overflow-x-auto">{`Analiza esta factura de proveedor y extrae los datos en el siguiente formato JSON:
+          <pre className="bg-[#F5F0E8] rounded p-3 text-xs font-mono whitespace-pre-wrap overflow-x-auto">{`Analiza esta factura de proveedor y extrae los datos en el siguiente formato JSON:
 
 {
   "proveedor": "nombre del proveedor",

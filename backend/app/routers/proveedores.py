@@ -126,7 +126,7 @@ def comparar_todos(db: Session = Depends(get_db)):
         db.query(PrecioProveedor)
         .options(
             joinedload(PrecioProveedor.proveedor_rel),
-            joinedload(PrecioProveedor.ingrediente_rel),
+            joinedload(PrecioProveedor.ingrediente_rel).joinedload(Ingrediente.categoria_rel),
         )
         .order_by(PrecioProveedor.ingrediente_id, PrecioProveedor.precio_por_unidad)
         .all()
@@ -134,11 +134,14 @@ def comparar_todos(db: Session = Depends(get_db)):
 
     result = {}
     for p in precios:
-        ing_name = p.ingrediente_rel.nombre
+        ing = p.ingrediente_rel
+        ing_name = ing.nombre
         if ing_name not in result:
+            cat = ing.categoria_rel
             result[ing_name] = {
                 "ingrediente_id": p.ingrediente_id,
-                "precio_actual": p.ingrediente_rel.precio_compra,
+                "precio_actual": ing.precio_compra,
+                "categoria": cat.nombre if cat else "Sin categoría",
                 "proveedores": [],
             }
         result[ing_name]["proveedores"].append({
