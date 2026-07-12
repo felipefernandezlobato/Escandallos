@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.database import Base, engine, get_db, SessionLocal
-from app.routers import categorias, ingredientes, recetas, importar, dashboard, backup
+from app.routers import categorias, ingredientes, recetas, importar, dashboard, backup, proveedores
 from app.models import Categoria
 
 Base.metadata.create_all(bind=engine)
@@ -27,6 +27,7 @@ app.include_router(recetas.router)
 app.include_router(importar.router)
 app.include_router(dashboard.router)
 app.include_router(backup.router)
+app.include_router(proveedores.router)
 
 
 @app.get("/api/health")

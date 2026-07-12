@@ -111,3 +111,30 @@ class HistorialPrecio(Base):
     fecha_cambio: Mapped[date] = mapped_column(Date, default=func.current_date())
 
     ingrediente_rel: Mapped["Ingrediente"] = relationship(back_populates="historial_precios")
+
+
+class Proveedor(Base):
+    __tablename__ = "proveedores"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    nombre: Mapped[str] = mapped_column(String(200), nullable=False, unique=True)
+    notas: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
+    precios: Mapped[List["PrecioProveedor"]] = relationship(back_populates="proveedor_rel", cascade="all, delete-orphan")
+
+
+class PrecioProveedor(Base):
+    __tablename__ = "precios_proveedor"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    ingrediente_id: Mapped[int] = mapped_column(Integer, ForeignKey("ingredientes.id"), nullable=False)
+    proveedor_id: Mapped[int] = mapped_column(Integer, ForeignKey("proveedores.id"), nullable=False)
+    precio: Mapped[float] = mapped_column(Float, nullable=False)
+    unidad: Mapped[str] = mapped_column(String(20), nullable=False)
+    cantidad: Mapped[float] = mapped_column(Float, nullable=False, default=1)
+    precio_por_unidad: Mapped[float] = mapped_column(Float, nullable=False)
+    fecha: Mapped[date] = mapped_column(Date, default=func.current_date())
+    notas: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
+    ingrediente_rel: Mapped["Ingrediente"] = relationship()
+    proveedor_rel: Mapped["Proveedor"] = relationship(back_populates="precios")
