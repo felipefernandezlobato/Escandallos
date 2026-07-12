@@ -198,8 +198,8 @@ const MENU: MenuSection[] = [
       { name: "Margarita", pvp: 16.9, recipeName: "Margarita" },
       { name: "Hugo Free", pvp: 12.9, recipeName: "Hugo Free" },
       { name: "Cucumber Cooler", pvp: 11.9, recipeName: "Cucumber Cooler" },
-      { name: "Sangría Copa", pvp: null, recipeName: "Sangría Copa" },
-      { name: "Sangría Jarra 1L", pvp: null, recipeName: "Sangría Jarra 1L" },
+      { name: "Sangría Copa 25cl", pvp: 7.5, recipeName: "Sangría Copa" },
+      { name: "Sangría Jarra 1L", pvp: 20.0, recipeName: "Sangría Jarra 1L" },
     ],
   },
 ];
