@@ -32,7 +32,7 @@ const MENU: MenuSection[] = [
       { name: "Flat White", pvp: 5.9, recipeName: "Flat White" },
       { name: "Espresso / Americano Freddo", pvp: 4.9, recipeName: "Espresso Freddo" },
       { name: "Latte Freddo", pvp: 6.9, recipeName: "Latte Freddo" },
-      { name: "Cold Brü", pvp: 4.9 },
+      { name: "Cold Brü", pvp: 4.9, recipeName: "Cold Brü" },
       { name: "Montblanc", pvp: 7.9, recipeName: "Mont Blanc" },
       { name: "Espresso Tonic", pvp: 7.9, recipeName: "Espresso Tonic" },
       { name: "Sunset at Brü", pvp: 7.9, recipeName: "Sunset at Brü" },
