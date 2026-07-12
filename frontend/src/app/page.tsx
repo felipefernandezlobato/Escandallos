@@ -275,6 +275,7 @@ export default function Dashboard() {
                     <th className="px-3 py-1.5 font-medium">Item</th>
                     <th className="px-3 py-1.5 font-medium text-right">Coste</th>
                     <th className="px-3 py-1.5 font-medium text-right">PVP</th>
+                    <th className="px-3 py-1.5 font-medium text-right">Margen</th>
                     <th className="px-3 py-1.5 font-medium text-right">x</th>
                   </tr>
                 </thead>
@@ -301,6 +302,9 @@ export default function Dashboard() {
                         </td>
                         <td className="px-3 py-1 text-right">
                           {item.pvp ? item.pvp.toFixed(2) : "—"}
+                        </td>
+                        <td className="px-3 py-1 text-right font-mono text-xs">
+                          {item.coste !== undefined && item.pvp ? (item.pvp - item.coste).toFixed(2) : "—"}
                         </td>
                         <td className={`px-3 py-1 text-right font-mono ${multiColor}`}>
                           {item.multi !== null ? `x${item.multi.toFixed(1)}` : "—"}

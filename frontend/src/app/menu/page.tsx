@@ -247,6 +247,7 @@ export default function MenuPage() {
                   <th className="px-4 py-2 font-medium">Item</th>
                   <th className="px-4 py-2 font-medium text-right w-24">Coste</th>
                   <th className="px-4 py-2 font-medium text-right w-24">PVP</th>
+                  <th className="px-4 py-2 font-medium text-right w-24">Margen</th>
                   <th className="px-4 py-2 font-medium text-right w-16">x</th>
                 </tr>
               </thead>
@@ -285,6 +286,9 @@ export default function MenuPage() {
                       </td>
                       <td className="px-4 py-1.5 text-right">
                         {pvp ? pvp.toFixed(2) : "—"}
+                      </td>
+                      <td className="px-4 py-1.5 text-right font-mono text-xs">
+                        {coste !== undefined && pvp ? (pvp - coste).toFixed(2) : "—"}
                       </td>
                       <td className={`px-4 py-1.5 text-right font-mono ${multiColor}`}>
                         {multi !== null ? `x${multi.toFixed(1)}` : "—"}
