@@ -85,8 +85,9 @@ export default function RecetasPage() {
         <p className="text-slate-500 text-center py-10">No hay recetas. Crea una para empezar.</p>
       ) : (
         <div className="space-y-8">
-          {categorias
-            .filter((cat) => recetas.some((r) => r.categoria_nombre === cat.nombre))
+          {["Cafetería", "Bebida", "Postre", "Brunch", "Snack"]
+            .map((nombre) => categorias.find((c) => c.nombre === nombre))
+            .filter((cat): cat is Categoria => cat !== undefined && recetas.some((r) => r.categoria_nombre === cat.nombre))
             .map((cat) => (
               <section key={cat.id}>
                 <h2 className="text-lg font-bold mb-3">{cat.nombre}</h2>
