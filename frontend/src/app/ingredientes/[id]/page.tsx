@@ -245,11 +245,13 @@ export default function IngredienteDetailPage() {
               <tr className="bg-[#F5F0E8] text-left text-[#6B5E52] border-b border-[#E8DFD3]">
                 <th className="px-4 py-2 font-medium">Receta</th>
                 <th className="px-4 py-2 font-medium">Categoria</th>
-                <th className="px-4 py-2 font-medium text-right">Margen</th>
+                <th className="px-4 py-2 font-medium text-right">x</th>
               </tr>
             </thead>
             <tbody>
-              {recetas.map((r) => (
+              {recetas.map((r) => {
+                const multi = r.precio_venta && r.coste_por_porcion > 0 ? r.precio_venta / r.coste_por_porcion : null;
+                return (
                 <tr key={r.id} className="border-b border-[#E8DFD3]/50">
                   <td className="px-4 py-2">
                     <Link href={`/recetas/${r.id}`} className="text-[#8B1A2B] hover:underline">
@@ -257,11 +259,17 @@ export default function IngredienteDetailPage() {
                     </Link>
                   </td>
                   <td className="px-4 py-2 text-[#6B5E52]">{r.categoria_nombre}</td>
-                  <td className="px-4 py-2 text-right">
-                    {r.margen_real != null ? `${r.margen_real.toFixed(1)}%` : "—"}
+                  <td className={`px-4 py-2 text-right font-mono ${
+                    multi === null ? "text-[#6B5E52]/50" :
+                    multi >= 8 ? "text-green-600 font-medium" :
+                    multi >= 5 ? "text-orange-500" :
+                    "text-red-600 font-medium"
+                  }`}>
+                    {multi !== null ? `x${multi.toFixed(1)}` : "—"}
                   </td>
                 </tr>
-              ))}
+                );
+              })}
             </tbody>
           </table>
         )}

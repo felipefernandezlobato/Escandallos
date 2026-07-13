@@ -24,9 +24,14 @@ router = APIRouter(prefix="/api/recetas", tags=["recetas"])
 
 
 def _receta_to_out(r: Receta, db: Session) -> dict:
-    ct = coste_total_receta(r, db)
-    cpp = coste_por_racion(r, db)
-    mr = margen_real(r, db)
+    try:
+        ct = coste_total_receta(r, db)
+        cpp = coste_por_racion(r, db)
+        mr = margen_real(r, db)
+    except (ValueError, ZeroDivisionError):
+        ct = 0.0
+        cpp = 0.0
+        mr = None
     return {
         **{c.key: getattr(r, c.key) for c in Receta.__table__.columns},
         "coste_total": round(ct, 4),

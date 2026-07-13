@@ -189,9 +189,14 @@ def recetas_con_ingrediente(ingrediente_id: int, db: Session = Depends(get_db), 
             .filter(Receta.id == r.id)
             .first()
         )
-        ct = coste_total_receta(r, db)
-        cpp = coste_por_racion(r, db)
-        mr = margen_real(r, db)
+        try:
+            ct = coste_total_receta(r, db)
+            cpp = coste_por_racion(r, db)
+            mr = margen_real(r, db)
+        except (ValueError, ZeroDivisionError):
+            ct = 0.0
+            cpp = 0.0
+            mr = None
         result.append({
             **{c.key: getattr(r, c.key) for c in Receta.__table__.columns},
             "coste_total": round(ct, 4),

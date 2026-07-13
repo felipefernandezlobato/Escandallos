@@ -282,6 +282,8 @@ export default function RecetaDetailPage() {
                       <span className="text-purple-600 text-xs mr-1">SUB</span>
                       <Link href={`/recetas/${l.subreceta_id}`} className="text-[#8B1A2B] hover:underline">{l.nombre_subreceta}</Link>
                     </span>
+                  ) : l.ingrediente_id ? (
+                    <Link href={`/ingredientes/${l.ingrediente_id}`} className="text-[#8B1A2B] hover:underline">{l.nombre_ingrediente}</Link>
                   ) : (
                     l.nombre_ingrediente
                   )}
