@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { apiFetch } from "@/lib/api";
-import type { Ingrediente, Categoria } from "@/lib/types";
+import type { Ingrediente, Categoria, RecomendacionItem } from "@/lib/types";
 
 interface StockEntry {
   ingrediente_id: number;
@@ -73,6 +73,11 @@ export default function InventarioPage() {
   } | null>(null);
   const [selectedIngId, setSelectedIngId] = useState<number | null>(null);
   const [vista, setVista] = useState<"cocina" | "cafe">("cocina");
+  const [ultimoConteo, setUltimoConteo] = useState<Record<string, string>>({});
+  const [recomendaciones, setRecomendaciones] = useState<RecomendacionItem[]>([]);
+  const [showRecomendaciones, setShowRecomendaciones] = useState(false);
+  const [cantidadesPedido, setCantidadesPedido] = useState<Record<number, string>>({});
+  const [creatingOrder, setCreatingOrder] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -80,8 +85,10 @@ export default function InventarioPage() {
       apiFetch<Ingrediente[]>("/api/ingredientes"),
       apiFetch<Categoria[]>("/api/categorias?tipo=ingrediente"),
       apiFetch<{ fechas: string[]; snapshot: InventarioSnapshot | null }>("/api/inventario"),
+      apiFetch<Record<string, string>>("/api/inventario/ultimo-conteo"),
     ])
-      .then(([ings, cats, inv]) => {
+      .then(([ings, cats, inv, conteo]) => {
+        setUltimoConteo(conteo);
         setIngredientes(ings);
         setCategorias(cats);
         setFechas(inv.fechas || []);
@@ -131,6 +138,7 @@ export default function InventarioPage() {
   };
 
   const ingredientesFiltrados = ingredientes.filter((ing) => {
+    if (ing.excluir_pedidos) return false;
     if (filtroCategoria && String(ing.categoria_id) !== filtroCategoria) return false;
     if (buscar && !ing.nombre.toLowerCase().includes(buscar.toLowerCase())) return false;
     return true;
@@ -175,6 +183,20 @@ export default function InventarioPage() {
       setLastSaved(new Date().toLocaleTimeString("es"));
       const inv = await apiFetch<{ fechas: string[] }>("/api/inventario");
       setFechas(inv.fechas || []);
+      const conteo = await apiFetch<Record<string, string>>("/api/inventario/ultimo-conteo");
+      setUltimoConteo(conteo);
+
+      const ids = registros.map((r) => r.ingrediente_id).join(",");
+      const rec = await apiFetch<{ items: RecomendacionItem[] }>(
+        `/api/inventario/recomendacion?ingrediente_ids=${ids}`
+      );
+      setRecomendaciones(rec.items);
+      const initial: Record<number, string> = {};
+      for (const item of rec.items) {
+        initial[item.ingrediente_id] = String(item.cantidad_sugerida);
+      }
+      setCantidadesPedido(initial);
+      setShowRecomendaciones(true);
     } catch (err) {
       alert("Error al guardar: " + (err as Error).message);
     } finally {
@@ -197,6 +219,51 @@ export default function InventarioPage() {
   const filledCount = Object.values(stock).filter(
     (s) => s.cantidad !== "" && parseFloat(s.cantidad) >= 0
   ).length;
+
+  const formatUltimoConteo = (ingId: number): string => {
+    const fecha = ultimoConteo[String(ingId)];
+    if (!fecha) return "—";
+    const diff = Math.floor(
+      (Date.now() - new Date(fecha + "T00:00:00").getTime()) / 86400000
+    );
+    if (diff === 0) return "hoy";
+    if (diff === 1) return "ayer";
+    if (diff < 7) return `hace ${diff}d`;
+    const weeks = Math.floor(diff / 7);
+    return weeks === 1 ? "hace 1 sem" : `hace ${weeks} sem`;
+  };
+
+  const handleCrearPedido = async (proveedor: string) => {
+    const items = recomendaciones.filter((r) => r.proveedor === proveedor);
+    const lineas = items
+      .filter((item) => {
+        const qty = parseFloat(cantidadesPedido[item.ingrediente_id] || "0");
+        return qty > 0;
+      })
+      .map((item) => ({
+        ingrediente_id: item.ingrediente_id,
+        cantidad_pedida: parseFloat(cantidadesPedido[item.ingrediente_id] || "0"),
+        unidad: item.unidad,
+      }));
+
+    if (lineas.length === 0) {
+      alert("No hay items con cantidad > 0 para este proveedor.");
+      return;
+    }
+
+    setCreatingOrder(true);
+    try {
+      await apiFetch("/api/pedidos", {
+        method: "POST",
+        body: JSON.stringify({ proveedor, lineas }),
+      });
+      alert(`Pedido para ${proveedor} creado como borrador.`);
+    } catch (err) {
+      alert("Error: " + (err as Error).message);
+    } finally {
+      setCreatingOrder(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -244,6 +311,7 @@ export default function InventarioPage() {
 
       {tab === "registrar" && (
         <>
+          {!showRecomendaciones && (<>
           <div className="flex gap-2 items-center">
             <button
               onClick={() => setVista("cocina")}
@@ -289,7 +357,7 @@ export default function InventarioPage() {
                 ))}
             </select>
             <span className="text-sm text-[#6B5E52]">
-              {filledCount} / {ingredientes.length}
+              {filledCount} / {ingredientesFiltrados.length}
             </span>
             {filledCount > 0 && (
               <button
@@ -316,9 +384,14 @@ export default function InventarioPage() {
                         key={ing.id}
                         className="flex items-center gap-2 bg-white border border-[#E8DFD3] rounded-lg px-3 py-2"
                       >
-                        <Link href={`/ingredientes/${ing.id}`} className="flex-1 text-sm truncate text-[#8B1A2B] hover:underline" title={ing.nombre}>
-                          {ing.nombre}
-                        </Link>
+                        <div className="flex-1 min-w-0">
+                          <Link href={`/ingredientes/${ing.id}`} className="text-sm truncate block text-[#8B1A2B] hover:underline" title={ing.nombre}>
+                            {ing.nombre}
+                          </Link>
+                          <span className="text-[10px] text-[#6B5E52]/60">
+                            {formatUltimoConteo(ing.id)}
+                          </span>
+                        </div>
                         <input
                           type="number"
                           step="any"
@@ -346,19 +419,143 @@ export default function InventarioPage() {
               ))}
             </div>
           )}
+          </>)}
 
-          <div className="sticky bottom-16 md:bottom-0 bg-[#F5F0E8] border-t border-[#E8DFD3] -mx-6 px-6 py-3 flex items-center justify-between">
-            <div className="text-sm text-[#6B5E52]">
-              {lastSaved && <span>Guardado a las {lastSaved}</span>}
+          {!showRecomendaciones && (
+            <div className="sticky bottom-16 md:bottom-0 bg-[#F5F0E8] border-t border-[#E8DFD3] -mx-6 px-6 py-3 flex items-center justify-between">
+              <div className="text-sm text-[#6B5E52]">
+                {lastSaved && <span>Guardado a las {lastSaved}</span>}
+              </div>
+              <button
+                onClick={handleSave}
+                disabled={saving || filledCount === 0}
+                className="bg-[#8B1A2B] text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-[#6B1420] transition-colors disabled:opacity-50"
+              >
+                {saving ? "Guardando..." : `Guardar y ver recomendacion (${filledCount})`}
+              </button>
             </div>
-            <button
-              onClick={handleSave}
-              disabled={saving || filledCount === 0}
-              className="bg-[#8B1A2B] text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-[#6B1420] transition-colors disabled:opacity-50"
-            >
-              {saving ? "Guardando..." : `Guardar Inventario (${filledCount})`}
-            </button>
-          </div>
+          )}
+
+          {showRecomendaciones && recomendaciones.length > 0 && (
+            <div className="space-y-6 mt-6">
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold">Recomendacion de Pedido</h2>
+                <button
+                  onClick={() => setShowRecomendaciones(false)}
+                  className="text-sm text-[#6B5E52] hover:text-[#8B1A2B]"
+                >
+                  Volver a inventario
+                </button>
+              </div>
+
+              {(() => {
+                const proveedores = Array.from(
+                  new Set(recomendaciones.map((r) => r.proveedor))
+                ).sort((a, b) => a.localeCompare(b, "es"));
+
+                return proveedores.map((prov) => {
+                  const items = recomendaciones.filter(
+                    (r) => r.proveedor === prov
+                  );
+                  const hasPositive = items.some(
+                    (i) => parseFloat(cantidadesPedido[i.ingrediente_id] || "0") > 0
+                  );
+                  return (
+                    <div
+                      key={prov}
+                      className="bg-white border border-[#E8DFD3] rounded-lg overflow-hidden"
+                    >
+                      <div className="flex items-center justify-between px-4 py-3 bg-[#F5F0E8] border-b border-[#E8DFD3]">
+                        <h3 className="font-semibold text-[#8B1A2B]">{prov}</h3>
+                        {hasPositive && (
+                          <button
+                            onClick={() => handleCrearPedido(prov)}
+                            disabled={creatingOrder}
+                            className="bg-[#8B1A2B] text-white px-3 py-1.5 rounded text-xs font-medium hover:bg-[#6B1420] transition-colors disabled:opacity-50"
+                          >
+                            Crear Pedido
+                          </button>
+                        )}
+                      </div>
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="border-b border-[#E8DFD3] text-left text-[#6B5E52]">
+                            <th className="px-4 py-2 font-medium">Ingrediente</th>
+                            <th className="px-4 py-2 font-medium text-right">Stock</th>
+                            <th className="px-4 py-2 font-medium text-right">
+                              Stk Deseado
+                            </th>
+                            <th className="px-4 py-2 font-medium text-right">Pedir</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {items.map((item) => (
+                            <tr
+                              key={item.ingrediente_id}
+                              className="border-b border-[#E8DFD3]/50 hover:bg-[#F5F0E8]"
+                            >
+                              <td className="px-4 py-2">
+                                <div>
+                                  <Link
+                                    href={`/ingredientes/${item.ingrediente_id}`}
+                                    className="text-[#8B1A2B] hover:underline"
+                                  >
+                                    {item.ingrediente_nombre}
+                                  </Link>
+                                  {item.nota && (
+                                    <span className="text-[10px] text-[#6B5E52]/60 ml-2">
+                                      {item.nota}
+                                    </span>
+                                  )}
+                                </div>
+                              </td>
+                              <td className="px-4 py-2 text-right">
+                                <span
+                                  className={
+                                    item.dias_stock !== null && item.dias_stock < 2
+                                      ? "text-red-600 font-medium"
+                                      : ""
+                                  }
+                                >
+                                  {item.stock_actual} {item.unidad}
+                                </span>
+                              </td>
+                              <td className="px-4 py-2 text-right text-[#6B5E52]">
+                                {item.par_level > 0
+                                  ? `${item.par_level} ${item.unidad}`
+                                  : "—"}
+                              </td>
+                              <td className="px-4 py-2 text-right">
+                                <input
+                                  type="number"
+                                  step="any"
+                                  min="0"
+                                  value={
+                                    cantidadesPedido[item.ingrediente_id] || ""
+                                  }
+                                  onChange={(e) =>
+                                    setCantidadesPedido((prev) => ({
+                                      ...prev,
+                                      [item.ingrediente_id]: e.target.value,
+                                    }))
+                                  }
+                                  className={`w-20 border rounded px-2 py-1 text-sm text-right ${
+                                    item.cantidad_sugerida === 0
+                                      ? "border-green-300 bg-green-50"
+                                      : "border-[#D4C4A8]"
+                                  }`}
+                                />
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  );
+                });
+              })()}
+            </div>
+          )}
         </>
       )}
 

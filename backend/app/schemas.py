@@ -66,6 +66,7 @@ class IngredienteOut(IngredienteBase):
     num_recetas: int = 0
     categoria_nombre: str = ""
     precios_proveedores: dict[str, float] = {}
+    excluir_pedidos: bool = False
 
     model_config = {"from_attributes": True}
 
@@ -319,7 +320,9 @@ class RecomendacionItem(BaseModel):
     unidad: str
     consumo_medio_semanal: float
     cantidad_sugerida: float
+    par_level: float = 0
     dias_stock: Optional[float] = None
+    nota: Optional[str] = None
 
 
 class RecomendacionOut(BaseModel):

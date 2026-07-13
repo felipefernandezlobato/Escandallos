@@ -21,6 +21,7 @@ export interface Ingrediente {
   num_recetas: number;
   categoria_nombre: string;
   precios_proveedores?: Record<string, number>;
+  excluir_pedidos?: boolean;
 }
 
 export interface LineaReceta {
@@ -161,7 +162,9 @@ export interface RecomendacionItem {
   unidad: string;
   consumo_medio_semanal: number;
   cantidad_sugerida: number;
+  par_level: number;
   dias_stock: number | null;
+  nota?: string | null;
 }
 
 export interface ConsumoSemanal {

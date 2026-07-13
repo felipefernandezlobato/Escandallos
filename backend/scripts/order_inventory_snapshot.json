@@ -1,0 +1,2157 @@
+{
+  "exported": "2026-07-13",
+  "notes": "Clean state: 15 ingredients, April-July 2026, week 14 excluded. Milk inventory from separate stock file.",
+  "pedidos": [
+    {
+      "fecha": "2026-04-09",
+      "proveedor": "Prodega",
+      "estado": "recibido",
+      "fecha_recepcion": "2026-04-09",
+      "lineas": [
+        {
+          "ingrediente": "Jamón",
+          "ingrediente_id": 79,
+          "cantidad_pedida": 2.0,
+          "cantidad_recibida": 2.0,
+          "unidad": "kg"
+        },
+        {
+          "ingrediente": "Huevo",
+          "ingrediente_id": 96,
+          "cantidad_pedida": 360.0,
+          "cantidad_recibida": 360.0,
+          "unidad": "unidad"
+        },
+        {
+          "ingrediente": "Yogur",
+          "ingrediente_id": 122,
+          "cantidad_pedida": 5.0,
+          "cantidad_recibida": 5.0,
+          "unidad": "kg"
+        },
+        {
+          "ingrediente": "Leche entera",
+          "ingrediente_id": 120,
+          "cantidad_pedida": 112.0,
+          "cantidad_recibida": 112.0,
+          "unidad": "litro"
+        },
+        {
+          "ingrediente": "Leche sin lactosa",
+          "ingrediente_id": 121,
+          "cantidad_pedida": 24.0,
+          "cantidad_recibida": 24.0,
+          "unidad": "litro"
+        },
+        {
+          "ingrediente": "Leche de avena",
+          "ingrediente_id": 119,
+          "cantidad_pedida": 66.0,
+          "cantidad_recibida": 66.0,
+          "unidad": "litro"
+        },
+        {
+          "ingrediente": "Halbhartkäse",
+          "ingrediente_id": 132,
+          "cantidad_pedida": 6.0,
+          "cantidad_recibida": 6.0,
+          "unidad": "kg"
+        },
+        {
+          "ingrediente": "Halbhartkäse",
+          "ingrediente_id": 132,
+          "cantidad_pedida": 5.0,
+          "cantidad_recibida": 5.0,
+          "unidad": "kg"
+        },
+        {
+          "ingrediente": "Chía",
+          "ingrediente_id": 57,
+          "cantidad_pedida": 4.0,
+          "cantidad_recibida": 4.0,
+          "unidad": "kg"
+        },
+        {
+          "ingrediente": "Avena",
+          "ingrediente_id": 51,
+          "cantidad_pedida": 5.0,
+          "cantidad_recibida": 5.0,
+          "unidad": "kg"
+        },
+        {
+          "ingrediente": "Sirope de arce",
+          "ingrediente_id": 144,
+          "cantidad_pedida": 4.0,
+          "cantidad_recibida": 4.0,
+          "unidad": "litro"
+        },
+        {
+          "ingrediente": "Philadelphia",
+          "ingrediente_id": 126,
+          "cantidad_pedida": 6.0,
+          "cantidad_recibida": 6.0,
+          "unidad": "unidad (1.65kg)"
+        }
+      ]
+    },
+    {
+      "fecha": "2026-04-16",
+      "proveedor": "Prodega",
+      "estado": "recibido",
+      "fecha_recepcion": "2026-04-16",
+      "lineas": [
+        {
+          "ingrediente": "Jamón",
+          "ingrediente_id": 79,
+          "cantidad_pedida": 1.0,
+          "cantidad_recibida": 1.0,
+          "unidad": "kg"
+        },
+        {
+          "ingrediente": "Huevo",
+          "ingrediente_id": 96,
+          "cantidad_pedida": 360.0,
+          "cantidad_recibida": 360.0,
+          "unidad": "unidad"
+        },
+        {
+          "ingrediente": "Salmón",
+          "ingrediente_id": 78,
+          "cantidad_pedida": 1.0,
+          "cantidad_recibida": 1.0,
+          "unidad": "kg"
+        },
+        {
+          "ingrediente": "Jamón",
+          "ingrediente_id": 79,
+          "cantidad_pedida": 4.0,
+          "cantidad_recibida": 4.0,
+          "unidad": "kg"
+        },
+        {
+          "ingrediente": "Yogur",
+          "ingrediente_id": 122,
+          "cantidad_pedida": 7.0,
+          "cantidad_recibida": 7.0,
+          "unidad": "kg"
+        },
+        {
+          "ingrediente": "Leche entera",
+          "ingrediente_id": 120,
+          "cantidad_pedida": 96.0,
+          "cantidad_recibida": 96.0,
+          "unidad": "litro"
+        },
+        {
+          "ingrediente": "Leche sin lactosa",
+          "ingrediente_id": 121,
+          "cantidad_pedida": 24.0,
+          "cantidad_recibida": 24.0,
+          "unidad": "litro"
+        },
+        {
+          "ingrediente": "Leche de avena",
+          "ingrediente_id": 119,
+          "cantidad_pedida": 66.0,
+          "cantidad_recibida": 66.0,
+          "unidad": "litro"
+        },
+        {
+          "ingrediente": "Halbhartkäse",
+          "ingrediente_id": 132,
+          "cantidad_pedida": 7.0,
+          "cantidad_recibida": 7.0,
+          "unidad": "kg"
+        },
+        {
+          "ingrediente": "Sirope de arce",
+          "ingrediente_id": 144,
+          "cantidad_pedida": 9.0,
+          "cantidad_recibida": 9.0,
+          "unidad": "litro"
+        },
+        {
+          "ingrediente": "Vainilla",
+          "ingrediente_id": 113,
+          "cantidad_pedida": 3.0,
+          "cantidad_recibida": 3.0,
+          "unidad": "unidad (450g)"
+        },
+        {
+          "ingrediente": "Philadelphia",
+          "ingrediente_id": 126,
+          "cantidad_pedida": 6.0,
+          "cantidad_recibida": 6.0,
+          "unidad": "unidad (1.65kg)"
+        },
+        {
+          "ingrediente": "Mantequilla",
+          "ingrediente_id": 123,
+          "cantidad_pedida": 10.0,
+          "cantidad_recibida": 10.0,
+          "unidad": "kg"
+        }
+      ]
+    },
+    {
+      "fecha": "2026-04-23",
+      "proveedor": "Prodega",
+      "estado": "recibido",
+      "fecha_recepcion": "2026-04-23",
+      "lineas": [
+        {
+          "ingrediente": "Jamón",
+          "ingrediente_id": 79,
+          "cantidad_pedida": 2.0,
+          "cantidad_recibida": 2.0,
+          "unidad": "kg"
+        },
+        {
+          "ingrediente": "Huevo",
+          "ingrediente_id": 96,
+          "cantidad_pedida": 270.0,
+          "cantidad_recibida": 270.0,
+          "unidad": "unidad"
+        },
+        {
+          "ingrediente": "Yogur",
+          "ingrediente_id": 122,
+          "cantidad_pedida": 7.0,
+          "cantidad_recibida": 7.0,
+          "unidad": "kg"
+        },
+        {
+          "ingrediente": "Leche entera",
+          "ingrediente_id": 120,
+          "cantidad_pedida": 120.0,
+          "cantidad_recibida": 120.0,
+          "unidad": "litro"
+        },
+        {
+          "ingrediente": "Leche sin lactosa",
+          "ingrediente_id": 121,
+          "cantidad_pedida": 12.0,
+          "cantidad_recibida": 12.0,
+          "unidad": "litro"
+        },
+        {
+          "ingrediente": "Leche de avena",
+          "ingrediente_id": 119,
+          "cantidad_pedida": 66.0,
+          "cantidad_recibida": 66.0,
+          "unidad": "litro"
+        },
+        {
+          "ingrediente": "Halbhartkäse",
+          "ingrediente_id": 132,
+          "cantidad_pedida": 6.0,
+          "cantidad_recibida": 6.0,
+          "unidad": "kg"
+        },
+        {
+          "ingrediente": "Halbhartkäse",
+          "ingrediente_id": 132,
+          "cantidad_pedida": 9.0,
+          "cantidad_recibida": 9.0,
+          "unidad": "kg"
+        },
+        {
+          "ingrediente": "Sirope de arce",
+          "ingrediente_id": 144,
+          "cantidad_pedida": 1.0,
+          "cantidad_recibida": 1.0,
+          "unidad": "litro"
+        },
+        {
+          "ingrediente": "Vainilla",
+          "ingrediente_id": 113,
+          "cantidad_pedida": 1.0,
+          "cantidad_recibida": 1.0,
+          "unidad": "unidad (450g)"
+        },
+        {
+          "ingrediente": "Philadelphia",
+          "ingrediente_id": 126,
+          "cantidad_pedida": 6.0,
+          "cantidad_recibida": 6.0,
+          "unidad": "unidad (1.65kg)"
+        }
+      ]
+    },
+    {
+      "fecha": "2026-04-30",
+      "proveedor": "Prodega",
+      "estado": "recibido",
+      "fecha_recepcion": "2026-04-30",
+      "lineas": [
+        {
+          "ingrediente": "Jamón",
+          "ingrediente_id": 79,
+          "cantidad_pedida": 3.0,
+          "cantidad_recibida": 3.0,
+          "unidad": "kg"
+        },
+        {
+          "ingrediente": "Huevo",
+          "ingrediente_id": 96,
+          "cantidad_pedida": 360.0,
+          "cantidad_recibida": 360.0,
+          "unidad": "unidad"
+        },
+        {
+          "ingrediente": "Salmón",
+          "ingrediente_id": 78,
+          "cantidad_pedida": 10.0,
+          "cantidad_recibida": 10.0,
+          "unidad": "kg"
+        },
+        {
+          "ingrediente": "Yogur",
+          "ingrediente_id": 122,
+          "cantidad_pedida": 10.0,
+          "cantidad_recibida": 10.0,
+          "unidad": "kg"
+        },
+        {
+          "ingrediente": "Leche entera",
+          "ingrediente_id": 120,
+          "cantidad_pedida": 120.0,
+          "cantidad_recibida": 120.0,
+          "unidad": "litro"
+        },
+        {
+          "ingrediente": "Leche sin lactosa",
+          "ingrediente_id": 121,
+          "cantidad_pedida": 12.0,
+          "cantidad_recibida": 12.0,
+          "unidad": "litro"
+        },
+        {
+          "ingrediente": "Leche de avena",
+          "ingrediente_id": 119,
+          "cantidad_pedida": 66.0,
+          "cantidad_recibida": 66.0,
+          "unidad": "litro"
+        },
+        {
+          "ingrediente": "Halbhartkäse",
+          "ingrediente_id": 132,
+          "cantidad_pedida": 9.0,
+          "cantidad_recibida": 9.0,
+          "unidad": "kg"
+        },
+        {
+          "ingrediente": "Avena",
+          "ingrediente_id": 51,
+          "cantidad_pedida": 5.0,
+          "cantidad_recibida": 5.0,
+          "unidad": "kg"
+        }
+      ]
+    },
+    {
+      "fecha": "2026-05-07",
+      "proveedor": "Prodega",
+      "estado": "recibido",
+      "fecha_recepcion": "2026-05-07",
+      "lineas": [
+        {
+          "ingrediente": "Jamón",
+          "ingrediente_id": 79,
+          "cantidad_pedida": 2.0,
+          "cantidad_recibida": 2.0,
+          "unidad": "kg"
+        },
+        {
+          "ingrediente": "Huevo",
+          "ingrediente_id": 96,
+          "cantidad_pedida": 360.0,
+          "cantidad_recibida": 360.0,
+          "unidad": "unidad"
+        },
+        {
+          "ingrediente": "Salmón",
+          "ingrediente_id": 78,
+          "cantidad_pedida": 10.0,
+          "cantidad_recibida": 10.0,
+          "unidad": "kg"
+        },
+        {
+          "ingrediente": "Yogur",
+          "ingrediente_id": 122,
+          "cantidad_pedida": 8.0,
+          "cantidad_recibida": 8.0,
+          "unidad": "kg"
+        },
+        {
+          "ingrediente": "Leche entera",
+          "ingrediente_id": 120,
+          "cantidad_pedida": 120.0,
+          "cantidad_recibida": 120.0,
+          "unidad": "litro"
+        },
+        {
+          "ingrediente": "Leche sin lactosa",
+          "ingrediente_id": 121,
+          "cantidad_pedida": 24.0,
+          "cantidad_recibida": 24.0,
+          "unidad": "litro"
+        },
+        {
+          "ingrediente": "Leche de avena",
+          "ingrediente_id": 119,
+          "cantidad_pedida": 66.0,
+          "cantidad_recibida": 66.0,
+          "unidad": "litro"
+        },
+        {
+          "ingrediente": "Halbhartkäse",
+          "ingrediente_id": 132,
+          "cantidad_pedida": 7.0,
+          "cantidad_recibida": 7.0,
+          "unidad": "kg"
+        },
+        {
+          "ingrediente": "Chía",
+          "ingrediente_id": 57,
+          "cantidad_pedida": 4.0,
+          "cantidad_recibida": 4.0,
+          "unidad": "kg"
+        },
+        {
+          "ingrediente": "Avena",
+          "ingrediente_id": 51,
+          "cantidad_pedida": 5.0,
+          "cantidad_recibida": 5.0,
+          "unidad": "kg"
+        },
+        {
+          "ingrediente": "Sirope de arce",
+          "ingrediente_id": 144,
+          "cantidad_pedida": 8.0,
+          "cantidad_recibida": 8.0,
+          "unidad": "litro"
+        }
+      ]
+    },
+    {
+      "fecha": "2026-05-14",
+      "proveedor": "Prodega",
+      "estado": "recibido",
+      "fecha_recepcion": "2026-05-14",
+      "lineas": [
+        {
+          "ingrediente": "Jamón",
+          "ingrediente_id": 79,
+          "cantidad_pedida": 2.0,
+          "cantidad_recibida": 2.0,
+          "unidad": "kg"
+        },
+        {
+          "ingrediente": "Huevo",
+          "ingrediente_id": 96,
+          "cantidad_pedida": 180.0,
+          "cantidad_recibida": 180.0,
+          "unidad": "unidad"
+        },
+        {
+          "ingrediente": "Yogur",
+          "ingrediente_id": 122,
+          "cantidad_pedida": 5.0,
+          "cantidad_recibida": 5.0,
+          "unidad": "kg"
+        },
+        {
+          "ingrediente": "Leche entera",
+          "ingrediente_id": 120,
+          "cantidad_pedida": 88.0,
+          "cantidad_recibida": 88.0,
+          "unidad": "litro"
+        },
+        {
+          "ingrediente": "Leche sin lactosa",
+          "ingrediente_id": 121,
+          "cantidad_pedida": 24.0,
+          "cantidad_recibida": 24.0,
+          "unidad": "litro"
+        },
+        {
+          "ingrediente": "Leche de avena",
+          "ingrediente_id": 119,
+          "cantidad_pedida": 5.0,
+          "cantidad_recibida": 5.0,
+          "unidad": "litro"
+        },
+        {
+          "ingrediente": "Halbhartkäse",
+          "ingrediente_id": 132,
+          "cantidad_pedida": 6.0,
+          "cantidad_recibida": 6.0,
+          "unidad": "kg"
+        },
+        {
+          "ingrediente": "Philadelphia",
+          "ingrediente_id": 126,
+          "cantidad_pedida": 4.0,
+          "cantidad_recibida": 4.0,
+          "unidad": "unidad (1.65kg)"
+        },
+        {
+          "ingrediente": "Mantequilla",
+          "ingrediente_id": 123,
+          "cantidad_pedida": 10.0,
+          "cantidad_recibida": 10.0,
+          "unidad": "kg"
+        }
+      ]
+    },
+    {
+      "fecha": "2026-05-21",
+      "proveedor": "Prodega",
+      "estado": "recibido",
+      "fecha_recepcion": "2026-05-21",
+      "lineas": [
+        {
+          "ingrediente": "Jamón",
+          "ingrediente_id": 79,
+          "cantidad_pedida": 8.0,
+          "cantidad_recibida": 8.0,
+          "unidad": "kg"
+        },
+        {
+          "ingrediente": "Huevo",
+          "ingrediente_id": 96,
+          "cantidad_pedida": 360.0,
+          "cantidad_recibida": 360.0,
+          "unidad": "unidad"
+        },
+        {
+          "ingrediente": "Yogur",
+          "ingrediente_id": 122,
+          "cantidad_pedida": 6.0,
+          "cantidad_recibida": 6.0,
+          "unidad": "kg"
+        },
+        {
+          "ingrediente": "Leche entera",
+          "ingrediente_id": 120,
+          "cantidad_pedida": 120.0,
+          "cantidad_recibida": 120.0,
+          "unidad": "litro"
+        },
+        {
+          "ingrediente": "Leche sin lactosa",
+          "ingrediente_id": 121,
+          "cantidad_pedida": 24.0,
+          "cantidad_recibida": 24.0,
+          "unidad": "litro"
+        },
+        {
+          "ingrediente": "Leche de avena",
+          "ingrediente_id": 119,
+          "cantidad_pedida": 66.0,
+          "cantidad_recibida": 66.0,
+          "unidad": "litro"
+        },
+        {
+          "ingrediente": "Halbhartkäse",
+          "ingrediente_id": 132,
+          "cantidad_pedida": 3.0,
+          "cantidad_recibida": 3.0,
+          "unidad": "kg"
+        },
+        {
+          "ingrediente": "Harina",
+          "ingrediente_id": 60,
+          "cantidad_pedida": 10.0,
+          "cantidad_recibida": 10.0,
+          "unidad": "kg"
+        },
+        {
+          "ingrediente": "Vainilla",
+          "ingrediente_id": 113,
+          "cantidad_pedida": 3.0,
+          "cantidad_recibida": 3.0,
+          "unidad": "unidad (450g)"
+        },
+        {
+          "ingrediente": "Philadelphia",
+          "ingrediente_id": 126,
+          "cantidad_pedida": 5.0,
+          "cantidad_recibida": 5.0,
+          "unidad": "unidad (1.65kg)"
+        },
+        {
+          "ingrediente": "Mantequilla",
+          "ingrediente_id": 123,
+          "cantidad_pedida": 10.0,
+          "cantidad_recibida": 10.0,
+          "unidad": "kg"
+        }
+      ]
+    },
+    {
+      "fecha": "2026-05-28",
+      "proveedor": "Prodega",
+      "estado": "recibido",
+      "fecha_recepcion": "2026-05-28",
+      "lineas": [
+        {
+          "ingrediente": "Huevo",
+          "ingrediente_id": 96,
+          "cantidad_pedida": 360.0,
+          "cantidad_recibida": 360.0,
+          "unidad": "unidad"
+        },
+        {
+          "ingrediente": "Yogur",
+          "ingrediente_id": 122,
+          "cantidad_pedida": 9.0,
+          "cantidad_recibida": 9.0,
+          "unidad": "kg"
+        },
+        {
+          "ingrediente": "Leche entera",
+          "ingrediente_id": 120,
+          "cantidad_pedida": 120.0,
+          "cantidad_recibida": 120.0,
+          "unidad": "litro"
+        },
+        {
+          "ingrediente": "Leche de avena",
+          "ingrediente_id": 119,
+          "cantidad_pedida": 66.0,
+          "cantidad_recibida": 66.0,
+          "unidad": "litro"
+        },
+        {
+          "ingrediente": "Halbhartkäse",
+          "ingrediente_id": 132,
+          "cantidad_pedida": 6.0,
+          "cantidad_recibida": 6.0,
+          "unidad": "kg"
+        },
+        {
+          "ingrediente": "Avena",
+          "ingrediente_id": 51,
+          "cantidad_pedida": 5.0,
+          "cantidad_recibida": 5.0,
+          "unidad": "kg"
+        },
+        {
+          "ingrediente": "Sirope de arce",
+          "ingrediente_id": 144,
+          "cantidad_pedida": 2.0,
+          "cantidad_recibida": 2.0,
+          "unidad": "litro"
+        },
+        {
+          "ingrediente": "Philadelphia",
+          "ingrediente_id": 126,
+          "cantidad_pedida": 4.0,
+          "cantidad_recibida": 4.0,
+          "unidad": "unidad (1.65kg)"
+        }
+      ]
+    },
+    {
+      "fecha": "2026-06-04",
+      "proveedor": "Prodega",
+      "estado": "recibido",
+      "fecha_recepcion": "2026-06-04",
+      "lineas": [
+        {
+          "ingrediente": "Jamón",
+          "ingrediente_id": 79,
+          "cantidad_pedida": 1.0,
+          "cantidad_recibida": 1.0,
+          "unidad": "kg"
+        },
+        {
+          "ingrediente": "Huevo",
+          "ingrediente_id": 96,
+          "cantidad_pedida": 270.0,
+          "cantidad_recibida": 270.0,
+          "unidad": "unidad"
+        },
+        {
+          "ingrediente": "Salmón",
+          "ingrediente_id": 78,
+          "cantidad_pedida": 10.0,
+          "cantidad_recibida": 10.0,
+          "unidad": "kg"
+        },
+        {
+          "ingrediente": "Yogur",
+          "ingrediente_id": 122,
+          "cantidad_pedida": 10.0,
+          "cantidad_recibida": 10.0,
+          "unidad": "kg"
+        },
+        {
+          "ingrediente": "Leche entera",
+          "ingrediente_id": 120,
+          "cantidad_pedida": 120.0,
+          "cantidad_recibida": 120.0,
+          "unidad": "litro"
+        },
+        {
+          "ingrediente": "Leche de avena",
+          "ingrediente_id": 119,
+          "cantidad_pedida": 66.0,
+          "cantidad_recibida": 66.0,
+          "unidad": "litro"
+        },
+        {
+          "ingrediente": "Halbhartkäse",
+          "ingrediente_id": 132,
+          "cantidad_pedida": 5.0,
+          "cantidad_recibida": 5.0,
+          "unidad": "kg"
+        },
+        {
+          "ingrediente": "Sirope de arce",
+          "ingrediente_id": 144,
+          "cantidad_pedida": 3.0,
+          "cantidad_recibida": 3.0,
+          "unidad": "litro"
+        },
+        {
+          "ingrediente": "Philadelphia",
+          "ingrediente_id": 126,
+          "cantidad_pedida": 3.0,
+          "cantidad_recibida": 3.0,
+          "unidad": "unidad (1.65kg)"
+        },
+        {
+          "ingrediente": "Mantequilla",
+          "ingrediente_id": 123,
+          "cantidad_pedida": 10.0,
+          "cantidad_recibida": 10.0,
+          "unidad": "kg"
+        }
+      ]
+    },
+    {
+      "fecha": "2026-06-11",
+      "proveedor": "Prodega",
+      "estado": "recibido",
+      "fecha_recepcion": "2026-06-11",
+      "lineas": [
+        {
+          "ingrediente": "Jamón",
+          "ingrediente_id": 79,
+          "cantidad_pedida": 5.0,
+          "cantidad_recibida": 5.0,
+          "unidad": "kg"
+        },
+        {
+          "ingrediente": "Huevo",
+          "ingrediente_id": 96,
+          "cantidad_pedida": 450.0,
+          "cantidad_recibida": 450.0,
+          "unidad": "unidad"
+        },
+        {
+          "ingrediente": "Yogur",
+          "ingrediente_id": 122,
+          "cantidad_pedida": 7.0,
+          "cantidad_recibida": 7.0,
+          "unidad": "kg"
+        },
+        {
+          "ingrediente": "Leche entera",
+          "ingrediente_id": 120,
+          "cantidad_pedida": 120.0,
+          "cantidad_recibida": 120.0,
+          "unidad": "litro"
+        },
+        {
+          "ingrediente": "Leche sin lactosa",
+          "ingrediente_id": 121,
+          "cantidad_pedida": 24.0,
+          "cantidad_recibida": 24.0,
+          "unidad": "litro"
+        },
+        {
+          "ingrediente": "Leche de avena",
+          "ingrediente_id": 119,
+          "cantidad_pedida": 66.0,
+          "cantidad_recibida": 66.0,
+          "unidad": "litro"
+        },
+        {
+          "ingrediente": "Halbhartkäse",
+          "ingrediente_id": 132,
+          "cantidad_pedida": 8.0,
+          "cantidad_recibida": 8.0,
+          "unidad": "kg"
+        },
+        {
+          "ingrediente": "Chía",
+          "ingrediente_id": 57,
+          "cantidad_pedida": 3.0,
+          "cantidad_recibida": 3.0,
+          "unidad": "kg"
+        },
+        {
+          "ingrediente": "Avena",
+          "ingrediente_id": 51,
+          "cantidad_pedida": 10.0,
+          "cantidad_recibida": 10.0,
+          "unidad": "kg"
+        },
+        {
+          "ingrediente": "Sirope de arce",
+          "ingrediente_id": 144,
+          "cantidad_pedida": 4.0,
+          "cantidad_recibida": 4.0,
+          "unidad": "litro"
+        },
+        {
+          "ingrediente": "Mantequilla",
+          "ingrediente_id": 123,
+          "cantidad_pedida": 10.0,
+          "cantidad_recibida": 10.0,
+          "unidad": "kg"
+        }
+      ]
+    },
+    {
+      "fecha": "2026-06-18",
+      "proveedor": "Prodega",
+      "estado": "recibido",
+      "fecha_recepcion": "2026-06-18",
+      "lineas": [
+        {
+          "ingrediente": "Huevo",
+          "ingrediente_id": 96,
+          "cantidad_pedida": 360.0,
+          "cantidad_recibida": 360.0,
+          "unidad": "unidad"
+        },
+        {
+          "ingrediente": "Yogur",
+          "ingrediente_id": 122,
+          "cantidad_pedida": 12.0,
+          "cantidad_recibida": 12.0,
+          "unidad": "kg"
+        },
+        {
+          "ingrediente": "Leche entera",
+          "ingrediente_id": 120,
+          "cantidad_pedida": 120.0,
+          "cantidad_recibida": 120.0,
+          "unidad": "litro"
+        },
+        {
+          "ingrediente": "Leche de avena",
+          "ingrediente_id": 119,
+          "cantidad_pedida": 66.0,
+          "cantidad_recibida": 66.0,
+          "unidad": "litro"
+        },
+        {
+          "ingrediente": "Halbhartkäse",
+          "ingrediente_id": 132,
+          "cantidad_pedida": 8.0,
+          "cantidad_recibida": 8.0,
+          "unidad": "kg"
+        },
+        {
+          "ingrediente": "Harina",
+          "ingrediente_id": 60,
+          "cantidad_pedida": 20.0,
+          "cantidad_recibida": 20.0,
+          "unidad": "kg"
+        },
+        {
+          "ingrediente": "Mantequilla",
+          "ingrediente_id": 123,
+          "cantidad_pedida": 20.0,
+          "cantidad_recibida": 20.0,
+          "unidad": "kg"
+        }
+      ]
+    },
+    {
+      "fecha": "2026-06-25",
+      "proveedor": "Prodega",
+      "estado": "recibido",
+      "fecha_recepcion": "2026-06-25",
+      "lineas": [
+        {
+          "ingrediente": "Jamón",
+          "ingrediente_id": 79,
+          "cantidad_pedida": 4.0,
+          "cantidad_recibida": 4.0,
+          "unidad": "kg"
+        },
+        {
+          "ingrediente": "Huevo",
+          "ingrediente_id": 96,
+          "cantidad_pedida": 360.0,
+          "cantidad_recibida": 360.0,
+          "unidad": "unidad"
+        },
+        {
+          "ingrediente": "Salmón",
+          "ingrediente_id": 78,
+          "cantidad_pedida": 10.0,
+          "cantidad_recibida": 10.0,
+          "unidad": "kg"
+        },
+        {
+          "ingrediente": "Yogur",
+          "ingrediente_id": 122,
+          "cantidad_pedida": 12.0,
+          "cantidad_recibida": 12.0,
+          "unidad": "kg"
+        },
+        {
+          "ingrediente": "Leche entera",
+          "ingrediente_id": 120,
+          "cantidad_pedida": 120.0,
+          "cantidad_recibida": 120.0,
+          "unidad": "litro"
+        },
+        {
+          "ingrediente": "Leche sin lactosa",
+          "ingrediente_id": 121,
+          "cantidad_pedida": 12.0,
+          "cantidad_recibida": 12.0,
+          "unidad": "litro"
+        },
+        {
+          "ingrediente": "Leche de avena",
+          "ingrediente_id": 119,
+          "cantidad_pedida": 66.0,
+          "cantidad_recibida": 66.0,
+          "unidad": "litro"
+        },
+        {
+          "ingrediente": "Halbhartkäse",
+          "ingrediente_id": 132,
+          "cantidad_pedida": 9.0,
+          "cantidad_recibida": 9.0,
+          "unidad": "kg"
+        },
+        {
+          "ingrediente": "Chía",
+          "ingrediente_id": 57,
+          "cantidad_pedida": 4.0,
+          "cantidad_recibida": 4.0,
+          "unidad": "kg"
+        },
+        {
+          "ingrediente": "Sirope de arce",
+          "ingrediente_id": 144,
+          "cantidad_pedida": 1.0,
+          "cantidad_recibida": 1.0,
+          "unidad": "litro"
+        },
+        {
+          "ingrediente": "Vainilla",
+          "ingrediente_id": 113,
+          "cantidad_pedida": 4.0,
+          "cantidad_recibida": 4.0,
+          "unidad": "unidad (450g)"
+        },
+        {
+          "ingrediente": "Philadelphia",
+          "ingrediente_id": 126,
+          "cantidad_pedida": 8.0,
+          "cantidad_recibida": 8.0,
+          "unidad": "unidad (1.65kg)"
+        }
+      ]
+    },
+    {
+      "fecha": "2026-07-02",
+      "proveedor": "Prodega",
+      "estado": "recibido",
+      "fecha_recepcion": "2026-07-02",
+      "lineas": [
+        {
+          "ingrediente": "Jamón",
+          "ingrediente_id": 79,
+          "cantidad_pedida": 1.0,
+          "cantidad_recibida": 1.0,
+          "unidad": "kg"
+        },
+        {
+          "ingrediente": "Huevo",
+          "ingrediente_id": 96,
+          "cantidad_pedida": 360.0,
+          "cantidad_recibida": 360.0,
+          "unidad": "unidad"
+        },
+        {
+          "ingrediente": "Yogur",
+          "ingrediente_id": 122,
+          "cantidad_pedida": 2.0,
+          "cantidad_recibida": 2.0,
+          "unidad": "kg"
+        },
+        {
+          "ingrediente": "Leche entera",
+          "ingrediente_id": 120,
+          "cantidad_pedida": 120.0,
+          "cantidad_recibida": 120.0,
+          "unidad": "litro"
+        },
+        {
+          "ingrediente": "Leche sin lactosa",
+          "ingrediente_id": 121,
+          "cantidad_pedida": 12.0,
+          "cantidad_recibida": 12.0,
+          "unidad": "litro"
+        },
+        {
+          "ingrediente": "Leche de avena",
+          "ingrediente_id": 119,
+          "cantidad_pedida": 66.0,
+          "cantidad_recibida": 66.0,
+          "unidad": "litro"
+        },
+        {
+          "ingrediente": "Halbhartkäse",
+          "ingrediente_id": 132,
+          "cantidad_pedida": 6.0,
+          "cantidad_recibida": 6.0,
+          "unidad": "kg"
+        },
+        {
+          "ingrediente": "Avena",
+          "ingrediente_id": 51,
+          "cantidad_pedida": 10.0,
+          "cantidad_recibida": 10.0,
+          "unidad": "kg"
+        },
+        {
+          "ingrediente": "Harina",
+          "ingrediente_id": 60,
+          "cantidad_pedida": 20.0,
+          "cantidad_recibida": 20.0,
+          "unidad": "kg"
+        },
+        {
+          "ingrediente": "Sirope de arce",
+          "ingrediente_id": 144,
+          "cantidad_pedida": 2.0,
+          "cantidad_recibida": 2.0,
+          "unidad": "litro"
+        },
+        {
+          "ingrediente": "Vainilla",
+          "ingrediente_id": 113,
+          "cantidad_pedida": 2.0,
+          "cantidad_recibida": 2.0,
+          "unidad": "unidad (450g)"
+        },
+        {
+          "ingrediente": "Philadelphia",
+          "ingrediente_id": 126,
+          "cantidad_pedida": 1.0,
+          "cantidad_recibida": 1.0,
+          "unidad": "unidad (1.65kg)"
+        }
+      ]
+    },
+    {
+      "fecha": "2026-07-09",
+      "proveedor": "Prodega",
+      "estado": "recibido",
+      "fecha_recepcion": "2026-07-09",
+      "lineas": [
+        {
+          "ingrediente": "Jamón",
+          "ingrediente_id": 79,
+          "cantidad_pedida": 1.0,
+          "cantidad_recibida": 1.0,
+          "unidad": "kg"
+        },
+        {
+          "ingrediente": "Huevo",
+          "ingrediente_id": 96,
+          "cantidad_pedida": 270.0,
+          "cantidad_recibida": 270.0,
+          "unidad": "unidad"
+        },
+        {
+          "ingrediente": "Yogur",
+          "ingrediente_id": 122,
+          "cantidad_pedida": 6.0,
+          "cantidad_recibida": 6.0,
+          "unidad": "kg"
+        },
+        {
+          "ingrediente": "Leche entera",
+          "ingrediente_id": 120,
+          "cantidad_pedida": 104.0,
+          "cantidad_recibida": 104.0,
+          "unidad": "litro"
+        },
+        {
+          "ingrediente": "Leche sin lactosa",
+          "ingrediente_id": 121,
+          "cantidad_pedida": 12.0,
+          "cantidad_recibida": 12.0,
+          "unidad": "litro"
+        },
+        {
+          "ingrediente": "Leche de avena",
+          "ingrediente_id": 119,
+          "cantidad_pedida": 66.0,
+          "cantidad_recibida": 66.0,
+          "unidad": "litro"
+        },
+        {
+          "ingrediente": "Halbhartkäse",
+          "ingrediente_id": 132,
+          "cantidad_pedida": 7.0,
+          "cantidad_recibida": 7.0,
+          "unidad": "kg"
+        },
+        {
+          "ingrediente": "Sirope de arce",
+          "ingrediente_id": 144,
+          "cantidad_pedida": 2.0,
+          "cantidad_recibida": 2.0,
+          "unidad": "litro"
+        },
+        {
+          "ingrediente": "Vainilla",
+          "ingrediente_id": 113,
+          "cantidad_pedida": 2.0,
+          "cantidad_recibida": 2.0,
+          "unidad": "unidad (450g)"
+        },
+        {
+          "ingrediente": "Philadelphia",
+          "ingrediente_id": 126,
+          "cantidad_pedida": 1.0,
+          "cantidad_recibida": 1.0,
+          "unidad": "unidad (1.65kg)"
+        }
+      ]
+    }
+  ],
+  "inventario": [
+    {
+      "ingrediente": "Leche entera",
+      "ingrediente_id": 120,
+      "cantidad": 56.0,
+      "unidad": "litro",
+      "fecha_registro": "2026-04-07"
+    },
+    {
+      "ingrediente": "Leche sin lactosa",
+      "ingrediente_id": 121,
+      "cantidad": 47.0,
+      "unidad": "litro",
+      "fecha_registro": "2026-04-07"
+    },
+    {
+      "ingrediente": "Leche de avena",
+      "ingrediente_id": 119,
+      "cantidad": 55.0,
+      "unidad": "litro",
+      "fecha_registro": "2026-04-07"
+    },
+    {
+      "ingrediente": "Jamón",
+      "ingrediente_id": 79,
+      "cantidad": 5.5,
+      "unidad": "kg",
+      "fecha_registro": "2026-04-09"
+    },
+    {
+      "ingrediente": "Huevo",
+      "ingrediente_id": 96,
+      "cantidad": 110.0,
+      "unidad": "unidad",
+      "fecha_registro": "2026-04-09"
+    },
+    {
+      "ingrediente": "Yogur",
+      "ingrediente_id": 122,
+      "cantidad": 4.0,
+      "unidad": "kg",
+      "fecha_registro": "2026-04-09"
+    },
+    {
+      "ingrediente": "Halbhartkäse",
+      "ingrediente_id": 132,
+      "cantidad": 3.0,
+      "unidad": "kg",
+      "fecha_registro": "2026-04-09"
+    },
+    {
+      "ingrediente": "Chía",
+      "ingrediente_id": 57,
+      "cantidad": 1.0,
+      "unidad": "kg",
+      "fecha_registro": "2026-04-09"
+    },
+    {
+      "ingrediente": "Avena",
+      "ingrediente_id": 51,
+      "cantidad": 1.0,
+      "unidad": "kg",
+      "fecha_registro": "2026-04-09"
+    },
+    {
+      "ingrediente": "Sirope de arce",
+      "ingrediente_id": 144,
+      "cantidad": 0.0,
+      "unidad": "litro",
+      "fecha_registro": "2026-04-09"
+    },
+    {
+      "ingrediente": "Philadelphia",
+      "ingrediente_id": 126,
+      "cantidad": 4.0,
+      "unidad": "unidad (1.65kg)",
+      "fecha_registro": "2026-04-09"
+    },
+    {
+      "ingrediente": "Leche entera",
+      "ingrediente_id": 120,
+      "cantidad": 52.0,
+      "unidad": "litro",
+      "fecha_registro": "2026-04-14"
+    },
+    {
+      "ingrediente": "Leche sin lactosa",
+      "ingrediente_id": 121,
+      "cantidad": 55.0,
+      "unidad": "litro",
+      "fecha_registro": "2026-04-14"
+    },
+    {
+      "ingrediente": "Leche de avena",
+      "ingrediente_id": 119,
+      "cantidad": 54.0,
+      "unidad": "litro",
+      "fecha_registro": "2026-04-14"
+    },
+    {
+      "ingrediente": "Jamón",
+      "ingrediente_id": 79,
+      "cantidad": 5.0,
+      "unidad": "kg",
+      "fecha_registro": "2026-04-16"
+    },
+    {
+      "ingrediente": "Huevo",
+      "ingrediente_id": 96,
+      "cantidad": 150.0,
+      "unidad": "unidad",
+      "fecha_registro": "2026-04-16"
+    },
+    {
+      "ingrediente": "Salmón",
+      "ingrediente_id": 78,
+      "cantidad": 9.0,
+      "unidad": "kg",
+      "fecha_registro": "2026-04-16"
+    },
+    {
+      "ingrediente": "Yogur",
+      "ingrediente_id": 122,
+      "cantidad": 0.2,
+      "unidad": "kg",
+      "fecha_registro": "2026-04-16"
+    },
+    {
+      "ingrediente": "Halbhartkäse",
+      "ingrediente_id": 132,
+      "cantidad": 2.0,
+      "unidad": "kg",
+      "fecha_registro": "2026-04-16"
+    },
+    {
+      "ingrediente": "Sirope de arce",
+      "ingrediente_id": 144,
+      "cantidad": 1.0,
+      "unidad": "litro",
+      "fecha_registro": "2026-04-16"
+    },
+    {
+      "ingrediente": "Vainilla",
+      "ingrediente_id": 113,
+      "cantidad": 2.0,
+      "unidad": "unidad (450g)",
+      "fecha_registro": "2026-04-16"
+    },
+    {
+      "ingrediente": "Philadelphia",
+      "ingrediente_id": 126,
+      "cantidad": 1.0,
+      "unidad": "unidad (1.65kg)",
+      "fecha_registro": "2026-04-16"
+    },
+    {
+      "ingrediente": "Leche entera",
+      "ingrediente_id": 120,
+      "cantidad": 42.0,
+      "unidad": "litro",
+      "fecha_registro": "2026-04-21"
+    },
+    {
+      "ingrediente": "Leche sin lactosa",
+      "ingrediente_id": 121,
+      "cantidad": 25.0,
+      "unidad": "litro",
+      "fecha_registro": "2026-04-21"
+    },
+    {
+      "ingrediente": "Leche de avena",
+      "ingrediente_id": 119,
+      "cantidad": 61.0,
+      "unidad": "litro",
+      "fecha_registro": "2026-04-21"
+    },
+    {
+      "ingrediente": "Jamón",
+      "ingrediente_id": 79,
+      "cantidad": 4.0,
+      "unidad": "kg",
+      "fecha_registro": "2026-04-23"
+    },
+    {
+      "ingrediente": "Huevo",
+      "ingrediente_id": 96,
+      "cantidad": 210.0,
+      "unidad": "unidad",
+      "fecha_registro": "2026-04-23"
+    },
+    {
+      "ingrediente": "Yogur",
+      "ingrediente_id": 122,
+      "cantidad": 2.0,
+      "unidad": "kg",
+      "fecha_registro": "2026-04-23"
+    },
+    {
+      "ingrediente": "Halbhartkäse",
+      "ingrediente_id": 132,
+      "cantidad": 4.0,
+      "unidad": "kg",
+      "fecha_registro": "2026-04-23"
+    },
+    {
+      "ingrediente": "Sirope de arce",
+      "ingrediente_id": 144,
+      "cantidad": 7.5,
+      "unidad": "litro",
+      "fecha_registro": "2026-04-23"
+    },
+    {
+      "ingrediente": "Vainilla",
+      "ingrediente_id": 113,
+      "cantidad": 3.5,
+      "unidad": "unidad (450g)",
+      "fecha_registro": "2026-04-23"
+    },
+    {
+      "ingrediente": "Philadelphia",
+      "ingrediente_id": 126,
+      "cantidad": 4.0,
+      "unidad": "unidad (1.65kg)",
+      "fecha_registro": "2026-04-23"
+    },
+    {
+      "ingrediente": "Leche entera",
+      "ingrediente_id": 120,
+      "cantidad": 49.0,
+      "unidad": "litro",
+      "fecha_registro": "2026-04-28"
+    },
+    {
+      "ingrediente": "Leche sin lactosa",
+      "ingrediente_id": 121,
+      "cantidad": 26.0,
+      "unidad": "litro",
+      "fecha_registro": "2026-04-28"
+    },
+    {
+      "ingrediente": "Leche de avena",
+      "ingrediente_id": 119,
+      "cantidad": 66.0,
+      "unidad": "litro",
+      "fecha_registro": "2026-04-28"
+    },
+    {
+      "ingrediente": "Jamón",
+      "ingrediente_id": 79,
+      "cantidad": 4.0,
+      "unidad": "kg",
+      "fecha_registro": "2026-04-30"
+    },
+    {
+      "ingrediente": "Huevo",
+      "ingrediente_id": 96,
+      "cantidad": 180.0,
+      "unidad": "unidad",
+      "fecha_registro": "2026-04-30"
+    },
+    {
+      "ingrediente": "Salmón",
+      "ingrediente_id": 78,
+      "cantidad": 3.0,
+      "unidad": "kg",
+      "fecha_registro": "2026-04-30"
+    },
+    {
+      "ingrediente": "Yogur",
+      "ingrediente_id": 122,
+      "cantidad": 1.0,
+      "unidad": "kg",
+      "fecha_registro": "2026-04-30"
+    },
+    {
+      "ingrediente": "Halbhartkäse",
+      "ingrediente_id": 132,
+      "cantidad": 4.0,
+      "unidad": "kg",
+      "fecha_registro": "2026-04-30"
+    },
+    {
+      "ingrediente": "Avena",
+      "ingrediente_id": 51,
+      "cantidad": 1.0,
+      "unidad": "kg",
+      "fecha_registro": "2026-04-30"
+    },
+    {
+      "ingrediente": "Leche entera",
+      "ingrediente_id": 120,
+      "cantidad": 72.0,
+      "unidad": "litro",
+      "fecha_registro": "2026-05-05"
+    },
+    {
+      "ingrediente": "Leche sin lactosa",
+      "ingrediente_id": 121,
+      "cantidad": 36.0,
+      "unidad": "litro",
+      "fecha_registro": "2026-05-05"
+    },
+    {
+      "ingrediente": "Leche de avena",
+      "ingrediente_id": 119,
+      "cantidad": 79.0,
+      "unidad": "litro",
+      "fecha_registro": "2026-05-05"
+    },
+    {
+      "ingrediente": "Jamón",
+      "ingrediente_id": 79,
+      "cantidad": 11.0,
+      "unidad": "unidad",
+      "fecha_registro": "2026-05-07"
+    },
+    {
+      "ingrediente": "Huevo",
+      "ingrediente_id": 96,
+      "cantidad": 180.0,
+      "unidad": "unidad",
+      "fecha_registro": "2026-05-07"
+    },
+    {
+      "ingrediente": "Salmón",
+      "ingrediente_id": 78,
+      "cantidad": 10.0,
+      "unidad": "kg",
+      "fecha_registro": "2026-05-07"
+    },
+    {
+      "ingrediente": "Yogur",
+      "ingrediente_id": 122,
+      "cantidad": 5.0,
+      "unidad": "kg",
+      "fecha_registro": "2026-05-07"
+    },
+    {
+      "ingrediente": "Halbhartkäse",
+      "ingrediente_id": 132,
+      "cantidad": 3.0,
+      "unidad": "kg",
+      "fecha_registro": "2026-05-07"
+    },
+    {
+      "ingrediente": "Chía",
+      "ingrediente_id": 57,
+      "cantidad": 3.0,
+      "unidad": "kg",
+      "fecha_registro": "2026-05-07"
+    },
+    {
+      "ingrediente": "Avena",
+      "ingrediente_id": 51,
+      "cantidad": 3.0,
+      "unidad": "kg",
+      "fecha_registro": "2026-05-07"
+    },
+    {
+      "ingrediente": "Sirope de arce",
+      "ingrediente_id": 144,
+      "cantidad": 4.0,
+      "unidad": "unidad",
+      "fecha_registro": "2026-05-07"
+    },
+    {
+      "ingrediente": "Leche entera",
+      "ingrediente_id": 120,
+      "cantidad": 68.0,
+      "unidad": "litro",
+      "fecha_registro": "2026-05-12"
+    },
+    {
+      "ingrediente": "Leche sin lactosa",
+      "ingrediente_id": 121,
+      "cantidad": 46.0,
+      "unidad": "litro",
+      "fecha_registro": "2026-05-12"
+    },
+    {
+      "ingrediente": "Leche de avena",
+      "ingrediente_id": 119,
+      "cantidad": 76.0,
+      "unidad": "litro",
+      "fecha_registro": "2026-05-12"
+    },
+    {
+      "ingrediente": "Jamón",
+      "ingrediente_id": 79,
+      "cantidad": 9.0,
+      "unidad": "unidad",
+      "fecha_registro": "2026-05-14"
+    },
+    {
+      "ingrediente": "Huevo",
+      "ingrediente_id": 96,
+      "cantidad": 270.0,
+      "unidad": "unidad",
+      "fecha_registro": "2026-05-14"
+    },
+    {
+      "ingrediente": "Yogur",
+      "ingrediente_id": 122,
+      "cantidad": 3.0,
+      "unidad": "kg",
+      "fecha_registro": "2026-05-14"
+    },
+    {
+      "ingrediente": "Halbhartkäse",
+      "ingrediente_id": 132,
+      "cantidad": 4.0,
+      "unidad": "kg",
+      "fecha_registro": "2026-05-14"
+    },
+    {
+      "ingrediente": "Philadelphia",
+      "ingrediente_id": 126,
+      "cantidad": 5.0,
+      "unidad": "unidad (1.65kg)",
+      "fecha_registro": "2026-05-14"
+    },
+    {
+      "ingrediente": "Mantequilla",
+      "ingrediente_id": 123,
+      "cantidad": 2.0,
+      "unidad": "kg",
+      "fecha_registro": "2026-05-14"
+    },
+    {
+      "ingrediente": "Leche entera",
+      "ingrediente_id": 120,
+      "cantidad": 44.0,
+      "unidad": "litro",
+      "fecha_registro": "2026-05-19"
+    },
+    {
+      "ingrediente": "Leche sin lactosa",
+      "ingrediente_id": 121,
+      "cantidad": 60.0,
+      "unidad": "litro",
+      "fecha_registro": "2026-05-19"
+    },
+    {
+      "ingrediente": "Leche de avena",
+      "ingrediente_id": 119,
+      "cantidad": 52.0,
+      "unidad": "litro",
+      "fecha_registro": "2026-05-19"
+    },
+    {
+      "ingrediente": "Jamón",
+      "ingrediente_id": 79,
+      "cantidad": 2.0,
+      "unidad": "unidad",
+      "fecha_registro": "2026-05-21"
+    },
+    {
+      "ingrediente": "Huevo",
+      "ingrediente_id": 96,
+      "cantidad": 180.0,
+      "unidad": "unidad",
+      "fecha_registro": "2026-05-21"
+    },
+    {
+      "ingrediente": "Yogur",
+      "ingrediente_id": 122,
+      "cantidad": 1.0,
+      "unidad": "kg",
+      "fecha_registro": "2026-05-21"
+    },
+    {
+      "ingrediente": "Halbhartkäse",
+      "ingrediente_id": 132,
+      "cantidad": 5.0,
+      "unidad": "kg",
+      "fecha_registro": "2026-05-21"
+    },
+    {
+      "ingrediente": "Harina",
+      "ingrediente_id": 60,
+      "cantidad": 5.0,
+      "unidad": "kg",
+      "fecha_registro": "2026-05-21"
+    },
+    {
+      "ingrediente": "Vainilla",
+      "ingrediente_id": 113,
+      "cantidad": 2.0,
+      "unidad": "unidad (450g)",
+      "fecha_registro": "2026-05-21"
+    },
+    {
+      "ingrediente": "Philadelphia",
+      "ingrediente_id": 126,
+      "cantidad": 7.0,
+      "unidad": "unidad (1.65kg)",
+      "fecha_registro": "2026-05-21"
+    },
+    {
+      "ingrediente": "Mantequilla",
+      "ingrediente_id": 123,
+      "cantidad": 4.0,
+      "unidad": "kg",
+      "fecha_registro": "2026-05-21"
+    },
+    {
+      "ingrediente": "Leche entera",
+      "ingrediente_id": 120,
+      "cantidad": 49.0,
+      "unidad": "litro",
+      "fecha_registro": "2026-05-27"
+    },
+    {
+      "ingrediente": "Leche sin lactosa",
+      "ingrediente_id": 121,
+      "cantidad": 66.0,
+      "unidad": "litro",
+      "fecha_registro": "2026-05-27"
+    },
+    {
+      "ingrediente": "Leche de avena",
+      "ingrediente_id": 119,
+      "cantidad": 53.0,
+      "unidad": "litro",
+      "fecha_registro": "2026-05-27"
+    },
+    {
+      "ingrediente": "Huevo",
+      "ingrediente_id": 96,
+      "cantidad": 150.0,
+      "unidad": "unidad",
+      "fecha_registro": "2026-05-28"
+    },
+    {
+      "ingrediente": "Yogur",
+      "ingrediente_id": 122,
+      "cantidad": 1.0,
+      "unidad": "kg",
+      "fecha_registro": "2026-05-28"
+    },
+    {
+      "ingrediente": "Halbhartkäse",
+      "ingrediente_id": 132,
+      "cantidad": 3.0,
+      "unidad": "kg",
+      "fecha_registro": "2026-05-28"
+    },
+    {
+      "ingrediente": "Avena",
+      "ingrediente_id": 51,
+      "cantidad": 2.5,
+      "unidad": "kg",
+      "fecha_registro": "2026-05-28"
+    },
+    {
+      "ingrediente": "Sirope de arce",
+      "ingrediente_id": 144,
+      "cantidad": 6.0,
+      "unidad": "unidad",
+      "fecha_registro": "2026-05-28"
+    },
+    {
+      "ingrediente": "Philadelphia",
+      "ingrediente_id": 126,
+      "cantidad": 8.0,
+      "unidad": "unidad (1.65kg)",
+      "fecha_registro": "2026-05-28"
+    },
+    {
+      "ingrediente": "Leche entera",
+      "ingrediente_id": 120,
+      "cantidad": 62.0,
+      "unidad": "litro",
+      "fecha_registro": "2026-06-03"
+    },
+    {
+      "ingrediente": "Leche sin lactosa",
+      "ingrediente_id": 121,
+      "cantidad": 52.0,
+      "unidad": "litro",
+      "fecha_registro": "2026-06-03"
+    },
+    {
+      "ingrediente": "Leche de avena",
+      "ingrediente_id": 119,
+      "cantidad": 57.0,
+      "unidad": "litro",
+      "fecha_registro": "2026-06-03"
+    },
+    {
+      "ingrediente": "Jamón",
+      "ingrediente_id": 79,
+      "cantidad": 5.0,
+      "unidad": "kg",
+      "fecha_registro": "2026-06-04"
+    },
+    {
+      "ingrediente": "Huevo",
+      "ingrediente_id": 96,
+      "cantidad": 220.0,
+      "unidad": "unidad",
+      "fecha_registro": "2026-06-04"
+    },
+    {
+      "ingrediente": "Salmón",
+      "ingrediente_id": 78,
+      "cantidad": 10.0,
+      "unidad": "kg",
+      "fecha_registro": "2026-06-04"
+    },
+    {
+      "ingrediente": "Yogur",
+      "ingrediente_id": 122,
+      "cantidad": 3.0,
+      "unidad": "kg",
+      "fecha_registro": "2026-06-04"
+    },
+    {
+      "ingrediente": "Halbhartkäse",
+      "ingrediente_id": 132,
+      "cantidad": 5.0,
+      "unidad": "kg",
+      "fecha_registro": "2026-06-04"
+    },
+    {
+      "ingrediente": "Sirope de arce",
+      "ingrediente_id": 144,
+      "cantidad": 5.0,
+      "unidad": "unidad",
+      "fecha_registro": "2026-06-04"
+    },
+    {
+      "ingrediente": "Philadelphia",
+      "ingrediente_id": 126,
+      "cantidad": 9.0,
+      "unidad": "unidad (1.65kg)",
+      "fecha_registro": "2026-06-04"
+    },
+    {
+      "ingrediente": "Mantequilla",
+      "ingrediente_id": 123,
+      "cantidad": 5.0,
+      "unidad": "kg",
+      "fecha_registro": "2026-06-04"
+    },
+    {
+      "ingrediente": "Leche entera",
+      "ingrediente_id": 120,
+      "cantidad": 67.0,
+      "unidad": "litro",
+      "fecha_registro": "2026-06-10"
+    },
+    {
+      "ingrediente": "Leche sin lactosa",
+      "ingrediente_id": 121,
+      "cantidad": 40.0,
+      "unidad": "litro",
+      "fecha_registro": "2026-06-10"
+    },
+    {
+      "ingrediente": "Leche de avena",
+      "ingrediente_id": 119,
+      "cantidad": 27.0,
+      "unidad": "litro",
+      "fecha_registro": "2026-06-10"
+    },
+    {
+      "ingrediente": "Jamón",
+      "ingrediente_id": 79,
+      "cantidad": 2.0,
+      "unidad": "kg",
+      "fecha_registro": "2026-06-11"
+    },
+    {
+      "ingrediente": "Huevo",
+      "ingrediente_id": 96,
+      "cantidad": 150.0,
+      "unidad": "unidad",
+      "fecha_registro": "2026-06-11"
+    },
+    {
+      "ingrediente": "Yogur",
+      "ingrediente_id": 122,
+      "cantidad": 5.0,
+      "unidad": "kg",
+      "fecha_registro": "2026-06-11"
+    },
+    {
+      "ingrediente": "Halbhartkäse",
+      "ingrediente_id": 132,
+      "cantidad": 2.0,
+      "unidad": "kg",
+      "fecha_registro": "2026-06-11"
+    },
+    {
+      "ingrediente": "Chía",
+      "ingrediente_id": 57,
+      "cantidad": 3.0,
+      "unidad": "kg",
+      "fecha_registro": "2026-06-11"
+    },
+    {
+      "ingrediente": "Avena",
+      "ingrediente_id": 51,
+      "cantidad": 5.0,
+      "unidad": "kg",
+      "fecha_registro": "2026-06-11"
+    },
+    {
+      "ingrediente": "Sirope de arce",
+      "ingrediente_id": 144,
+      "cantidad": 6.0,
+      "unidad": "unidad",
+      "fecha_registro": "2026-06-11"
+    },
+    {
+      "ingrediente": "Mantequilla",
+      "ingrediente_id": 123,
+      "cantidad": 10.0,
+      "unidad": "kg",
+      "fecha_registro": "2026-06-11"
+    },
+    {
+      "ingrediente": "Leche entera",
+      "ingrediente_id": 120,
+      "cantidad": 78.0,
+      "unidad": "litro",
+      "fecha_registro": "2026-06-17"
+    },
+    {
+      "ingrediente": "Leche sin lactosa",
+      "ingrediente_id": 121,
+      "cantidad": 49.0,
+      "unidad": "litro",
+      "fecha_registro": "2026-06-17"
+    },
+    {
+      "ingrediente": "Leche de avena",
+      "ingrediente_id": 119,
+      "cantidad": 26.0,
+      "unidad": "litro",
+      "fecha_registro": "2026-06-17"
+    },
+    {
+      "ingrediente": "Huevo",
+      "ingrediente_id": 96,
+      "cantidad": 270.0,
+      "unidad": "unidad",
+      "fecha_registro": "2026-06-18"
+    },
+    {
+      "ingrediente": "Yogur",
+      "ingrediente_id": 122,
+      "cantidad": 2.0,
+      "unidad": "kg",
+      "fecha_registro": "2026-06-18"
+    },
+    {
+      "ingrediente": "Halbhartkäse",
+      "ingrediente_id": 132,
+      "cantidad": 3.0,
+      "unidad": "kg",
+      "fecha_registro": "2026-06-18"
+    },
+    {
+      "ingrediente": "Harina",
+      "ingrediente_id": 60,
+      "cantidad": 3.0,
+      "unidad": "kg",
+      "fecha_registro": "2026-06-18"
+    },
+    {
+      "ingrediente": "Mantequilla",
+      "ingrediente_id": 123,
+      "cantidad": 13.0,
+      "unidad": "kg",
+      "fecha_registro": "2026-06-18"
+    },
+    {
+      "ingrediente": "Leche entera",
+      "ingrediente_id": 120,
+      "cantidad": 68.0,
+      "unidad": "litro",
+      "fecha_registro": "2026-06-24"
+    },
+    {
+      "ingrediente": "Leche sin lactosa",
+      "ingrediente_id": 121,
+      "cantidad": 35.0,
+      "unidad": "litro",
+      "fecha_registro": "2026-06-24"
+    },
+    {
+      "ingrediente": "Leche de avena",
+      "ingrediente_id": 119,
+      "cantidad": 16.0,
+      "unidad": "litro",
+      "fecha_registro": "2026-06-24"
+    },
+    {
+      "ingrediente": "Jamón",
+      "ingrediente_id": 79,
+      "cantidad": 3.0,
+      "unidad": "kg",
+      "fecha_registro": "2026-06-25"
+    },
+    {
+      "ingrediente": "Huevo",
+      "ingrediente_id": 96,
+      "cantidad": 180.0,
+      "unidad": "unidad",
+      "fecha_registro": "2026-06-25"
+    },
+    {
+      "ingrediente": "Salmón",
+      "ingrediente_id": 78,
+      "cantidad": 10.0,
+      "unidad": "kg",
+      "fecha_registro": "2026-06-25"
+    },
+    {
+      "ingrediente": "Yogur",
+      "ingrediente_id": 122,
+      "cantidad": 4.0,
+      "unidad": "kg",
+      "fecha_registro": "2026-06-25"
+    },
+    {
+      "ingrediente": "Halbhartkäse",
+      "ingrediente_id": 132,
+      "cantidad": 1.0,
+      "unidad": "kg",
+      "fecha_registro": "2026-06-25"
+    },
+    {
+      "ingrediente": "Chía",
+      "ingrediente_id": 57,
+      "cantidad": 5.0,
+      "unidad": "kg",
+      "fecha_registro": "2026-06-25"
+    },
+    {
+      "ingrediente": "Sirope de arce",
+      "ingrediente_id": 144,
+      "cantidad": 7.0,
+      "unidad": "unidad",
+      "fecha_registro": "2026-06-25"
+    },
+    {
+      "ingrediente": "Vainilla",
+      "ingrediente_id": 113,
+      "cantidad": 1.0,
+      "unidad": "unidad (450g)",
+      "fecha_registro": "2026-06-25"
+    },
+    {
+      "ingrediente": "Philadelphia",
+      "ingrediente_id": 126,
+      "cantidad": 4.0,
+      "unidad": "unidad (1.65kg)",
+      "fecha_registro": "2026-06-25"
+    },
+    {
+      "ingrediente": "Leche entera",
+      "ingrediente_id": 120,
+      "cantidad": 116.0,
+      "unidad": "litro",
+      "fecha_registro": "2026-07-01"
+    },
+    {
+      "ingrediente": "Leche sin lactosa",
+      "ingrediente_id": 121,
+      "cantidad": 35.0,
+      "unidad": "litro",
+      "fecha_registro": "2026-07-01"
+    },
+    {
+      "ingrediente": "Leche de avena",
+      "ingrediente_id": 119,
+      "cantidad": 31.0,
+      "unidad": "litro",
+      "fecha_registro": "2026-07-01"
+    },
+    {
+      "ingrediente": "Jamón",
+      "ingrediente_id": 79,
+      "cantidad": 11.0,
+      "unidad": "kg",
+      "fecha_registro": "2026-07-02"
+    },
+    {
+      "ingrediente": "Huevo",
+      "ingrediente_id": 96,
+      "cantidad": 240.0,
+      "unidad": "unidad",
+      "fecha_registro": "2026-07-02"
+    },
+    {
+      "ingrediente": "Yogur",
+      "ingrediente_id": 122,
+      "cantidad": 10.0,
+      "unidad": "kg",
+      "fecha_registro": "2026-07-02"
+    },
+    {
+      "ingrediente": "Halbhartkäse",
+      "ingrediente_id": 132,
+      "cantidad": 5.0,
+      "unidad": "kg",
+      "fecha_registro": "2026-07-02"
+    },
+    {
+      "ingrediente": "Avena",
+      "ingrediente_id": 51,
+      "cantidad": 5.0,
+      "unidad": "kg",
+      "fecha_registro": "2026-07-02"
+    },
+    {
+      "ingrediente": "Harina",
+      "ingrediente_id": 60,
+      "cantidad": 10.0,
+      "unidad": "kg",
+      "fecha_registro": "2026-07-02"
+    },
+    {
+      "ingrediente": "Sirope de arce",
+      "ingrediente_id": 144,
+      "cantidad": 6.0,
+      "unidad": "litro",
+      "fecha_registro": "2026-07-02"
+    },
+    {
+      "ingrediente": "Vainilla",
+      "ingrediente_id": 113,
+      "cantidad": 4.0,
+      "unidad": "unidad (450g)",
+      "fecha_registro": "2026-07-02"
+    },
+    {
+      "ingrediente": "Philadelphia",
+      "ingrediente_id": 126,
+      "cantidad": 9.0,
+      "unidad": "unidad (1.65kg)",
+      "fecha_registro": "2026-07-02"
+    },
+    {
+      "ingrediente": "Leche entera",
+      "ingrediente_id": 120,
+      "cantidad": 32.0,
+      "unidad": "litro",
+      "fecha_registro": "2026-07-08"
+    },
+    {
+      "ingrediente": "Leche sin lactosa",
+      "ingrediente_id": 121,
+      "cantidad": 21.0,
+      "unidad": "litro",
+      "fecha_registro": "2026-07-08"
+    },
+    {
+      "ingrediente": "Leche de avena",
+      "ingrediente_id": 119,
+      "cantidad": 44.0,
+      "unidad": "litro",
+      "fecha_registro": "2026-07-08"
+    },
+    {
+      "ingrediente": "Jamón",
+      "ingrediente_id": 79,
+      "cantidad": 5.0,
+      "unidad": "kg",
+      "fecha_registro": "2026-07-09"
+    },
+    {
+      "ingrediente": "Huevo",
+      "ingrediente_id": 96,
+      "cantidad": 300.0,
+      "unidad": "unidad",
+      "fecha_registro": "2026-07-09"
+    },
+    {
+      "ingrediente": "Yogur",
+      "ingrediente_id": 122,
+      "cantidad": 6.0,
+      "unidad": "kg",
+      "fecha_registro": "2026-07-09"
+    },
+    {
+      "ingrediente": "Halbhartkäse",
+      "ingrediente_id": 132,
+      "cantidad": 4.0,
+      "unidad": "kg",
+      "fecha_registro": "2026-07-09"
+    },
+    {
+      "ingrediente": "Sirope de arce",
+      "ingrediente_id": 144,
+      "cantidad": 6.0,
+      "unidad": "litro",
+      "fecha_registro": "2026-07-09"
+    },
+    {
+      "ingrediente": "Vainilla",
+      "ingrediente_id": 113,
+      "cantidad": 4.0,
+      "unidad": "unidad (450g)",
+      "fecha_registro": "2026-07-09"
+    },
+    {
+      "ingrediente": "Philadelphia",
+      "ingrediente_id": 126,
+      "cantidad": 1.0,
+      "unidad": "unidad (1.65kg)",
+      "fecha_registro": "2026-07-09"
+    }
+  ]
+}

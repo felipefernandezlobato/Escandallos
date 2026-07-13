@@ -106,27 +106,64 @@ def tendencia_consumo(historial: list[dict]) -> str:
     return "estable"
 
 
-def recomendacion_pedido(db: Session) -> list[dict]:
+def recomendacion_pedido(
+    db: Session, ingrediente_ids: list[int] | None = None
+) -> list[dict]:
     """Order-Up-To system: pedir = par_level - stock_actual.
-    Par level = consumo_medio + safety_stock (1.65 × std_dev)."""
+    Par level = consumo_medio + safety_stock (1.65 × std_dev).
+
+    When ingrediente_ids is provided, only calculate for those ingredients.
+    Always includes items even when cantidad_sugerida is 0.
+    """
     import math
 
-    ingredientes = db.query(Ingrediente).order_by(Ingrediente.nombre).all()
+    if ingrediente_ids:
+        ingredientes = (
+            db.query(Ingrediente)
+            .filter(Ingrediente.id.in_(ingrediente_ids))
+            .order_by(Ingrediente.nombre)
+            .all()
+        )
+    else:
+        return []
+
     resultado = []
 
     for ing in ingredientes:
         media = consumo_medio_semanal(ing.id, db)
-        if media <= 0:
-            continue
-
         stk = stock_actual(ing.id, db)
-        if stk is None:
+        stock_qty = stk["cantidad"] if stk else 0
+        unidad = stk["unidad"] if stk else ing.unidad_compra
+
+        if media <= 0:
+            resultado.append({
+                "ingrediente_id": ing.id,
+                "ingrediente_nombre": ing.nombre,
+                "proveedor": ing.proveedor or "Sin proveedor",
+                "stock_actual": round(stock_qty, 2),
+                "unidad": unidad,
+                "consumo_medio_semanal": 0,
+                "cantidad_sugerida": 0,
+                "par_level": 0,
+                "dias_stock": None,
+                "nota": "Sin datos de consumo",
+            })
             continue
-        stock_qty = stk["cantidad"]
-        unidad = stk["unidad"]
 
         historial = consumo_semanal(ing.id, db)
         if len(historial) < 3:
+            resultado.append({
+                "ingrediente_id": ing.id,
+                "ingrediente_nombre": ing.nombre,
+                "proveedor": ing.proveedor or "Sin proveedor",
+                "stock_actual": round(stock_qty, 2),
+                "unidad": unidad,
+                "consumo_medio_semanal": round(media, 2),
+                "cantidad_sugerida": 0,
+                "par_level": 0,
+                "dias_stock": None,
+                "nota": "Pocas semanas de historial",
+            })
             continue
 
         weekly_vals = [h["cantidad"] for h in historial]
@@ -140,9 +177,6 @@ def recomendacion_pedido(db: Session) -> list[dict]:
 
         consumo_diario = media / 7
         dias_stock = stock_qty / consumo_diario if consumo_diario > 0 else None
-
-        if cantidad_sugerida <= 0:
-            continue
 
         resultado.append({
             "ingrediente_id": ing.id,

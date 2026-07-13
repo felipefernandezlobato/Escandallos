@@ -191,11 +191,31 @@ def stock_actual_todos(
 
 @router.get("/recomendacion")
 def obtener_recomendacion(
+    ingrediente_ids: Optional[str] = None,
     db: Session = Depends(get_db),
     user=Depends(get_current_user),
 ):
-    items = recomendacion_pedido(db)
+    ids = None
+    if ingrediente_ids:
+        ids = [int(x) for x in ingrediente_ids.split(",") if x.strip()]
+    items = recomendacion_pedido(db, ingrediente_ids=ids)
     return RecomendacionOut(fecha=date.today(), items=items)
+
+
+@router.get("/ultimo-conteo")
+def ultimo_conteo(
+    db: Session = Depends(get_db),
+    user=Depends(get_current_user),
+):
+    rows = (
+        db.query(
+            InventarioRegistro.ingrediente_id,
+            func.max(InventarioRegistro.fecha_registro).label("ultima_fecha"),
+        )
+        .group_by(InventarioRegistro.ingrediente_id)
+        .all()
+    )
+    return {str(ing_id): str(fecha) for ing_id, fecha in rows}
 
 
 @router.get("/alertas-stock")
