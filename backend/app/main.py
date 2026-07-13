@@ -14,7 +14,7 @@ from app.auth import (
     verify_password,
 )
 from app.database import Base, engine, get_db, SessionLocal
-from app.routers import categorias, ingredientes, recetas, importar, dashboard, backup, proveedores
+from app.routers import categorias, ingredientes, recetas, importar, dashboard, backup, proveedores, inventario, pedidos
 from app.models import Categoria
 
 Base.metadata.create_all(bind=engine)
@@ -59,6 +59,8 @@ app.include_router(importar.router)
 app.include_router(dashboard.router)
 app.include_router(backup.router)
 app.include_router(proveedores.router)
+app.include_router(inventario.router)
+app.include_router(pedidos.router)
 
 
 @app.get("/api/health")

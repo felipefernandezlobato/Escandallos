@@ -1,3 +1,5 @@
+from typing import Optional
+
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session, joinedload
 
@@ -63,7 +65,7 @@ def obtener_alertas(db: Session = Depends(get_db), user=Depends(get_current_user
 
 @router.get("/rankings", response_model=list[RankingItem])
 def obtener_rankings(
-    categoria_id: int | None = None,
+    categoria_id: Optional[int] = None,
     orden: str = "margen_desc",
     db: Session = Depends(get_db),
     user=Depends(get_current_user),
@@ -105,7 +107,7 @@ def obtener_rankings(
 
 @router.get("/tendencias", response_model=list[TendenciaItem])
 def obtener_tendencias(
-    ingrediente_id: int | None = None,
+    ingrediente_id: Optional[int] = None,
     db: Session = Depends(get_db),
     user=Depends(get_current_user),
 ):

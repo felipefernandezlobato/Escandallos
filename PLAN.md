@@ -437,55 +437,55 @@ escandallos/
 Objetivo: Reemplazar el sistema actual de pedidos/inventario en Google Sheets por un módulo integrado en la app. El jefe de cocina introduce el inventario actual, la app recomienda qué pedir basándose en consumo histórico, y genera pedidos agrupados por proveedor.
 
 #### 11.1 — Modelo de Datos
-- [ ] 11.1.1 Modelo InventarioRegistro: ingrediente_id, cantidad, unidad, fecha_registro (snapshot semanal del stock on-hand)
-- [ ] 11.1.2 Modelo Pedido: fecha, proveedor, estado (borrador/enviado/recibido), notas
-- [ ] 11.1.3 Modelo LineaPedido: pedido_id, ingrediente_id, cantidad_pedida, unidad, cantidad_recibida (null hasta recepción), precio_unitario
-- [ ] 11.1.4 Migraciones Alembic para las nuevas tablas
-- [ ] 11.1.5 Servicio de cálculo de consumo medio (basado en historial de pedidos + inventario)
+- [x] 11.1.1 Modelo InventarioRegistro: ingrediente_id, cantidad, unidad, fecha_registro (snapshot semanal del stock on-hand)
+- [x] 11.1.2 Modelo Pedido: fecha, proveedor, estado (borrador/enviado/recibido), notas
+- [x] 11.1.3 Modelo LineaPedido: pedido_id, ingrediente_id, cantidad_pedida, unidad, cantidad_recibida (null hasta recepción), precio_unitario
+- [x] 11.1.4 Migraciones Alembic para las nuevas tablas
+- [x] 11.1.5 Servicio de cálculo de consumo medio (basado en historial de pedidos + inventario)
 
 #### 11.2 — Importar Datos Históricos del Excel
-- [ ] 11.2.1 Script para parsear "ESTUDIO ingredientes" del Excel: mapear filas a ingredientes, columnas I+ a pedidos por fecha
-- [ ] 11.2.2 Extraer inventario on-hand de los comentarios de celdas
-- [ ] 11.2.3 Calcular consumo semanal real: pedido_semana_anterior + inventario_anterior - inventario_actual
-- [ ] 11.2.4 Cargar datos históricos en las nuevas tablas (~25 semanas de datos)
+- [x] 11.2.1 Script para parsear "ESTUDIO ingredientes" del Excel: mapear filas a ingredientes, columnas I+ a pedidos por fecha
+- [x] 11.2.2 Extraer inventario on-hand de los comentarios de celdas (339 registros)
+- [x] 11.2.3 Calcular consumo semanal real: basado en pedidos recibidos + inventario
+- [x] 11.2.4 Cargar datos históricos: 60 pedidos, 672 líneas, 339 inventarios (37 semanas, oct 2024–jul 2025)
 
 #### 11.3 — Backend: API de Inventario y Pedidos
-- [ ] 11.3.1 CRUD Inventario: POST /api/inventario (registrar stock actual), GET /api/inventario (historial)
-- [ ] 11.3.2 GET /api/inventario/recomendacion — calcula qué pedir: consumo_medio_semanal - stock_actual + margen_seguridad
-- [ ] 11.3.3 CRUD Pedidos: GET, POST, PUT, DELETE /api/pedidos
-- [ ] 11.3.4 POST /api/pedidos/{id}/recibir — registrar recepción, actualizar precios de ingredientes si cambiaron
-- [ ] 11.3.5 GET /api/pedidos/por-proveedor — agrupar recomendación por proveedor para generar pedido
-- [ ] 11.3.6 GET /api/consumo/{ingrediente_id} — historial de consumo semanal + media móvil
+- [x] 11.3.1 CRUD Inventario: POST /api/inventario (registrar stock actual), GET /api/inventario (historial), GET /api/inventario/actual
+- [x] 11.3.2 GET /api/inventario/recomendacion — calcula qué pedir: consumo_medio_semanal - stock_actual + margen_seguridad
+- [x] 11.3.3 CRUD Pedidos: GET, POST, PUT, DELETE /api/pedidos + POST enviar
+- [x] 11.3.4 POST /api/pedidos/{id}/recibir — registrar recepción, actualizar precios de ingredientes si cambiaron
+- [x] 11.3.5 GET /api/pedidos/por-proveedor — agrupar recomendación por proveedor para generar pedido
+- [x] 11.3.6 GET /api/inventario/consumo/{ingrediente_id} — historial de consumo semanal + media móvil
 
 #### 11.4 — Frontend: Registro de Inventario
-- [ ] 11.4.1 Página /inventario — lista rápida de ingredientes con input numérico para stock actual
-- [ ] 11.4.2 Agrupado por categoría, con búsqueda rápida
-- [ ] 11.4.3 Botón "Guardar inventario" que registra el snapshot completo
-- [ ] 11.4.4 Vista de historial de inventario (qué se registró cada semana)
+- [x] 11.4.1 Página /inventario — lista rápida de ingredientes con input numérico para stock actual
+- [x] 11.4.2 Agrupado por categoría, con búsqueda rápida
+- [x] 11.4.3 Botón "Guardar inventario" que registra el snapshot completo
+- [x] 11.4.4 Vista de historial de inventario (qué se registró cada semana)
 
 #### 11.5 — Frontend: Recomendación y Pedidos
-- [ ] 11.5.1 Página /pedidos — vista de recomendación: ingrediente, stock actual, consumo medio, cantidad sugerida
-- [ ] 11.5.2 El usuario puede ajustar cantidades antes de confirmar
-- [ ] 11.5.3 Vista agrupada por proveedor (Prodega, Rietschi, etc.) para hacer el pedido fácil
-- [ ] 11.5.4 Botón "Crear pedido" que guarda el pedido como borrador
-- [ ] 11.5.5 Flujo de recepción: marcar pedido como recibido, ajustar cantidades reales, actualizar precios si cambiaron
-- [ ] 11.5.6 Historial de pedidos anteriores
+- [x] 11.5.1 Página /pedidos — vista de recomendación: ingrediente, stock actual, consumo medio, cantidad sugerida
+- [x] 11.5.2 El usuario puede ajustar cantidades antes de confirmar
+- [x] 11.5.3 Vista agrupada por proveedor (Prodega, Rietschi, etc.) para hacer el pedido fácil
+- [x] 11.5.4 Botón "Crear pedido" que guarda el pedido como borrador
+- [x] 11.5.5 Flujo de recepción: marcar pedido como recibido, ajustar cantidades reales, actualizar precios si cambiaron
+- [x] 11.5.6 Historial de pedidos anteriores
 
 #### 11.6 — Frontend: Análisis de Consumo
-- [ ] 11.6.1 Gráfico de consumo semanal por ingrediente (últimas 12 semanas)
-- [ ] 11.6.2 Alertas de stock bajo (por debajo de 2 días de consumo)
-- [ ] 11.6.3 Tendencias de consumo (subiendo/bajando/estable)
-- [ ] 11.6.4 Coste semanal total de pedidos por proveedor
+- [x] 11.6.1 Gráfico de consumo semanal por ingrediente (barras, últimas 12 semanas)
+- [x] 11.6.2 Alertas de stock bajo (por debajo de 2 días de consumo) — tabla con stock, días, consumo/día
+- [x] 11.6.3 Tendencias de consumo (subiendo ↑ / bajando ↓ / estable →)
+- [x] 11.6.4 Coste semanal total de pedidos por proveedor — tabla con columnas por proveedor
 
 #### 11.7 — Mejora de Importación de Facturas
-- [ ] 11.7.1 Al importar factura, actualizar precios de ingredientes existentes automáticamente
-- [ ] 11.7.2 Preview claro: precio anterior vs nuevo, con % de cambio
-- [ ] 11.7.3 Confirmar → actualiza precios + crea historial + recalcula costes
-- [ ] 11.7.4 Opción de crear pedido desde la factura importada (registrar como "recibido")
+- [x] 11.7.1 Al importar factura, actualizar precios de ingredientes existentes automáticamente
+- [x] 11.7.2 Preview claro: precio anterior vs nuevo, con % de cambio (ya existía)
+- [x] 11.7.3 Confirmar → actualiza precios + crea historial + recalcula costes (ya existía)
+- [x] 11.7.4 Opción de crear pedido desde la factura importada (checkbox "Registrar como pedido recibido")
 
 #### 11.8 — Tests y Deploy
-- [ ] 11.8.1 Tests de endpoints de inventario y pedidos
-- [ ] 11.8.2 Test de cálculo de consumo medio y recomendación
+- [x] 11.8.1 Tests de endpoints de inventario y pedidos (25 tests, 72 total)
+- [x] 11.8.2 Test de cálculo de consumo medio, recomendación, alertas, coste semanal
 - [ ] 11.8.3 Deploy a producción (push → auto-deploy)
 
 ---

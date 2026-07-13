@@ -28,6 +28,15 @@ export default function IngredienteDetailPage() {
   const [historial, setHistorial] = useState<HistorialPrecio[]>([]);
   const [recetas, setRecetas] = useState<Receta[]>([]);
   const [preciosProveedores, setPreciosProveedores] = useState<PrecioProveedor[]>([]);
+  const [consumo, setConsumo] = useState<{
+    consumo_medio: number;
+    unidad: string;
+    tendencia: string;
+    reorder_point?: number | null;
+    eoq?: number | null;
+    historial: Array<{ semana: string; cantidad: number; unidad: string }>;
+    stock_historial: Array<{ fecha: string; cantidad: number; unidad: string }>;
+  } | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
 
@@ -38,12 +47,14 @@ export default function IngredienteDetailPage() {
       apiFetch<HistorialPrecio[]>(`/api/ingredientes/${id}/historial`),
       apiFetch<Receta[]>(`/api/ingredientes/${id}/recetas`),
       apiFetch<ComparacionProveedores>(`/api/proveedores/comparar/${id}`).catch(() => ({ ingrediente: { id: 0, nombre: "", precio_actual: 0 }, precios: [] })),
+      apiFetch<typeof consumo>(`/api/inventario/consumo/${id}`).catch(() => null),
     ])
-      .then(([ing, hist, rec, comp]) => {
+      .then(([ing, hist, rec, comp, cons]) => {
         setIngrediente(ing);
         setHistorial(hist);
         setRecetas(rec);
         setPreciosProveedores(comp.precios);
+        setConsumo(cons as typeof consumo);
       })
       .catch(() => setNotFound(true))
       .finally(() => setLoading(false));
@@ -231,6 +242,111 @@ export default function IngredienteDetailPage() {
           </table>
         )}
       </div>
+
+      {/* Consumo y Stock */}
+      {consumo && (consumo.historial.length > 0 || (consumo.stock_historial && consumo.stock_historial.length > 0)) && (
+        <div className="bg-white border border-[#E8DFD3] rounded-lg p-4 space-y-4">
+          <div>
+            <h2 className="text-lg font-semibold">Consumo y Stock</h2>
+            <p className="text-sm text-[#6B5E52]">
+              Media: {consumo.consumo_medio} {consumo.unidad}/semana — Tendencia:{" "}
+              <span className={
+                consumo.tendencia === "subiendo" ? "text-red-600" :
+                consumo.tendencia === "bajando" ? "text-green-600" : "text-[#6B5E52]"
+              }>
+                {consumo.tendencia === "subiendo" ? "↑ Subiendo" :
+                 consumo.tendencia === "bajando" ? "↓ Bajando" : "→ Estable"}
+              </span>
+            </p>
+          </div>
+
+          {/* Stock Control Chart */}
+          {consumo.stock_historial && consumo.stock_historial.length > 0 && (() => {
+            const pts = consumo.stock_historial;
+            const rop = consumo.reorder_point;
+            const eoq = consumo.eoq;
+            const maxVal = Math.max(...pts.map(p => p.cantidad), rop ?? 0, eoq ?? 0, 1);
+            const w = 600, h = 160, pad = 40, padR = 10, padB = 20;
+            const plotW = w - pad - padR, plotH = h - padB;
+            const xScale = (i: number) => pad + (i / Math.max(pts.length - 1, 1)) * plotW;
+            const yScale = (v: number) => plotH - (v / maxVal) * (plotH - 10);
+            const polyline = pts.map((p, i) => `${xScale(i)},${yScale(p.cantidad)}`).join(" ");
+            const gridLines = 4;
+            return (
+              <div>
+                <p className="text-xs text-[#6B5E52] mb-1 font-medium">
+                  Control de Stock
+                  {rop != null && <span className="text-red-600 ml-3">Stock de Seguridad: {rop}</span>}
+                  {eoq != null && <span className="text-blue-600 ml-3">Stock Deseado: {eoq}</span>}
+                </p>
+                <svg viewBox={`0 0 ${w} ${h}`} className="w-full" style={{ maxHeight: 200 }}>
+                  {Array.from({ length: gridLines + 1 }, (_, i) => {
+                    const val = Math.round((maxVal / gridLines) * i);
+                    const y = yScale(val);
+                    return (
+                      <g key={i}>
+                        <line x1={pad} y1={y} x2={w - padR} y2={y} stroke="#E8DFD3" strokeWidth="0.5" />
+                        <text x={pad - 4} y={y + 3} textAnchor="end" fontSize="8" fill="#6B5E52">{val}</text>
+                      </g>
+                    );
+                  })}
+                  {rop != null && (
+                    <line x1={pad} y1={yScale(rop)} x2={w - padR} y2={yScale(rop)}
+                      stroke="#dc2626" strokeWidth="1" strokeDasharray="6,4" />
+                  )}
+                  {eoq != null && (
+                    <line x1={pad} y1={yScale(eoq)} x2={w - padR} y2={yScale(eoq)}
+                      stroke="#2563eb" strokeWidth="1" strokeDasharray="6,4" />
+                  )}
+                  <polyline points={polyline} fill="none" stroke="#8B1A2B" strokeWidth="2" />
+                  {pts.map((p, i) => (
+                    <circle key={i} cx={xScale(i)} cy={yScale(p.cantidad)} r="3" fill="#8B1A2B">
+                      <title>{p.fecha}: {p.cantidad} {p.unidad}</title>
+                    </circle>
+                  ))}
+                  {pts.filter((_, i) => i === 0 || i === pts.length - 1 || i === Math.floor(pts.length / 2)).map((p, idx) => {
+                    const i = idx === 0 ? 0 : idx === 1 ? Math.floor(pts.length / 2) : pts.length - 1;
+                    return (
+                      <text key={i} x={xScale(i)} y={h - 4} textAnchor="middle" fontSize="7" fill="#6B5E52">
+                        {pts[i].fecha}
+                      </text>
+                    );
+                  })}
+                </svg>
+              </div>
+            );
+          })()}
+
+          {/* Consumption bars */}
+          {consumo.historial.length > 0 && (
+            <div>
+              <p className="text-xs text-[#6B5E52] mb-1 font-medium">Consumo Semanal</p>
+              <div className="space-y-1">
+                <div className="flex items-end gap-1" style={{ height: 80 }}>
+                  {(() => {
+                    const max = Math.max(...consumo.historial.map(x => x.cantidad));
+                    return consumo.historial.map((h, i) => {
+                      const barH = max > 0 ? Math.max((h.cantidad / max) * 65, 3) : 3;
+                      return (
+                        <div key={i} className="flex-1 flex flex-col items-center justify-end"
+                          title={`${h.semana}: ${h.cantidad} ${h.unidad}`}>
+                          <span className="text-[8px] text-[#6B5E52] mb-0.5">{h.cantidad}</span>
+                          <div className="w-full bg-[#8B1A2B] rounded-t opacity-60" style={{ height: barH }} />
+                        </div>
+                      );
+                    });
+                  })()}
+                </div>
+                <div className="flex gap-1 text-[8px] text-[#6B5E52]">
+                  {consumo.historial.map((h, i) => (
+                    <div key={i} className="flex-1 text-center truncate">{h.semana.replace(/^\d{4}-/, "")}</div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Recetas que lo usan */}
       <div className="bg-white border border-[#E8DFD3] rounded-lg overflow-hidden">

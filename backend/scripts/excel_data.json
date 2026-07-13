@@ -1,0 +1,7938 @@
+{
+  "ingredients": [
+    {
+      "row": 3,
+      "short_name": "Aceto",
+      "full_name": "Aceto Balsmico di Modena",
+      "category": "aceite",
+      "units": "L",
+      "prices": {
+        "saviva": 15.313,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 5.79
+      }
+    },
+    {
+      "row": 4,
+      "short_name": "Aceite",
+      "full_name": "Olivenöl extra vergine Spanien, 10 l",
+      "category": "aceite",
+      "units": "10 l",
+      "prices": {
+        "saviva": 8.2,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 8.01
+      }
+    },
+    {
+      "row": 5,
+      "short_name": "Mayonesa",
+      "full_name": "Quality Mayonnaise Squeeze, 865 g",
+      "category": "aceite",
+      "units": null,
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": null
+      }
+    },
+    {
+      "row": 6,
+      "short_name": "Aceite Girasol",
+      "full_name": "Rapsöl, 20 l",
+      "category": "aceite",
+      "units": "20 Lt",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 4.35
+      }
+    },
+    {
+      "row": 7,
+      "short_name": null,
+      "full_name": "Saitaku Hon Mirin, 500 ml",
+      "category": "aceite",
+      "units": null,
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": null
+      }
+    },
+    {
+      "row": 8,
+      "short_name": null,
+      "full_name": "Senf thomy",
+      "category": "aceite",
+      "units": "1 kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 6.93
+      }
+    },
+    {
+      "row": 9,
+      "short_name": "Soja",
+      "full_name": "Soja Sauce 5lt",
+      "category": "aceite",
+      "units": null,
+      "prices": {
+        "saviva": 8.818,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 8.79
+      }
+    },
+    {
+      "row": 10,
+      "short_name": "Vinagre",
+      "full_name": "Weissweinessig vinegar",
+      "category": "aceite",
+      "units": "L",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 2.81
+      }
+    },
+    {
+      "row": 11,
+      "short_name": null,
+      "full_name": "Chips Nature, 12 x 400 g",
+      "category": "afterwork",
+      "units": "12 x 400 g",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 11.15
+      }
+    },
+    {
+      "row": 12,
+      "short_name": null,
+      "full_name": "Iliada Kalamata Oliven, entsteint, 3,1 kg",
+      "category": "afterwork",
+      "units": "3.1kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": null
+      }
+    },
+    {
+      "row": 13,
+      "short_name": null,
+      "full_name": "Iliada Oliven grün, entsteint, 3,1 kg",
+      "category": "afterwork",
+      "units": "3.1kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": 9.8,
+        "pfaff": null,
+        "prodega": 6.21
+      }
+    },
+    {
+      "row": 14,
+      "short_name": null,
+      "full_name": "Oliven Iliada grüne entkernt mariniert, 1,45 kg",
+      "category": "afterwork",
+      "units": "1 kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 6.89
+      }
+    },
+    {
+      "row": 15,
+      "short_name": null,
+      "full_name": "Quality Salami Milano, 1 kg",
+      "category": "afterwork",
+      "units": "1 kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 17.72
+      }
+    },
+    {
+      "row": 16,
+      "short_name": "Bacon",
+      "full_name": "bacon Economy Bratspeck geräucht geschnitten, ca. 500 g",
+      "category": "carne",
+      "units": "500 g",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 15.2
+      }
+    },
+    {
+      "row": 17,
+      "short_name": "Jamon",
+      "full_name": "Hinterschinken, geschnitten, ca. 500 g (14 Sc",
+      "category": "carne",
+      "units": "1 kg",
+      "prices": {
+        "saviva": 15.9,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 14.84
+      }
+    },
+    {
+      "row": 18,
+      "short_name": "Pork Belly",
+      "full_name": "pork belly Schweins-Brustspitzen, portioniert, geschnitten",
+      "category": "carne",
+      "units": null,
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": null
+      }
+    },
+    {
+      "row": 19,
+      "short_name": null,
+      "full_name": "Poulet brust",
+      "category": "carne",
+      "units": "1kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 13.5
+      }
+    },
+    {
+      "row": 20,
+      "short_name": null,
+      "full_name": "El Campeon Chorizo mild geschält, ca. 950 g",
+      "category": "carne embutido",
+      "units": null,
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 23.5
+      }
+    },
+    {
+      "row": 21,
+      "short_name": null,
+      "full_name": "Mortadella Cilindrica Pistazien 1kg",
+      "category": "carne embutido",
+      "units": "1kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": 21.5,
+        "pfaff": null,
+        "prodega": 24.7
+      }
+    },
+    {
+      "row": 22,
+      "short_name": null,
+      "full_name": "Mortadella Rustica 1/2, ca. 1 kg",
+      "category": "carne embutido",
+      "units": "1kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 18.3
+      }
+    },
+    {
+      "row": 23,
+      "short_name": null,
+      "full_name": "Paleta Iberico Bellota, Spanien, ca. 1,2 kg",
+      "category": "carne embutido",
+      "units": "/Kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 79.5
+      }
+    },
+    {
+      "row": 24,
+      "short_name": null,
+      "full_name": "Quality Salami Milano, 1 kg",
+      "category": "carne embutido",
+      "units": "1kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": 18.5,
+        "prodega": 17.9
+      }
+    },
+    {
+      "row": 25,
+      "short_name": null,
+      "full_name": "Salame Sant'Angelo 1kg",
+      "category": "carne embutido",
+      "units": "1kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": 38.0,
+        "pfaff": null,
+        "prodega": null
+      }
+    },
+    {
+      "row": 26,
+      "short_name": null,
+      "full_name": "Salami del Portico Cavazzuti 1kg",
+      "category": "carne embutido",
+      "units": "1kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": 29.5,
+        "pfaff": null,
+        "prodega": null
+      }
+    },
+    {
+      "row": 27,
+      "short_name": null,
+      "full_name": "Salami Ventricina",
+      "category": "carne embutido",
+      "units": null,
+      "prices": {
+        "saviva": null,
+        "caporaso": 18.0,
+        "pfaff": null,
+        "prodega": 23.5
+      }
+    },
+    {
+      "row": 28,
+      "short_name": "Huevos",
+      "full_name": "Eier Import, Bodenhaltung, 53g+, 90 Stück",
+      "category": "carne huevo",
+      "units": "90 St",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": 0.5,
+        "prodega": 0.42
+      }
+    },
+    {
+      "row": 29,
+      "short_name": "Yema de Huevo",
+      "full_name": "yema de huevo Natura Plus Eigelb flüssig Schweiz, 1 kg",
+      "category": "carne huevo",
+      "units": "1L",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": null
+      }
+    },
+    {
+      "row": 30,
+      "short_name": "Anchoas",
+      "full_name": "Anchoas Marinierte Sardellen Filet, 200 g",
+      "category": "carne pescado",
+      "units": "200g",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 4.5
+      }
+    },
+    {
+      "row": 31,
+      "short_name": "Salmon",
+      "full_name": "lachs salmon",
+      "category": "carne pescado",
+      "units": "1kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": 21.9,
+        "prodega": 22.9
+      }
+    },
+    {
+      "row": 32,
+      "short_name": "10489.0",
+      "full_name": "Pão de Mafra (10x500g)",
+      "category": "covin",
+      "units": "/ uni",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 1.9
+      }
+    },
+    {
+      "row": 33,
+      "short_name": "10099.0",
+      "full_name": "Pimentos Padron (8x300g)",
+      "category": "covin",
+      "units": "/Kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 4.95
+      }
+    },
+    {
+      "row": 34,
+      "short_name": "10544.0",
+      "full_name": "Carrillera Iberica",
+      "category": "covin carne",
+      "units": "/Kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 29.95
+      }
+    },
+    {
+      "row": 35,
+      "short_name": null,
+      "full_name": "Secreto C&G SECRETO IBERICO 20x(2Kg+-)",
+      "category": "covin carne",
+      "units": "/Kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 36.95
+      }
+    },
+    {
+      "row": 36,
+      "short_name": "10563.0",
+      "full_name": "Secreto Iberico de 2a",
+      "category": "covin carne",
+      "units": "/Kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 21.95
+      }
+    },
+    {
+      "row": 37,
+      "short_name": "20102.0",
+      "full_name": "Chourizo Iberico 100%",
+      "category": "covin carne embutido",
+      "units": "/Kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": 47.05,
+        "prodega": 60.0
+      }
+    },
+    {
+      "row": 38,
+      "short_name": "20121.0",
+      "full_name": "Jamon Iberico Selecion S/Hueso",
+      "category": "covin carne embutido",
+      "units": "/Kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 89.95
+      }
+    },
+    {
+      "row": 39,
+      "short_name": "10482.0",
+      "full_name": "CROQUETAS BACALAO 13/15 10x350gr",
+      "category": "covin croquetas",
+      "units": "10x350g",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 16.95
+      }
+    },
+    {
+      "row": 40,
+      "short_name": "10757.0",
+      "full_name": "Croquetas de Boletos y Trufa (4x1Kg)",
+      "category": "covin croquetas",
+      "units": "4x1kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 16.95
+      }
+    },
+    {
+      "row": 41,
+      "short_name": "10679.0",
+      "full_name": "Croquetas de Gambon Panko (4x1Kg)",
+      "category": "covin croquetas",
+      "units": "4x1kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 16.95
+      }
+    },
+    {
+      "row": 42,
+      "short_name": "10230.0",
+      "full_name": "Croquetas Explosion Iberico Panko (4x1Kg)",
+      "category": "covin croquetas",
+      "units": "4x1kg",
+      "prices": {
+        "saviva": "/Kg",
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 16.95
+      }
+    },
+    {
+      "row": 43,
+      "short_name": "10681.0",
+      "full_name": "CROQUETAS JAMON IBERICO PANKO IBERIA 35gr 4x1Kg",
+      "category": "covin croquetas",
+      "units": "4x1kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 16.95
+      }
+    },
+    {
+      "row": 44,
+      "short_name": "Jengibre Molido",
+      "full_name": "Ingwer gemahlen, 310 g",
+      "category": "especias",
+      "units": "310 g",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 7.39
+      }
+    },
+    {
+      "row": 45,
+      "short_name": "Paprika",
+      "full_name": "Paprika mild, 380 g",
+      "category": "especias",
+      "units": "380g",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 9.61
+      }
+    },
+    {
+      "row": 46,
+      "short_name": "Pimienta",
+      "full_name": "Pfeffer schwarz ganz, 800 g Quality",
+      "category": "especias",
+      "units": "800 g",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 24.725
+      }
+    },
+    {
+      "row": 47,
+      "short_name": null,
+      "full_name": "Pfeffer weiss ganz, 470 g",
+      "category": "especias",
+      "units": "470 g",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 25.10638298
+      }
+    },
+    {
+      "row": 48,
+      "short_name": "Sal Himalaya",
+      "full_name": "salz himalaya 0.9 kg",
+      "category": "especias",
+      "units": "1 kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 9.877777778
+      }
+    },
+    {
+      "row": 49,
+      "short_name": null,
+      "full_name": "Salz JuraSel Speisesalz grün, mit Jod und Fluor, 1 kg",
+      "category": "especias",
+      "units": "1 kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 1.1
+      }
+    },
+    {
+      "row": 50,
+      "short_name": null,
+      "full_name": "Zimt gemahlen",
+      "category": "especias",
+      "units": "370g",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 28.7
+      }
+    },
+    {
+      "row": 51,
+      "short_name": null,
+      "full_name": "Zimtstangen, 15 cm, 400 g",
+      "category": "especias",
+      "units": "400 g",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 21.41
+      }
+    },
+    {
+      "row": 52,
+      "short_name": "Chilli Flakes",
+      "full_name": "Chili gebrochen, 290 g",
+      "category": "especias adorno",
+      "units": "290 g",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 30.48275862
+      }
+    },
+    {
+      "row": 53,
+      "short_name": null,
+      "full_name": "Ingwer BRESC Ingwerpüree, 450 g",
+      "category": "especias adorno",
+      "units": null,
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 24.04444444
+      }
+    },
+    {
+      "row": 54,
+      "short_name": "Mohnsamen",
+      "full_name": "Zwicky Mohnsamen, 5 kg",
+      "category": "especias adorno",
+      "units": null,
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 6.0
+      }
+    },
+    {
+      "row": 55,
+      "short_name": null,
+      "full_name": "B Peterli gekraust *",
+      "category": "especias hierbas",
+      "units": "1 kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": 11.8,
+        "prodega": 14.76
+      }
+    },
+    {
+      "row": 56,
+      "short_name": null,
+      "full_name": "B Pfefferminze grün Bündeli (",
+      "category": "especias hierbas",
+      "units": "bund",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": 57.8125,
+        "prodega": 52.75
+      }
+    },
+    {
+      "row": 57,
+      "short_name": null,
+      "full_name": "B Schnittlauch lose Bund (Bund)B",
+      "category": "especias hierbas",
+      "units": "bund",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": 50.0,
+        "prodega": 57.1
+      }
+    },
+    {
+      "row": 58,
+      "short_name": null,
+      "full_name": "B Zwiebelkeimlinge, 100 g zwiebelsprossen",
+      "category": "especias hierbas",
+      "units": "100 g",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": 52.0,
+        "prodega": 41.1
+      }
+    },
+    {
+      "row": 59,
+      "short_name": null,
+      "full_name": "Basilikum, 1 kg",
+      "category": "especias hierbas",
+      "units": "1 kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 29.69
+      }
+    },
+    {
+      "row": 60,
+      "short_name": null,
+      "full_name": "Aepfel Gala KI. I 12.5 kg. CH (IFCO)",
+      "category": "fruta",
+      "units": "1 kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": 3.05,
+        "prodega": 3.45
+      }
+    },
+    {
+      "row": 61,
+      "short_name": null,
+      "full_name": "banane",
+      "category": "fruta",
+      "units": "1 kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": 2.9,
+        "prodega": 3.05
+      }
+    },
+    {
+      "row": 62,
+      "short_name": null,
+      "full_name": "Erdbeeren 500        g.        (IFCO) Stück",
+      "category": "fruta",
+      "units": "500g",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": 10.9,
+        "prodega": 13.44
+      }
+    },
+    {
+      "row": 63,
+      "short_name": null,
+      "full_name": "heidelbeeren",
+      "category": "fruta",
+      "units": "500g",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": 5.8,
+        "prodega": 12.26
+      }
+    },
+    {
+      "row": 64,
+      "short_name": null,
+      "full_name": "himbeeren",
+      "category": "fruta",
+      "units": "250g",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": 8.6,
+        "prodega": 18.32
+      }
+    },
+    {
+      "row": 65,
+      "short_name": null,
+      "full_name": "kiwi",
+      "category": "fruta",
+      "units": "st",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": 0.8,
+        "prodega": 0.7
+      }
+    },
+    {
+      "row": 66,
+      "short_name": null,
+      "full_name": "Limetten / Limes, 4,2 kg",
+      "category": "fruta",
+      "units": "4.2 kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": 4.2,
+        "prodega": 2.98
+      }
+    },
+    {
+      "row": 67,
+      "short_name": null,
+      "full_name": "Orangen",
+      "category": "fruta",
+      "units": "1 kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": 1.85,
+        "prodega": 2.26
+      }
+    },
+    {
+      "row": 68,
+      "short_name": null,
+      "full_name": "Pear Conference",
+      "category": "fruta",
+      "units": "1 kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": 3.1,
+        "prodega": 4.22
+      }
+    },
+    {
+      "row": 69,
+      "short_name": null,
+      "full_name": "Trauben weiss",
+      "category": "fruta",
+      "units": "500g",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": 6.5,
+        "prodega": 7.02
+      }
+    },
+    {
+      "row": 70,
+      "short_name": null,
+      "full_name": "Traubne blau",
+      "category": "fruta",
+      "units": "500g",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": 3.1,
+        "prodega": 5.0
+      }
+    },
+    {
+      "row": 71,
+      "short_name": null,
+      "full_name": "zitronen",
+      "category": "fruta",
+      "units": "1 kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": 2.7,
+        "prodega": 2.68
+      }
+    },
+    {
+      "row": 72,
+      "short_name": null,
+      "full_name": "Zumo de naranja",
+      "category": "fruta",
+      "units": null,
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 1.99
+      }
+    },
+    {
+      "row": 73,
+      "short_name": null,
+      "full_name": "Beerenmischung, TK, 2 x 2,5 kg",
+      "category": "fruta congelada",
+      "units": "5 kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 8.95
+      }
+    },
+    {
+      "row": 74,
+      "short_name": null,
+      "full_name": "Erdbeeren ungezuckert TK 2 x 2,5 kg",
+      "category": "fruta congelada",
+      "units": "5 kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 5.88
+      }
+    },
+    {
+      "row": 75,
+      "short_name": null,
+      "full_name": "Artischocken Hälften, 3,1kg Natura e Bontà",
+      "category": "fruta y verdura",
+      "units": "3.1 kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": 27.0,
+        "prodega": 13.49333333
+      }
+    },
+    {
+      "row": 76,
+      "short_name": null,
+      "full_name": "Auberginen, 5 kg",
+      "category": "fruta y verdura",
+      "units": "5 kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": 2.95,
+        "prodega": 4.36
+      }
+    },
+    {
+      "row": 77,
+      "short_name": null,
+      "full_name": "Avocados essreif, 16 St",
+      "category": "fruta y verdura",
+      "units": "16 St",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": 1.45,
+        "prodega": 1.48
+      }
+    },
+    {
+      "row": 78,
+      "short_name": null,
+      "full_name": "champignon brown",
+      "category": "fruta y verdura",
+      "units": "1 kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": 8.75,
+        "prodega": 9.22
+      }
+    },
+    {
+      "row": 79,
+      "short_name": null,
+      "full_name": "champignon weiss",
+      "category": "fruta y verdura",
+      "units": "1 kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": 7.8,
+        "prodega": 8.53
+      }
+    },
+    {
+      "row": 80,
+      "short_name": null,
+      "full_name": "Cherry Tomaten Rispen",
+      "category": "fruta y verdura",
+      "units": null,
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": 5.1,
+        "prodega": 6.66
+      }
+    },
+    {
+      "row": 81,
+      "short_name": null,
+      "full_name": "Cherry tomten",
+      "category": "fruta y verdura",
+      "units": "1 kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": 7.95,
+        "prodega": 9.64
+      }
+    },
+    {
+      "row": 82,
+      "short_name": null,
+      "full_name": "Economy Kapern Capotes, 4,350 kg",
+      "category": "fruta y verdura",
+      "units": "4 x 1100 g",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 5.59
+      }
+    },
+    {
+      "row": 83,
+      "short_name": null,
+      "full_name": "gurken",
+      "category": "fruta y verdura",
+      "units": "stuck",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": 1.1,
+        "prodega": 1.37
+      }
+    },
+    {
+      "row": 84,
+      "short_name": null,
+      "full_name": "Karotten",
+      "category": "fruta y verdura",
+      "units": "kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": 1.65,
+        "prodega": 1.73
+      }
+    },
+    {
+      "row": 85,
+      "short_name": null,
+      "full_name": "kartoffeln, festkochend, 2,5 kg",
+      "category": "fruta y verdura",
+      "units": "2.5 kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": 1.6,
+        "prodega": 1.512
+      }
+    },
+    {
+      "row": 86,
+      "short_name": null,
+      "full_name": "Knoblauch Original ganz geschält, 1 kg",
+      "category": "fruta y verdura",
+      "units": "1 kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": 14.3,
+        "prodega": 11.01
+      }
+    },
+    {
+      "row": 87,
+      "short_name": null,
+      "full_name": "Knoblauch, 70 - 90 mm, 5 kg",
+      "category": "fruta y verdura",
+      "units": null,
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": 4.6,
+        "prodega": 7.85
+      }
+    },
+    {
+      "row": 88,
+      "short_name": null,
+      "full_name": "peperoni rot",
+      "category": "fruta y verdura",
+      "units": "2kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": 3.6,
+        "prodega": 5.93
+      }
+    },
+    {
+      "row": 89,
+      "short_name": null,
+      "full_name": "peperoni tri color",
+      "category": "fruta y verdura",
+      "units": null,
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": 6.8,
+        "prodega": 5.65
+      }
+    },
+    {
+      "row": 90,
+      "short_name": null,
+      "full_name": "rucola",
+      "category": "fruta y verdura",
+      "units": "1kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": 10.2,
+        "prodega": 12.85
+      }
+    },
+    {
+      "row": 91,
+      "short_name": null,
+      "full_name": "Tomaten gedörrt",
+      "category": "fruta y verdura",
+      "units": "1 kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": 10.5,
+        "prodega": 12.7
+      }
+    },
+    {
+      "row": 92,
+      "short_name": null,
+      "full_name": "Tomaten, rund, 6 kg",
+      "category": "fruta y verdura",
+      "units": "6 kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": 3.85,
+        "prodega": 3.12
+      }
+    },
+    {
+      "row": 93,
+      "short_name": null,
+      "full_name": "zucchetti grun",
+      "category": "fruta y verdura",
+      "units": null,
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": 2.65,
+        "prodega": 2.2
+      }
+    },
+    {
+      "row": 94,
+      "short_name": null,
+      "full_name": "Zwiebeln mittel, gepackt, 1 kg",
+      "category": "fruta y verdura",
+      "units": "1 kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": 1.8,
+        "prodega": 1.9
+      }
+    },
+    {
+      "row": 95,
+      "short_name": null,
+      "full_name": "Zwiebeln Rot",
+      "category": "fruta y verdura",
+      "units": null,
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": 1.9,
+        "prodega": 2.14
+      }
+    },
+    {
+      "row": 96,
+      "short_name": null,
+      "full_name": "Baumnusskerne, gebrochen, hell, 1 kg",
+      "category": "frutos secos",
+      "units": "1 kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 12.64
+      }
+    },
+    {
+      "row": 97,
+      "short_name": null,
+      "full_name": "Cashews Bruch, 1 kg",
+      "category": "frutos secos",
+      "units": "1 kg",
+      "prices": {
+        "saviva": 16.02,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 14.46
+      }
+    },
+    {
+      "row": 98,
+      "short_name": null,
+      "full_name": "cocos-Chips nature, 600 g",
+      "category": "frutos secos",
+      "units": "600g",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 14.96666667
+      }
+    },
+    {
+      "row": 99,
+      "short_name": null,
+      "full_name": "Economy Haselnusskerne ganz, 2,5 kg",
+      "category": "frutos secos",
+      "units": null,
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 12.16
+      }
+    },
+    {
+      "row": 100,
+      "short_name": null,
+      "full_name": "Erdnüsse geröstet, gesalzen, 1 kg",
+      "category": "frutos secos",
+      "units": "1 kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 6.82
+      }
+    },
+    {
+      "row": 101,
+      "short_name": null,
+      "full_name": "Haselnüsse ganz geschält  1kg",
+      "category": "frutos secos",
+      "units": null,
+      "prices": {
+        "saviva": 26.33,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 22.49
+      }
+    },
+    {
+      "row": 102,
+      "short_name": null,
+      "full_name": "Kichererbsen garbanzos",
+      "category": "frutos secos",
+      "units": null,
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 3.45
+      }
+    },
+    {
+      "row": 103,
+      "short_name": null,
+      "full_name": "Mandel Economy Mandeln ganz, 2,5 kg",
+      "category": "frutos secos",
+      "units": null,
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 11.5
+      }
+    },
+    {
+      "row": 104,
+      "short_name": "yogurt",
+      "full_name": "Joghurt nach griechischer Art, 10% Milchfett, 1 kg",
+      "category": "lacteos",
+      "units": "1 kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 4.59
+      }
+    },
+    {
+      "row": 105,
+      "short_name": null,
+      "full_name": "MILCH Emmi Vollmilch IP-SUISSE 3,5%, pasteurisiert, 8 x 1 l",
+      "category": "lacteos leche",
+      "units": "8 x 1 l",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 1.5
+      }
+    },
+    {
+      "row": 106,
+      "short_name": null,
+      "full_name": "milch lactose frei",
+      "category": "lacteos leche",
+      "units": null,
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 2.22
+      }
+    },
+    {
+      "row": 107,
+      "short_name": null,
+      "full_name": "milch oatly",
+      "category": "lacteos leche",
+      "units": null,
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 2.72
+      }
+    },
+    {
+      "row": 108,
+      "short_name": null,
+      "full_name": "Vollrahm 35%, UHT",
+      "category": "lacteos leche",
+      "units": "1L",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 6.3
+      }
+    },
+    {
+      "row": 109,
+      "short_name": null,
+      "full_name": "burrata congelada",
+      "category": "lacteos queso",
+      "units": null,
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": null
+      }
+    },
+    {
+      "row": 110,
+      "short_name": null,
+      "full_name": "burrata fresca",
+      "category": "lacteos queso",
+      "units": "2x125g",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": null
+      }
+    },
+    {
+      "row": 111,
+      "short_name": null,
+      "full_name": "Emmentaler Typ, Scheiben, 8 x 5 cm, 2 kg",
+      "category": "lacteos queso",
+      "units": "1 kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 14.56
+      }
+    },
+    {
+      "row": 112,
+      "short_name": null,
+      "full_name": "Galbani Mascarpone, 500 g",
+      "category": "lacteos queso",
+      "units": "0.5kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 7.73
+      }
+    },
+    {
+      "row": 113,
+      "short_name": null,
+      "full_name": "Halbhartkäse Gastro, Scheiben, 1 kg",
+      "category": "lacteos queso",
+      "units": "1 kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 12.26
+      }
+    },
+    {
+      "row": 114,
+      "short_name": null,
+      "full_name": "Hartkäse Swiss, Scheiben, 1 kg",
+      "category": "lacteos queso",
+      "units": "1 kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 13.31
+      }
+    },
+    {
+      "row": 115,
+      "short_name": null,
+      "full_name": "Käse Sandwich         Scheiben",
+      "category": "lacteos queso",
+      "units": null,
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": 8.95,
+        "prodega": 7.45
+      }
+    },
+    {
+      "row": 116,
+      "short_name": null,
+      "full_name": "Mozzarella di Bufala Campana DOP, 16 x 125 g",
+      "category": "lacteos queso",
+      "units": null,
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 2.26
+      }
+    },
+    {
+      "row": 117,
+      "short_name": null,
+      "full_name": "parmigiano",
+      "category": "lacteos queso",
+      "units": "1 kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": 29.5,
+        "prodega": 24.08
+      }
+    },
+    {
+      "row": 118,
+      "short_name": null,
+      "full_name": "Philadelphia, 1,65 kg (9 Be)",
+      "category": "lacteos queso",
+      "units": "1.65 kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": 25.35,
+        "prodega": 12.09090909
+      }
+    },
+    {
+      "row": 119,
+      "short_name": null,
+      "full_name": "Soignon Bûche de chèvre, Weichkäse, 1 kg Queso de Cabra",
+      "category": "lacteos queso",
+      "units": "1kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 17.96
+      }
+    },
+    {
+      "row": 120,
+      "short_name": null,
+      "full_name": "Gorgonzola San Antonio DOP, 1/4 Laib ca. 1,5 kg",
+      "category": "lacteos queso tablas",
+      "units": "1 kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": 12.5,
+        "pfaff": 26.18,
+        "prodega": 15.62
+      }
+    },
+    {
+      "row": 121,
+      "short_name": null,
+      "full_name": "Montasio Käse DOP 1kg / Cremo Greyerzer AOP, classic, ca. 2 kg",
+      "category": "lacteos queso tablas",
+      "units": "1 kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": 14.6,
+        "pfaff": null,
+        "prodega": 18.71
+      }
+    },
+    {
+      "row": 122,
+      "short_name": null,
+      "full_name": "Taleggio",
+      "category": "lacteos queso tablas",
+      "units": "1 kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": 10.0,
+        "pfaff": null,
+        "prodega": null
+      }
+    },
+    {
+      "row": 123,
+      "short_name": null,
+      "full_name": "Butter, 10 x 1 kg",
+      "category": "reposteria",
+      "units": "10 kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": 17.45,
+        "prodega": 12.9
+      }
+    },
+    {
+      "row": 124,
+      "short_name": null,
+      "full_name": "Crema / Nata Quality Vollrahm 35%, UHT, 12 x 1 l",
+      "category": "lacteos reposteria",
+      "units": null,
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 6.3
+      }
+    },
+    {
+      "row": 125,
+      "short_name": null,
+      "full_name": "Alustar Alu Förmchen 8 cm, 30 Stück",
+      "category": "material cocina",
+      "units": "30 St",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 5.71
+      }
+    },
+    {
+      "row": 126,
+      "short_name": null,
+      "full_name": "Backofen- und Grillreiniger, 320 ml",
+      "category": "material cocina",
+      "units": "320 ml",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 5.44
+      }
+    },
+    {
+      "row": 127,
+      "short_name": null,
+      "full_name": "Backstar Backpapier GN 1/1 53 x 32,5 cm, 300 Bogen",
+      "category": "material cocina",
+      "units": "300 Bogen",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 30.98
+      }
+    },
+    {
+      "row": 128,
+      "short_name": null,
+      "full_name": "Einweghandschuhe Nitril, Grösse L, schwarz, 100 St",
+      "category": "material cocina",
+      "units": "100 St",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 9.87
+      }
+    },
+    {
+      "row": 129,
+      "short_name": null,
+      "full_name": "Einweghandschuhe Nitril, Grösse M, schwarz, 100 St",
+      "category": "material cocina",
+      "units": "100 St",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 9.87
+      }
+    },
+    {
+      "row": 130,
+      "short_name": null,
+      "full_name": "Frischhaltefolie, PVC, 45 cm x 300 m",
+      "category": "material cocina",
+      "units": "45 cm x 300 m",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 15.54
+      }
+    },
+    {
+      "row": 131,
+      "short_name": null,
+      "full_name": "Barilla Lasagne, 5 kg",
+      "category": "Pan",
+      "units": "5kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 43.8
+      }
+    },
+    {
+      "row": 132,
+      "short_name": null,
+      "full_name": "Bistro Boulangerie Milchbrot, tiefgekühlt, 3 x 850 g",
+      "category": "Pan",
+      "units": "850 g",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 6.45
+      }
+    },
+    {
+      "row": 133,
+      "short_name": null,
+      "full_name": "Deliciel Bagel Back und Brau, tiefgekühlt, 50 x 61 g",
+      "category": "Pan",
+      "units": null,
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 59.52
+      }
+    },
+    {
+      "row": 134,
+      "short_name": null,
+      "full_name": "Di Marco Pinsa Romana classic, 19 x 30 cm",
+      "category": "Pan",
+      "units": "230g",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 3.2
+      }
+    },
+    {
+      "row": 135,
+      "short_name": null,
+      "full_name": "Romer's Huusbrot hell, vorgebacken, einzeln verpackt",
+      "category": "Pan",
+      "units": "3 unit",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 4.49
+      }
+    },
+    {
+      "row": 136,
+      "short_name": null,
+      "full_name": "Sternanis Quality",
+      "category": "Pan",
+      "units": "150g",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 11.07
+      }
+    },
+    {
+      "row": 137,
+      "short_name": "Chia",
+      "full_name": "Chia Samen schwarz, 1 kg",
+      "category": "reposteria",
+      "units": "1 kg",
+      "prices": {
+        "saviva": 9.7,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 7.49
+      }
+    },
+    {
+      "row": 138,
+      "short_name": null,
+      "full_name": "Haferflocken grob, 5 kg",
+      "category": "reposteria",
+      "units": "5 kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 3.02
+      }
+    },
+    {
+      "row": 139,
+      "short_name": null,
+      "full_name": "Maizena Quality Maisstärke, 2,5 kg",
+      "category": "reposteria",
+      "units": null,
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": null
+      }
+    },
+    {
+      "row": 140,
+      "short_name": null,
+      "full_name": "peanut butter",
+      "category": "reposteria",
+      "units": null,
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 13.12
+      }
+    },
+    {
+      "row": 141,
+      "short_name": null,
+      "full_name": "Tahini Sesampaste, 2 kg",
+      "category": "reposteria",
+      "units": "2 kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 8.01
+      }
+    },
+    {
+      "row": 142,
+      "short_name": null,
+      "full_name": "VEG-Pinsamehl Romana, 2.5 kg",
+      "category": "reposteria",
+      "units": "2.500kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 8.42
+      }
+    },
+    {
+      "row": 143,
+      "short_name": null,
+      "full_name": "Weissmehl, 10 x 1 kg",
+      "category": "reposteria",
+      "units": "10 x 1 kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 1.14
+      }
+    },
+    {
+      "row": 144,
+      "short_name": null,
+      "full_name": "Backpulver",
+      "category": "reposteria",
+      "units": null,
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 6.58
+      }
+    },
+    {
+      "row": 145,
+      "short_name": null,
+      "full_name": "choco blanco Quality Couverture Tropfen, weiss 28%, 2,5 kg",
+      "category": "reposteria choco",
+      "units": "2.5 kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 38.31
+      }
+    },
+    {
+      "row": 146,
+      "short_name": null,
+      "full_name": "Kakao pulver callier",
+      "category": "reposteria choco",
+      "units": "0.8 kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 22.0375
+      }
+    },
+    {
+      "row": 147,
+      "short_name": null,
+      "full_name": "Maracaibo Clasificado 65% Couverture dunkel Rondo, 3 x 2 kg",
+      "category": "reposteria choco",
+      "units": "1 kg",
+      "prices": {
+        "saviva": 33.3,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 21.34
+      }
+    },
+    {
+      "row": 148,
+      "short_name": null,
+      "full_name": "Ahorn sirup Natura Bio Ahornsirup, 1 l (2 Fl)",
+      "category": "reposteria endulzante",
+      "units": "1 l",
+      "prices": {
+        "saviva": 23.69,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 22.54
+      }
+    },
+    {
+      "row": 149,
+      "short_name": null,
+      "full_name": "HONIG Nectaflor Blütenhonig, 2,8 kg",
+      "category": "reposteria endulzante",
+      "units": "2.8 kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 10.76785714
+      }
+    },
+    {
+      "row": 150,
+      "short_name": null,
+      "full_name": "pistachio 7Chef Crema Pistacchio 9 %, tiefgekühlt, 8 x 500 g",
+      "category": "reposteria endulzante",
+      "units": null,
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": null
+      }
+    },
+    {
+      "row": 151,
+      "short_name": null,
+      "full_name": "Vanille Agrano Flüssigaroma , 450 g",
+      "category": "reposteria endulzante",
+      "units": "450 g",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 32.4
+      }
+    },
+    {
+      "row": 152,
+      "short_name": null,
+      "full_name": "ZUCKER Fairtrade Rohzucker aus Zuckerrohr, 10 x 1 kg",
+      "category": "reposteria endulzante",
+      "units": "10 x 1 kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 2.54
+      }
+    },
+    {
+      "row": 153,
+      "short_name": null,
+      "full_name": "ZUCKER Feinkristallzucker, 10 x 1 kg",
+      "category": "reposteria endulzante",
+      "units": "10 x 1 kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 1.37
+      }
+    },
+    {
+      "row": 154,
+      "short_name": null,
+      "full_name": "ZUCKER Puderzucker 6 x 500g",
+      "category": "reposteria endulzante",
+      "units": "1 kg",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 3.42
+      }
+    },
+    {
+      "row": 155,
+      "short_name": null,
+      "full_name": "Zucker sticks braun",
+      "category": "reposteria endulzante",
+      "units": "1000 x 4g",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 28.19
+      }
+    },
+    {
+      "row": 156,
+      "short_name": null,
+      "full_name": "Zucker sticks weiss",
+      "category": "reposteria endulzante",
+      "units": "1000 x 5g",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 16.84
+      }
+    },
+    {
+      "row": 157,
+      "short_name": null,
+      "full_name": "Handwaschmittel",
+      "category": "z jabon de platos",
+      "units": "10L",
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 11.88
+      }
+    },
+    {
+      "row": 158,
+      "short_name": null,
+      "full_name": "Holzzahnstocher",
+      "category": "z palillos",
+      "units": null,
+      "prices": {
+        "saviva": null,
+        "caporaso": null,
+        "pfaff": null,
+        "prodega": 2.5
+      }
+    }
+  ],
+  "dates": [
+    "2025-10-03",
+    "2025-10-10",
+    "2025-10-24",
+    "2025-10-31",
+    "2025-11-07",
+    "2025-11-14",
+    "2025-11-21",
+    "2025-11-28",
+    "2025-12-05",
+    "2025-12-12",
+    "2025-12-19",
+    "2026-01-02",
+    "2026-01-09",
+    "2026-01-16",
+    "2026-01-23",
+    "2026-01-29",
+    "2026-02-06",
+    "2026-02-13",
+    "2026-02-20",
+    "2026-02-27",
+    "2026-03-06",
+    "2026-03-13",
+    "2026-03-20",
+    "2026-03-27",
+    "2026-04-02",
+    "2026-04-09",
+    "2026-04-16",
+    "2026-04-23",
+    "2026-04-30",
+    "2026-05-07",
+    "2026-05-14",
+    "2026-05-21",
+    "2026-05-28",
+    "2026-06-04",
+    "2026-06-11",
+    "2026-06-18",
+    "2026-06-25",
+    "2026-07-02",
+    "2026-07-09"
+  ],
+  "date_columns": [
+    {
+      "col_index": 47,
+      "col_letter": "AU",
+      "date": "2025-10-03",
+      "raw_header": "2025-10-03 00:00:00"
+    },
+    {
+      "col_index": 46,
+      "col_letter": "AT",
+      "date": "2025-10-10",
+      "raw_header": "10.10'"
+    },
+    {
+      "col_index": 45,
+      "col_letter": "AS",
+      "date": "2025-10-24",
+      "raw_header": "24.10'"
+    },
+    {
+      "col_index": 44,
+      "col_letter": "AR",
+      "date": "2025-10-31",
+      "raw_header": "31.10'"
+    },
+    {
+      "col_index": 43,
+      "col_letter": "AQ",
+      "date": "2025-11-07",
+      "raw_header": "07.11'"
+    },
+    {
+      "col_index": 42,
+      "col_letter": "AP",
+      "date": "2025-11-14",
+      "raw_header": "14.11'"
+    },
+    {
+      "col_index": 41,
+      "col_letter": "AO",
+      "date": "2025-11-21",
+      "raw_header": "21.11'"
+    },
+    {
+      "col_index": 40,
+      "col_letter": "AN",
+      "date": "2025-11-28",
+      "raw_header": "28.11'"
+    },
+    {
+      "col_index": 39,
+      "col_letter": "AM",
+      "date": "2025-12-05",
+      "raw_header": "05.12'"
+    },
+    {
+      "col_index": 38,
+      "col_letter": "AL",
+      "date": "2025-12-12",
+      "raw_header": "12.12'"
+    },
+    {
+      "col_index": 37,
+      "col_letter": "AK",
+      "date": "2025-12-19",
+      "raw_header": "2025-12-19 00:00:00"
+    },
+    {
+      "col_index": 36,
+      "col_letter": "AJ",
+      "date": "2026-01-02",
+      "raw_header": "2026-01-02 00:00:00"
+    },
+    {
+      "col_index": 35,
+      "col_letter": "AI",
+      "date": "2026-01-09",
+      "raw_header": "09.01'"
+    },
+    {
+      "col_index": 34,
+      "col_letter": "AH",
+      "date": "2026-01-16",
+      "raw_header": "16.01'"
+    },
+    {
+      "col_index": 33,
+      "col_letter": "AG",
+      "date": "2026-01-23",
+      "raw_header": "23.01'"
+    },
+    {
+      "col_index": 32,
+      "col_letter": "AF",
+      "date": "2026-01-29",
+      "raw_header": "29.01'"
+    },
+    {
+      "col_index": 31,
+      "col_letter": "AE",
+      "date": "2026-02-06",
+      "raw_header": "06.02'"
+    },
+    {
+      "col_index": 30,
+      "col_letter": "AD",
+      "date": "2026-02-13",
+      "raw_header": "13.02'"
+    },
+    {
+      "col_index": 29,
+      "col_letter": "AC",
+      "date": "2026-02-20",
+      "raw_header": "20.02'"
+    },
+    {
+      "col_index": 28,
+      "col_letter": "AB",
+      "date": "2026-02-27",
+      "raw_header": "27.02'"
+    },
+    {
+      "col_index": 27,
+      "col_letter": "AA",
+      "date": "2026-03-06",
+      "raw_header": "06.03'"
+    },
+    {
+      "col_index": 26,
+      "col_letter": "Z",
+      "date": "2026-03-13",
+      "raw_header": "13.03'"
+    },
+    {
+      "col_index": 25,
+      "col_letter": "Y",
+      "date": "2026-03-20",
+      "raw_header": "20.03'"
+    },
+    {
+      "col_index": 24,
+      "col_letter": "X",
+      "date": "2026-03-27",
+      "raw_header": "27.03"
+    },
+    {
+      "col_index": 23,
+      "col_letter": "W",
+      "date": "2026-04-02",
+      "raw_header": "2.04"
+    },
+    {
+      "col_index": 22,
+      "col_letter": "V",
+      "date": "2026-04-09",
+      "raw_header": "9.04"
+    },
+    {
+      "col_index": 21,
+      "col_letter": "U",
+      "date": "2026-04-16",
+      "raw_header": "16.04"
+    },
+    {
+      "col_index": 20,
+      "col_letter": "T",
+      "date": "2026-04-23",
+      "raw_header": "23.04"
+    },
+    {
+      "col_index": 19,
+      "col_letter": "S",
+      "date": "2026-04-30",
+      "raw_header": "30.04"
+    },
+    {
+      "col_index": 18,
+      "col_letter": "R",
+      "date": "2026-05-07",
+      "raw_header": "7.05"
+    },
+    {
+      "col_index": 17,
+      "col_letter": "Q",
+      "date": "2026-05-14",
+      "raw_header": "14.05"
+    },
+    {
+      "col_index": 16,
+      "col_letter": "P",
+      "date": "2026-05-21",
+      "raw_header": "21.05"
+    },
+    {
+      "col_index": 15,
+      "col_letter": "O",
+      "date": "2026-05-28",
+      "raw_header": "28.05"
+    },
+    {
+      "col_index": 14,
+      "col_letter": "N",
+      "date": "2026-06-04",
+      "raw_header": "4.06"
+    },
+    {
+      "col_index": 13,
+      "col_letter": "M",
+      "date": "2026-06-11",
+      "raw_header": "11.06"
+    },
+    {
+      "col_index": 12,
+      "col_letter": "L",
+      "date": "2026-06-18",
+      "raw_header": "18.06"
+    },
+    {
+      "col_index": 11,
+      "col_letter": "K",
+      "date": "2026-06-25",
+      "raw_header": "25.06"
+    },
+    {
+      "col_index": 10,
+      "col_letter": "J",
+      "date": "2026-07-02",
+      "raw_header": "2.7"
+    },
+    {
+      "col_index": 9,
+      "col_letter": "I",
+      "date": "2026-07-09",
+      "raw_header": "2026-07-09 00:00:00"
+    }
+  ],
+  "orders": [
+    {
+      "row": 4,
+      "date": "2025-10-10",
+      "col": "AT",
+      "value": "10L",
+      "comment": null
+    },
+    {
+      "row": 4,
+      "date": "2025-11-21",
+      "col": "AO",
+      "value": "10L",
+      "comment": null
+    },
+    {
+      "row": 4,
+      "date": "2025-12-05",
+      "col": "AM",
+      "value": "20L",
+      "comment": null
+    },
+    {
+      "row": 4,
+      "date": "2025-12-19",
+      "col": "AK",
+      "value": "10L",
+      "comment": null
+    },
+    {
+      "row": 4,
+      "date": "2026-02-06",
+      "col": "AE",
+      "value": "10L",
+      "comment": null
+    },
+    {
+      "row": 4,
+      "date": "2026-02-27",
+      "col": "AB",
+      "value": "10L",
+      "comment": "3L"
+    },
+    {
+      "row": 4,
+      "date": "2026-03-20",
+      "col": "Y",
+      "value": "10L",
+      "comment": "0.500L"
+    },
+    {
+      "row": 4,
+      "date": "2026-04-30",
+      "col": "S",
+      "value": "10L",
+      "comment": null
+    },
+    {
+      "row": 4,
+      "date": "2026-05-21",
+      "col": "P",
+      "value": 10.0,
+      "comment": "9L"
+    },
+    {
+      "row": 4,
+      "date": "2026-06-04",
+      "col": "N",
+      "value": 10.0,
+      "comment": "7 litros"
+    },
+    {
+      "row": 4,
+      "date": "2026-07-09",
+      "col": "I",
+      "value": "10L",
+      "comment": "4L"
+    },
+    {
+      "row": 5,
+      "date": "2026-03-06",
+      "col": "AA",
+      "value": 1.0,
+      "comment": null
+    },
+    {
+      "row": 6,
+      "date": "2025-12-05",
+      "col": "AM",
+      "value": "20L",
+      "comment": null
+    },
+    {
+      "row": 6,
+      "date": "2026-02-06",
+      "col": "AE",
+      "value": "20L",
+      "comment": null
+    },
+    {
+      "row": 6,
+      "date": "2026-03-20",
+      "col": "Y",
+      "value": "20L",
+      "comment": "3l"
+    },
+    {
+      "row": 6,
+      "date": "2026-05-07",
+      "col": "R",
+      "value": 20.0,
+      "comment": "8 litros"
+    },
+    {
+      "row": 6,
+      "date": "2026-06-25",
+      "col": "K",
+      "value": 20.0,
+      "comment": "500ml"
+    },
+    {
+      "row": 7,
+      "date": "2026-03-27",
+      "col": "X",
+      "value": "1unit",
+      "comment": "0 unit"
+    },
+    {
+      "row": 8,
+      "date": "2026-06-11",
+      "col": "M",
+      "value": 1.0,
+      "comment": "0"
+    },
+    {
+      "row": 9,
+      "date": "2025-11-14",
+      "col": "AP",
+      "value": "5L",
+      "comment": null
+    },
+    {
+      "row": 9,
+      "date": "2026-05-21",
+      "col": "P",
+      "value": 5.0,
+      "comment": "0"
+    },
+    {
+      "row": 10,
+      "date": "2025-12-19",
+      "col": "AK",
+      "value": "10L",
+      "comment": null
+    },
+    {
+      "row": 11,
+      "date": "2026-02-27",
+      "col": "AB",
+      "value": null,
+      "comment": "7 bolsas"
+    },
+    {
+      "row": 11,
+      "date": "2026-03-27",
+      "col": "X",
+      "value": 12.0,
+      "comment": "1 bolsa"
+    },
+    {
+      "row": 11,
+      "date": "2026-06-18",
+      "col": "L",
+      "value": null,
+      "comment": "no llego el dia 19"
+    },
+    {
+      "row": 11,
+      "date": "2026-06-25",
+      "col": "K",
+      "value": 9.0,
+      "comment": "2"
+    },
+    {
+      "row": 12,
+      "date": "2025-11-14",
+      "col": "AP",
+      "value": "1 unit",
+      "comment": null
+    },
+    {
+      "row": 12,
+      "date": "2025-11-21",
+      "col": "AO",
+      "value": "1 unit",
+      "comment": null
+    },
+    {
+      "row": 13,
+      "date": "2026-03-13",
+      "col": "Z",
+      "value": 1.0,
+      "comment": "0.5 unit"
+    },
+    {
+      "row": 13,
+      "date": "2026-03-20",
+      "col": "Y",
+      "value": 1.0,
+      "comment": "1unit(3.100kg)"
+    },
+    {
+      "row": 13,
+      "date": "2026-03-27",
+      "col": "X",
+      "value": 2.0,
+      "comment": "0"
+    },
+    {
+      "row": 13,
+      "date": "2026-04-23",
+      "col": "T",
+      "value": 2.0,
+      "comment": "0\nReply:\n\tdiscount"
+    },
+    {
+      "row": 13,
+      "date": "2026-05-28",
+      "col": "O",
+      "value": 2.0,
+      "comment": "1 unit"
+    },
+    {
+      "row": 13,
+      "date": "2026-06-11",
+      "col": "M",
+      "value": 2.0,
+      "comment": "1 unit"
+    },
+    {
+      "row": 13,
+      "date": "2026-06-18",
+      "col": "L",
+      "value": 1.0,
+      "comment": "2 unit"
+    },
+    {
+      "row": 13,
+      "date": "2026-07-09",
+      "col": "I",
+      "value": "1unit",
+      "comment": "2 unit"
+    },
+    {
+      "row": 14,
+      "date": "2025-11-07",
+      "col": "AQ",
+      "value": 1.0,
+      "comment": null
+    },
+    {
+      "row": 14,
+      "date": "2025-11-21",
+      "col": "AO",
+      "value": "1 unit",
+      "comment": null
+    },
+    {
+      "row": 14,
+      "date": "2026-02-13",
+      "col": "AD",
+      "value": "1 unit",
+      "comment": null
+    },
+    {
+      "row": 15,
+      "date": "2026-03-27",
+      "col": "X",
+      "value": "1unit",
+      "comment": "0"
+    },
+    {
+      "row": 16,
+      "date": "2026-03-06",
+      "col": "AA",
+      "value": 1.0,
+      "comment": null
+    },
+    {
+      "row": 16,
+      "date": "2026-03-27",
+      "col": "X",
+      "value": 1.0,
+      "comment": "100g"
+    },
+    {
+      "row": 16,
+      "date": "2026-06-11",
+      "col": "M",
+      "value": "2KG",
+      "comment": "0"
+    },
+    {
+      "row": 16,
+      "date": "2026-07-09",
+      "col": "I",
+      "value": "2kg",
+      "comment": "1kg"
+    },
+    {
+      "row": 17,
+      "date": "2025-10-03",
+      "col": "AU",
+      "value": 7.5,
+      "comment": null
+    },
+    {
+      "row": 17,
+      "date": "2025-10-10",
+      "col": "AT",
+      "value": 5.0,
+      "comment": null
+    },
+    {
+      "row": 17,
+      "date": "2025-10-24",
+      "col": "AS",
+      "value": 7.0,
+      "comment": null
+    },
+    {
+      "row": 17,
+      "date": "2025-10-31",
+      "col": "AR",
+      "value": 3.0,
+      "comment": null
+    },
+    {
+      "row": 17,
+      "date": "2025-11-07",
+      "col": "AQ",
+      "value": 0.0,
+      "comment": null
+    },
+    {
+      "row": 17,
+      "date": "2025-11-14",
+      "col": "AP",
+      "value": 7.0,
+      "comment": null
+    },
+    {
+      "row": 17,
+      "date": "2025-11-21",
+      "col": "AO",
+      "value": 5.0,
+      "comment": null
+    },
+    {
+      "row": 17,
+      "date": "2025-11-28",
+      "col": "AN",
+      "value": 4.0,
+      "comment": null
+    },
+    {
+      "row": 17,
+      "date": "2025-12-05",
+      "col": "AM",
+      "value": 3.0,
+      "comment": null
+    },
+    {
+      "row": 17,
+      "date": "2025-12-12",
+      "col": "AL",
+      "value": 6.0,
+      "comment": null
+    },
+    {
+      "row": 17,
+      "date": "2025-12-19",
+      "col": "AK",
+      "value": 0.0,
+      "comment": null
+    },
+    {
+      "row": 17,
+      "date": "2026-01-02",
+      "col": "AJ",
+      "value": 4.0,
+      "comment": null
+    },
+    {
+      "row": 17,
+      "date": "2026-01-09",
+      "col": "AI",
+      "value": 5.0,
+      "comment": null
+    },
+    {
+      "row": 17,
+      "date": "2026-01-16",
+      "col": "AH",
+      "value": 0.0,
+      "comment": null
+    },
+    {
+      "row": 17,
+      "date": "2026-01-23",
+      "col": "AG",
+      "value": 3.0,
+      "comment": null
+    },
+    {
+      "row": 17,
+      "date": "2026-01-29",
+      "col": "AF",
+      "value": 0.0,
+      "comment": null
+    },
+    {
+      "row": 17,
+      "date": "2026-02-06",
+      "col": "AE",
+      "value": 5.0,
+      "comment": null
+    },
+    {
+      "row": 17,
+      "date": "2026-02-13",
+      "col": "AD",
+      "value": 3.0,
+      "comment": "2 kg"
+    },
+    {
+      "row": 17,
+      "date": "2026-02-20",
+      "col": "AC",
+      "value": 4.0,
+      "comment": "2 kg"
+    },
+    {
+      "row": 17,
+      "date": "2026-02-27",
+      "col": "AB",
+      "value": 3.0,
+      "comment": "3 kg"
+    },
+    {
+      "row": 17,
+      "date": "2026-03-06",
+      "col": "AA",
+      "value": 2.0,
+      "comment": "3.5 kg"
+    },
+    {
+      "row": 17,
+      "date": "2026-03-13",
+      "col": "Z",
+      "value": 3.0,
+      "comment": "3.5 kl"
+    },
+    {
+      "row": 17,
+      "date": "2026-03-20",
+      "col": "Y",
+      "value": 4.5,
+      "comment": "2.5kg"
+    },
+    {
+      "row": 17,
+      "date": "2026-03-27",
+      "col": "X",
+      "value": 4.0,
+      "comment": "4kg"
+    },
+    {
+      "row": 17,
+      "date": "2026-04-02",
+      "col": "W",
+      "value": 0.0,
+      "comment": null
+    },
+    {
+      "row": 17,
+      "date": "2026-04-09",
+      "col": "V",
+      "value": 2.0,
+      "comment": "5.5kg"
+    },
+    {
+      "row": 17,
+      "date": "2026-04-16",
+      "col": "U",
+      "value": 1.0,
+      "comment": "5kg"
+    },
+    {
+      "row": 17,
+      "date": "2026-04-23",
+      "col": "T",
+      "value": 2.0,
+      "comment": "4 kg"
+    },
+    {
+      "row": 17,
+      "date": "2026-04-30",
+      "col": "S",
+      "value": 3.0,
+      "comment": "4 kg"
+    },
+    {
+      "row": 17,
+      "date": "2026-05-07",
+      "col": "R",
+      "value": 2.0,
+      "comment": "11 unit"
+    },
+    {
+      "row": 17,
+      "date": "2026-05-14",
+      "col": "Q",
+      "value": 2.0,
+      "comment": "9 unit"
+    },
+    {
+      "row": 17,
+      "date": "2026-05-21",
+      "col": "P",
+      "value": 8.0,
+      "comment": "2 unit"
+    },
+    {
+      "row": 17,
+      "date": "2026-06-04",
+      "col": "N",
+      "value": 1.0,
+      "comment": "5 kg"
+    },
+    {
+      "row": 17,
+      "date": "2026-06-11",
+      "col": "M",
+      "value": 5.0,
+      "comment": "2 kg"
+    },
+    {
+      "row": 17,
+      "date": "2026-06-25",
+      "col": "K",
+      "value": "4kg",
+      "comment": "3 kg"
+    },
+    {
+      "row": 17,
+      "date": "2026-07-02",
+      "col": "J",
+      "value": 1.0,
+      "comment": "11kg"
+    },
+    {
+      "row": 17,
+      "date": "2026-07-09",
+      "col": "I",
+      "value": "1kg",
+      "comment": "5kg"
+    },
+    {
+      "row": 18,
+      "date": "2026-03-06",
+      "col": "AA",
+      "value": 1.0,
+      "comment": null
+    },
+    {
+      "row": 18,
+      "date": "2026-05-28",
+      "col": "O",
+      "value": 1.0,
+      "comment": "700"
+    },
+    {
+      "row": 18,
+      "date": "2026-06-18",
+      "col": "L",
+      "value": "5kg",
+      "comment": "0"
+    },
+    {
+      "row": 19,
+      "date": "2026-06-11",
+      "col": "M",
+      "value": "5kg",
+      "comment": null
+    },
+    {
+      "row": 21,
+      "date": "2025-12-05",
+      "col": "AM",
+      "value": 2.0,
+      "comment": null
+    },
+    {
+      "row": 21,
+      "date": "2026-01-16",
+      "col": "AH",
+      "value": 1.0,
+      "comment": null
+    },
+    {
+      "row": 21,
+      "date": "2026-02-20",
+      "col": "AC",
+      "value": 1.0,
+      "comment": null
+    },
+    {
+      "row": 22,
+      "date": "2026-03-27",
+      "col": "X",
+      "value": 1.0,
+      "comment": "0"
+    },
+    {
+      "row": 22,
+      "date": "2026-07-09",
+      "col": "I",
+      "value": "1kg",
+      "comment": "200g"
+    },
+    {
+      "row": 27,
+      "date": "2026-01-16",
+      "col": "AH",
+      "value": 2.4,
+      "comment": null
+    },
+    {
+      "row": 27,
+      "date": "2026-04-30",
+      "col": "S",
+      "value": 2.4,
+      "comment": null
+    },
+    {
+      "row": 27,
+      "date": "2026-05-21",
+      "col": "P",
+      "value": null,
+      "comment": "2.28kg"
+    },
+    {
+      "row": 28,
+      "date": "2025-10-03",
+      "col": "AU",
+      "value": 180,
+      "comment": null
+    },
+    {
+      "row": 28,
+      "date": "2025-10-10",
+      "col": "AT",
+      "value": 180.0,
+      "comment": null
+    },
+    {
+      "row": 28,
+      "date": "2025-10-24",
+      "col": "AS",
+      "value": 270,
+      "comment": null
+    },
+    {
+      "row": 28,
+      "date": "2025-10-31",
+      "col": "AR",
+      "value": 270,
+      "comment": null
+    },
+    {
+      "row": 28,
+      "date": "2025-11-07",
+      "col": "AQ",
+      "value": 270,
+      "comment": null
+    },
+    {
+      "row": 28,
+      "date": "2025-11-14",
+      "col": "AP",
+      "value": 360,
+      "comment": null
+    },
+    {
+      "row": 28,
+      "date": "2025-11-21",
+      "col": "AO",
+      "value": 180,
+      "comment": null
+    },
+    {
+      "row": 28,
+      "date": "2025-11-28",
+      "col": "AN",
+      "value": 360,
+      "comment": null
+    },
+    {
+      "row": 28,
+      "date": "2025-12-05",
+      "col": "AM",
+      "value": 270,
+      "comment": null
+    },
+    {
+      "row": 28,
+      "date": "2025-12-12",
+      "col": "AL",
+      "value": 270,
+      "comment": null
+    },
+    {
+      "row": 28,
+      "date": "2025-12-19",
+      "col": "AK",
+      "value": 90,
+      "comment": null
+    },
+    {
+      "row": 28,
+      "date": "2026-01-02",
+      "col": "AJ",
+      "value": 270,
+      "comment": null
+    },
+    {
+      "row": 28,
+      "date": "2026-01-09",
+      "col": "AI",
+      "value": 180,
+      "comment": null
+    },
+    {
+      "row": 28,
+      "date": "2026-01-16",
+      "col": "AH",
+      "value": 270,
+      "comment": null
+    },
+    {
+      "row": 28,
+      "date": "2026-01-23",
+      "col": "AG",
+      "value": 270,
+      "comment": null
+    },
+    {
+      "row": 28,
+      "date": "2026-01-29",
+      "col": "AF",
+      "value": 270,
+      "comment": null
+    },
+    {
+      "row": 28,
+      "date": "2026-02-06",
+      "col": "AE",
+      "value": 360,
+      "comment": null
+    },
+    {
+      "row": 28,
+      "date": "2026-02-13",
+      "col": "AD",
+      "value": 360,
+      "comment": "60"
+    },
+    {
+      "row": 28,
+      "date": "2026-02-20",
+      "col": "AC",
+      "value": 360,
+      "comment": "60"
+    },
+    {
+      "row": 28,
+      "date": "2026-02-27",
+      "col": "AB",
+      "value": 360,
+      "comment": "90"
+    },
+    {
+      "row": 28,
+      "date": "2026-03-06",
+      "col": "AA",
+      "value": 360,
+      "comment": "90"
+    },
+    {
+      "row": 28,
+      "date": "2026-03-13",
+      "col": "Z",
+      "value": 250.0,
+      "comment": null
+    },
+    {
+      "row": 28,
+      "date": "2026-03-20",
+      "col": "Y",
+      "value": 360,
+      "comment": "150"
+    },
+    {
+      "row": 28,
+      "date": "2026-03-27",
+      "col": "X",
+      "value": 360,
+      "comment": "360\nReply:\n\thay 360 huevos en bru ahora?"
+    },
+    {
+      "row": 28,
+      "date": "2026-04-09",
+      "col": "V",
+      "value": 360,
+      "comment": "110"
+    },
+    {
+      "row": 28,
+      "date": "2026-04-16",
+      "col": "U",
+      "value": 360,
+      "comment": "150"
+    },
+    {
+      "row": 28,
+      "date": "2026-04-23",
+      "col": "T",
+      "value": 270,
+      "comment": "210"
+    },
+    {
+      "row": 28,
+      "date": "2026-04-30",
+      "col": "S",
+      "value": 360,
+      "comment": "180"
+    },
+    {
+      "row": 28,
+      "date": "2026-05-07",
+      "col": "R",
+      "value": 360.0,
+      "comment": "180"
+    },
+    {
+      "row": 28,
+      "date": "2026-05-14",
+      "col": "Q",
+      "value": 180.0,
+      "comment": "270"
+    },
+    {
+      "row": 28,
+      "date": "2026-05-21",
+      "col": "P",
+      "value": 360.0,
+      "comment": "180"
+    },
+    {
+      "row": 28,
+      "date": "2026-05-28",
+      "col": "O",
+      "value": 360.0,
+      "comment": "150"
+    },
+    {
+      "row": 28,
+      "date": "2026-06-04",
+      "col": "N",
+      "value": 270.0,
+      "comment": "220 unit"
+    },
+    {
+      "row": 28,
+      "date": "2026-06-11",
+      "col": "M",
+      "value": 450.0,
+      "comment": "150"
+    },
+    {
+      "row": 28,
+      "date": "2026-06-18",
+      "col": "L",
+      "value": 360.0,
+      "comment": "270"
+    },
+    {
+      "row": 28,
+      "date": "2026-06-25",
+      "col": "K",
+      "value": 360.0,
+      "comment": "180"
+    },
+    {
+      "row": 28,
+      "date": "2026-07-02",
+      "col": "J",
+      "value": 360.0,
+      "comment": "240"
+    },
+    {
+      "row": 28,
+      "date": "2026-07-09",
+      "col": "I",
+      "value": 270.0,
+      "comment": "300"
+    },
+    {
+      "row": 29,
+      "date": "2026-03-06",
+      "col": "AA",
+      "value": 1.0,
+      "comment": null
+    },
+    {
+      "row": 29,
+      "date": "2026-03-20",
+      "col": "Y",
+      "value": 1.0,
+      "comment": "@bruspecialtycoffee4@gmail.com\n\naqui falta algo no?\nbruspecialtycoffee4@gmail.com zugewiesen\nReply:\n\t1"
+    },
+    {
+      "row": 29,
+      "date": "2026-05-28",
+      "col": "O",
+      "value": 2.0,
+      "comment": "0"
+    },
+    {
+      "row": 29,
+      "date": "2026-06-18",
+      "col": "L",
+      "value": 3.0,
+      "comment": "1"
+    },
+    {
+      "row": 29,
+      "date": "2026-07-09",
+      "col": "I",
+      "value": "3L",
+      "comment": "1L"
+    },
+    {
+      "row": 30,
+      "date": "2026-03-06",
+      "col": "AA",
+      "value": 1.0,
+      "comment": null
+    },
+    {
+      "row": 30,
+      "date": "2026-05-28",
+      "col": "O",
+      "value": 1.0,
+      "comment": "0"
+    },
+    {
+      "row": 31,
+      "date": "2025-10-10",
+      "col": "AT",
+      "value": 10.0,
+      "comment": null
+    },
+    {
+      "row": 31,
+      "date": "2025-10-24",
+      "col": "AS",
+      "value": 1.0,
+      "comment": null
+    },
+    {
+      "row": 31,
+      "date": "2025-11-21",
+      "col": "AO",
+      "value": 10.0,
+      "comment": null
+    },
+    {
+      "row": 31,
+      "date": "2025-12-12",
+      "col": "AL",
+      "value": 10.0,
+      "comment": null
+    },
+    {
+      "row": 31,
+      "date": "2026-02-06",
+      "col": "AE",
+      "value": 10.0,
+      "comment": null
+    },
+    {
+      "row": 31,
+      "date": "2026-02-27",
+      "col": "AB",
+      "value": null,
+      "comment": "8 kg"
+    },
+    {
+      "row": 31,
+      "date": "2026-03-06",
+      "col": "AA",
+      "value": 10.0,
+      "comment": "7 kg\n\n18.61 chf / kg"
+    },
+    {
+      "row": 31,
+      "date": "2026-03-27",
+      "col": "X",
+      "value": 10.0,
+      "comment": "6kg"
+    },
+    {
+      "row": 31,
+      "date": "2026-04-16",
+      "col": "U",
+      "value": 1.0,
+      "comment": "9kg"
+    },
+    {
+      "row": 31,
+      "date": "2026-04-30",
+      "col": "S",
+      "value": 10.0,
+      "comment": "3 kg"
+    },
+    {
+      "row": 31,
+      "date": "2026-05-07",
+      "col": "R",
+      "value": 10.0,
+      "comment": "10 kg"
+    },
+    {
+      "row": 31,
+      "date": "2026-06-04",
+      "col": "N",
+      "value": 10.0,
+      "comment": "10 kg"
+    },
+    {
+      "row": 31,
+      "date": "2026-06-25",
+      "col": "K",
+      "value": "10kg",
+      "comment": "10kg"
+    },
+    {
+      "row": 34,
+      "date": "2026-04-16",
+      "col": "U",
+      "value": 1.32,
+      "comment": null
+    },
+    {
+      "row": 36,
+      "date": "2026-04-16",
+      "col": "U",
+      "value": 2.32,
+      "comment": null
+    },
+    {
+      "row": 39,
+      "date": "2026-04-16",
+      "col": "U",
+      "value": 3.5,
+      "comment": null
+    },
+    {
+      "row": 40,
+      "date": "2026-04-16",
+      "col": "U",
+      "value": 4.0,
+      "comment": null
+    },
+    {
+      "row": 41,
+      "date": "2026-04-16",
+      "col": "U",
+      "value": 4.0,
+      "comment": null
+    },
+    {
+      "row": 42,
+      "date": "2026-04-16",
+      "col": "U",
+      "value": 4.0,
+      "comment": null
+    },
+    {
+      "row": 43,
+      "date": "2026-04-16",
+      "col": "U",
+      "value": 4.0,
+      "comment": null
+    },
+    {
+      "row": 44,
+      "date": "2026-06-18",
+      "col": "L",
+      "value": "",
+      "comment": null
+    },
+    {
+      "row": 45,
+      "date": "2025-11-28",
+      "col": "AN",
+      "value": "1 unit",
+      "comment": null
+    },
+    {
+      "row": 46,
+      "date": "2026-04-23",
+      "col": "T",
+      "value": 1.0,
+      "comment": null
+    },
+    {
+      "row": 48,
+      "date": "2025-10-03",
+      "col": "AU",
+      "value": 1.0,
+      "comment": null
+    },
+    {
+      "row": 50,
+      "date": "2025-12-12",
+      "col": "AL",
+      "value": 1.0,
+      "comment": null
+    },
+    {
+      "row": 50,
+      "date": "2026-01-09",
+      "col": "AI",
+      "value": 1.0,
+      "comment": null
+    },
+    {
+      "row": 50,
+      "date": "2026-01-23",
+      "col": "AG",
+      "value": 1.0,
+      "comment": null
+    },
+    {
+      "row": 50,
+      "date": "2026-05-28",
+      "col": "O",
+      "value": 3.0,
+      "comment": "1"
+    },
+    {
+      "row": 50,
+      "date": "2026-06-11",
+      "col": "M",
+      "value": 3.0,
+      "comment": "2 botes"
+    },
+    {
+      "row": 50,
+      "date": "2026-06-18",
+      "col": "L",
+      "value": 3.0,
+      "comment": "4"
+    },
+    {
+      "row": 50,
+      "date": "2026-07-02",
+      "col": "J",
+      "value": 2.0,
+      "comment": "6"
+    },
+    {
+      "row": 51,
+      "date": "2026-01-23",
+      "col": "AG",
+      "value": 1.0,
+      "comment": null
+    },
+    {
+      "row": 51,
+      "date": "2026-03-06",
+      "col": "AA",
+      "value": 1.0,
+      "comment": null
+    },
+    {
+      "row": 51,
+      "date": "2026-05-28",
+      "col": "O",
+      "value": 1.0,
+      "comment": "0"
+    },
+    {
+      "row": 52,
+      "date": "2025-11-07",
+      "col": "AQ",
+      "value": 1.0,
+      "comment": null
+    },
+    {
+      "row": 52,
+      "date": "2025-11-14",
+      "col": "AP",
+      "value": 1.0,
+      "comment": null
+    },
+    {
+      "row": 52,
+      "date": "2026-01-29",
+      "col": "AF",
+      "value": 1.0,
+      "comment": null
+    },
+    {
+      "row": 52,
+      "date": "2026-02-20",
+      "col": "AC",
+      "value": 1.0,
+      "comment": null
+    },
+    {
+      "row": 52,
+      "date": "2026-02-27",
+      "col": "AB",
+      "value": 1.0,
+      "comment": "0 units"
+    },
+    {
+      "row": 52,
+      "date": "2026-03-13",
+      "col": "Z",
+      "value": 2.0,
+      "comment": "0"
+    },
+    {
+      "row": 52,
+      "date": "2026-03-27",
+      "col": "X",
+      "value": 1.0,
+      "comment": "1unit"
+    },
+    {
+      "row": 52,
+      "date": "2026-04-09",
+      "col": "V",
+      "value": 1.0,
+      "comment": "70%"
+    },
+    {
+      "row": 52,
+      "date": "2026-04-23",
+      "col": "T",
+      "value": 2.0,
+      "comment": "discount"
+    },
+    {
+      "row": 52,
+      "date": "2026-05-07",
+      "col": "R",
+      "value": 2.0,
+      "comment": "1 unit"
+    },
+    {
+      "row": 52,
+      "date": "2026-05-21",
+      "col": "P",
+      "value": 1.0,
+      "comment": "1 unit"
+    },
+    {
+      "row": 52,
+      "date": "2026-05-28",
+      "col": "O",
+      "value": 2.0,
+      "comment": "1 unit"
+    },
+    {
+      "row": 52,
+      "date": "2026-06-11",
+      "col": "M",
+      "value": 1.0,
+      "comment": "2"
+    },
+    {
+      "row": 52,
+      "date": "2026-06-18",
+      "col": "L",
+      "value": 1.0,
+      "comment": "2"
+    },
+    {
+      "row": 52,
+      "date": "2026-07-09",
+      "col": "I",
+      "value": 4.0,
+      "comment": "0"
+    },
+    {
+      "row": 53,
+      "date": "2026-03-20",
+      "col": "Y",
+      "value": "1unit",
+      "comment": null
+    },
+    {
+      "row": 54,
+      "date": "2026-02-06",
+      "col": "AE",
+      "value": "5 kg",
+      "comment": null
+    },
+    {
+      "row": 54,
+      "date": "2026-06-11",
+      "col": "M",
+      "value": "5 kg",
+      "comment": "1 kg"
+    },
+    {
+      "row": 56,
+      "date": "2026-04-16",
+      "col": "U",
+      "value": 1.0,
+      "comment": null
+    },
+    {
+      "row": 56,
+      "date": "2026-04-23",
+      "col": "T",
+      "value": 1.0,
+      "comment": "0"
+    },
+    {
+      "row": 58,
+      "date": "2026-04-16",
+      "col": "U",
+      "value": 3.0,
+      "comment": "2 units"
+    },
+    {
+      "row": 58,
+      "date": "2026-04-23",
+      "col": "T",
+      "value": 2.0,
+      "comment": "3 unit"
+    },
+    {
+      "row": 59,
+      "date": "2026-04-23",
+      "col": "T",
+      "value": 1.0,
+      "comment": "0"
+    },
+    {
+      "row": 59,
+      "date": "2026-07-02",
+      "col": "J",
+      "value": "1kg",
+      "comment": "0"
+    },
+    {
+      "row": 62,
+      "date": "2026-04-09",
+      "col": "V",
+      "value": 1.0,
+      "comment": "0.400"
+    },
+    {
+      "row": 62,
+      "date": "2026-04-16",
+      "col": "U",
+      "value": 1.0,
+      "comment": "746g"
+    },
+    {
+      "row": 62,
+      "date": "2026-04-23",
+      "col": "T",
+      "value": 1.0,
+      "comment": "400g"
+    },
+    {
+      "row": 62,
+      "date": "2026-04-30",
+      "col": "S",
+      "value": 1.0,
+      "comment": "445g"
+    },
+    {
+      "row": 62,
+      "date": "2026-05-07",
+      "col": "R",
+      "value": 1.0,
+      "comment": "230g"
+    },
+    {
+      "row": 62,
+      "date": "2026-05-14",
+      "col": "Q",
+      "value": 1.0,
+      "comment": "0"
+    },
+    {
+      "row": 62,
+      "date": "2026-05-21",
+      "col": "P",
+      "value": 1.0,
+      "comment": "190g"
+    },
+    {
+      "row": 62,
+      "date": "2026-05-28",
+      "col": "O",
+      "value": 2.0,
+      "comment": "500 g"
+    },
+    {
+      "row": 62,
+      "date": "2026-06-04",
+      "col": "N",
+      "value": null,
+      "comment": "500kg"
+    },
+    {
+      "row": 62,
+      "date": "2026-06-18",
+      "col": "L",
+      "value": 2.0,
+      "comment": "103g"
+    },
+    {
+      "row": 62,
+      "date": "2026-06-25",
+      "col": "K",
+      "value": 2.0,
+      "comment": "415g"
+    },
+    {
+      "row": 62,
+      "date": "2026-07-02",
+      "col": "J",
+      "value": 2.0,
+      "comment": "35g"
+    },
+    {
+      "row": 62,
+      "date": "2026-07-09",
+      "col": "I",
+      "value": 2.0,
+      "comment": "300g"
+    },
+    {
+      "row": 63,
+      "date": "2026-04-09",
+      "col": "V",
+      "value": 1.0,
+      "comment": "0.200"
+    },
+    {
+      "row": 63,
+      "date": "2026-04-16",
+      "col": "U",
+      "value": 1.0,
+      "comment": "129g"
+    },
+    {
+      "row": 63,
+      "date": "2026-04-23",
+      "col": "T",
+      "value": 1.0,
+      "comment": "342g"
+    },
+    {
+      "row": 63,
+      "date": "2026-04-30",
+      "col": "S",
+      "value": 1.0,
+      "comment": "226g"
+    },
+    {
+      "row": 63,
+      "date": "2026-05-07",
+      "col": "R",
+      "value": 1.0,
+      "comment": null
+    },
+    {
+      "row": 63,
+      "date": "2026-05-21",
+      "col": "P",
+      "value": 2.0,
+      "comment": "233g"
+    },
+    {
+      "row": 63,
+      "date": "2026-05-28",
+      "col": "O",
+      "value": 2.0,
+      "comment": "0"
+    },
+    {
+      "row": 63,
+      "date": "2026-06-04",
+      "col": "N",
+      "value": null,
+      "comment": "250 g"
+    },
+    {
+      "row": 63,
+      "date": "2026-06-18",
+      "col": "L",
+      "value": 2.0,
+      "comment": "20g"
+    },
+    {
+      "row": 63,
+      "date": "2026-06-25",
+      "col": "K",
+      "value": 2.0,
+      "comment": "156g"
+    },
+    {
+      "row": 63,
+      "date": "2026-07-02",
+      "col": "J",
+      "value": 2.0,
+      "comment": "1unit"
+    },
+    {
+      "row": 63,
+      "date": "2026-07-09",
+      "col": "I",
+      "value": 2.0,
+      "comment": "1 unit"
+    },
+    {
+      "row": 64,
+      "date": "2026-04-09",
+      "col": "V",
+      "value": 1.0,
+      "comment": "0.250"
+    },
+    {
+      "row": 64,
+      "date": "2026-04-16",
+      "col": "U",
+      "value": 2.0,
+      "comment": "127g"
+    },
+    {
+      "row": 64,
+      "date": "2026-04-23",
+      "col": "T",
+      "value": 1.0,
+      "comment": null
+    },
+    {
+      "row": 64,
+      "date": "2026-04-30",
+      "col": "S",
+      "value": 1.0,
+      "comment": "250g"
+    },
+    {
+      "row": 64,
+      "date": "2026-05-07",
+      "col": "R",
+      "value": 1.0,
+      "comment": "169g"
+    },
+    {
+      "row": 64,
+      "date": "2026-05-21",
+      "col": "P",
+      "value": 2.0,
+      "comment": "180g"
+    },
+    {
+      "row": 64,
+      "date": "2026-05-28",
+      "col": "O",
+      "value": 2.0,
+      "comment": "0"
+    },
+    {
+      "row": 64,
+      "date": "2026-06-04",
+      "col": "N",
+      "value": 2.0,
+      "comment": "70g"
+    },
+    {
+      "row": 64,
+      "date": "2026-06-18",
+      "col": "L",
+      "value": 2.0,
+      "comment": "36g"
+    },
+    {
+      "row": 64,
+      "date": "2026-06-25",
+      "col": "K",
+      "value": null,
+      "comment": "no stok, tenemos 240g"
+    },
+    {
+      "row": 64,
+      "date": "2026-07-02",
+      "col": "J",
+      "value": 2.0,
+      "comment": "0"
+    },
+    {
+      "row": 64,
+      "date": "2026-07-09",
+      "col": "I",
+      "value": null,
+      "comment": "1 unit\nReply:\n\tno hay disponible"
+    },
+    {
+      "row": 66,
+      "date": "2026-04-09",
+      "col": "V",
+      "value": "4.2 kg",
+      "comment": "3.200"
+    },
+    {
+      "row": 66,
+      "date": "2026-04-16",
+      "col": "U",
+      "value": "4.2 kg",
+      "comment": null
+    },
+    {
+      "row": 66,
+      "date": "2026-04-23",
+      "col": "T",
+      "value": "4.2 kg",
+      "comment": "4 kg"
+    },
+    {
+      "row": 66,
+      "date": "2026-04-30",
+      "col": "S",
+      "value": "4.2 kg",
+      "comment": "6.302 kg"
+    },
+    {
+      "row": 66,
+      "date": "2026-06-04",
+      "col": "N",
+      "value": "4.2 kg",
+      "comment": "2,100 kg"
+    },
+    {
+      "row": 66,
+      "date": "2026-06-11",
+      "col": "M",
+      "value": 5.0,
+      "comment": "500g"
+    },
+    {
+      "row": 66,
+      "date": "2026-06-18",
+      "col": "L",
+      "value": "4.20kg",
+      "comment": "2.700"
+    },
+    {
+      "row": 66,
+      "date": "2026-06-25",
+      "col": "K",
+      "value": "8.400kg",
+      "comment": "0"
+    },
+    {
+      "row": 66,
+      "date": "2026-07-02",
+      "col": "J",
+      "value": 8.4,
+      "comment": "3.300g"
+    },
+    {
+      "row": 66,
+      "date": "2026-07-09",
+      "col": "I",
+      "value": 4.2,
+      "comment": "4kg"
+    },
+    {
+      "row": 69,
+      "date": "2026-04-16",
+      "col": "U",
+      "value": null,
+      "comment": "0.5kg"
+    },
+    {
+      "row": 69,
+      "date": "2026-04-23",
+      "col": "T",
+      "value": null,
+      "comment": "286g"
+    },
+    {
+      "row": 69,
+      "date": "2026-04-30",
+      "col": "S",
+      "value": null,
+      "comment": "500g"
+    },
+    {
+      "row": 69,
+      "date": "2026-05-07",
+      "col": "R",
+      "value": 1.0,
+      "comment": "103g"
+    },
+    {
+      "row": 69,
+      "date": "2026-07-02",
+      "col": "J",
+      "value": 1.0,
+      "comment": "0"
+    },
+    {
+      "row": 69,
+      "date": "2026-07-09",
+      "col": "I",
+      "value": "2unit",
+      "comment": "100 g"
+    },
+    {
+      "row": 70,
+      "date": "2026-04-16",
+      "col": "U",
+      "value": null,
+      "comment": "0.5kg"
+    },
+    {
+      "row": 70,
+      "date": "2026-07-02",
+      "col": "J",
+      "value": 1.0,
+      "comment": "0\nReply:\n\t234g"
+    },
+    {
+      "row": 70,
+      "date": "2026-07-09",
+      "col": "I",
+      "value": "2 unit",
+      "comment": "50g"
+    },
+    {
+      "row": 72,
+      "date": "2026-04-16",
+      "col": "U",
+      "value": 12.0,
+      "comment": null
+    },
+    {
+      "row": 72,
+      "date": "2026-07-09",
+      "col": "I",
+      "value": "12unit",
+      "comment": null
+    },
+    {
+      "row": 73,
+      "date": "2025-11-28",
+      "col": "AN",
+      "value": "5kg",
+      "comment": null
+    },
+    {
+      "row": 73,
+      "date": "2026-02-27",
+      "col": "AB",
+      "value": "5kg",
+      "comment": "0.5 kg"
+    },
+    {
+      "row": 73,
+      "date": "2026-03-20",
+      "col": "Y",
+      "value": "5kg",
+      "comment": null
+    },
+    {
+      "row": 73,
+      "date": "2026-04-30",
+      "col": "S",
+      "value": "5kg",
+      "comment": "2.5 kg"
+    },
+    {
+      "row": 73,
+      "date": "2026-05-21",
+      "col": "P",
+      "value": 5.0,
+      "comment": "0"
+    },
+    {
+      "row": 73,
+      "date": "2026-06-18",
+      "col": "L",
+      "value": 5.0,
+      "comment": "5kg"
+    },
+    {
+      "row": 73,
+      "date": "2026-06-25",
+      "col": "K",
+      "value": 5.0,
+      "comment": "5"
+    },
+    {
+      "row": 73,
+      "date": "2026-07-09",
+      "col": "I",
+      "value": 5.0,
+      "comment": "5"
+    },
+    {
+      "row": 74,
+      "date": "2025-10-24",
+      "col": "AS",
+      "value": 2.0,
+      "comment": null
+    },
+    {
+      "row": 74,
+      "date": "2025-11-14",
+      "col": "AP",
+      "value": "5kg",
+      "comment": null
+    },
+    {
+      "row": 74,
+      "date": "2026-02-27",
+      "col": "AB",
+      "value": "5kg",
+      "comment": "0.5 kg"
+    },
+    {
+      "row": 74,
+      "date": "2026-03-20",
+      "col": "Y",
+      "value": "5kg",
+      "comment": "5kg"
+    },
+    {
+      "row": 74,
+      "date": "2026-04-16",
+      "col": "U",
+      "value": "5kg",
+      "comment": "0kg"
+    },
+    {
+      "row": 74,
+      "date": "2026-05-21",
+      "col": "P",
+      "value": 5.0,
+      "comment": "5kg una caja"
+    },
+    {
+      "row": 74,
+      "date": "2026-06-25",
+      "col": "K",
+      "value": 5.0,
+      "comment": "5"
+    },
+    {
+      "row": 74,
+      "date": "2026-07-09",
+      "col": "I",
+      "value": 10.0,
+      "comment": "2.5kg"
+    },
+    {
+      "row": 78,
+      "date": "2025-11-21",
+      "col": "AO",
+      "value": "1kg",
+      "comment": null
+    },
+    {
+      "row": 79,
+      "date": "2025-11-21",
+      "col": "AO",
+      "value": "1kg",
+      "comment": null
+    },
+    {
+      "row": 82,
+      "date": "2026-02-06",
+      "col": "AE",
+      "value": "1 Unit",
+      "comment": null
+    },
+    {
+      "row": 82,
+      "date": "2026-03-20",
+      "col": "Y",
+      "value": 1.0,
+      "comment": "1unit"
+    },
+    {
+      "row": 83,
+      "date": "2026-04-16",
+      "col": "U",
+      "value": 4.0,
+      "comment": null
+    },
+    {
+      "row": 86,
+      "date": "2026-01-29",
+      "col": "AF",
+      "value": 1.0,
+      "comment": null
+    },
+    {
+      "row": 96,
+      "date": "2025-10-24",
+      "col": "AS",
+      "value": 1.0,
+      "comment": null
+    },
+    {
+      "row": 96,
+      "date": "2025-11-07",
+      "col": "AQ",
+      "value": 2.0,
+      "comment": null
+    },
+    {
+      "row": 96,
+      "date": "2025-11-14",
+      "col": "AP",
+      "value": 2.0,
+      "comment": null
+    },
+    {
+      "row": 96,
+      "date": "2025-11-21",
+      "col": "AO",
+      "value": 4.0,
+      "comment": null
+    },
+    {
+      "row": 96,
+      "date": "2025-12-05",
+      "col": "AM",
+      "value": 2.0,
+      "comment": null
+    },
+    {
+      "row": 96,
+      "date": "2026-01-09",
+      "col": "AI",
+      "value": 4.0,
+      "comment": null
+    },
+    {
+      "row": 96,
+      "date": "2026-02-06",
+      "col": "AE",
+      "value": 2.0,
+      "comment": null
+    },
+    {
+      "row": 96,
+      "date": "2026-02-13",
+      "col": "AD",
+      "value": 2.0,
+      "comment": null
+    },
+    {
+      "row": 96,
+      "date": "2026-02-20",
+      "col": "AC",
+      "value": 2.0,
+      "comment": "1 kg"
+    },
+    {
+      "row": 96,
+      "date": "2026-02-27",
+      "col": "AB",
+      "value": null,
+      "comment": "2 kg"
+    },
+    {
+      "row": 96,
+      "date": "2026-03-06",
+      "col": "AA",
+      "value": 2.0,
+      "comment": "0.5 kg"
+    },
+    {
+      "row": 96,
+      "date": "2026-03-20",
+      "col": "Y",
+      "value": 1.0,
+      "comment": "2kg"
+    },
+    {
+      "row": 96,
+      "date": "2026-04-09",
+      "col": "V",
+      "value": "3kg",
+      "comment": "0"
+    },
+    {
+      "row": 96,
+      "date": "2026-04-16",
+      "col": "U",
+      "value": "4kg",
+      "comment": "2kg"
+    },
+    {
+      "row": 96,
+      "date": "2026-04-30",
+      "col": "S",
+      "value": null,
+      "comment": "4 kg"
+    },
+    {
+      "row": 96,
+      "date": "2026-05-07",
+      "col": "R",
+      "value": 4.0,
+      "comment": "2 kg"
+    },
+    {
+      "row": 96,
+      "date": "2026-06-11",
+      "col": "M",
+      "value": 3.0,
+      "comment": "2"
+    },
+    {
+      "row": 96,
+      "date": "2026-06-18",
+      "col": "L",
+      "value": 5.0,
+      "comment": "1"
+    },
+    {
+      "row": 96,
+      "date": "2026-07-02",
+      "col": "J",
+      "value": 1.0,
+      "comment": "4"
+    },
+    {
+      "row": 96,
+      "date": "2026-07-09",
+      "col": "I",
+      "value": "2kg",
+      "comment": "5kg"
+    },
+    {
+      "row": 97,
+      "date": "2025-10-03",
+      "col": "AU",
+      "value": 1.0,
+      "comment": null
+    },
+    {
+      "row": 97,
+      "date": "2026-01-29",
+      "col": "AF",
+      "value": 2.0,
+      "comment": null
+    },
+    {
+      "row": 97,
+      "date": "2026-02-13",
+      "col": "AD",
+      "value": 2.0,
+      "comment": null
+    },
+    {
+      "row": 97,
+      "date": "2026-04-16",
+      "col": "U",
+      "value": "2kg",
+      "comment": "0"
+    },
+    {
+      "row": 97,
+      "date": "2026-04-23",
+      "col": "T",
+      "value": null,
+      "comment": "2.5 kg"
+    },
+    {
+      "row": 97,
+      "date": "2026-04-30",
+      "col": "S",
+      "value": null,
+      "comment": "2 kg"
+    },
+    {
+      "row": 97,
+      "date": "2026-05-07",
+      "col": "R",
+      "value": 2.0,
+      "comment": "1.200 kg"
+    },
+    {
+      "row": 97,
+      "date": "2026-06-11",
+      "col": "M",
+      "value": 3.0,
+      "comment": "3 kg"
+    },
+    {
+      "row": 97,
+      "date": "2026-07-02",
+      "col": "J",
+      "value": 3.0,
+      "comment": "2kg"
+    },
+    {
+      "row": 98,
+      "date": "2025-11-28",
+      "col": "AN",
+      "value": "1 unit",
+      "comment": null
+    },
+    {
+      "row": 98,
+      "date": "2025-12-12",
+      "col": "AL",
+      "value": "1 unit",
+      "comment": null
+    },
+    {
+      "row": 98,
+      "date": "2026-05-28",
+      "col": "O",
+      "value": "1 unit",
+      "comment": "0"
+    },
+    {
+      "row": 98,
+      "date": "2026-07-02",
+      "col": "J",
+      "value": "2 units",
+      "comment": "0"
+    },
+    {
+      "row": 99,
+      "date": "2026-04-23",
+      "col": "T",
+      "value": 2.5,
+      "comment": null
+    },
+    {
+      "row": 99,
+      "date": "2026-04-30",
+      "col": "S",
+      "value": null,
+      "comment": "2.5 kg"
+    },
+    {
+      "row": 99,
+      "date": "2026-06-11",
+      "col": "M",
+      "value": "2 kg",
+      "comment": "0"
+    },
+    {
+      "row": 99,
+      "date": "2026-07-02",
+      "col": "J",
+      "value": "10 kg",
+      "comment": "0\nReply:\n\tno habia disponible por eso no pedi en las ultimas semanas"
+    },
+    {
+      "row": 100,
+      "date": "2025-11-28",
+      "col": "AN",
+      "value": "2kg",
+      "comment": null
+    },
+    {
+      "row": 100,
+      "date": "2026-01-09",
+      "col": "AI",
+      "value": "1kg",
+      "comment": null
+    },
+    {
+      "row": 100,
+      "date": "2026-01-29",
+      "col": "AF",
+      "value": 6.0,
+      "comment": "discounted"
+    },
+    {
+      "row": 100,
+      "date": "2026-04-30",
+      "col": "S",
+      "value": 4.0,
+      "comment": "0"
+    },
+    {
+      "row": 100,
+      "date": "2026-05-28",
+      "col": "O",
+      "value": 4.0,
+      "comment": "0"
+    },
+    {
+      "row": 100,
+      "date": "2026-07-02",
+      "col": "J",
+      "value": 6.0,
+      "comment": "1"
+    },
+    {
+      "row": 101,
+      "date": "2026-05-07",
+      "col": "R",
+      "value": 2.5,
+      "comment": "2 kg"
+    },
+    {
+      "row": 101,
+      "date": "2026-06-18",
+      "col": "L",
+      "value": null,
+      "comment": "0 y no esta disponible esta semana por eso no pedi"
+    },
+    {
+      "row": 102,
+      "date": "2025-11-21",
+      "col": "AO",
+      "value": "5kg",
+      "comment": null
+    },
+    {
+      "row": 102,
+      "date": "2026-05-28",
+      "col": "O",
+      "value": 1.0,
+      "comment": "0"
+    },
+    {
+      "row": 103,
+      "date": "2026-04-23",
+      "col": "T",
+      "value": null,
+      "comment": "2.28 kg"
+    },
+    {
+      "row": 103,
+      "date": "2026-04-30",
+      "col": "S",
+      "value": 2.5,
+      "comment": "1.5 kg"
+    },
+    {
+      "row": 103,
+      "date": "2026-05-28",
+      "col": "O",
+      "value": 2.5,
+      "comment": "2.5 kg"
+    },
+    {
+      "row": 103,
+      "date": "2026-06-11",
+      "col": "M",
+      "value": 1.0,
+      "comment": null
+    },
+    {
+      "row": 104,
+      "date": "2025-10-03",
+      "col": "AU",
+      "value": 3.0,
+      "comment": null
+    },
+    {
+      "row": 104,
+      "date": "2025-10-10",
+      "col": "AT",
+      "value": 2.0,
+      "comment": null
+    },
+    {
+      "row": 104,
+      "date": "2025-10-24",
+      "col": "AS",
+      "value": 10.0,
+      "comment": null
+    },
+    {
+      "row": 104,
+      "date": "2025-10-31",
+      "col": "AR",
+      "value": 8.0,
+      "comment": null
+    },
+    {
+      "row": 104,
+      "date": "2025-11-07",
+      "col": "AQ",
+      "value": 2.0,
+      "comment": null
+    },
+    {
+      "row": 104,
+      "date": "2025-11-14",
+      "col": "AP",
+      "value": 5.0,
+      "comment": null
+    },
+    {
+      "row": 104,
+      "date": "2025-11-21",
+      "col": "AO",
+      "value": 8.0,
+      "comment": null
+    },
+    {
+      "row": 104,
+      "date": "2025-11-28",
+      "col": "AN",
+      "value": 0.0,
+      "comment": null
+    },
+    {
+      "row": 104,
+      "date": "2025-12-05",
+      "col": "AM",
+      "value": 7.0,
+      "comment": null
+    },
+    {
+      "row": 104,
+      "date": "2025-12-12",
+      "col": "AL",
+      "value": 5.0,
+      "comment": null
+    },
+    {
+      "row": 104,
+      "date": "2025-12-19",
+      "col": "AK",
+      "value": 0.0,
+      "comment": null
+    },
+    {
+      "row": 104,
+      "date": "2026-01-02",
+      "col": "AJ",
+      "value": 8,
+      "comment": null
+    },
+    {
+      "row": 104,
+      "date": "2026-01-09",
+      "col": "AI",
+      "value": 6.0,
+      "comment": null
+    },
+    {
+      "row": 104,
+      "date": "2026-01-16",
+      "col": "AH",
+      "value": "6kg",
+      "comment": null
+    },
+    {
+      "row": 104,
+      "date": "2026-01-23",
+      "col": "AG",
+      "value": 3.0,
+      "comment": null
+    },
+    {
+      "row": 104,
+      "date": "2026-01-29",
+      "col": "AF",
+      "value": 6.0,
+      "comment": null
+    },
+    {
+      "row": 104,
+      "date": "2026-02-06",
+      "col": "AE",
+      "value": 4.0,
+      "comment": null
+    },
+    {
+      "row": 104,
+      "date": "2026-02-13",
+      "col": "AD",
+      "value": 3.0,
+      "comment": "3 kg"
+    },
+    {
+      "row": 104,
+      "date": "2026-02-20",
+      "col": "AC",
+      "value": 5.0,
+      "comment": "2 kg"
+    },
+    {
+      "row": 104,
+      "date": "2026-02-27",
+      "col": "AB",
+      "value": 6.0,
+      "comment": "2 kg"
+    },
+    {
+      "row": 104,
+      "date": "2026-03-06",
+      "col": "AA",
+      "value": 6.0,
+      "comment": "2 kg"
+    },
+    {
+      "row": 104,
+      "date": "2026-03-13",
+      "col": "Z",
+      "value": 7.0,
+      "comment": "0"
+    },
+    {
+      "row": 104,
+      "date": "2026-03-20",
+      "col": "Y",
+      "value": 3.0,
+      "comment": "6kg"
+    },
+    {
+      "row": 104,
+      "date": "2026-03-27",
+      "col": "X",
+      "value": "7kg",
+      "comment": "3kg"
+    },
+    {
+      "row": 104,
+      "date": "2026-04-02",
+      "col": "W",
+      "value": "3kg",
+      "comment": "6kg"
+    },
+    {
+      "row": 104,
+      "date": "2026-04-09",
+      "col": "V",
+      "value": "5kg",
+      "comment": "4L"
+    },
+    {
+      "row": 104,
+      "date": "2026-04-16",
+      "col": "U",
+      "value": "7kg",
+      "comment": "0.200g\nReply:\n\tsi los numeros estan bien, esta semana hemos usado casi 9 kilos. tienes que pedir mas que 7."
+    },
+    {
+      "row": 104,
+      "date": "2026-04-23",
+      "col": "T",
+      "value": 7.0,
+      "comment": "2 kg"
+    },
+    {
+      "row": 104,
+      "date": "2026-04-30",
+      "col": "S",
+      "value": 10.0,
+      "comment": "1 kg"
+    },
+    {
+      "row": 104,
+      "date": "2026-05-07",
+      "col": "R",
+      "value": 8.0,
+      "comment": "5 kg"
+    },
+    {
+      "row": 104,
+      "date": "2026-05-14",
+      "col": "Q",
+      "value": 5.0,
+      "comment": "3kg"
+    },
+    {
+      "row": 104,
+      "date": "2026-05-21",
+      "col": "P",
+      "value": 6.0,
+      "comment": "1 kg"
+    },
+    {
+      "row": 104,
+      "date": "2026-05-28",
+      "col": "O",
+      "value": 9.0,
+      "comment": "1 L"
+    },
+    {
+      "row": 104,
+      "date": "2026-06-04",
+      "col": "N",
+      "value": 10.0,
+      "comment": "3 L"
+    },
+    {
+      "row": 104,
+      "date": "2026-06-11",
+      "col": "M",
+      "value": 7.0,
+      "comment": "5 L"
+    },
+    {
+      "row": 104,
+      "date": "2026-06-18",
+      "col": "L",
+      "value": 12.0,
+      "comment": "2L"
+    },
+    {
+      "row": 104,
+      "date": "2026-06-25",
+      "col": "K",
+      "value": "12kg",
+      "comment": "4kg"
+    },
+    {
+      "row": 104,
+      "date": "2026-07-02",
+      "col": "J",
+      "value": 2.0,
+      "comment": "10kg"
+    },
+    {
+      "row": 104,
+      "date": "2026-07-09",
+      "col": "I",
+      "value": "6kg",
+      "comment": "6kg"
+    },
+    {
+      "row": 105,
+      "date": "2025-10-10",
+      "col": "AT",
+      "value": 80,
+      "comment": null
+    },
+    {
+      "row": 105,
+      "date": "2025-10-24",
+      "col": "AS",
+      "value": 112,
+      "comment": null
+    },
+    {
+      "row": 105,
+      "date": "2025-10-31",
+      "col": "AR",
+      "value": 96,
+      "comment": null
+    },
+    {
+      "row": 105,
+      "date": "2025-11-07",
+      "col": "AQ",
+      "value": 124.0,
+      "comment": null
+    },
+    {
+      "row": 105,
+      "date": "2025-11-14",
+      "col": "AP",
+      "value": 88.0,
+      "comment": null
+    },
+    {
+      "row": 105,
+      "date": "2025-11-21",
+      "col": "AO",
+      "value": 96,
+      "comment": null
+    },
+    {
+      "row": 105,
+      "date": "2025-11-28",
+      "col": "AN",
+      "value": 96,
+      "comment": null
+    },
+    {
+      "row": 105,
+      "date": "2025-12-05",
+      "col": "AM",
+      "value": 64,
+      "comment": null
+    },
+    {
+      "row": 105,
+      "date": "2025-12-12",
+      "col": "AL",
+      "value": 96,
+      "comment": null
+    },
+    {
+      "row": 105,
+      "date": "2025-12-19",
+      "col": "AK",
+      "value": 56,
+      "comment": null
+    },
+    {
+      "row": 105,
+      "date": "2026-01-02",
+      "col": "AJ",
+      "value": 104,
+      "comment": null
+    },
+    {
+      "row": 105,
+      "date": "2026-01-09",
+      "col": "AI",
+      "value": 96,
+      "comment": null
+    },
+    {
+      "row": 105,
+      "date": "2026-01-16",
+      "col": "AH",
+      "value": 96,
+      "comment": null
+    },
+    {
+      "row": 105,
+      "date": "2026-01-23",
+      "col": "AG",
+      "value": 96,
+      "comment": "we bought 30L in the shop cause we didnt have enough to get to friday"
+    },
+    {
+      "row": 105,
+      "date": "2026-01-29",
+      "col": "AF",
+      "value": 120,
+      "comment": null
+    },
+    {
+      "row": 105,
+      "date": "2026-02-06",
+      "col": "AE",
+      "value": 112,
+      "comment": null
+    },
+    {
+      "row": 105,
+      "date": "2026-02-13",
+      "col": "AD",
+      "value": 96,
+      "comment": null
+    },
+    {
+      "row": 105,
+      "date": "2026-02-20",
+      "col": "AC",
+      "value": 96,
+      "comment": null
+    },
+    {
+      "row": 105,
+      "date": "2026-02-27",
+      "col": "AB",
+      "value": 96,
+      "comment": null
+    },
+    {
+      "row": 105,
+      "date": "2026-03-06",
+      "col": "AA",
+      "value": 72,
+      "comment": null
+    },
+    {
+      "row": 105,
+      "date": "2026-03-13",
+      "col": "Z",
+      "value": 96,
+      "comment": "0\nReply:\n\tno has pedido 12, si no 12 * 8 verdad? cambialo porfa\n\nfijate en lo que hay en las otras para que tenga sentido"
+    },
+    {
+      "row": 105,
+      "date": "2026-03-20",
+      "col": "Y",
+      "value": 96,
+      "comment": null
+    },
+    {
+      "row": 105,
+      "date": "2026-03-27",
+      "col": "X",
+      "value": 96,
+      "comment": "91"
+    },
+    {
+      "row": 105,
+      "date": "2026-04-02",
+      "col": "W",
+      "value": 70.0,
+      "comment": null
+    },
+    {
+      "row": 105,
+      "date": "2026-04-09",
+      "col": "V",
+      "value": 112,
+      "comment": null
+    },
+    {
+      "row": 105,
+      "date": "2026-04-16",
+      "col": "U",
+      "value": 96,
+      "comment": "te he aumentado estos, pide lo mismo que la ultima vez, subamos un poco el stock."
+    },
+    {
+      "row": 105,
+      "date": "2026-04-23",
+      "col": "T",
+      "value": 120,
+      "comment": "42"
+    },
+    {
+      "row": 105,
+      "date": "2026-04-30",
+      "col": "S",
+      "value": 120,
+      "comment": null
+    },
+    {
+      "row": 105,
+      "date": "2026-05-07",
+      "col": "R",
+      "value": 120.0,
+      "comment": null
+    },
+    {
+      "row": 105,
+      "date": "2026-05-14",
+      "col": "Q",
+      "value": 88.0,
+      "comment": null
+    },
+    {
+      "row": 105,
+      "date": "2026-05-21",
+      "col": "P",
+      "value": 120.0,
+      "comment": null
+    },
+    {
+      "row": 105,
+      "date": "2026-05-28",
+      "col": "O",
+      "value": 120.0,
+      "comment": null
+    },
+    {
+      "row": 105,
+      "date": "2026-06-04",
+      "col": "N",
+      "value": 120.0,
+      "comment": null
+    },
+    {
+      "row": 105,
+      "date": "2026-06-11",
+      "col": "M",
+      "value": 120.0,
+      "comment": null
+    },
+    {
+      "row": 105,
+      "date": "2026-06-18",
+      "col": "L",
+      "value": 120.0,
+      "comment": null
+    },
+    {
+      "row": 105,
+      "date": "2026-06-25",
+      "col": "K",
+      "value": 120.0,
+      "comment": null
+    },
+    {
+      "row": 105,
+      "date": "2026-07-02",
+      "col": "J",
+      "value": 120.0,
+      "comment": "87"
+    },
+    {
+      "row": 105,
+      "date": "2026-07-09",
+      "col": "I",
+      "value": "104 L",
+      "comment": null
+    },
+    {
+      "row": 106,
+      "date": "2025-10-03",
+      "col": "AU",
+      "value": 0.0,
+      "comment": null
+    },
+    {
+      "row": 106,
+      "date": "2025-10-10",
+      "col": "AT",
+      "value": 20.0,
+      "comment": null
+    },
+    {
+      "row": 106,
+      "date": "2025-10-24",
+      "col": "AS",
+      "value": 0.0,
+      "comment": null
+    },
+    {
+      "row": 106,
+      "date": "2025-10-31",
+      "col": "AR",
+      "value": 12.0,
+      "comment": null
+    },
+    {
+      "row": 106,
+      "date": "2025-11-07",
+      "col": "AQ",
+      "value": 12.0,
+      "comment": null
+    },
+    {
+      "row": 106,
+      "date": "2025-11-14",
+      "col": "AP",
+      "value": 6.0,
+      "comment": null
+    },
+    {
+      "row": 106,
+      "date": "2025-11-21",
+      "col": "AO",
+      "value": 12.0,
+      "comment": null
+    },
+    {
+      "row": 106,
+      "date": "2025-11-28",
+      "col": "AN",
+      "value": 13.0,
+      "comment": null
+    },
+    {
+      "row": 106,
+      "date": "2025-12-05",
+      "col": "AM",
+      "value": 0.0,
+      "comment": null
+    },
+    {
+      "row": 106,
+      "date": "2025-12-12",
+      "col": "AL",
+      "value": 48,
+      "comment": "discount to 1.78chf"
+    },
+    {
+      "row": 106,
+      "date": "2025-12-19",
+      "col": "AK",
+      "value": 6.0,
+      "comment": null
+    },
+    {
+      "row": 106,
+      "date": "2026-01-02",
+      "col": "AJ",
+      "value": 12.0,
+      "comment": null
+    },
+    {
+      "row": 106,
+      "date": "2026-01-09",
+      "col": "AI",
+      "value": 12.0,
+      "comment": null
+    },
+    {
+      "row": 106,
+      "date": "2026-01-16",
+      "col": "AH",
+      "value": 12.0,
+      "comment": null
+    },
+    {
+      "row": 106,
+      "date": "2026-01-23",
+      "col": "AG",
+      "value": 12.0,
+      "comment": null
+    },
+    {
+      "row": 106,
+      "date": "2026-01-29",
+      "col": "AF",
+      "value": 12.0,
+      "comment": null
+    },
+    {
+      "row": 106,
+      "date": "2026-02-06",
+      "col": "AE",
+      "value": 12.0,
+      "comment": null
+    },
+    {
+      "row": 106,
+      "date": "2026-02-13",
+      "col": "AD",
+      "value": 12.0,
+      "comment": null
+    },
+    {
+      "row": 106,
+      "date": "2026-02-20",
+      "col": "AC",
+      "value": 12.0,
+      "comment": null
+    },
+    {
+      "row": 106,
+      "date": "2026-02-27",
+      "col": "AB",
+      "value": 12.0,
+      "comment": null
+    },
+    {
+      "row": 106,
+      "date": "2026-03-06",
+      "col": "AA",
+      "value": 12.0,
+      "comment": null
+    },
+    {
+      "row": 106,
+      "date": "2026-03-13",
+      "col": "Z",
+      "value": 0.0,
+      "comment": null
+    },
+    {
+      "row": 106,
+      "date": "2026-03-20",
+      "col": "Y",
+      "value": 12.0,
+      "comment": null
+    },
+    {
+      "row": 106,
+      "date": "2026-03-27",
+      "col": "X",
+      "value": 12.0,
+      "comment": "66"
+    },
+    {
+      "row": 106,
+      "date": "2026-04-02",
+      "col": "W",
+      "value": 0.0,
+      "comment": null
+    },
+    {
+      "row": 106,
+      "date": "2026-04-09",
+      "col": "V",
+      "value": 24.0,
+      "comment": null
+    },
+    {
+      "row": 106,
+      "date": "2026-04-16",
+      "col": "U",
+      "value": 24.0,
+      "comment": null
+    },
+    {
+      "row": 106,
+      "date": "2026-04-23",
+      "col": "T",
+      "value": 12.0,
+      "comment": "25"
+    },
+    {
+      "row": 106,
+      "date": "2026-04-30",
+      "col": "S",
+      "value": 12.0,
+      "comment": null
+    },
+    {
+      "row": 106,
+      "date": "2026-05-07",
+      "col": "R",
+      "value": 24.0,
+      "comment": null
+    },
+    {
+      "row": 106,
+      "date": "2026-05-14",
+      "col": "Q",
+      "value": 24.0,
+      "comment": null
+    },
+    {
+      "row": 106,
+      "date": "2026-05-21",
+      "col": "P",
+      "value": 24.0,
+      "comment": null
+    },
+    {
+      "row": 106,
+      "date": "2026-06-11",
+      "col": "M",
+      "value": 24.0,
+      "comment": null
+    },
+    {
+      "row": 106,
+      "date": "2026-06-25",
+      "col": "K",
+      "value": 12.0,
+      "comment": null
+    },
+    {
+      "row": 106,
+      "date": "2026-07-02",
+      "col": "J",
+      "value": 12.0,
+      "comment": "31"
+    },
+    {
+      "row": 106,
+      "date": "2026-07-09",
+      "col": "I",
+      "value": 12.0,
+      "comment": null
+    },
+    {
+      "row": 107,
+      "date": "2025-10-03",
+      "col": "AU",
+      "value": 60,
+      "comment": null
+    },
+    {
+      "row": 107,
+      "date": "2025-10-10",
+      "col": "AT",
+      "value": 60,
+      "comment": null
+    },
+    {
+      "row": 107,
+      "date": "2025-10-24",
+      "col": "AS",
+      "value": 0.0,
+      "comment": null
+    },
+    {
+      "row": 107,
+      "date": "2025-10-31",
+      "col": "AR",
+      "value": 60,
+      "comment": null
+    },
+    {
+      "row": 107,
+      "date": "2025-11-07",
+      "col": "AQ",
+      "value": 0.0,
+      "comment": null
+    },
+    {
+      "row": 107,
+      "date": "2025-11-14",
+      "col": "AP",
+      "value": 0.0,
+      "comment": null
+    },
+    {
+      "row": 107,
+      "date": "2025-11-21",
+      "col": "AO",
+      "value": 12.0,
+      "comment": null
+    },
+    {
+      "row": 107,
+      "date": "2025-11-28",
+      "col": "AN",
+      "value": 48,
+      "comment": null
+    },
+    {
+      "row": 107,
+      "date": "2025-12-05",
+      "col": "AM",
+      "value": 36,
+      "comment": null
+    },
+    {
+      "row": 107,
+      "date": "2025-12-12",
+      "col": "AL",
+      "value": 72,
+      "comment": null
+    },
+    {
+      "row": 107,
+      "date": "2025-12-19",
+      "col": "AK",
+      "value": 36,
+      "comment": null
+    },
+    {
+      "row": 107,
+      "date": "2026-01-02",
+      "col": "AJ",
+      "value": 36.0,
+      "comment": null
+    },
+    {
+      "row": 107,
+      "date": "2026-01-09",
+      "col": "AI",
+      "value": 48,
+      "comment": null
+    },
+    {
+      "row": 107,
+      "date": "2026-01-16",
+      "col": "AH",
+      "value": 48,
+      "comment": null
+    },
+    {
+      "row": 107,
+      "date": "2026-01-23",
+      "col": "AG",
+      "value": 48,
+      "comment": "we bought 15L in the shop cause we didnt have enough to get to friday"
+    },
+    {
+      "row": 107,
+      "date": "2026-01-29",
+      "col": "AF",
+      "value": 72,
+      "comment": null
+    },
+    {
+      "row": 107,
+      "date": "2026-02-06",
+      "col": "AE",
+      "value": 66,
+      "comment": null
+    },
+    {
+      "row": 107,
+      "date": "2026-02-13",
+      "col": "AD",
+      "value": 66,
+      "comment": null
+    },
+    {
+      "row": 107,
+      "date": "2026-02-20",
+      "col": "AC",
+      "value": 66,
+      "comment": null
+    },
+    {
+      "row": 107,
+      "date": "2026-02-27",
+      "col": "AB",
+      "value": 66,
+      "comment": null
+    },
+    {
+      "row": 107,
+      "date": "2026-03-06",
+      "col": "AA",
+      "value": 66,
+      "comment": null
+    },
+    {
+      "row": 107,
+      "date": "2026-03-13",
+      "col": "Z",
+      "value": 54,
+      "comment": "0"
+    },
+    {
+      "row": 107,
+      "date": "2026-03-20",
+      "col": "Y",
+      "value": 54,
+      "comment": null
+    },
+    {
+      "row": 107,
+      "date": "2026-03-27",
+      "col": "X",
+      "value": 66,
+      "comment": "84"
+    },
+    {
+      "row": 107,
+      "date": "2026-04-02",
+      "col": "W",
+      "value": 20.0,
+      "comment": null
+    },
+    {
+      "row": 107,
+      "date": "2026-04-09",
+      "col": "V",
+      "value": 66,
+      "comment": null
+    },
+    {
+      "row": 107,
+      "date": "2026-04-16",
+      "col": "U",
+      "value": 66,
+      "comment": null
+    },
+    {
+      "row": 107,
+      "date": "2026-04-23",
+      "col": "T",
+      "value": 66,
+      "comment": "61"
+    },
+    {
+      "row": 107,
+      "date": "2026-04-30",
+      "col": "S",
+      "value": 66,
+      "comment": null
+    },
+    {
+      "row": 107,
+      "date": "2026-05-07",
+      "col": "R",
+      "value": 66.0,
+      "comment": null
+    },
+    {
+      "row": 107,
+      "date": "2026-05-14",
+      "col": "Q",
+      "value": 5.0,
+      "comment": null
+    },
+    {
+      "row": 107,
+      "date": "2026-05-21",
+      "col": "P",
+      "value": 66.0,
+      "comment": null
+    },
+    {
+      "row": 107,
+      "date": "2026-05-28",
+      "col": "O",
+      "value": 66.0,
+      "comment": null
+    },
+    {
+      "row": 107,
+      "date": "2026-06-04",
+      "col": "N",
+      "value": 66.0,
+      "comment": null
+    },
+    {
+      "row": 107,
+      "date": "2026-06-11",
+      "col": "M",
+      "value": 66.0,
+      "comment": null
+    },
+    {
+      "row": 107,
+      "date": "2026-06-18",
+      "col": "L",
+      "value": 66.0,
+      "comment": null
+    },
+    {
+      "row": 107,
+      "date": "2026-06-25",
+      "col": "K",
+      "value": 66.0,
+      "comment": null
+    },
+    {
+      "row": 107,
+      "date": "2026-07-02",
+      "col": "J",
+      "value": 66.0,
+      "comment": "25"
+    },
+    {
+      "row": 107,
+      "date": "2026-07-09",
+      "col": "I",
+      "value": 66.0,
+      "comment": null
+    },
+    {
+      "row": 108,
+      "date": "2026-06-18",
+      "col": "L",
+      "value": "12 unit",
+      "comment": "0"
+    },
+    {
+      "row": 109,
+      "date": "2026-04-30",
+      "col": "S",
+      "value": 60,
+      "comment": null
+    },
+    {
+      "row": 109,
+      "date": "2026-05-21",
+      "col": "P",
+      "value": null,
+      "comment": "16 units"
+    },
+    {
+      "row": 109,
+      "date": "2026-05-28",
+      "col": "O",
+      "value": 50.0,
+      "comment": "0"
+    },
+    {
+      "row": 109,
+      "date": "2026-06-18",
+      "col": "L",
+      "value": null,
+      "comment": "50 unit"
+    },
+    {
+      "row": 109,
+      "date": "2026-06-25",
+      "col": "K",
+      "value": 160.0,
+      "comment": "50 unit"
+    },
+    {
+      "row": 109,
+      "date": "2026-07-09",
+      "col": "I",
+      "value": "stock?",
+      "comment": null
+    },
+    {
+      "row": 110,
+      "date": "2026-01-09",
+      "col": "AI",
+      "value": "5 units",
+      "comment": null
+    },
+    {
+      "row": 110,
+      "date": "2026-04-30",
+      "col": "S",
+      "value": 24,
+      "comment": null
+    },
+    {
+      "row": 110,
+      "date": "2026-05-21",
+      "col": "P",
+      "value": null,
+      "comment": "0"
+    },
+    {
+      "row": 110,
+      "date": "2026-05-28",
+      "col": "O",
+      "value": 56.0,
+      "comment": "0"
+    },
+    {
+      "row": 110,
+      "date": "2026-06-11",
+      "col": "M",
+      "value": null,
+      "comment": "23"
+    },
+    {
+      "row": 110,
+      "date": "2026-06-18",
+      "col": "L",
+      "value": null,
+      "comment": "9"
+    },
+    {
+      "row": 110,
+      "date": "2026-06-25",
+      "col": "K",
+      "value": 16.0,
+      "comment": "0"
+    },
+    {
+      "row": 110,
+      "date": "2026-07-09",
+      "col": "I",
+      "value": "stock?",
+      "comment": null
+    },
+    {
+      "row": 111,
+      "date": "2025-10-31",
+      "col": "AR",
+      "value": 2.0,
+      "comment": null
+    },
+    {
+      "row": 111,
+      "date": "2025-11-07",
+      "col": "AQ",
+      "value": 2.0,
+      "comment": null
+    },
+    {
+      "row": 111,
+      "date": "2025-11-14",
+      "col": "AP",
+      "value": 2.0,
+      "comment": null
+    },
+    {
+      "row": 111,
+      "date": "2025-11-21",
+      "col": "AO",
+      "value": 0.0,
+      "comment": null
+    },
+    {
+      "row": 111,
+      "date": "2025-11-28",
+      "col": "AN",
+      "value": 0.0,
+      "comment": null
+    },
+    {
+      "row": 111,
+      "date": "2025-12-05",
+      "col": "AM",
+      "value": 6.0,
+      "comment": null
+    },
+    {
+      "row": 111,
+      "date": "2025-12-12",
+      "col": "AL",
+      "value": 2.0,
+      "comment": null
+    },
+    {
+      "row": 111,
+      "date": "2025-12-19",
+      "col": "AK",
+      "value": 0.0,
+      "comment": null
+    },
+    {
+      "row": 111,
+      "date": "2026-01-02",
+      "col": "AJ",
+      "value": 0.0,
+      "comment": null
+    },
+    {
+      "row": 111,
+      "date": "2026-01-09",
+      "col": "AI",
+      "value": 4.0,
+      "comment": null
+    },
+    {
+      "row": 111,
+      "date": "2026-01-16",
+      "col": "AH",
+      "value": 0.0,
+      "comment": null
+    },
+    {
+      "row": 111,
+      "date": "2026-01-23",
+      "col": "AG",
+      "value": 0.0,
+      "comment": null
+    },
+    {
+      "row": 111,
+      "date": "2026-01-29",
+      "col": "AF",
+      "value": 4.0,
+      "comment": null
+    },
+    {
+      "row": 111,
+      "date": "2026-02-06",
+      "col": "AE",
+      "value": 4.0,
+      "comment": null
+    },
+    {
+      "row": 111,
+      "date": "2026-02-13",
+      "col": "AD",
+      "value": 2.0,
+      "comment": "3 kg"
+    },
+    {
+      "row": 111,
+      "date": "2026-02-20",
+      "col": "AC",
+      "value": 4.0,
+      "comment": "2 kg"
+    },
+    {
+      "row": 111,
+      "date": "2026-02-27",
+      "col": "AB",
+      "value": 4.0,
+      "comment": "2 kg"
+    },
+    {
+      "row": 111,
+      "date": "2026-03-06",
+      "col": "AA",
+      "value": 4.0,
+      "comment": "2.5 kg"
+    },
+    {
+      "row": 111,
+      "date": "2026-03-13",
+      "col": "Z",
+      "value": 4.0,
+      "comment": "4"
+    },
+    {
+      "row": 111,
+      "date": "2026-03-20",
+      "col": "Y",
+      "value": 4.0,
+      "comment": "2"
+    },
+    {
+      "row": 111,
+      "date": "2026-03-27",
+      "col": "X",
+      "value": 6.0,
+      "comment": "2"
+    },
+    {
+      "row": 111,
+      "date": "2026-04-02",
+      "col": "W",
+      "value": 0.0,
+      "comment": null
+    },
+    {
+      "row": 111,
+      "date": "2026-04-09",
+      "col": "V",
+      "value": 6.0,
+      "comment": "3kg"
+    },
+    {
+      "row": 111,
+      "date": "2026-04-16",
+      "col": "U",
+      "value": 0.0,
+      "comment": "8kg"
+    },
+    {
+      "row": 111,
+      "date": "2026-04-23",
+      "col": "T",
+      "value": 6.0,
+      "comment": "4 kg"
+    },
+    {
+      "row": 111,
+      "date": "2026-04-30",
+      "col": "S",
+      "value": 0.0,
+      "comment": "6 kg"
+    },
+    {
+      "row": 112,
+      "date": "2026-03-27",
+      "col": "X",
+      "value": 1.0,
+      "comment": "(0) Es para prueba"
+    },
+    {
+      "row": 112,
+      "date": "2026-04-09",
+      "col": "V",
+      "value": 1.0,
+      "comment": "0"
+    },
+    {
+      "row": 112,
+      "date": "2026-05-28",
+      "col": "O",
+      "value": 1.0,
+      "comment": "0"
+    },
+    {
+      "row": 113,
+      "date": "2025-10-03",
+      "col": "AU",
+      "value": 5.0,
+      "comment": null
+    },
+    {
+      "row": 113,
+      "date": "2025-10-10",
+      "col": "AT",
+      "value": 3.0,
+      "comment": null
+    },
+    {
+      "row": 113,
+      "date": "2025-10-24",
+      "col": "AS",
+      "value": 8.0,
+      "comment": null
+    },
+    {
+      "row": 113,
+      "date": "2025-10-31",
+      "col": "AR",
+      "value": 7.0,
+      "comment": null
+    },
+    {
+      "row": 113,
+      "date": "2025-11-07",
+      "col": "AQ",
+      "value": 7.0,
+      "comment": null
+    },
+    {
+      "row": 113,
+      "date": "2025-11-14",
+      "col": "AP",
+      "value": 7.0,
+      "comment": null
+    },
+    {
+      "row": 113,
+      "date": "2025-11-21",
+      "col": "AO",
+      "value": 10.0,
+      "comment": null
+    },
+    {
+      "row": 113,
+      "date": "2025-11-28",
+      "col": "AN",
+      "value": 3.0,
+      "comment": null
+    },
+    {
+      "row": 113,
+      "date": "2025-12-05",
+      "col": "AM",
+      "value": 7.0,
+      "comment": null
+    },
+    {
+      "row": 113,
+      "date": "2025-12-12",
+      "col": "AL",
+      "value": 6.0,
+      "comment": null
+    },
+    {
+      "row": 113,
+      "date": "2025-12-19",
+      "col": "AK",
+      "value": 0.0,
+      "comment": null
+    },
+    {
+      "row": 113,
+      "date": "2026-01-02",
+      "col": "AJ",
+      "value": 3.0,
+      "comment": null
+    },
+    {
+      "row": 113,
+      "date": "2026-01-09",
+      "col": "AI",
+      "value": 5.0,
+      "comment": null
+    },
+    {
+      "row": 113,
+      "date": "2026-01-16",
+      "col": "AH",
+      "value": 6.0,
+      "comment": null
+    },
+    {
+      "row": 113,
+      "date": "2026-01-23",
+      "col": "AG",
+      "value": 4.0,
+      "comment": null
+    },
+    {
+      "row": 113,
+      "date": "2026-01-29",
+      "col": "AF",
+      "value": 6.0,
+      "comment": null
+    },
+    {
+      "row": 113,
+      "date": "2026-02-06",
+      "col": "AE",
+      "value": 8.0,
+      "comment": null
+    },
+    {
+      "row": 113,
+      "date": "2026-02-13",
+      "col": "AD",
+      "value": 7.0,
+      "comment": "1 kg"
+    },
+    {
+      "row": 113,
+      "date": "2026-02-20",
+      "col": "AC",
+      "value": 8.0,
+      "comment": "0 kg"
+    },
+    {
+      "row": 113,
+      "date": "2026-02-27",
+      "col": "AB",
+      "value": 12.0,
+      "comment": "0kg"
+    },
+    {
+      "row": 113,
+      "date": "2026-03-06",
+      "col": "AA",
+      "value": 8.0,
+      "comment": "5 kg"
+    },
+    {
+      "row": 113,
+      "date": "2026-03-13",
+      "col": "Z",
+      "value": 3.0,
+      "comment": "2"
+    },
+    {
+      "row": 113,
+      "date": "2026-03-20",
+      "col": "Y",
+      "value": 10.0,
+      "comment": "2 kg"
+    },
+    {
+      "row": 113,
+      "date": "2026-03-27",
+      "col": "X",
+      "value": "5kg",
+      "comment": "5kg"
+    },
+    {
+      "row": 113,
+      "date": "2026-04-02",
+      "col": "W",
+      "value": "4kg",
+      "comment": "6kg"
+    },
+    {
+      "row": 113,
+      "date": "2026-04-09",
+      "col": "V",
+      "value": 5.0,
+      "comment": "2kg"
+    },
+    {
+      "row": 113,
+      "date": "2026-04-16",
+      "col": "U",
+      "value": 7.0,
+      "comment": "2kg"
+    },
+    {
+      "row": 113,
+      "date": "2026-04-23",
+      "col": "T",
+      "value": 9.0,
+      "comment": "2 kg"
+    },
+    {
+      "row": 113,
+      "date": "2026-04-30",
+      "col": "S",
+      "value": 9.0,
+      "comment": "4 kg"
+    },
+    {
+      "row": 113,
+      "date": "2026-05-07",
+      "col": "R",
+      "value": 7.0,
+      "comment": "3"
+    },
+    {
+      "row": 113,
+      "date": "2026-05-14",
+      "col": "Q",
+      "value": 6.0,
+      "comment": "4"
+    },
+    {
+      "row": 113,
+      "date": "2026-05-21",
+      "col": "P",
+      "value": 3.0,
+      "comment": "5 kg"
+    },
+    {
+      "row": 113,
+      "date": "2026-05-28",
+      "col": "O",
+      "value": 6.0,
+      "comment": "3 kl"
+    },
+    {
+      "row": 113,
+      "date": "2026-06-04",
+      "col": "N",
+      "value": 5.0,
+      "comment": "5"
+    },
+    {
+      "row": 113,
+      "date": "2026-06-11",
+      "col": "M",
+      "value": 8.0,
+      "comment": "2 kg"
+    },
+    {
+      "row": 113,
+      "date": "2026-06-18",
+      "col": "L",
+      "value": 8.0,
+      "comment": "3kg"
+    },
+    {
+      "row": 113,
+      "date": "2026-06-25",
+      "col": "K",
+      "value": 9.0,
+      "comment": "1kg"
+    },
+    {
+      "row": 113,
+      "date": "2026-07-02",
+      "col": "J",
+      "value": 6.0,
+      "comment": "5kg"
+    },
+    {
+      "row": 113,
+      "date": "2026-07-09",
+      "col": "I",
+      "value": 7.0,
+      "comment": "4"
+    },
+    {
+      "row": 114,
+      "date": "2025-11-14",
+      "col": "AP",
+      "value": "",
+      "comment": null
+    },
+    {
+      "row": 114,
+      "date": "2026-01-02",
+      "col": "AJ",
+      "value": 5,
+      "comment": null
+    },
+    {
+      "row": 116,
+      "date": "2026-01-16",
+      "col": "AH",
+      "value": 32.0,
+      "comment": null
+    },
+    {
+      "row": 116,
+      "date": "2026-02-06",
+      "col": "AE",
+      "value": 16.0,
+      "comment": null
+    },
+    {
+      "row": 116,
+      "date": "2026-02-20",
+      "col": "AC",
+      "value": 16.0,
+      "comment": null
+    },
+    {
+      "row": 116,
+      "date": "2026-03-06",
+      "col": "AA",
+      "value": 16.0,
+      "comment": "0"
+    },
+    {
+      "row": 116,
+      "date": "2026-03-13",
+      "col": "Z",
+      "value": null,
+      "comment": "@bruspecialtycoffee4@gmail.com porque no hemos pedido burratas? si dijimos al final que ibamos a mantener la cherry toast no? \n\no has hablado con caporaso?\nbruspecialtycoffee4@gmail.com zugewiesen"
+    },
+    {
+      "row": 116,
+      "date": "2026-03-20",
+      "col": "Y",
+      "value": 32.0,
+      "comment": "0"
+    },
+    {
+      "row": 117,
+      "date": "2025-10-03",
+      "col": "AU",
+      "value": 1.0,
+      "comment": null
+    },
+    {
+      "row": 117,
+      "date": "2025-10-24",
+      "col": "AS",
+      "value": 2.0,
+      "comment": null
+    },
+    {
+      "row": 117,
+      "date": "2025-11-14",
+      "col": "AP",
+      "value": 1.0,
+      "comment": null
+    },
+    {
+      "row": 117,
+      "date": "2025-11-28",
+      "col": "AN",
+      "value": 1.0,
+      "comment": null
+    },
+    {
+      "row": 117,
+      "date": "2025-12-12",
+      "col": "AL",
+      "value": 1.0,
+      "comment": null
+    },
+    {
+      "row": 117,
+      "date": "2025-12-19",
+      "col": "AK",
+      "value": 1.0,
+      "comment": null
+    },
+    {
+      "row": 117,
+      "date": "2026-01-02",
+      "col": "AJ",
+      "value": 2.0,
+      "comment": null
+    },
+    {
+      "row": 117,
+      "date": "2026-02-06",
+      "col": "AE",
+      "value": 1.0,
+      "comment": null
+    },
+    {
+      "row": 117,
+      "date": "2026-02-13",
+      "col": "AD",
+      "value": 2.0,
+      "comment": "0 kg"
+    },
+    {
+      "row": 117,
+      "date": "2026-02-27",
+      "col": "AB",
+      "value": null,
+      "comment": "1 kg"
+    },
+    {
+      "row": 117,
+      "date": "2026-03-13",
+      "col": "Z",
+      "value": 1.0,
+      "comment": "0.500kg"
+    },
+    {
+      "row": 117,
+      "date": "2026-03-27",
+      "col": "X",
+      "value": 1.0,
+      "comment": "0.400g"
+    },
+    {
+      "row": 117,
+      "date": "2026-04-09",
+      "col": "V",
+      "value": 1.0,
+      "comment": "0.800"
+    },
+    {
+      "row": 117,
+      "date": "2026-04-16",
+      "col": "U",
+      "value": null,
+      "comment": "1.240kg"
+    },
+    {
+      "row": 117,
+      "date": "2026-04-23",
+      "col": "T",
+      "value": 2.0,
+      "comment": "0 kg"
+    },
+    {
+      "row": 117,
+      "date": "2026-04-30",
+      "col": "S",
+      "value": null,
+      "comment": "2 kg"
+    },
+    {
+      "row": 117,
+      "date": "2026-05-07",
+      "col": "R",
+      "value": 2.0,
+      "comment": "0"
+    },
+    {
+      "row": 117,
+      "date": "2026-05-28",
+      "col": "O",
+      "value": 2.0,
+      "comment": "0"
+    },
+    {
+      "row": 117,
+      "date": "2026-06-04",
+      "col": "N",
+      "value": 3.0,
+      "comment": "0,500 kg"
+    },
+    {
+      "row": 117,
+      "date": "2026-06-18",
+      "col": "L",
+      "value": 3.0,
+      "comment": "1  y medio"
+    },
+    {
+      "row": 118,
+      "date": "2025-10-03",
+      "col": "AU",
+      "value": 2.0,
+      "comment": null
+    },
+    {
+      "row": 118,
+      "date": "2025-10-10",
+      "col": "AT",
+      "value": 0.0,
+      "comment": null
+    },
+    {
+      "row": 118,
+      "date": "2025-10-24",
+      "col": "AS",
+      "value": 7.0,
+      "comment": null
+    },
+    {
+      "row": 118,
+      "date": "2025-10-31",
+      "col": "AR",
+      "value": 0.0,
+      "comment": null
+    },
+    {
+      "row": 118,
+      "date": "2025-11-07",
+      "col": "AQ",
+      "value": 4.0,
+      "comment": null
+    },
+    {
+      "row": 118,
+      "date": "2025-11-14",
+      "col": "AP",
+      "value": 4.0,
+      "comment": null
+    },
+    {
+      "row": 118,
+      "date": "2025-11-21",
+      "col": "AO",
+      "value": 5.0,
+      "comment": null
+    },
+    {
+      "row": 118,
+      "date": "2025-11-28",
+      "col": "AN",
+      "value": 0.0,
+      "comment": null
+    },
+    {
+      "row": 118,
+      "date": "2025-12-05",
+      "col": "AM",
+      "value": 2.0,
+      "comment": null
+    },
+    {
+      "row": 118,
+      "date": "2025-12-12",
+      "col": "AL",
+      "value": 3.0,
+      "comment": null
+    },
+    {
+      "row": 118,
+      "date": "2025-12-19",
+      "col": "AK",
+      "value": 0.0,
+      "comment": null
+    },
+    {
+      "row": 118,
+      "date": "2026-01-02",
+      "col": "AJ",
+      "value": 3.0,
+      "comment": null
+    },
+    {
+      "row": 118,
+      "date": "2026-01-09",
+      "col": "AI",
+      "value": 1.0,
+      "comment": null
+    },
+    {
+      "row": 118,
+      "date": "2026-01-16",
+      "col": "AH",
+      "value": 2.0,
+      "comment": null
+    },
+    {
+      "row": 118,
+      "date": "2026-01-23",
+      "col": "AG",
+      "value": 2.0,
+      "comment": null
+    },
+    {
+      "row": 118,
+      "date": "2026-01-29",
+      "col": "AF",
+      "value": 6.0,
+      "comment": "discount"
+    },
+    {
+      "row": 118,
+      "date": "2026-02-06",
+      "col": "AE",
+      "value": 0.0,
+      "comment": null
+    },
+    {
+      "row": 118,
+      "date": "2026-02-13",
+      "col": "AD",
+      "value": 0.0,
+      "comment": "3 unit"
+    },
+    {
+      "row": 118,
+      "date": "2026-02-20",
+      "col": "AC",
+      "value": 5.0,
+      "comment": "0 units"
+    },
+    {
+      "row": 118,
+      "date": "2026-02-27",
+      "col": "AB",
+      "value": 3.0,
+      "comment": null
+    },
+    {
+      "row": 118,
+      "date": "2026-03-06",
+      "col": "AA",
+      "value": 5.0,
+      "comment": "2 kg"
+    },
+    {
+      "row": 118,
+      "date": "2026-03-13",
+      "col": "Z",
+      "value": 3.0,
+      "comment": "3.30"
+    },
+    {
+      "row": 118,
+      "date": "2026-03-20",
+      "col": "Y",
+      "value": "6 unit",
+      "comment": "1 unit"
+    },
+    {
+      "row": 118,
+      "date": "2026-03-27",
+      "col": "X",
+      "value": "5 unit",
+      "comment": "5unit"
+    },
+    {
+      "row": 118,
+      "date": "2026-04-02",
+      "col": "W",
+      "value": 4.0,
+      "comment": "4kg"
+    },
+    {
+      "row": 118,
+      "date": "2026-04-09",
+      "col": "V",
+      "value": 6.0,
+      "comment": "4unit"
+    },
+    {
+      "row": 118,
+      "date": "2026-04-16",
+      "col": "U",
+      "value": 6.0,
+      "comment": "1 1/2 kg\nReply:\n\tkg o bote?"
+    },
+    {
+      "row": 118,
+      "date": "2026-04-23",
+      "col": "T",
+      "value": 6.0,
+      "comment": "4 units"
+    },
+    {
+      "row": 118,
+      "date": "2026-04-30",
+      "col": "S",
+      "value": 0.0,
+      "comment": "7 units"
+    },
+    {
+      "row": 118,
+      "date": "2026-05-14",
+      "col": "Q",
+      "value": 4.0,
+      "comment": "5 unit"
+    },
+    {
+      "row": 118,
+      "date": "2026-05-21",
+      "col": "P",
+      "value": 5.0,
+      "comment": "7 unit"
+    },
+    {
+      "row": 118,
+      "date": "2026-05-28",
+      "col": "O",
+      "value": 4.0,
+      "comment": "8 unit"
+    },
+    {
+      "row": 118,
+      "date": "2026-06-04",
+      "col": "N",
+      "value": 3.0,
+      "comment": "9 unit"
+    },
+    {
+      "row": 118,
+      "date": "2026-06-25",
+      "col": "K",
+      "value": "8unit",
+      "comment": "4unit"
+    },
+    {
+      "row": 118,
+      "date": "2026-07-02",
+      "col": "J",
+      "value": 1.0,
+      "comment": "9"
+    },
+    {
+      "row": 118,
+      "date": "2026-07-09",
+      "col": "I",
+      "value": 1.0,
+      "comment": "1 unit\nReply:\n\tsolo hemos pedido 1 bote habiendo solo un bote en stock?"
+    },
+    {
+      "row": 120,
+      "date": "2025-12-05",
+      "col": "AM",
+      "value": "1 unit",
+      "comment": null
+    },
+    {
+      "row": 120,
+      "date": "2026-03-20",
+      "col": "Y",
+      "value": 1.5,
+      "comment": "0"
+    },
+    {
+      "row": 120,
+      "date": "2026-04-30",
+      "col": "S",
+      "value": 1.52,
+      "comment": null
+    },
+    {
+      "row": 120,
+      "date": "2026-05-21",
+      "col": "P",
+      "value": null,
+      "comment": "1.033kg"
+    },
+    {
+      "row": 121,
+      "date": "2025-12-05",
+      "col": "AM",
+      "value": "2kg",
+      "comment": null
+    },
+    {
+      "row": 122,
+      "date": "2026-04-30",
+      "col": "S",
+      "value": 8.56,
+      "comment": null
+    },
+    {
+      "row": 122,
+      "date": "2026-06-25",
+      "col": "K",
+      "value": "10kg",
+      "comment": "0"
+    },
+    {
+      "row": 122,
+      "date": "2026-07-09",
+      "col": "I",
+      "value": "stock?",
+      "comment": null
+    },
+    {
+      "row": 123,
+      "date": "2025-11-14",
+      "col": "AP",
+      "value": "10kg",
+      "comment": null
+    },
+    {
+      "row": 123,
+      "date": "2025-12-05",
+      "col": "AM",
+      "value": "5kg",
+      "comment": null
+    },
+    {
+      "row": 123,
+      "date": "2025-12-19",
+      "col": "AK",
+      "value": "2kg",
+      "comment": null
+    },
+    {
+      "row": 123,
+      "date": "2026-01-09",
+      "col": "AI",
+      "value": 10.0,
+      "comment": null
+    },
+    {
+      "row": 123,
+      "date": "2026-02-13",
+      "col": "AD",
+      "value": 10.0,
+      "comment": null
+    },
+    {
+      "row": 123,
+      "date": "2026-02-27",
+      "col": "AB",
+      "value": 10.0,
+      "comment": null
+    },
+    {
+      "row": 123,
+      "date": "2026-03-20",
+      "col": "Y",
+      "value": "10kg",
+      "comment": null
+    },
+    {
+      "row": 123,
+      "date": "2026-04-16",
+      "col": "U",
+      "value": "10kg",
+      "comment": null
+    },
+    {
+      "row": 123,
+      "date": "2026-04-30",
+      "col": "S",
+      "value": null,
+      "comment": "10 kg"
+    },
+    {
+      "row": 123,
+      "date": "2026-05-14",
+      "col": "Q",
+      "value": 10.0,
+      "comment": "2 kg precio de esta 12.51fr."
+    },
+    {
+      "row": 123,
+      "date": "2026-05-21",
+      "col": "P",
+      "value": 10.0,
+      "comment": "4"
+    },
+    {
+      "row": 123,
+      "date": "2026-06-04",
+      "col": "N",
+      "value": "10kg",
+      "comment": "5 kg"
+    },
+    {
+      "row": 123,
+      "date": "2026-06-11",
+      "col": "M",
+      "value": 10.0,
+      "comment": "10 kg"
+    },
+    {
+      "row": 123,
+      "date": "2026-06-18",
+      "col": "L",
+      "value": 20.0,
+      "comment": "13"
+    },
+    {
+      "row": 123,
+      "date": "2026-07-09",
+      "col": "I",
+      "value": "stock?",
+      "comment": null
+    },
+    {
+      "row": 124,
+      "date": "2026-03-06",
+      "col": "AA",
+      "value": 1.0,
+      "comment": null
+    },
+    {
+      "row": 125,
+      "date": "2026-02-27",
+      "col": "AB",
+      "value": "",
+      "comment": null
+    },
+    {
+      "row": 127,
+      "date": "2025-11-21",
+      "col": "AO",
+      "value": "2 units",
+      "comment": null
+    },
+    {
+      "row": 127,
+      "date": "2026-02-20",
+      "col": "AC",
+      "value": 2.0,
+      "comment": null
+    },
+    {
+      "row": 127,
+      "date": "2026-03-20",
+      "col": "Y",
+      "value": 1.0,
+      "comment": "1"
+    },
+    {
+      "row": 127,
+      "date": "2026-04-16",
+      "col": "U",
+      "value": 5.0,
+      "comment": null
+    },
+    {
+      "row": 127,
+      "date": "2026-07-02",
+      "col": "J",
+      "value": 4.0,
+      "comment": null
+    },
+    {
+      "row": 128,
+      "date": "2026-02-20",
+      "col": "AC",
+      "value": 2.0,
+      "comment": null
+    },
+    {
+      "row": 128,
+      "date": "2026-04-09",
+      "col": "V",
+      "value": "2unit",
+      "comment": "0"
+    },
+    {
+      "row": 128,
+      "date": "2026-04-30",
+      "col": "S",
+      "value": "2unit",
+      "comment": "1 unit"
+    },
+    {
+      "row": 128,
+      "date": "2026-05-28",
+      "col": "O",
+      "value": "1 unit",
+      "comment": null
+    },
+    {
+      "row": 128,
+      "date": "2026-07-02",
+      "col": "J",
+      "value": 2.0,
+      "comment": "1"
+    },
+    {
+      "row": 129,
+      "date": "2026-03-20",
+      "col": "Y",
+      "value": "1unit",
+      "comment": null
+    },
+    {
+      "row": 129,
+      "date": "2026-04-09",
+      "col": "V",
+      "value": "2unit",
+      "comment": "0"
+    },
+    {
+      "row": 129,
+      "date": "2026-04-30",
+      "col": "S",
+      "value": "2unit",
+      "comment": "0.5 units"
+    },
+    {
+      "row": 129,
+      "date": "2026-05-28",
+      "col": "O",
+      "value": 3.0,
+      "comment": "0"
+    },
+    {
+      "row": 129,
+      "date": "2026-06-18",
+      "col": "L",
+      "value": null,
+      "comment": "1"
+    },
+    {
+      "row": 129,
+      "date": "2026-07-02",
+      "col": "J",
+      "value": 2.0,
+      "comment": "1"
+    },
+    {
+      "row": 130,
+      "date": "2026-01-16",
+      "col": "AH",
+      "value": 3.0,
+      "comment": "it was in discount"
+    },
+    {
+      "row": 130,
+      "date": "2026-02-20",
+      "col": "AC",
+      "value": "nitri",
+      "comment": null
+    },
+    {
+      "row": 130,
+      "date": "2026-04-16",
+      "col": "U",
+      "value": 2.0,
+      "comment": null
+    },
+    {
+      "row": 131,
+      "date": "2026-06-11",
+      "col": "M",
+      "value": "5kg",
+      "comment": "0"
+    },
+    {
+      "row": 132,
+      "date": "2026-06-18",
+      "col": "L",
+      "value": 4.0,
+      "comment": null
+    },
+    {
+      "row": 132,
+      "date": "2026-07-09",
+      "col": "I",
+      "value": 6.0,
+      "comment": "12\nReply:\n\tcomo hay 12 si pone que hemos comprado 4 ?"
+    },
+    {
+      "row": 133,
+      "date": "2026-04-09",
+      "col": "V",
+      "value": null,
+      "comment": "PEDIR LAA PROXIMA SEMANA"
+    },
+    {
+      "row": 133,
+      "date": "2026-04-16",
+      "col": "U",
+      "value": "1 unit",
+      "comment": "si no me equivoco habia que pedir bagels no?"
+    },
+    {
+      "row": 134,
+      "date": "2026-06-11",
+      "col": "M",
+      "value": "16 unit",
+      "comment": "0"
+    },
+    {
+      "row": 135,
+      "date": "2026-06-18",
+      "col": "L",
+      "value": 18.0,
+      "comment": "1"
+    },
+    {
+      "row": 135,
+      "date": "2026-07-02",
+      "col": "J",
+      "value": 5.0,
+      "comment": "15"
+    },
+    {
+      "row": 136,
+      "date": "2025-11-14",
+      "col": "AP",
+      "value": "1 unit",
+      "comment": null
+    },
+    {
+      "row": 136,
+      "date": "2025-12-05",
+      "col": "AM",
+      "value": "1 unit",
+      "comment": null
+    },
+    {
+      "row": 137,
+      "date": "2025-11-14",
+      "col": "AP",
+      "value": 1.0,
+      "comment": null
+    },
+    {
+      "row": 137,
+      "date": "2025-11-21",
+      "col": "AO",
+      "value": 1.0,
+      "comment": null
+    },
+    {
+      "row": 137,
+      "date": "2025-12-12",
+      "col": "AL",
+      "value": 1.0,
+      "comment": null
+    },
+    {
+      "row": 137,
+      "date": "2026-01-23",
+      "col": "AG",
+      "value": 1.0,
+      "comment": null
+    },
+    {
+      "row": 137,
+      "date": "2026-02-06",
+      "col": "AE",
+      "value": 2.0,
+      "comment": null
+    },
+    {
+      "row": 137,
+      "date": "2026-03-06",
+      "col": "AA",
+      "value": 1.0,
+      "comment": "2 kg"
+    },
+    {
+      "row": 137,
+      "date": "2026-03-13",
+      "col": "Z",
+      "value": 5.0,
+      "comment": "2"
+    },
+    {
+      "row": 137,
+      "date": "2026-03-20",
+      "col": "Y",
+      "value": "1kg",
+      "comment": "2kg"
+    },
+    {
+      "row": 137,
+      "date": "2026-04-09",
+      "col": "V",
+      "value": "4kg",
+      "comment": "1kg"
+    },
+    {
+      "row": 137,
+      "date": "2026-04-30",
+      "col": "S",
+      "value": null,
+      "comment": "2 kg"
+    },
+    {
+      "row": 137,
+      "date": "2026-05-07",
+      "col": "R",
+      "value": 4.0,
+      "comment": "3 kg"
+    },
+    {
+      "row": 137,
+      "date": "2026-06-11",
+      "col": "M",
+      "value": 3.0,
+      "comment": "3 kg"
+    },
+    {
+      "row": 137,
+      "date": "2026-06-25",
+      "col": "K",
+      "value": "4kg",
+      "comment": "5kg"
+    },
+    {
+      "row": 138,
+      "date": "2025-10-03",
+      "col": "AU",
+      "value": 1.0,
+      "comment": null
+    },
+    {
+      "row": 138,
+      "date": "2025-11-14",
+      "col": "AP",
+      "value": 5.0,
+      "comment": null
+    },
+    {
+      "row": 138,
+      "date": "2025-12-12",
+      "col": "AL",
+      "value": 5.0,
+      "comment": null
+    },
+    {
+      "row": 138,
+      "date": "2026-01-29",
+      "col": "AF",
+      "value": 5.0,
+      "comment": null
+    },
+    {
+      "row": 138,
+      "date": "2026-02-27",
+      "col": "AB",
+      "value": 5.0,
+      "comment": "2 kg"
+    },
+    {
+      "row": 138,
+      "date": "2026-04-09",
+      "col": "V",
+      "value": "5kg",
+      "comment": "1kg"
+    },
+    {
+      "row": 138,
+      "date": "2026-04-30",
+      "col": "S",
+      "value": 5.0,
+      "comment": "1 kg"
+    },
+    {
+      "row": 138,
+      "date": "2026-05-07",
+      "col": "R",
+      "value": 5.0,
+      "comment": "3 1/3"
+    },
+    {
+      "row": 138,
+      "date": "2026-05-28",
+      "col": "O",
+      "value": 5.0,
+      "comment": "2500"
+    },
+    {
+      "row": 138,
+      "date": "2026-06-11",
+      "col": "M",
+      "value": 10.0,
+      "comment": "5 kg"
+    },
+    {
+      "row": 138,
+      "date": "2026-07-02",
+      "col": "J",
+      "value": 10.0,
+      "comment": "5kg"
+    },
+    {
+      "row": 139,
+      "date": "2026-03-06",
+      "col": "AA",
+      "value": 1.0,
+      "comment": null
+    },
+    {
+      "row": 140,
+      "date": "2026-02-20",
+      "col": "AC",
+      "value": 6.0,
+      "comment": null
+    },
+    {
+      "row": 140,
+      "date": "2026-04-16",
+      "col": "U",
+      "value": 5.0,
+      "comment": "2unit"
+    },
+    {
+      "row": 140,
+      "date": "2026-05-28",
+      "col": "O",
+      "value": 2.0,
+      "comment": "3"
+    },
+    {
+      "row": 140,
+      "date": "2026-06-04",
+      "col": "N",
+      "value": 3.0,
+      "comment": "3 unit"
+    },
+    {
+      "row": 140,
+      "date": "2026-06-25",
+      "col": "K",
+      "value": "4unit",
+      "comment": "4unit"
+    },
+    {
+      "row": 141,
+      "date": "2026-04-09",
+      "col": "V",
+      "value": "2kg",
+      "comment": "0.200g"
+    },
+    {
+      "row": 142,
+      "date": "2026-04-09",
+      "col": "V",
+      "value": 1.0,
+      "comment": "0 es para hacer prueba"
+    },
+    {
+      "row": 142,
+      "date": "2026-06-04",
+      "col": "N",
+      "value": 1.0,
+      "comment": "0"
+    },
+    {
+      "row": 143,
+      "date": "2025-10-24",
+      "col": "AS",
+      "value": 100.0,
+      "comment": null
+    },
+    {
+      "row": 143,
+      "date": "2026-05-21",
+      "col": "P",
+      "value": 10.0,
+      "comment": "5 kg"
+    },
+    {
+      "row": 143,
+      "date": "2026-06-18",
+      "col": "L",
+      "value": 20.0,
+      "comment": "3"
+    },
+    {
+      "row": 143,
+      "date": "2026-07-02",
+      "col": "J",
+      "value": 20.0,
+      "comment": "10"
+    },
+    {
+      "row": 144,
+      "date": "2026-01-16",
+      "col": "AH",
+      "value": 1.0,
+      "comment": null
+    },
+    {
+      "row": 144,
+      "date": "2026-01-23",
+      "col": "AG",
+      "value": 1.0,
+      "comment": null
+    },
+    {
+      "row": 144,
+      "date": "2026-02-13",
+      "col": "AD",
+      "value": "1 kg",
+      "comment": null
+    },
+    {
+      "row": 144,
+      "date": "2026-04-09",
+      "col": "V",
+      "value": 1.0,
+      "comment": "0.300"
+    },
+    {
+      "row": 144,
+      "date": "2026-04-30",
+      "col": "S",
+      "value": 1.0,
+      "comment": null
+    },
+    {
+      "row": 145,
+      "date": "2025-12-19",
+      "col": "AK",
+      "value": "",
+      "comment": null
+    },
+    {
+      "row": 145,
+      "date": "2026-03-06",
+      "col": "AA",
+      "value": 1.0,
+      "comment": null
+    },
+    {
+      "row": 146,
+      "date": "2026-02-27",
+      "col": "AB",
+      "value": "2 unit",
+      "comment": "0 units"
+    },
+    {
+      "row": 146,
+      "date": "2026-07-09",
+      "col": "I",
+      "value": 1.0,
+      "comment": "0"
+    },
+    {
+      "row": 147,
+      "date": "2025-10-24",
+      "col": "AS",
+      "value": "8kg",
+      "comment": null
+    },
+    {
+      "row": 147,
+      "date": "2025-11-14",
+      "col": "AP",
+      "value": "12kg",
+      "comment": null
+    },
+    {
+      "row": 147,
+      "date": "2025-12-19",
+      "col": "AK",
+      "value": "12kg",
+      "comment": null
+    },
+    {
+      "row": 147,
+      "date": "2026-03-20",
+      "col": "Y",
+      "value": "12kg",
+      "comment": null
+    },
+    {
+      "row": 147,
+      "date": "2026-05-21",
+      "col": "P",
+      "value": 24.0,
+      "comment": "400 g"
+    },
+    {
+      "row": 148,
+      "date": "2025-10-03",
+      "col": "AU",
+      "value": "2L",
+      "comment": null
+    },
+    {
+      "row": 148,
+      "date": "2025-11-07",
+      "col": "AQ",
+      "value": "2L",
+      "comment": null
+    },
+    {
+      "row": 148,
+      "date": "2025-11-14",
+      "col": "AP",
+      "value": "2L",
+      "comment": null
+    },
+    {
+      "row": 148,
+      "date": "2025-11-21",
+      "col": "AO",
+      "value": "3L",
+      "comment": null
+    },
+    {
+      "row": 148,
+      "date": "2025-12-05",
+      "col": "AM",
+      "value": "2L",
+      "comment": null
+    },
+    {
+      "row": 148,
+      "date": "2025-12-12",
+      "col": "AL",
+      "value": "2L",
+      "comment": null
+    },
+    {
+      "row": 148,
+      "date": "2026-01-09",
+      "col": "AI",
+      "value": "4L",
+      "comment": null
+    },
+    {
+      "row": 148,
+      "date": "2026-01-16",
+      "col": "AH",
+      "value": "2L",
+      "comment": null
+    },
+    {
+      "row": 148,
+      "date": "2026-01-29",
+      "col": "AF",
+      "value": "2L",
+      "comment": null
+    },
+    {
+      "row": 148,
+      "date": "2026-02-06",
+      "col": "AE",
+      "value": "4L",
+      "comment": null
+    },
+    {
+      "row": 148,
+      "date": "2026-02-20",
+      "col": "AC",
+      "value": "4L",
+      "comment": null
+    },
+    {
+      "row": 148,
+      "date": "2026-02-27",
+      "col": "AB",
+      "value": "3L",
+      "comment": "2L"
+    },
+    {
+      "row": 148,
+      "date": "2026-03-06",
+      "col": "AA",
+      "value": "2L",
+      "comment": null
+    },
+    {
+      "row": 148,
+      "date": "2026-03-20",
+      "col": "Y",
+      "value": 5.0,
+      "comment": "0"
+    },
+    {
+      "row": 148,
+      "date": "2026-04-09",
+      "col": "V",
+      "value": "4L",
+      "comment": "0"
+    },
+    {
+      "row": 148,
+      "date": "2026-04-16",
+      "col": "U",
+      "value": "9L",
+      "comment": "1 L\nReply:\n\tEN DESCUENTO PILLA MAS"
+    },
+    {
+      "row": 148,
+      "date": "2026-04-23",
+      "col": "T",
+      "value": "1 L",
+      "comment": "7.5 L"
+    },
+    {
+      "row": 148,
+      "date": "2026-04-30",
+      "col": "S",
+      "value": null,
+      "comment": "6 L"
+    },
+    {
+      "row": 148,
+      "date": "2026-05-07",
+      "col": "R",
+      "value": 8.0,
+      "comment": "4 unit"
+    },
+    {
+      "row": 148,
+      "date": "2026-05-28",
+      "col": "O",
+      "value": 2.0,
+      "comment": "6 unit"
+    },
+    {
+      "row": 148,
+      "date": "2026-06-04",
+      "col": "N",
+      "value": 3.0,
+      "comment": "5 unit"
+    },
+    {
+      "row": 148,
+      "date": "2026-06-11",
+      "col": "M",
+      "value": 4.0,
+      "comment": "6 unit"
+    },
+    {
+      "row": 148,
+      "date": "2026-06-25",
+      "col": "K",
+      "value": 1.0,
+      "comment": "7unit"
+    },
+    {
+      "row": 148,
+      "date": "2026-07-02",
+      "col": "J",
+      "value": 2.0,
+      "comment": "6"
+    },
+    {
+      "row": 148,
+      "date": "2026-07-09",
+      "col": "I",
+      "value": 2.0,
+      "comment": "6"
+    },
+    {
+      "row": 149,
+      "date": "2026-01-09",
+      "col": "AI",
+      "value": 2.0,
+      "comment": null
+    },
+    {
+      "row": 149,
+      "date": "2026-01-16",
+      "col": "AH",
+      "value": 1.0,
+      "comment": "it was in discount"
+    },
+    {
+      "row": 149,
+      "date": "2026-05-07",
+      "col": "R",
+      "value": 1.0,
+      "comment": "3 unit"
+    },
+    {
+      "row": 150,
+      "date": "2026-03-06",
+      "col": "AA",
+      "value": 1.0,
+      "comment": null
+    },
+    {
+      "row": 150,
+      "date": "2026-05-28",
+      "col": "O",
+      "value": 1.0,
+      "comment": "1 unidad"
+    },
+    {
+      "row": 151,
+      "date": "2025-11-07",
+      "col": "AQ",
+      "value": 1.0,
+      "comment": null
+    },
+    {
+      "row": 151,
+      "date": "2025-11-14",
+      "col": "AP",
+      "value": 1.0,
+      "comment": null
+    },
+    {
+      "row": 151,
+      "date": "2025-12-05",
+      "col": "AM",
+      "value": 3.0,
+      "comment": null
+    },
+    {
+      "row": 151,
+      "date": "2025-12-12",
+      "col": "AL",
+      "value": 2.0,
+      "comment": null
+    },
+    {
+      "row": 151,
+      "date": "2026-01-23",
+      "col": "AG",
+      "value": 1.0,
+      "comment": null
+    },
+    {
+      "row": 151,
+      "date": "2026-01-29",
+      "col": "AF",
+      "value": 3.0,
+      "comment": null
+    },
+    {
+      "row": 151,
+      "date": "2026-02-27",
+      "col": "AB",
+      "value": null,
+      "comment": "2 units"
+    },
+    {
+      "row": 151,
+      "date": "2026-03-20",
+      "col": "Y",
+      "value": 2.0,
+      "comment": "1 unit"
+    },
+    {
+      "row": 151,
+      "date": "2026-04-09",
+      "col": "V",
+      "value": null,
+      "comment": "2.5L"
+    },
+    {
+      "row": 151,
+      "date": "2026-04-16",
+      "col": "U",
+      "value": 3.0,
+      "comment": "2unit"
+    },
+    {
+      "row": 151,
+      "date": "2026-04-23",
+      "col": "T",
+      "value": 1.0,
+      "comment": "3.5 units"
+    },
+    {
+      "row": 151,
+      "date": "2026-04-30",
+      "col": "S",
+      "value": null,
+      "comment": "3 units"
+    },
+    {
+      "row": 151,
+      "date": "2026-05-21",
+      "col": "P",
+      "value": 3.0,
+      "comment": "2 unit"
+    },
+    {
+      "row": 151,
+      "date": "2026-06-25",
+      "col": "K",
+      "value": "4unit",
+      "comment": "1unit"
+    },
+    {
+      "row": 151,
+      "date": "2026-07-02",
+      "col": "J",
+      "value": 2.0,
+      "comment": "4"
+    },
+    {
+      "row": 151,
+      "date": "2026-07-09",
+      "col": "I",
+      "value": 2.0,
+      "comment": "4 unit"
+    },
+    {
+      "row": 152,
+      "date": "2026-04-23",
+      "col": "T",
+      "value": null,
+      "comment": "5 kg"
+    },
+    {
+      "row": 152,
+      "date": "2026-05-21",
+      "col": "P",
+      "value": 10.0,
+      "comment": "2 kg"
+    },
+    {
+      "row": 152,
+      "date": "2026-07-02",
+      "col": "J",
+      "value": 10.0,
+      "comment": "4"
+    },
+    {
+      "row": 153,
+      "date": "2025-10-10",
+      "col": "AT",
+      "value": 10.0,
+      "comment": null
+    },
+    {
+      "row": 153,
+      "date": "2025-12-05",
+      "col": "AM",
+      "value": 10.0,
+      "comment": null
+    },
+    {
+      "row": 153,
+      "date": "2026-01-09",
+      "col": "AI",
+      "value": 10.0,
+      "comment": null
+    },
+    {
+      "row": 153,
+      "date": "2026-01-23",
+      "col": "AG",
+      "value": 10.0,
+      "comment": null
+    },
+    {
+      "row": 153,
+      "date": "2026-02-20",
+      "col": "AC",
+      "value": 10.0,
+      "comment": null
+    },
+    {
+      "row": 153,
+      "date": "2026-02-27",
+      "col": "AB",
+      "value": null,
+      "comment": "8 kg"
+    },
+    {
+      "row": 153,
+      "date": "2026-03-06",
+      "col": "AA",
+      "value": 10.0,
+      "comment": "4 kg"
+    },
+    {
+      "row": 153,
+      "date": "2026-03-20",
+      "col": "Y",
+      "value": 10.0,
+      "comment": "3"
+    },
+    {
+      "row": 153,
+      "date": "2026-04-23",
+      "col": "T",
+      "value": 10.0,
+      "comment": "3 kg"
+    },
+    {
+      "row": 153,
+      "date": "2026-05-21",
+      "col": "P",
+      "value": 10.0,
+      "comment": "3 kg"
+    },
+    {
+      "row": 153,
+      "date": "2026-06-04",
+      "col": "N",
+      "value": 10.0,
+      "comment": "2kg"
+    },
+    {
+      "row": 153,
+      "date": "2026-06-11",
+      "col": "M",
+      "value": 20.0,
+      "comment": "8 kg"
+    },
+    {
+      "row": 153,
+      "date": "2026-07-02",
+      "col": "J",
+      "value": 10.0,
+      "comment": "12"
+    },
+    {
+      "row": 154,
+      "date": "2026-02-06",
+      "col": "AE",
+      "value": 6.0,
+      "comment": null
+    },
+    {
+      "row": 154,
+      "date": "2026-03-13",
+      "col": "Z",
+      "value": 6.0,
+      "comment": "0"
+    },
+    {
+      "row": 154,
+      "date": "2026-04-23",
+      "col": "T",
+      "value": 6.0,
+      "comment": "1 kg"
+    },
+    {
+      "row": 154,
+      "date": "2026-05-21",
+      "col": "P",
+      "value": 6.0,
+      "comment": "1 unit"
+    },
+    {
+      "row": 154,
+      "date": "2026-06-11",
+      "col": "M",
+      "value": 6.0,
+      "comment": "3 kg"
+    },
+    {
+      "row": 154,
+      "date": "2026-07-02",
+      "col": "J",
+      "value": "6unit",
+      "comment": "5"
+    },
+    {
+      "row": 155,
+      "date": "2025-11-28",
+      "col": "AN",
+      "value": "4kg",
+      "comment": null
+    },
+    {
+      "row": 156,
+      "date": "2025-11-28",
+      "col": "AN",
+      "value": "5kg",
+      "comment": null
+    },
+    {
+      "row": 157,
+      "date": "2026-06-11",
+      "col": "M",
+      "value": "10L",
+      "comment": null
+    },
+    {
+      "row": 158,
+      "date": "2026-06-11",
+      "col": "M",
+      "value": "2 unit",
+      "comment": null
+    }
+  ],
+  "summary": {
+    "ingredients": 156,
+    "dates": 39,
+    "orders_filled": 803,
+    "comments": 419
+  }
+}

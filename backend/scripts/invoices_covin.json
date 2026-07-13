@@ -1,0 +1,406 @@
+[
+  {
+    "supplier": "Covin",
+    "invoice_number": "2025262",
+    "invoice_date": "2026-03-10",
+    "total_chf": 1093.65,
+    "notes": "Fecha en nombre de archivo: 2026-04-09 (fecha de pago estimada). Rechnungsdatum real: 10.03.2026",
+    "items": [
+      {
+        "name": "Estrella Galicia 0.0 Vidrio 4x6x25cl",
+        "quantity": 2,
+        "unit": "caja",
+        "unit_price": 20.45,
+        "total": 40.90,
+        "art_nr": "60012",
+        "notes": "2 Crt (cajas de 24 botellas 25cl sin alcohol)"
+      },
+      {
+        "name": "Estrella Galicia Barril 30 1x30Lt",
+        "quantity": 3,
+        "unit": "unidad",
+        "unit_price": 115.00,
+        "total": 345.00,
+        "art_nr": "60018",
+        "notes": "3 barriles de 30 litros"
+      },
+      {
+        "name": "Estrella Galicia 1906 Barril 30 1x30Lt",
+        "quantity": 1,
+        "unit": "unidad",
+        "unit_price": 125.00,
+        "total": 125.00,
+        "art_nr": "60064",
+        "notes": "1 barril 1906 de 30 litros"
+      },
+      {
+        "name": "Gaz Gas Carbagas CO2 Cerveza",
+        "quantity": 2,
+        "unit": "unidad",
+        "unit_price": 70.00,
+        "total": 140.00,
+        "art_nr": "60073",
+        "notes": "Botella CO2 para cerveza. Incluye depósito (Depot) de CHF 100/unidad"
+      }
+    ]
+  },
+  {
+    "supplier": "Covin",
+    "invoice_number": "2024518",
+    "invoice_date": "2026-02-09",
+    "total_chf": 1118.55,
+    "notes": "Fecha en nombre de archivo: 2026-04-09. Rechnungsdatum real: 09.02.2026. Cliente: Coffee Crew AG, Fernandez Lobato Felipe, Sterngasse 19",
+    "items": [
+      {
+        "name": "Estrella Galicia Barril 30 1x30Lt",
+        "quantity": 3,
+        "unit": "unidad",
+        "unit_price": 115.00,
+        "total": 345.00,
+        "art_nr": "60018",
+        "notes": "3 barriles de 30 litros"
+      },
+      {
+        "name": "Gaz Gas Carbagas CO2 Cerveza",
+        "quantity": 1,
+        "unit": "unidad",
+        "unit_price": 70.00,
+        "total": 70.00,
+        "art_nr": "60073",
+        "notes": "Botella CO2 para cerveza. Depósito CHF 100"
+      },
+      {
+        "name": "Cofrit Pimientos del Padrón 8x300gr",
+        "quantity": 8,
+        "unit": "unidad",
+        "unit_price": 4.95,
+        "total": 39.60,
+        "art_nr": "10099",
+        "notes": "1 caja (Crt) con 8 bolsas de 300g congeladas. Origen ESP"
+      },
+      {
+        "name": "Ameztoi Croquetas Explosion Iberico Panko 35gr 4x1Kg",
+        "quantity": 4,
+        "unit": "unidad",
+        "unit_price": 15.95,
+        "total": 63.80,
+        "art_nr": "10230",
+        "notes": "1 caja con 4 bolsas de 1kg. Precio por bolsa"
+      },
+      {
+        "name": "C&G Lomo Adobado Ibérico 16x(1.5Kg+-)",
+        "quantity": 1.230,
+        "unit": "kg",
+        "unit_price": 32.95,
+        "total": 40.55,
+        "art_nr": "10279",
+        "notes": "Vendido por peso. 1.230 kg"
+      },
+      {
+        "name": "Traditional Pao Mafra 10x500gr",
+        "quantity": 10,
+        "unit": "unidad",
+        "unit_price": 1.90,
+        "total": 19.00,
+        "art_nr": "10489",
+        "notes": "1 caja con 10 panes de 500g congelados. Origen PRT"
+      },
+      {
+        "name": "C&G Carrillera Ibérico 16x(1.5Kg+-)",
+        "quantity": 3.380,
+        "unit": "kg",
+        "unit_price": 29.95,
+        "total": 101.25,
+        "art_nr": "10544",
+        "notes": "Vendido por peso. 3 unidades = 3.380 kg total (aprox 1.127 kg/ud)"
+      },
+      {
+        "name": "Ameztoi Croquetas de Gambón Panko 35gr 4x1Kg",
+        "quantity": 4,
+        "unit": "unidad",
+        "unit_price": 17.95,
+        "total": 71.80,
+        "art_nr": "10679",
+        "notes": "1 caja con 4 bolsas de 1kg. Precio por bolsa"
+      },
+      {
+        "name": "Ameztoi Croquetas de Boletus Edulis y Trufa Panko 35gr 4x1Kg",
+        "quantity": 4,
+        "unit": "unidad",
+        "unit_price": 17.95,
+        "total": 71.80,
+        "art_nr": "10757",
+        "notes": "1 caja con 4 bolsas de 1kg. Precio por bolsa"
+      },
+      {
+        "name": "Öko-Beteiligung / Éco-participation",
+        "quantity": 1,
+        "unit": "unidad",
+        "unit_price": 5.00,
+        "total": 5.00,
+        "art_nr": "90090",
+        "notes": "Tasa ecológica. No es un ingrediente"
+      }
+    ]
+  },
+  {
+    "supplier": "Covin",
+    "invoice_number": "2025557",
+    "invoice_date": "2026-03-23",
+    "total_chf": 220.25,
+    "notes": "Fecha en nombre de archivo: 2026-04-17. Rechnungsdatum real: 23.03.2026. Lieferdatum: 20.03.2026",
+    "items": [
+      {
+        "name": "Estrella Galicia 1906 Barril 30 1x30Lt",
+        "quantity": 2,
+        "unit": "unidad",
+        "unit_price": 125.00,
+        "total": 250.00,
+        "art_nr": "60064",
+        "notes": "2 barriles 1906 de 30 litros. Saldo depósito -1 barril (retorno neto)"
+      }
+    ]
+  },
+  {
+    "supplier": "Covin",
+    "invoice_number": "2025612",
+    "invoice_date": "2026-03-24",
+    "total_chf": 348.65,
+    "notes": "Fecha en nombre de archivo: 2026-04-29. Rechnungsdatum real: 24.03.2026. Lieferdatum: 24.03.2026",
+    "items": [
+      {
+        "name": "Estrella Galicia Barril 30 1x30Lt",
+        "quantity": 2,
+        "unit": "unidad",
+        "unit_price": 115.00,
+        "total": 230.00,
+        "art_nr": "60018",
+        "notes": "2 barriles de 30 litros"
+      }
+    ]
+  },
+  {
+    "supplier": "Covin",
+    "invoice_number": "2025833",
+    "invoice_date": "2026-03-31",
+    "total_chf": 697.25,
+    "notes": "Fecha en nombre de archivo: 2026-04-30. Rechnungsdatum real: 31.03.2026. Lieferdatum: 31.03.2026",
+    "items": [
+      {
+        "name": "Estrella Galicia Barril 30 1x30Lt",
+        "quantity": 4,
+        "unit": "unidad",
+        "unit_price": 115.00,
+        "total": 460.00,
+        "art_nr": "60018",
+        "notes": "4 barriles de 30 litros"
+      }
+    ]
+  },
+  {
+    "supplier": "Covin",
+    "invoice_number": "2026352",
+    "invoice_date": "2026-04-22",
+    "total_chf": 727.60,
+    "notes": "Fecha en nombre de archivo: 2026-05-21. Rechnungsdatum real: 22.04.2026. Lieferdatum: 21.04.2026",
+    "items": [
+      {
+        "name": "Estrella Galicia Barril 30 1x30Lt",
+        "quantity": 2,
+        "unit": "unidad",
+        "unit_price": 115.00,
+        "total": 230.00,
+        "art_nr": "60018",
+        "notes": "2 barriles de 30 litros"
+      },
+      {
+        "name": "Sunquick Concentrado Maracuyá 6x700ml",
+        "quantity": 6,
+        "unit": "unidad",
+        "unit_price": 3.95,
+        "total": 23.70,
+        "art_nr": "40114",
+        "notes": "1 caja con 6 botellas de 700ml. Concentrado de fruta. Origen PRT"
+      },
+      {
+        "name": "Ameztoi Croquetas Explosion Iberico Panko 35gr 4x1Kg",
+        "quantity": 4,
+        "unit": "unidad",
+        "unit_price": 16.95,
+        "total": 67.80,
+        "art_nr": "10230",
+        "notes": "1 caja con 4 bolsas de 1kg. Precio actualizado respecto factura anterior (era 15.95)"
+      },
+      {
+        "name": "Ameztoi Croquetas Bacalao 13/15 10x350gr",
+        "quantity": 10,
+        "unit": "unidad",
+        "unit_price": 4.95,
+        "total": 49.50,
+        "art_nr": "10482",
+        "notes": "1 caja con 10 porciones de 350g"
+      },
+      {
+        "name": "C&G Secreto Ibérico 20x(2Kg+-)",
+        "quantity": 2.350,
+        "unit": "kg",
+        "unit_price": 36.95,
+        "total": 86.85,
+        "art_nr": "10542",
+        "notes": "Vendido por peso. 2.350 kg"
+      },
+      {
+        "name": "C&G Carrillera Ibérico 16x(1.5Kg+-)",
+        "quantity": 1.320,
+        "unit": "kg",
+        "unit_price": 26.95,
+        "total": 35.55,
+        "art_nr": "10544",
+        "notes": "Vendido por peso. 1.320 kg. Precio actualizado (era 29.95)"
+      },
+      {
+        "name": "Ameztoi Croquetas de Gambón Panko 35gr 4x1Kg",
+        "quantity": 4,
+        "unit": "unidad",
+        "unit_price": 16.95,
+        "total": 67.80,
+        "art_nr": "10679",
+        "notes": "1 caja con 4 bolsas de 1kg. Precio actualizado (era 17.95)"
+      },
+      {
+        "name": "Ameztoi Croquetas Jamón Ibérico Panko Iberia 35gr 4x1Kg",
+        "quantity": 4,
+        "unit": "unidad",
+        "unit_price": 16.95,
+        "total": 67.80,
+        "art_nr": "10681",
+        "notes": "1 caja con 4 bolsas de 1kg. Nuevo producto"
+      },
+      {
+        "name": "Ameztoi Croquetas de Boletus Edulis y Trufa Panko 35gr 4x1Kg",
+        "quantity": 4,
+        "unit": "unidad",
+        "unit_price": 16.95,
+        "total": 67.80,
+        "art_nr": "10757",
+        "notes": "1 caja con 4 bolsas de 1kg. Precio actualizado (era 17.95)"
+      }
+    ]
+  },
+  {
+    "supplier": "Covin",
+    "invoice_number": "MAHNUNG-2025557",
+    "invoice_date": "2026-06-10",
+    "total_chf": 230.25,
+    "notes": "MAHNUNG (aviso de cobro), no es una factura de producto. Referencia a factura 2025557 (220.25 CHF) + Mahngebüren (recargo mora) 10.00 CHF. Archivo: 2026_06_11-230CHF_Covin_11281.pdf. NO contiene productos nuevos.",
+    "items": []
+  },
+  {
+    "supplier": "Covin",
+    "invoice_number": "2026886",
+    "invoice_date": "2026-05-12",
+    "total_chf": 1617.20,
+    "notes": "Fecha en nombre de archivo: 2026-06-12. Rechnungsdatum real: 12.05.2026. Lieferdatum: 11.05.2026",
+    "items": [
+      {
+        "name": "Estrella Galicia 0.0 Vidrio 4x6x25cl",
+        "quantity": 11,
+        "unit": "caja",
+        "unit_price": 20.45,
+        "total": 224.95,
+        "art_nr": "60012",
+        "notes": "11 Crt (cajas de 24 botellas 25cl sin alcohol)"
+      },
+      {
+        "name": "Estrella Galicia Barril 30 1x30Lt",
+        "quantity": 6,
+        "unit": "unidad",
+        "unit_price": 115.00,
+        "total": 690.00,
+        "art_nr": "60018",
+        "notes": "6 barriles de 30 litros"
+      },
+      {
+        "name": "Estrella Galicia 1906 Barril 30 1x30Lt",
+        "quantity": 4,
+        "unit": "unidad",
+        "unit_price": 125.00,
+        "total": 500.00,
+        "art_nr": "60064",
+        "notes": "4 barriles 1906 de 30 litros"
+      }
+    ]
+  },
+  {
+    "supplier": "Covin",
+    "invoice_number": "2027382",
+    "invoice_date": "2026-06-03",
+    "total_chf": 834.45,
+    "notes": "Fecha en nombre de archivo: 2026-07-03. Rechnungsdatum real: 03.06.2026. Lieferdatum: 02.06.2026",
+    "items": [
+      {
+        "name": "Estrella Galicia Barril 30 1x30Lt",
+        "quantity": 2,
+        "unit": "unidad",
+        "unit_price": 115.00,
+        "total": 230.00,
+        "art_nr": "60018",
+        "notes": "2 barriles de 30 litros"
+      },
+      {
+        "name": "La Tita Sangria Barril 1x30Lt",
+        "quantity": 2,
+        "unit": "unidad",
+        "unit_price": 99.00,
+        "total": 198.00,
+        "art_nr": "50158",
+        "notes": "2 barriles de sangria de 30 litros. Origen ESP"
+      },
+      {
+        "name": "Gaz Gas Carbagas CO2 Cerveza",
+        "quantity": 1,
+        "unit": "unidad",
+        "unit_price": 70.00,
+        "total": 70.00,
+        "art_nr": "60073",
+        "notes": "Botella CO2 para cerveza. Depósito CHF 100"
+      }
+    ]
+  },
+  {
+    "supplier": "Covin",
+    "invoice_number": "2027742",
+    "invoice_date": "2026-06-16",
+    "total_chf": 689.30,
+    "notes": "Fecha en nombre de archivo: 2026-07-15. Rechnungsdatum real: 16.06.2026. Lieferdatum: 16.06.2026",
+    "items": [
+      {
+        "name": "Estrella Galicia Barril 30 1x30Lt",
+        "quantity": 4,
+        "unit": "unidad",
+        "unit_price": 115.00,
+        "total": 460.00,
+        "art_nr": "60018",
+        "notes": "4 barriles de 30 litros"
+      },
+      {
+        "name": "Estrella Galicia 1906 Barril 30 1x30Lt",
+        "quantity": 2,
+        "unit": "unidad",
+        "unit_price": 125.00,
+        "total": 250.00,
+        "art_nr": "60064",
+        "notes": "2 barriles 1906 de 30 litros"
+      },
+      {
+        "name": "Gaz Gas Carbagas CO2 Cerveza",
+        "quantity": 1,
+        "unit": "unidad",
+        "unit_price": 70.00,
+        "total": 70.00,
+        "art_nr": "60073",
+        "notes": "Botella CO2 para cerveza. CO2 DEPO saldo neto 0 en esta entrega"
+      }
+    ]
+  }
+]

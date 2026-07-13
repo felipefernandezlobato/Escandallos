@@ -107,3 +107,74 @@ export interface ImportarPreview {
   fecha: string;
   matches: ImportarMatch[];
 }
+
+// --- Inventario ---
+
+export interface InventarioRegistro {
+  id: number;
+  ingrediente_id: number;
+  cantidad: number;
+  unidad: string;
+  fecha_registro: string;
+  notas: string | null;
+  ingrediente_nombre: string;
+}
+
+export interface InventarioSnapshot {
+  fecha: string;
+  registros: InventarioRegistro[];
+  total_items: number;
+}
+
+// --- Pedidos ---
+
+export interface LineaPedido {
+  id: number;
+  ingrediente_id: number;
+  cantidad_pedida: number;
+  unidad: string;
+  cantidad_recibida: number | null;
+  precio_unitario: number | null;
+  ingrediente_nombre: string;
+}
+
+export interface Pedido {
+  id: number;
+  fecha: string;
+  proveedor: string;
+  estado: string;
+  notas: string | null;
+  fecha_recepcion: string | null;
+  num_lineas: number;
+  total_estimado: number;
+}
+
+export interface PedidoDetail extends Pedido {
+  lineas: LineaPedido[];
+}
+
+export interface RecomendacionItem {
+  ingrediente_id: number;
+  ingrediente_nombre: string;
+  proveedor: string;
+  stock_actual: number;
+  unidad: string;
+  consumo_medio_semanal: number;
+  cantidad_sugerida: number;
+  dias_stock: number | null;
+}
+
+export interface ConsumoSemanal {
+  semana: string;
+  cantidad: number;
+  unidad: string;
+}
+
+export interface ConsumoData {
+  ingrediente_id: number;
+  ingrediente_nombre: string;
+  consumo_medio: number;
+  unidad: string;
+  tendencia: string;
+  historial: ConsumoSemanal[];
+}

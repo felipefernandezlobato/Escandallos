@@ -27,6 +27,7 @@ export default function ImportarPage() {
   const [resultado, setResultado] = useState<{ actualizados: number; creados: number } | null>(null);
   const [error, setError] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [crearPedido, setCrearPedido] = useState(true);
 
   const handlePdfUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -85,6 +86,38 @@ export default function ImportarPage() {
           body: JSON.stringify({ proveedor: preview.proveedor, items }),
         }
       );
+      if (crearPedido && preview) {
+        const lineas = preview.matches
+          .filter((m) => m.ingrediente_id)
+          .map((m) => ({
+            ingrediente_id: m.ingrediente_id,
+            cantidad_pedida: m.item.cantidad,
+            unidad: m.item.unidad,
+            precio_unitario: m.item.precio_unitario,
+          }));
+        if (lineas.length > 0) {
+          const pedido = await apiFetch<{ id: number; lineas: Array<{ id: number }> }>(
+            "/api/pedidos",
+            {
+              method: "POST",
+              body: JSON.stringify({
+                proveedor: preview.proveedor,
+                lineas,
+              }),
+            }
+          );
+          await apiFetch(`/api/pedidos/${pedido.id}/recibir`, {
+            method: "POST",
+            body: JSON.stringify({
+              lineas: pedido.lineas.map((l, i) => ({
+                linea_id: l.id,
+                cantidad_recibida: lineas[i].cantidad_pedida,
+                precio_unitario: lineas[i].precio_unitario,
+              })),
+            }),
+          }).catch(() => {});
+        }
+      }
       setResultado(result);
       setPreview(null);
     } catch (err: any) {
@@ -178,12 +211,23 @@ export default function ImportarPage() {
               <h3 className="font-semibold">Vista Previa — {preview.proveedor}</h3>
               <p className="text-xs text-[#6B5E52]">Fecha: {preview.fecha}</p>
             </div>
-            <button
-              onClick={handleConfirm}
-              className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700"
-            >
-              Confirmar Importación
-            </button>
+            <div className="flex items-center gap-4">
+              <label className="flex items-center gap-2 text-sm text-[#6B5E52]">
+                <input
+                  type="checkbox"
+                  checked={crearPedido}
+                  onChange={(e) => setCrearPedido(e.target.checked)}
+                  className="rounded border-[#D4C4A8]"
+                />
+                Registrar como pedido recibido
+              </label>
+              <button
+                onClick={handleConfirm}
+                className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700"
+              >
+                Confirmar Importacion
+              </button>
+            </div>
           </div>
 
           <div className="overflow-x-auto">

@@ -138,3 +138,46 @@ class PrecioProveedor(Base):
 
     ingrediente_rel: Mapped["Ingrediente"] = relationship()
     proveedor_rel: Mapped["Proveedor"] = relationship(back_populates="precios")
+
+
+class InventarioRegistro(Base):
+    __tablename__ = "inventario_registros"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    ingrediente_id: Mapped[int] = mapped_column(Integer, ForeignKey("ingredientes.id"), nullable=False)
+    cantidad: Mapped[float] = mapped_column(Float, nullable=False)
+    unidad: Mapped[str] = mapped_column(String(20), nullable=False)
+    fecha_registro: Mapped[date] = mapped_column(Date, default=func.current_date())
+    notas: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
+    ingrediente_rel: Mapped["Ingrediente"] = relationship()
+
+
+class Pedido(Base):
+    __tablename__ = "pedidos"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    fecha: Mapped[date] = mapped_column(Date, default=func.current_date())
+    proveedor: Mapped[str] = mapped_column(String(200), nullable=False)
+    estado: Mapped[str] = mapped_column(String(20), nullable=False, default="borrador")
+    notas: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    fecha_recepcion: Mapped[Optional[date]] = mapped_column(Date, nullable=True)
+
+    lineas: Mapped[List["LineaPedido"]] = relationship(
+        back_populates="pedido_rel", cascade="all, delete-orphan"
+    )
+
+
+class LineaPedido(Base):
+    __tablename__ = "lineas_pedido"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    pedido_id: Mapped[int] = mapped_column(Integer, ForeignKey("pedidos.id"), nullable=False)
+    ingrediente_id: Mapped[int] = mapped_column(Integer, ForeignKey("ingredientes.id"), nullable=False)
+    cantidad_pedida: Mapped[float] = mapped_column(Float, nullable=False)
+    unidad: Mapped[str] = mapped_column(String(20), nullable=False)
+    cantidad_recibida: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    precio_unitario: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+
+    pedido_rel: Mapped["Pedido"] = relationship(back_populates="lineas")
+    ingrediente_rel: Mapped["Ingrediente"] = relationship()

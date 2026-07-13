@@ -1,0 +1,668 @@
+{
+  "supplier": "Jos. Pfaff AG",
+  "invoices": [
+    {
+      "invoice_number": "445199",
+      "invoice_date": "2026-03-31",
+      "currency": "CHF",
+      "deliveries": [
+        {
+          "delivery_date": "2026-03-17",
+          "rechnung": "443545",
+          "items": [
+            { "name_de": "Brombeeren 125 g. (Karton)", "name_es": "Moras", "quantity": 2.0, "unit": "unidad", "unit_price": 5.80, "total_price": 11.60 },
+            { "name_de": "Heidelbeeren 250 g. (Gitter)", "name_es": "Arandanos", "quantity": 2.0, "unit": "unidad", "unit_price": 5.55, "total_price": 11.10 },
+            { "name_de": "Himbeeren 250g (Gitter)", "name_es": "Frambuesas", "quantity": 2.0, "unit": "unidad", "unit_price": 5.00, "total_price": 10.00 },
+            { "name_de": "Bananen Kl. I (Freie Marke) 18 kg. Imp (Karton)", "name_es": "Platanos", "quantity": 2.4, "unit": "kg", "unit_price": 2.90, "total_price": 6.95 },
+            { "name_de": "Limes lose 4 kg. Imp (Karton)", "name_es": "Limas", "quantity": 1.0, "unit": "unidad", "unit_price": 13.60, "total_price": 13.60 },
+            { "name_de": "Champignons weiss 1 kg. CH (Box)", "name_es": "Champinones blancos", "quantity": 2.0, "unit": "kg", "unit_price": 7.80, "total_price": 15.60 },
+            { "name_de": "Schnittlauch lose Bund (Bund)", "name_es": "Cebollino", "quantity": 2.0, "unit": "unidad", "unit_price": 4.00, "total_price": 8.00 },
+            { "name_de": "Rucola lose 1 kg. Imp. (Colis)", "name_es": "Rucula", "quantity": 1.0, "unit": "kg", "unit_price": 8.85, "total_price": 8.85 },
+            { "name_de": "Zwiebeln rot (IFCO)", "name_es": "Cebollas rojas", "quantity": 2.35, "unit": "kg", "unit_price": 1.90, "total_price": 4.45 },
+            { "name_de": "Karotten lose gross ch (IFCO)", "name_es": "Zanahorias", "quantity": 2.05, "unit": "kg", "unit_price": 1.65, "total_price": 3.40 },
+            { "name_de": "Zwiebelsprossen 100 g. (Beutel)", "name_es": "Brotes de cebolla", "quantity": 3.0, "unit": "unidad", "unit_price": 4.80, "total_price": 14.40 },
+            { "name_de": "Orangen gross (IFCO)", "name_es": "Naranjas", "quantity": 2.5, "unit": "kg", "unit_price": 1.50, "total_price": 3.75 },
+            { "name_de": "Zitronen 6 kg. Imp (IFCO)", "name_es": "Limones", "quantity": 1.0, "unit": "kg", "unit_price": 2.90, "total_price": 2.90 },
+            { "name_de": "Avocados Hass 16 stk. Imp (Karton)", "name_es": "Aguacates", "quantity": 2.0, "unit": "unidad", "unit_price": 23.20, "total_price": 46.40 },
+            { "name_de": "Tomaten gedorrt 1 kg. Imp (Beutel)", "name_es": "Tomates secos", "quantity": 1.0, "unit": "kg", "unit_price": 10.50, "total_price": 10.50 }
+          ]
+        },
+        {
+          "delivery_date": "2026-03-19",
+          "rechnung": "443841",
+          "items": [
+            { "name_de": "Bananen Kl. I (Freie Marke) 18 kg. Imp (Karton)", "name_es": "Platanos", "quantity": 2.4, "unit": "kg", "unit_price": 2.90, "total_price": 6.95 },
+            { "name_de": "Rucola lose 1 kg. Imp. (Colis)", "name_es": "Rucula", "quantity": 1.0, "unit": "kg", "unit_price": 8.85, "total_price": 8.85 },
+            { "name_de": "Kartoffeln VENEZIA festkochend 10 kg. CH (IFCO)", "name_es": "Patatas", "quantity": 1.05, "unit": "kg", "unit_price": 1.80, "total_price": 1.90 },
+            { "name_de": "Tomaten am Zweig (IFCO)", "name_es": "Tomates en rama", "quantity": 2.1, "unit": "kg", "unit_price": 3.60, "total_price": 7.55 },
+            { "name_de": "Cherry Tomaten am Zweig (IFCO)", "name_es": "Tomates cherry", "quantity": 1.0, "unit": "kg", "unit_price": 8.60, "total_price": 8.60 },
+            { "name_de": "Orangen gross (IFCO)", "name_es": "Naranjas", "quantity": 1.2, "unit": "kg", "unit_price": 1.50, "total_price": 1.80 },
+            { "name_de": "Avocados Hass 16 stk. Imp (Karton)", "name_es": "Aguacates", "quantity": 3.0, "unit": "unidad", "unit_price": 23.20, "total_price": 69.60 },
+            { "name_de": "Avocados Hass 16 stk. Imp (Karton) - Retoure", "name_es": "Aguacates (devolucion)", "quantity": -1.0, "unit": "unidad", "unit_price": 23.20, "total_price": -23.20 }
+          ]
+        },
+        {
+          "delivery_date": "2026-03-19",
+          "rechnung": "443851",
+          "items": [
+            { "name_de": "Avocados Hass 16 stk. Imp (Karton)", "name_es": "Aguacates", "quantity": 1.0, "unit": "unidad", "unit_price": 23.20, "total_price": 23.20 }
+          ]
+        },
+        {
+          "delivery_date": "2026-03-20",
+          "rechnung": "444014",
+          "items": [
+            { "name_de": "Erdbeeren 500 g. CH (IFCO)", "name_es": "Fresas", "quantity": 1.0, "unit": "unidad", "unit_price": 5.20, "total_price": 5.20 },
+            { "name_de": "Himbeeren 250g (Gitter)", "name_es": "Frambuesas", "quantity": 1.0, "unit": "unidad", "unit_price": 4.75, "total_price": 4.75 },
+            { "name_de": "Schnittlauch lose Bund (Bund)", "name_es": "Cebollino", "quantity": 2.0, "unit": "unidad", "unit_price": 4.00, "total_price": 8.00 },
+            { "name_de": "Zwiebeln rot (IFCO)", "name_es": "Cebollas rojas", "quantity": 1.05, "unit": "kg", "unit_price": 1.90, "total_price": 2.00 },
+            { "name_de": "Gala Aepfel Kl. I 12.5 kg. CH (IFCO)", "name_es": "Manzanas Gala", "quantity": 1.2, "unit": "kg", "unit_price": 2.70, "total_price": 3.25 },
+            { "name_de": "Trauben weiss kernlos 10 x 500 g. Imp (Karton)", "name_es": "Uvas blancas", "quantity": 1.0, "unit": "unidad", "unit_price": 3.80, "total_price": 3.80 }
+          ]
+        },
+        {
+          "delivery_date": "2026-03-21",
+          "rechnung": "444043",
+          "items": [
+            { "name_de": "Brombeeren 125 g. (Karton)", "name_es": "Moras", "quantity": 1.0, "unit": "unidad", "unit_price": 5.80, "total_price": 5.80 },
+            { "name_de": "Erdbeeren 500 g. (Gitter)", "name_es": "Fresas", "quantity": 2.0, "unit": "unidad", "unit_price": 3.80, "total_price": 7.60 },
+            { "name_de": "Heidelbeeren 250 g. (Gitter)", "name_es": "Arandanos", "quantity": 1.0, "unit": "unidad", "unit_price": 5.55, "total_price": 5.55 },
+            { "name_de": "Limes lose 4 kg. Imp (Karton)", "name_es": "Limas", "quantity": 1.0, "unit": "unidad", "unit_price": 13.60, "total_price": 13.60 },
+            { "name_de": "Schnittlauch lose Bund (Bund)", "name_es": "Cebollino", "quantity": 2.0, "unit": "unidad", "unit_price": 4.00, "total_price": 8.00 },
+            { "name_de": "Zwiebelsprossen 100 g. (Beutel)", "name_es": "Brotes de cebolla", "quantity": 3.0, "unit": "unidad", "unit_price": 4.80, "total_price": 14.40 },
+            { "name_de": "Avocados Hass 16 stk. Imp (Karton)", "name_es": "Aguacates", "quantity": 3.0, "unit": "unidad", "unit_price": 23.20, "total_price": 69.60 }
+          ]
+        },
+        {
+          "delivery_date": "2026-03-24",
+          "rechnung": "444357",
+          "items": [
+            { "name_de": "Erdbeeren 500 g. (Gitter)", "name_es": "Fresas", "quantity": 2.0, "unit": "unidad", "unit_price": 3.80, "total_price": 7.60 },
+            { "name_de": "Himbeeren 250g (Gitter)", "name_es": "Frambuesas", "quantity": 1.0, "unit": "unidad", "unit_price": 5.00, "total_price": 5.00 },
+            { "name_de": "Bananen Kl. I (Freie Marke) 18 kg. Imp (Karton)", "name_es": "Platanos", "quantity": 2.4, "unit": "kg", "unit_price": 2.90, "total_price": 6.95 },
+            { "name_de": "Schnittlauch lose Bund (Bund)", "name_es": "Cebollino", "quantity": 2.0, "unit": "unidad", "unit_price": 4.00, "total_price": 8.00 },
+            { "name_de": "Rucola lose 1 kg. Imp. (Colis)", "name_es": "Rucula", "quantity": 1.0, "unit": "kg", "unit_price": 8.85, "total_price": 8.85 },
+            { "name_de": "Auberginen 5 kg. (Karton)", "name_es": "Berenjenas", "quantity": 1.0, "unit": "kg", "unit_price": 2.80, "total_price": 2.80 },
+            { "name_de": "Zitronen 6 kg. Imp (IFCO)", "name_es": "Limones", "quantity": 1.0, "unit": "kg", "unit_price": 2.90, "total_price": 2.90 },
+            { "name_de": "Avocados Hass 16 stk. Imp (Karton)", "name_es": "Aguacates", "quantity": 3.0, "unit": "unidad", "unit_price": 23.20, "total_price": 69.60 }
+          ]
+        },
+        {
+          "delivery_date": "2026-03-25",
+          "rechnung": "444434",
+          "items": [
+            { "name_de": "Basilikum Topf (Topf)", "name_es": "Albahaca", "quantity": 2.0, "unit": "unidad", "unit_price": 3.20, "total_price": 6.40 },
+            { "name_de": "Kartoffeln VENEZIA festkochend 10 kg. CH (IFCO)", "name_es": "Patatas", "quantity": 1.05, "unit": "kg", "unit_price": 1.80, "total_price": 1.90 },
+            { "name_de": "Zwiebeln rot (IFCO)", "name_es": "Cebollas rojas", "quantity": 2.35, "unit": "kg", "unit_price": 1.90, "total_price": 4.45 },
+            { "name_de": "Cherry Tomaten am Zweig (IFCO)", "name_es": "Tomates cherry", "quantity": 1.0, "unit": "kg", "unit_price": 8.60, "total_price": 8.60 },
+            { "name_de": "Williams Birnen (IFCO)", "name_es": "Peras Williams", "quantity": 1.2, "unit": "kg", "unit_price": 2.95, "total_price": 3.55 }
+          ]
+        },
+        {
+          "delivery_date": "2026-03-26",
+          "rechnung": "444622",
+          "items": [
+            { "name_de": "Brombeeren 125 g. (Karton)", "name_es": "Moras", "quantity": 2.0, "unit": "unidad", "unit_price": 5.80, "total_price": 11.60 },
+            { "name_de": "Heidelbeeren 250 g. (Gitter)", "name_es": "Arandanos", "quantity": 2.0, "unit": "unidad", "unit_price": 5.55, "total_price": 11.10 },
+            { "name_de": "Himbeeren 250g (Gitter)", "name_es": "Frambuesas", "quantity": 2.0, "unit": "unidad", "unit_price": 5.00, "total_price": 10.00 },
+            { "name_de": "Gurken 12 Stk. (IFCO)", "name_es": "Pepinos", "quantity": 1.0, "unit": "unidad", "unit_price": 2.40, "total_price": 2.40 },
+            { "name_de": "Zwiebelsprossen 100 g. (Beutel)", "name_es": "Brotes de cebolla", "quantity": 3.0, "unit": "unidad", "unit_price": 4.80, "total_price": 14.40 },
+            { "name_de": "Trauben blau kernlos 10 x 500 g. Imp (Karton)", "name_es": "Uvas negras", "quantity": 1.0, "unit": "unidad", "unit_price": 3.45, "total_price": 3.45 },
+            { "name_de": "Trauben weiss kernlos 10 x 500 g. Imp (Karton)", "name_es": "Uvas blancas", "quantity": 1.0, "unit": "unidad", "unit_price": 3.80, "total_price": 3.80 },
+            { "name_de": "Avocados Hass 16 stk. Imp (Karton)", "name_es": "Aguacates", "quantity": 3.0, "unit": "unidad", "unit_price": 23.20, "total_price": 69.60 }
+          ]
+        },
+        {
+          "delivery_date": "2026-03-27",
+          "rechnung": "444732",
+          "items": [
+            { "name_de": "Avocados Hass 16 stk. Imp (Karton)", "name_es": "Aguacates", "quantity": 9.0, "unit": "unidad", "unit_price": 0.00, "total_price": 0.00 }
+          ]
+        },
+        {
+          "delivery_date": "2026-03-28",
+          "rechnung": "444922",
+          "items": [
+            { "name_de": "Brombeeren 125 g. (Karton)", "name_es": "Moras", "quantity": 2.0, "unit": "unidad", "unit_price": 5.80, "total_price": 11.60 },
+            { "name_de": "Erdbeeren 500 g. (Gitter)", "name_es": "Fresas", "quantity": 2.0, "unit": "unidad", "unit_price": 3.80, "total_price": 7.60 },
+            { "name_de": "Heidelbeeren 250 g. (Gitter)", "name_es": "Arandanos", "quantity": 2.0, "unit": "unidad", "unit_price": 5.55, "total_price": 11.10 },
+            { "name_de": "Himbeeren 250g (Gitter)", "name_es": "Frambuesas", "quantity": 2.0, "unit": "unidad", "unit_price": 5.00, "total_price": 10.00 },
+            { "name_de": "Limes lose 4 kg. Imp (Karton)", "name_es": "Limas", "quantity": 1.0, "unit": "unidad", "unit_price": 13.60, "total_price": 13.60 },
+            { "name_de": "Schnittlauch lose Bund (Bund)", "name_es": "Cebollino", "quantity": 2.0, "unit": "unidad", "unit_price": 4.00, "total_price": 8.00 },
+            { "name_de": "Pfefferminze grün Bündeli (Bund)", "name_es": "Hierbabuena", "quantity": 2.0, "unit": "unidad", "unit_price": 1.85, "total_price": 3.70 },
+            { "name_de": "Rucola lose 1 kg. Imp. (Colis)", "name_es": "Rucula", "quantity": 1.0, "unit": "kg", "unit_price": 8.85, "total_price": 8.85 },
+            { "name_de": "Kartoffeln VENEZIA festkochend 10 kg. CH (IFCO)", "name_es": "Patatas", "quantity": 1.05, "unit": "kg", "unit_price": 1.80, "total_price": 1.90 },
+            { "name_de": "Karotten lose gross ch (IFCO)", "name_es": "Zanahorias", "quantity": 2.05, "unit": "kg", "unit_price": 1.65, "total_price": 3.40 },
+            { "name_de": "Zwiebelsprossen 100 g. (Beutel)", "name_es": "Brotes de cebolla", "quantity": 3.0, "unit": "unidad", "unit_price": 4.80, "total_price": 14.40 },
+            { "name_de": "Orangen gross (IFCO)", "name_es": "Naranjas", "quantity": 2.5, "unit": "kg", "unit_price": 1.50, "total_price": 3.75 },
+            { "name_de": "Zitronen 6 kg. Imp (IFCO)", "name_es": "Limones", "quantity": 1.0, "unit": "kg", "unit_price": 2.90, "total_price": 2.90 },
+            { "name_de": "Avocados Hass 16 stk. Imp (Karton)", "name_es": "Aguacates", "quantity": 4.0, "unit": "unidad", "unit_price": 23.20, "total_price": 92.80 }
+          ]
+        },
+        {
+          "delivery_date": "2026-03-31",
+          "rechnung": "445104",
+          "items": [
+            { "name_de": "Brombeeren 125 g. (Karton)", "name_es": "Moras", "quantity": 2.0, "unit": "unidad", "unit_price": 5.80, "total_price": 11.60 },
+            { "name_de": "Erdbeeren 500 g. (Gitter)", "name_es": "Fresas", "quantity": 2.0, "unit": "unidad", "unit_price": 3.80, "total_price": 7.60 },
+            { "name_de": "Heidelbeeren 250 g. (Gitter)", "name_es": "Arandanos", "quantity": 2.0, "unit": "unidad", "unit_price": 5.55, "total_price": 11.10 },
+            { "name_de": "Himbeeren 250g (Gitter)", "name_es": "Frambuesas", "quantity": 2.0, "unit": "unidad", "unit_price": 5.00, "total_price": 10.00 },
+            { "name_de": "Bananen Kl. I (Freie Marke) 18 kg. Imp (Karton)", "name_es": "Platanos", "quantity": 2.4, "unit": "kg", "unit_price": 2.90, "total_price": 6.95 },
+            { "name_de": "Champignons weiss 1 kg. CH (Box)", "name_es": "Champinones blancos", "quantity": 2.0, "unit": "kg", "unit_price": 7.80, "total_price": 15.60 },
+            { "name_de": "Schnittlauch lose Bund (Bund)", "name_es": "Cebollino", "quantity": 2.0, "unit": "unidad", "unit_price": 4.00, "total_price": 8.00 },
+            { "name_de": "Pfefferminze grün Bündeli (Bund)", "name_es": "Hierbabuena", "quantity": 2.0, "unit": "unidad", "unit_price": 1.85, "total_price": 3.70 },
+            { "name_de": "Gurken 12 Stk. (IFCO)", "name_es": "Pepinos", "quantity": 1.0, "unit": "unidad", "unit_price": 2.40, "total_price": 2.40 },
+            { "name_de": "Tomaten am Zweig (IFCO)", "name_es": "Tomates en rama", "quantity": 2.1, "unit": "kg", "unit_price": 3.60, "total_price": 7.55 },
+            { "name_de": "Cherry Tomaten am Zweig (IFCO)", "name_es": "Tomates cherry", "quantity": 1.0, "unit": "kg", "unit_price": 8.60, "total_price": 8.60 },
+            { "name_de": "Zwiebelsprossen 100 g. (Beutel)", "name_es": "Brotes de cebolla", "quantity": 3.0, "unit": "unidad", "unit_price": 4.80, "total_price": 14.40 },
+            { "name_de": "Conference 12.5 kg. (Karton)", "name_es": "Peras Conference", "quantity": 1.2, "unit": "kg", "unit_price": 2.95, "total_price": 3.55 },
+            { "name_de": "Trauben blau kernlos 10 x 500 g. Imp (Karton)", "name_es": "Uvas negras", "quantity": 1.0, "unit": "unidad", "unit_price": 3.45, "total_price": 3.45 },
+            { "name_de": "Trauben weiss kernlos 10 x 500 g. Imp (Karton)", "name_es": "Uvas blancas", "quantity": 1.0, "unit": "unidad", "unit_price": 3.80, "total_price": 3.80 },
+            { "name_de": "Orangen gross (IFCO)", "name_es": "Naranjas", "quantity": 2.5, "unit": "kg", "unit_price": 1.50, "total_price": 3.75 },
+            { "name_de": "Zitronen 6 kg. Imp (IFCO)", "name_es": "Limones", "quantity": 1.0, "unit": "kg", "unit_price": 2.90, "total_price": 2.90 },
+            { "name_de": "Tomaten gedorrt 1 kg. Imp (Beutel)", "name_es": "Tomates secos", "quantity": 4.0, "unit": "kg", "unit_price": 10.50, "total_price": 42.00 }
+          ]
+        }
+      ]
+    },
+    {
+      "invoice_number": "446762",
+      "invoice_date": "2026-04-15",
+      "currency": "CHF",
+      "deliveries": [
+        {
+          "delivery_date": "2026-04-02",
+          "rechnung": "445515",
+          "items": [
+            { "name_de": "Erdbeeren 500 g. (Gitter)", "name_es": "Fresas", "quantity": 2.0, "unit": "unidad", "unit_price": 3.80, "total_price": 7.60 },
+            { "name_de": "Heidelbeeren 250 g. (Gitter)", "name_es": "Arandanos", "quantity": 2.0, "unit": "unidad", "unit_price": 5.55, "total_price": 11.10 },
+            { "name_de": "Himbeeren 250g (Gitter)", "name_es": "Frambuesas", "quantity": 1.0, "unit": "unidad", "unit_price": 5.00, "total_price": 5.00 },
+            { "name_de": "Bananen Kl. I (Freie Marke) 18 kg. Imp (Karton)", "name_es": "Platanos", "quantity": 2.4, "unit": "kg", "unit_price": 2.90, "total_price": 6.95 },
+            { "name_de": "Limes lose 4 kg. Imp (Karton)", "name_es": "Limas", "quantity": 1.0, "unit": "unidad", "unit_price": 13.60, "total_price": 13.60 },
+            { "name_de": "Schnittlauch lose Bund (Bund)", "name_es": "Cebollino", "quantity": 2.0, "unit": "unidad", "unit_price": 4.00, "total_price": 8.00 },
+            { "name_de": "Rucola lose 1 kg. Imp. (Colis)", "name_es": "Rucula", "quantity": 1.0, "unit": "kg", "unit_price": 8.85, "total_price": 8.85 },
+            { "name_de": "Gala Aepfel Kl. I 12.5 kg. CH (IFCO)", "name_es": "Manzanas Gala", "quantity": 1.2, "unit": "kg", "unit_price": 2.70, "total_price": 3.25 },
+            { "name_de": "Zitronen 6 kg. Imp (IFCO)", "name_es": "Limones", "quantity": 1.0, "unit": "kg", "unit_price": 2.90, "total_price": 2.90 },
+            { "name_de": "Avocados Hass 16 stk. Imp (Karton)", "name_es": "Aguacates", "quantity": 3.0, "unit": "unidad", "unit_price": 23.20, "total_price": 69.60 }
+          ]
+        },
+        {
+          "delivery_date": "2026-04-08",
+          "rechnung": "445896",
+          "items": [
+            { "name_de": "Brombeeren 125 g. (Karton)", "name_es": "Moras", "quantity": 2.0, "unit": "unidad", "unit_price": 5.80, "total_price": 11.60 },
+            { "name_de": "Himbeeren 250g (Gitter)", "name_es": "Frambuesas", "quantity": 2.0, "unit": "unidad", "unit_price": 5.00, "total_price": 10.00 },
+            { "name_de": "Bananen Kl. I (Freie Marke) 18 kg. Imp (Karton)", "name_es": "Platanos", "quantity": 2.4, "unit": "kg", "unit_price": 2.90, "total_price": 6.95 },
+            { "name_de": "Limes lose 4 kg. Imp (Karton)", "name_es": "Limas", "quantity": 1.0, "unit": "unidad", "unit_price": 13.60, "total_price": 13.60 },
+            { "name_de": "Schnittlauch lose Bund (Bund)", "name_es": "Cebollino", "quantity": 2.0, "unit": "unidad", "unit_price": 4.00, "total_price": 8.00 },
+            { "name_de": "Basilikum Topf (Topf)", "name_es": "Albahaca", "quantity": 2.0, "unit": "unidad", "unit_price": 3.20, "total_price": 6.40 },
+            { "name_de": "Pfefferminze grün Bündeli (Bund)", "name_es": "Hierbabuena", "quantity": 2.0, "unit": "unidad", "unit_price": 1.85, "total_price": 3.70 },
+            { "name_de": "Gurken 12 Stk. (IFCO)", "name_es": "Pepinos", "quantity": 2.0, "unit": "unidad", "unit_price": 2.40, "total_price": 4.80 },
+            { "name_de": "Zwiebeln gross (IFCO)", "name_es": "Cebollas grandes", "quantity": 5.0, "unit": "kg", "unit_price": 1.80, "total_price": 9.00 },
+            { "name_de": "Zwiebeln rot (IFCO)", "name_es": "Cebollas rojas", "quantity": 2.35, "unit": "kg", "unit_price": 1.90, "total_price": 4.45 },
+            { "name_de": "Karotten lose gross ch (IFCO)", "name_es": "Zanahorias", "quantity": 2.05, "unit": "kg", "unit_price": 1.65, "total_price": 3.40 },
+            { "name_de": "Tomaten am Zweig (IFCO)", "name_es": "Tomates en rama", "quantity": 2.1, "unit": "kg", "unit_price": 3.60, "total_price": 7.55 },
+            { "name_de": "Cherry Tomaten am Zweig (IFCO)", "name_es": "Tomates cherry", "quantity": 1.0, "unit": "kg", "unit_price": 8.60, "total_price": 8.60 },
+            { "name_de": "Gala Aepfel Kl. I 12.5 kg. CH (IFCO)", "name_es": "Manzanas Gala", "quantity": 1.2, "unit": "kg", "unit_price": 2.70, "total_price": 3.25 },
+            { "name_de": "Williams Birnen (IFCO)", "name_es": "Peras Williams", "quantity": 1.2, "unit": "kg", "unit_price": 2.95, "total_price": 3.55 },
+            { "name_de": "Trauben blau kernlos 10 x 500 g. Imp (Karton)", "name_es": "Uvas negras", "quantity": 1.0, "unit": "unidad", "unit_price": 3.45, "total_price": 3.45 },
+            { "name_de": "Orangen gross (IFCO)", "name_es": "Naranjas", "quantity": 2.5, "unit": "kg", "unit_price": 1.50, "total_price": 3.75 },
+            { "name_de": "Zitronen 6 kg. Imp (IFCO)", "name_es": "Limones", "quantity": 1.0, "unit": "kg", "unit_price": 2.90, "total_price": 2.90 },
+            { "name_de": "Avocados Hass 16 stk. Imp (Karton)", "name_es": "Aguacates", "quantity": 3.0, "unit": "unidad", "unit_price": 23.20, "total_price": 69.60 }
+          ]
+        },
+        {
+          "delivery_date": "2026-04-10",
+          "rechnung": "446161",
+          "items": [
+            { "name_de": "Rucola lose 1 kg. Imp. (Colis)", "name_es": "Rucula", "quantity": 1.0, "unit": "kg", "unit_price": 8.85, "total_price": 8.85 },
+            { "name_de": "Cherry Tomaten am Zweig (IFCO)", "name_es": "Tomates cherry", "quantity": 1.1, "unit": "kg", "unit_price": 8.60, "total_price": 9.45 },
+            { "name_de": "Zwiebelsprossen 100 g. (Beutel)", "name_es": "Brotes de cebolla", "quantity": 3.0, "unit": "unidad", "unit_price": 4.80, "total_price": 14.40 },
+            { "name_de": "Orangen gross (IFCO)", "name_es": "Naranjas", "quantity": 1.2, "unit": "kg", "unit_price": 1.50, "total_price": 1.80 },
+            { "name_de": "Avocados Hass 16 stk. Imp (Karton)", "name_es": "Aguacates", "quantity": 1.0, "unit": "unidad", "unit_price": 23.20, "total_price": 23.20 }
+          ]
+        },
+        {
+          "delivery_date": "2026-04-11",
+          "rechnung": "446279",
+          "items": [
+            { "name_de": "Avocados Hass 16 stk. Imp (Karton)", "name_es": "Aguacates", "quantity": 9.0, "unit": "unidad", "unit_price": 0.00, "total_price": 0.00 }
+          ]
+        },
+        {
+          "delivery_date": "2026-04-11",
+          "rechnung": "446357",
+          "items": [
+            { "name_de": "Brombeeren 125 g. (Karton)", "name_es": "Moras", "quantity": 1.0, "unit": "unidad", "unit_price": 5.80, "total_price": 5.80 },
+            { "name_de": "Erdbeeren 500 g. (Gitter)", "name_es": "Fresas", "quantity": 1.0, "unit": "unidad", "unit_price": 3.80, "total_price": 3.80 },
+            { "name_de": "Schnittlauch lose Bund (Bund)", "name_es": "Cebollino", "quantity": 2.0, "unit": "unidad", "unit_price": 4.00, "total_price": 8.00 },
+            { "name_de": "Rucola lose 1 kg. Imp. (Colis)", "name_es": "Rucula", "quantity": 1.0, "unit": "kg", "unit_price": 8.85, "total_price": 8.85 },
+            { "name_de": "Zwiebelsprossen 100 g. (Beutel)", "name_es": "Brotes de cebolla", "quantity": 3.0, "unit": "unidad", "unit_price": 4.80, "total_price": 14.40 },
+            { "name_de": "Avocados Hass 16 stk. Imp (Karton)", "name_es": "Aguacates", "quantity": 4.0, "unit": "unidad", "unit_price": 23.20, "total_price": 92.80 }
+          ]
+        },
+        {
+          "delivery_date": "2026-04-15",
+          "rechnung": "446670",
+          "items": [
+            { "name_de": "Erdbeeren 500 g. (Gitter)", "name_es": "Fresas", "quantity": 1.0, "unit": "unidad", "unit_price": 4.05, "total_price": 4.05 },
+            { "name_de": "Himbeeren 250g (Gitter)", "name_es": "Frambuesas", "quantity": 1.0, "unit": "unidad", "unit_price": 5.00, "total_price": 5.00 },
+            { "name_de": "Bananen Kl. I (Freie Marke) 18 kg. Imp (Karton)", "name_es": "Platanos", "quantity": 2.2, "unit": "kg", "unit_price": 2.90, "total_price": 6.40 },
+            { "name_de": "Pfefferminze grün Bündeli (Bund)", "name_es": "Hierbabuena", "quantity": 2.0, "unit": "unidad", "unit_price": 1.85, "total_price": 3.70 },
+            { "name_de": "Rucola lose 1 kg. Imp. (Colis)", "name_es": "Rucula", "quantity": 1.0, "unit": "unidad", "unit_price": 8.85, "total_price": 8.85 },
+            { "name_de": "Kartoffeln VENEZIA festkochend 10 kg. CH (IFCO)", "name_es": "Patatas", "quantity": 1.1, "unit": "kg", "unit_price": 1.80, "total_price": 2.00 },
+            { "name_de": "Karotten lose gross ch (IFCO)", "name_es": "Zanahorias", "quantity": 1.1, "unit": "kg", "unit_price": 1.65, "total_price": 1.80 },
+            { "name_de": "Gala Aepfel Kl. I 12.5 kg. CH (IFCO)", "name_es": "Manzanas Gala", "quantity": 1.05, "unit": "kg", "unit_price": 2.70, "total_price": 2.85 },
+            { "name_de": "Trauben blau kernlos 10 x 500 g. Imp (Karton)", "name_es": "Uvas negras", "quantity": 1.0, "unit": "unidad", "unit_price": 3.45, "total_price": 3.45 },
+            { "name_de": "Trauben weiss kernlos 10 x 500 g. Imp (Karton)", "name_es": "Uvas blancas", "quantity": 1.0, "unit": "unidad", "unit_price": 3.80, "total_price": 3.80 },
+            { "name_de": "Orangen gross (IFCO)", "name_es": "Naranjas", "quantity": 1.0, "unit": "kg", "unit_price": 1.50, "total_price": 1.50 },
+            { "name_de": "Zitronen 6 kg. Imp (IFCO)", "name_es": "Limones", "quantity": 1.0, "unit": "kg", "unit_price": 2.90, "total_price": 2.90 },
+            { "name_de": "Avocados Hass 16 stk. Imp (Karton)", "name_es": "Aguacates", "quantity": 1.0, "unit": "unidad", "unit_price": 23.20, "total_price": 23.20 }
+          ]
+        }
+      ]
+    },
+    {
+      "invoice_number": "448594",
+      "invoice_date": "2026-04-30",
+      "currency": "CHF",
+      "deliveries": [
+        {
+          "delivery_date": "2026-04-16",
+          "rechnung": "446880",
+          "items": [
+            { "name_de": "Pfefferminze grün Bündeli (Bund)", "name_es": "Hierbabuena", "quantity": 2.0, "unit": "unidad", "unit_price": 1.85, "total_price": 3.70 },
+            { "name_de": "Auberginen 5 kg. (Karton)", "name_es": "Berenjenas", "quantity": 6.0, "unit": "kg", "unit_price": 2.80, "total_price": 16.80 },
+            { "name_de": "Kartoffeln VENEZIA festkochend 10 kg. CH (IFCO)", "name_es": "Patatas", "quantity": 1.05, "unit": "kg", "unit_price": 1.80, "total_price": 1.90 },
+            { "name_de": "Zwiebeln rot (IFCO)", "name_es": "Cebollas rojas", "quantity": 2.35, "unit": "kg", "unit_price": 1.90, "total_price": 4.45 },
+            { "name_de": "Orangen gross (IFCO)", "name_es": "Naranjas", "quantity": 2.5, "unit": "kg", "unit_price": 1.50, "total_price": 3.75 }
+          ]
+        },
+        {
+          "delivery_date": "2026-04-18",
+          "rechnung": "447101",
+          "items": [
+            { "name_de": "Schnittlauch lose Bund (Bund)", "name_es": "Cebollino", "quantity": 2.0, "unit": "unidad", "unit_price": 4.00, "total_price": 8.00 },
+            { "name_de": "Avocados Hass 16 stk. Imp (Karton)", "name_es": "Aguacates", "quantity": 5.0, "unit": "unidad", "unit_price": 23.20, "total_price": 116.00 }
+          ]
+        },
+        {
+          "delivery_date": "2026-04-21",
+          "rechnung": "447361",
+          "items": [
+            { "name_de": "Limes lose 4 kg. Imp (Karton)", "name_es": "Limas", "quantity": 1.0, "unit": "unidad", "unit_price": 13.60, "total_price": 13.60 },
+            { "name_de": "Schnittlauch lose Bund (Bund)", "name_es": "Cebollino", "quantity": 2.0, "unit": "unidad", "unit_price": 4.00, "total_price": 8.00 },
+            { "name_de": "Pfefferminze grün Bündeli (Bund)", "name_es": "Hierbabuena", "quantity": 2.0, "unit": "unidad", "unit_price": 1.85, "total_price": 3.70 },
+            { "name_de": "Rucola lose 1 kg. Imp. (Colis)", "name_es": "Rucula", "quantity": 2.0, "unit": "kg", "unit_price": 8.85, "total_price": 17.70 },
+            { "name_de": "Gurken 12 Stk. (IFCO)", "name_es": "Pepinos", "quantity": 2.0, "unit": "unidad", "unit_price": 2.40, "total_price": 4.80 },
+            { "name_de": "Kartoffeln VENEZIA festkochend 10 kg. CH (IFCO)", "name_es": "Patatas", "quantity": 1.05, "unit": "kg", "unit_price": 1.80, "total_price": 1.90 },
+            { "name_de": "Tomaten B 57mm+ 6 kg. (IFCO)", "name_es": "Tomates", "quantity": 1.05, "unit": "kg", "unit_price": 3.60, "total_price": 3.80 },
+            { "name_de": "Cherry Tomaten am Zweig (IFCO)", "name_es": "Tomates cherry", "quantity": 1.1, "unit": "kg", "unit_price": 8.60, "total_price": 9.45 },
+            { "name_de": "Zwiebelsprossen 100 g. (Beutel)", "name_es": "Brotes de cebolla", "quantity": 3.0, "unit": "unidad", "unit_price": 4.80, "total_price": 14.40 },
+            { "name_de": "Williams Birnen (IFCO)", "name_es": "Peras Williams", "quantity": 1.2, "unit": "kg", "unit_price": 2.95, "total_price": 3.55 },
+            { "name_de": "Orangen gross (IFCO)", "name_es": "Naranjas", "quantity": 2.5, "unit": "kg", "unit_price": 1.50, "total_price": 3.75 },
+            { "name_de": "Zitronen 6 kg. Imp (IFCO)", "name_es": "Limones", "quantity": 1.0, "unit": "kg", "unit_price": 3.60, "total_price": 3.60 }
+          ]
+        },
+        {
+          "delivery_date": "2026-04-23",
+          "rechnung": "447682",
+          "items": [
+            { "name_de": "Bananen Kl. I (Freie Marke) 18 kg. Imp (Karton)", "name_es": "Platanos", "quantity": 2.4, "unit": "kg", "unit_price": 2.90, "total_price": 6.95 },
+            { "name_de": "Champignons weiss 1 kg. CH (Box)", "name_es": "Champinones blancos", "quantity": 6.0, "unit": "kg", "unit_price": 7.80, "total_price": 46.80 },
+            { "name_de": "Rucola lose 1 kg. Imp. (Colis)", "name_es": "Rucula", "quantity": 1.0, "unit": "kg", "unit_price": 8.85, "total_price": 8.85 },
+            { "name_de": "Zwiebeln gross (IFCO)", "name_es": "Cebollas grandes", "quantity": 2.0, "unit": "kg", "unit_price": 1.80, "total_price": 3.60 },
+            { "name_de": "Orangen gross (IFCO)", "name_es": "Naranjas", "quantity": 1.25, "unit": "kg", "unit_price": 1.50, "total_price": 1.90 },
+            { "name_de": "Zitronen 6 kg. Imp (IFCO)", "name_es": "Limones", "quantity": 2.0, "unit": "kg", "unit_price": 3.60, "total_price": 7.20 }
+          ]
+        },
+        {
+          "delivery_date": "2026-04-25",
+          "rechnung": "447828",
+          "items": [
+            { "name_de": "Limes lose 4 kg. Imp (Karton)", "name_es": "Limas", "quantity": 1.0, "unit": "unidad", "unit_price": 13.60, "total_price": 13.60 },
+            { "name_de": "Schnittlauch lose Bund (Bund)", "name_es": "Cebollino", "quantity": 2.0, "unit": "unidad", "unit_price": 4.00, "total_price": 8.00 },
+            { "name_de": "Rucola lose 1 kg. Imp. (Colis)", "name_es": "Rucula", "quantity": 2.0, "unit": "unidad", "unit_price": 8.85, "total_price": 17.70 },
+            { "name_de": "Cherry Tomaten am Zweig (IFCO)", "name_es": "Tomates cherry", "quantity": 1.1, "unit": "kg", "unit_price": 7.85, "total_price": 8.65 },
+            { "name_de": "Conference 12.5 kg. (Karton)", "name_es": "Peras Conference", "quantity": 1.2, "unit": "kg", "unit_price": 2.95, "total_price": 3.55 },
+            { "name_de": "Trauben blau kernlos 10 x 500 g. Imp (Karton)", "name_es": "Uvas negras", "quantity": 1.0, "unit": "unidad", "unit_price": 3.45, "total_price": 3.45 },
+            { "name_de": "Trauben weiss kernlos 10 x 500 g. Imp (Karton)", "name_es": "Uvas blancas", "quantity": 1.0, "unit": "unidad", "unit_price": 3.80, "total_price": 3.80 },
+            { "name_de": "Avocados Hass 16 stk. Imp (Karton)", "name_es": "Aguacates", "quantity": 4.0, "unit": "unidad", "unit_price": 23.20, "total_price": 92.80 },
+            { "name_de": "Tomaten gedorrt 1 kg. Imp (Beutel)", "name_es": "Tomates secos", "quantity": 4.0, "unit": "kg", "unit_price": 10.50, "total_price": 42.00 },
+            { "name_de": "TK Waldbeerenmischung Bina 5 kg. (Karton)", "name_es": "Mezcla bayas silvestres congeladas", "quantity": 1.0, "unit": "unidad", "unit_price": 44.00, "total_price": 44.00 }
+          ]
+        },
+        {
+          "delivery_date": "2026-04-28",
+          "rechnung": "448124",
+          "items": [
+            { "name_de": "Erdbeeren 500 g. (Gitter)", "name_es": "Fresas", "quantity": 1.0, "unit": "unidad", "unit_price": 3.50, "total_price": 3.50 },
+            { "name_de": "Himbeeren 250g (Gitter)", "name_es": "Frambuesas", "quantity": 1.0, "unit": "unidad", "unit_price": 5.55, "total_price": 5.55 },
+            { "name_de": "Bananen Kl. I (Freie Marke) 18 kg. Imp (Karton)", "name_es": "Platanos", "quantity": 2.6, "unit": "kg", "unit_price": 2.90, "total_price": 7.55 },
+            { "name_de": "Schnittlauch lose Bund (Bund)", "name_es": "Cebollino", "quantity": 1.0, "unit": "unidad", "unit_price": 4.00, "total_price": 4.00 },
+            { "name_de": "Kartoffeln VENEZIA festkochend 10 kg. CH (IFCO)", "name_es": "Patatas", "quantity": 1.05, "unit": "kg", "unit_price": 1.80, "total_price": 1.90 },
+            { "name_de": "Zwiebeln gross (IFCO)", "name_es": "Cebollas grandes", "quantity": 1.4, "unit": "kg", "unit_price": 1.80, "total_price": 2.50 },
+            { "name_de": "Tomaten B 57mm+ 6 kg. (IFCO)", "name_es": "Tomates", "quantity": 1.05, "unit": "kg", "unit_price": 3.60, "total_price": 3.80 },
+            { "name_de": "Cherry Tomaten am Zweig (IFCO)", "name_es": "Tomates cherry", "quantity": 1.1, "unit": "kg", "unit_price": 7.70, "total_price": 8.45 },
+            { "name_de": "Zwiebelsprossen 100 g. (Beutel)", "name_es": "Brotes de cebolla", "quantity": 2.0, "unit": "unidad", "unit_price": 4.80, "total_price": 9.60 },
+            { "name_de": "Gala Aepfel Kl. I 12.5 kg. CH (IFCO)", "name_es": "Manzanas Gala", "quantity": 1.2, "unit": "kg", "unit_price": 2.70, "total_price": 3.25 },
+            { "name_de": "Conference 12.5 kg. (Karton)", "name_es": "Peras Conference", "quantity": 1.1, "unit": "kg", "unit_price": 2.95, "total_price": 3.25 },
+            { "name_de": "Trauben weiss kernlos 10 x 500 g. Imp (Karton)", "name_es": "Uvas blancas", "quantity": 1.0, "unit": "unidad", "unit_price": 3.80, "total_price": 3.80 },
+            { "name_de": "Orangen gross (IFCO)", "name_es": "Naranjas", "quantity": 1.1, "unit": "kg", "unit_price": 1.50, "total_price": 1.65 },
+            { "name_de": "Zitronen 6 kg. Imp (IFCO)", "name_es": "Limones", "quantity": 1.15, "unit": "kg", "unit_price": 3.60, "total_price": 4.15 },
+            { "name_de": "Avocados Hass 16 stk. Imp (Karton)", "name_es": "Aguacates", "quantity": 1.0, "unit": "unidad", "unit_price": 23.20, "total_price": 23.20 }
+          ]
+        }
+      ]
+    },
+    {
+      "invoice_number": "450179",
+      "invoice_date": "2026-05-15",
+      "currency": "CHF",
+      "deliveries": [
+        {
+          "delivery_date": "2026-05-02",
+          "rechnung": "448913",
+          "items": [
+            { "name_de": "Himbeeren 250g (Gitter)", "name_es": "Frambuesas", "quantity": 2.0, "unit": "unidad", "unit_price": 5.00, "total_price": 10.00 },
+            { "name_de": "Erdbeeren 500 g. CH (IFCO)", "name_es": "Fresas", "quantity": 1.0, "unit": "unidad", "unit_price": 5.20, "total_price": 5.20 },
+            { "name_de": "Schnittlauch lose Bund (Bund)", "name_es": "Cebollino", "quantity": 2.0, "unit": "unidad", "unit_price": 4.00, "total_price": 8.00 },
+            { "name_de": "Rucola lose 1 kg. Imp. (Colis)", "name_es": "Rucula", "quantity": 1.0, "unit": "kg", "unit_price": 8.85, "total_price": 8.85 },
+            { "name_de": "Zwiebelsprossen 100 g. (Beutel)", "name_es": "Brotes de cebolla", "quantity": 3.0, "unit": "unidad", "unit_price": 4.80, "total_price": 14.40 },
+            { "name_de": "Conference 12.5 kg. (Karton)", "name_es": "Peras Conference", "quantity": 1.2, "unit": "kg", "unit_price": 2.95, "total_price": 3.55 },
+            { "name_de": "Trauben blau kernlos 10 x 500 g. Imp (Karton)", "name_es": "Uvas negras", "quantity": 1.0, "unit": "unidad", "unit_price": 3.45, "total_price": 3.45 },
+            { "name_de": "Orangen gross (IFCO)", "name_es": "Naranjas", "quantity": 2.5, "unit": "kg", "unit_price": 1.50, "total_price": 3.75 },
+            { "name_de": "Zitronen 6 kg. Imp (IFCO)", "name_es": "Limones", "quantity": 1.0, "unit": "kg", "unit_price": 2.90, "total_price": 2.90 },
+            { "name_de": "Avocados Hass 16 stk. Imp (Karton)", "name_es": "Aguacates", "quantity": 4.0, "unit": "unidad", "unit_price": 23.20, "total_price": 92.80 }
+          ]
+        },
+        {
+          "delivery_date": "2026-05-05",
+          "rechnung": "449038",
+          "items": [
+            { "name_de": "Erdbeeren REGIO 500 g. (IFCO)", "name_es": "Fresas regionales", "quantity": 3.0, "unit": "unidad", "unit_price": 6.20, "total_price": 18.60 },
+            { "name_de": "Himbeeren 250g (Gitter)", "name_es": "Frambuesas", "quantity": 2.0, "unit": "unidad", "unit_price": 5.55, "total_price": 11.10 },
+            { "name_de": "Bananen Kl. I (Freie Marke) 18 kg. Imp (Karton)", "name_es": "Platanos", "quantity": 2.4, "unit": "kg", "unit_price": 2.90, "total_price": 6.95 },
+            { "name_de": "Limes lose 4 kg. Imp (Karton)", "name_es": "Limas", "quantity": 1.0, "unit": "unidad", "unit_price": 14.60, "total_price": 14.60 },
+            { "name_de": "Champignons weiss 1 kg. CH (Box)", "name_es": "Champinones blancos", "quantity": 4.0, "unit": "kg", "unit_price": 7.80, "total_price": 31.20 },
+            { "name_de": "Waldchampignons 1 kg. CH (Box)", "name_es": "Champinones silvestres", "quantity": 4.0, "unit": "kg", "unit_price": 8.75, "total_price": 35.00 },
+            { "name_de": "Schnittlauch lose Bund (Bund)", "name_es": "Cebollino", "quantity": 2.0, "unit": "unidad", "unit_price": 4.00, "total_price": 8.00 },
+            { "name_de": "Auberginen 5 kg. (Karton)", "name_es": "Berenjenas", "quantity": 1.0, "unit": "kg", "unit_price": 2.80, "total_price": 2.80 },
+            { "name_de": "Knoblauch (IFCO)", "name_es": "Ajo", "quantity": 1.0, "unit": "kg", "unit_price": 6.00, "total_price": 6.00 },
+            { "name_de": "Kartoffeln VENEZIA festkochend 10 kg. CH (IFCO)", "name_es": "Patatas", "quantity": 1.05, "unit": "kg", "unit_price": 1.80, "total_price": 1.90 },
+            { "name_de": "Zwiebeln gross (IFCO)", "name_es": "Cebollas grandes", "quantity": 5.0, "unit": "kg", "unit_price": 1.80, "total_price": 9.00 },
+            { "name_de": "Zwiebeln rot (IFCO)", "name_es": "Cebollas rojas", "quantity": 2.35, "unit": "kg", "unit_price": 1.90, "total_price": 4.45 },
+            { "name_de": "Karotten lose gross ch (IFCO)", "name_es": "Zanahorias", "quantity": 2.05, "unit": "kg", "unit_price": 1.65, "total_price": 3.40 },
+            { "name_de": "Cherry Tomaten am Zweig (IFCO)", "name_es": "Tomates cherry", "quantity": 1.0, "unit": "kg", "unit_price": 6.25, "total_price": 6.25 },
+            { "name_de": "Zwiebelsprossen 100 g. (Beutel)", "name_es": "Brotes de cebolla", "quantity": 3.0, "unit": "unidad", "unit_price": 4.80, "total_price": 14.40 },
+            { "name_de": "Gala Aepfel Kl. I 12.5 kg. CH (IFCO)", "name_es": "Manzanas Gala", "quantity": 1.2, "unit": "kg", "unit_price": 2.70, "total_price": 3.25 },
+            { "name_de": "Trauben blau kernlos 10 x 500 g. Imp (Karton)", "name_es": "Uvas negras", "quantity": 1.0, "unit": "unidad", "unit_price": 3.45, "total_price": 3.45 },
+            { "name_de": "Trauben weiss kernlos 10 x 500 g. Imp (Karton)", "name_es": "Uvas blancas", "quantity": 1.0, "unit": "unidad", "unit_price": 3.95, "total_price": 3.95 },
+            { "name_de": "Orangen gross (IFCO)", "name_es": "Naranjas", "quantity": 2.5, "unit": "kg", "unit_price": 1.60, "total_price": 4.00 },
+            { "name_de": "Zitronen 6 kg. Imp (IFCO)", "name_es": "Limones", "quantity": 1.0, "unit": "kg", "unit_price": 3.10, "total_price": 3.10 }
+          ]
+        },
+        {
+          "delivery_date": "2026-05-05",
+          "rechnung": "449117",
+          "items": [
+            { "name_de": "Schnittlauch lose Bund (Bund)", "name_es": "Cebollino (devolucion)", "quantity": -2.0, "unit": "unidad", "unit_price": 4.00, "total_price": -8.00 },
+            { "name_de": "Zwiebeln rot (IFCO)", "name_es": "Cebollas rojas", "quantity": 2.35, "unit": "kg", "unit_price": 1.90, "total_price": 4.45 }
+          ]
+        },
+        {
+          "delivery_date": "2026-05-08",
+          "rechnung": "449526",
+          "items": [
+            { "name_de": "Pfefferminze grün Bündeli (Bund)", "name_es": "Hierbabuena", "quantity": 3.0, "unit": "unidad", "unit_price": 1.85, "total_price": 5.55 },
+            { "name_de": "Rucola lose 1 kg. Imp. (Colis)", "name_es": "Rucula", "quantity": 2.0, "unit": "unidad", "unit_price": 8.85, "total_price": 17.70 },
+            { "name_de": "Gurken 12 Stk. (IFCO)", "name_es": "Pepinos", "quantity": 4.0, "unit": "unidad", "unit_price": 2.40, "total_price": 9.60 },
+            { "name_de": "Gala Aepfel Kl. I 12.5 kg. CH (IFCO)", "name_es": "Manzanas Gala", "quantity": 1.2, "unit": "kg", "unit_price": 2.70, "total_price": 3.25 },
+            { "name_de": "Orangen gross (IFCO)", "name_es": "Naranjas", "quantity": 1.1, "unit": "kg", "unit_price": 1.60, "total_price": 1.75 }
+          ]
+        },
+        {
+          "delivery_date": "2026-05-09",
+          "rechnung": "449586",
+          "items": [
+            { "name_de": "Heidelbeeren 250 g. (Gitter)", "name_es": "Arandanos", "quantity": 1.0, "unit": "unidad", "unit_price": 5.80, "total_price": 5.80 },
+            { "name_de": "Bananen Kl. I (Freie Marke) 18 kg. Imp (Karton)", "name_es": "Platanos", "quantity": 2.1, "unit": "kg", "unit_price": 2.90, "total_price": 6.10 },
+            { "name_de": "Karotten lose gross ch (IFCO)", "name_es": "Zanahorias", "quantity": 1.05, "unit": "kg", "unit_price": 1.65, "total_price": 1.75 },
+            { "name_de": "Avocados Hass 16 stk. Imp (Karton)", "name_es": "Aguacates", "quantity": 5.0, "unit": "unidad", "unit_price": 23.20, "total_price": 116.00 }
+          ]
+        },
+        {
+          "delivery_date": "2026-05-12",
+          "rechnung": "449909",
+          "items": [
+            { "name_de": "Erdbeeren 500 g. CH (IFCO)", "name_es": "Fresas", "quantity": 1.0, "unit": "unidad", "unit_price": 7.20, "total_price": 7.20 },
+            { "name_de": "Himbeeren 250g (Gitter)", "name_es": "Frambuesas", "quantity": 1.0, "unit": "unidad", "unit_price": 5.55, "total_price": 5.55 },
+            { "name_de": "Bananen Kl. I (Freie Marke) 18 kg. Imp (Karton)", "name_es": "Platanos", "quantity": 2.6, "unit": "kg", "unit_price": 2.90, "total_price": 7.55 },
+            { "name_de": "Limes lose 4 kg. Imp (Karton)", "name_es": "Limas", "quantity": 1.0, "unit": "unidad", "unit_price": 14.60, "total_price": 14.60 },
+            { "name_de": "Champignons weiss 1 kg. CH (Box)", "name_es": "Champinones blancos", "quantity": 4.0, "unit": "kg", "unit_price": 7.80, "total_price": 31.20 },
+            { "name_de": "Waldchampignons 1 kg. CH (Box)", "name_es": "Champinones silvestres", "quantity": 4.0, "unit": "kg", "unit_price": 8.75, "total_price": 35.00 },
+            { "name_de": "Rucola lose 1 kg. Imp. (Colis)", "name_es": "Rucula", "quantity": 1.0, "unit": "kg", "unit_price": 8.85, "total_price": 8.85 },
+            { "name_de": "Auberginen 5 kg. (Karton)", "name_es": "Berenjenas", "quantity": 6.0, "unit": "kg", "unit_price": 2.80, "total_price": 16.80 },
+            { "name_de": "Zwiebeln gross (IFCO)", "name_es": "Cebollas grandes", "quantity": 5.0, "unit": "kg", "unit_price": 1.80, "total_price": 9.00 },
+            { "name_de": "Zwiebeln rot (IFCO)", "name_es": "Cebollas rojas", "quantity": 1.0, "unit": "kg", "unit_price": 1.90, "total_price": 1.90 },
+            { "name_de": "Karotten lose gross ch (IFCO)", "name_es": "Zanahorias", "quantity": 1.0, "unit": "kg", "unit_price": 1.65, "total_price": 1.65 },
+            { "name_de": "Cherry Tomaten am Zweig (IFCO)", "name_es": "Tomates cherry", "quantity": 1.0, "unit": "kg", "unit_price": 6.25, "total_price": 6.25 },
+            { "name_de": "Zwiebelsprossen 100 g. (Beutel)", "name_es": "Brotes de cebolla", "quantity": 2.0, "unit": "unidad", "unit_price": 4.80, "total_price": 9.60 },
+            { "name_de": "Gala Aepfel Kl. I 12.5 kg. CH (IFCO)", "name_es": "Manzanas Gala", "quantity": 1.0, "unit": "kg", "unit_price": 2.70, "total_price": 2.70 },
+            { "name_de": "Trauben blau kernlos 10 x 500 g. Imp (Karton)", "name_es": "Uvas negras", "quantity": 1.0, "unit": "unidad", "unit_price": 3.60, "total_price": 3.60 },
+            { "name_de": "Trauben weiss kernlos 10 x 500 g. Imp (Karton)", "name_es": "Uvas blancas", "quantity": 1.0, "unit": "unidad", "unit_price": 3.95, "total_price": 3.95 },
+            { "name_de": "Orangen gross (IFCO)", "name_es": "Naranjas", "quantity": 1.15, "unit": "kg", "unit_price": 1.60, "total_price": 1.85 },
+            { "name_de": "Zitronen 6 kg. Imp (IFCO)", "name_es": "Limones", "quantity": 1.1, "unit": "kg", "unit_price": 3.10, "total_price": 3.40 },
+            { "name_de": "Avocados Hass 16 stk. Imp (Karton)", "name_es": "Aguacates", "quantity": 1.0, "unit": "unidad", "unit_price": 23.20, "total_price": 23.20 }
+          ]
+        },
+        {
+          "delivery_date": "2026-05-13",
+          "rechnung": "449999",
+          "items": [
+            { "name_de": "Pfefferminze grün Bündeli (Bund)", "name_es": "Hierbabuena", "quantity": 2.0, "unit": "unidad", "unit_price": 1.85, "total_price": 3.70 },
+            { "name_de": "Gurken 12 Stk. (IFCO)", "name_es": "Pepinos", "quantity": 4.0, "unit": "unidad", "unit_price": 2.20, "total_price": 8.80 },
+            { "name_de": "Zwiebelsprossen 100 g. (Beutel)", "name_es": "Brotes de cebolla", "quantity": 1.0, "unit": "unidad", "unit_price": 4.80, "total_price": 4.80 },
+            { "name_de": "Orangen gross (IFCO)", "name_es": "Naranjas", "quantity": 1.4, "unit": "kg", "unit_price": 1.60, "total_price": 2.25 }
+          ]
+        },
+        {
+          "delivery_date": "2026-05-15",
+          "rechnung": "450048",
+          "items": [
+            { "name_de": "Heidelbeeren 250 g. (Gitter)", "name_es": "Arandanos", "quantity": 1.0, "unit": "unidad", "unit_price": 5.80, "total_price": 5.80 },
+            { "name_de": "Fair Trade Bananen Hav. 18 kg. Imp (Karton)", "name_es": "Platanos Fair Trade", "quantity": 2.4, "unit": "kg", "unit_price": 3.35, "total_price": 8.05 },
+            { "name_de": "Limes lose 4 kg. Imp (Karton)", "name_es": "Limas", "quantity": 1.0, "unit": "unidad", "unit_price": 14.60, "total_price": 14.60 },
+            { "name_de": "Rucola lose 1 kg. Imp. (Colis)", "name_es": "Rucula", "quantity": 2.0, "unit": "unidad", "unit_price": 8.85, "total_price": 17.70 },
+            { "name_de": "Gurken 12 Stk. (IFCO)", "name_es": "Pepinos", "quantity": 2.0, "unit": "unidad", "unit_price": 2.20, "total_price": 4.40 },
+            { "name_de": "Cherry Tomaten am Zweig (IFCO)", "name_es": "Tomates cherry", "quantity": 2.0, "unit": "kg", "unit_price": 6.25, "total_price": 12.50 },
+            { "name_de": "Zwiebelsprossen 100 g. (Beutel)", "name_es": "Brotes de cebolla", "quantity": 2.0, "unit": "unidad", "unit_price": 4.80, "total_price": 9.60 },
+            { "name_de": "Gala Aepfel Kl. I 12.5 kg. CH (IFCO)", "name_es": "Manzanas Gala", "quantity": 1.1, "unit": "kg", "unit_price": 2.70, "total_price": 2.95 },
+            { "name_de": "Orangen gross (IFCO)", "name_es": "Naranjas", "quantity": 1.1, "unit": "kg", "unit_price": 1.60, "total_price": 1.75 },
+            { "name_de": "Avocados Hass 16 stk. Imp (Karton)", "name_es": "Aguacates", "quantity": 5.0, "unit": "unidad", "unit_price": 23.20, "total_price": 116.00 }
+          ]
+        }
+      ]
+    },
+    {
+      "invoice_number": "451848",
+      "invoice_date": "2026-05-31",
+      "currency": "CHF",
+      "deliveries": [
+        {
+          "delivery_date": "2026-05-19",
+          "rechnung": "450556",
+          "items": [
+            { "name_de": "Erdbeeren 500 g. CH (IFCO)", "name_es": "Fresas", "quantity": 2.0, "unit": "unidad", "unit_price": 6.75, "total_price": 13.50 },
+            { "name_de": "Heidelbeeren 250 g. (Gitter)", "name_es": "Arandanos", "quantity": 2.0, "unit": "unidad", "unit_price": 3.65, "total_price": 7.30 },
+            { "name_de": "Himbeeren 250g (Gitter)", "name_es": "Frambuesas", "quantity": 2.0, "unit": "unidad", "unit_price": 4.85, "total_price": 9.70 },
+            { "name_de": "Bananen Kl. I (Freie Marke) 18 kg. Imp (Karton)", "name_es": "Platanos", "quantity": 2.4, "unit": "kg", "unit_price": 2.90, "total_price": 6.95 },
+            { "name_de": "Limes lose 4 kg. Imp (Karton)", "name_es": "Limas", "quantity": 1.0, "unit": "unidad", "unit_price": 15.20, "total_price": 15.20 },
+            { "name_de": "Rucola lose 1 kg. Imp. (Colis)", "name_es": "Rucula", "quantity": 2.0, "unit": "unidad", "unit_price": 8.85, "total_price": 17.70 },
+            { "name_de": "Gurken 12 Stk. (IFCO)", "name_es": "Pepinos", "quantity": 2.0, "unit": "unidad", "unit_price": 2.40, "total_price": 4.80 },
+            { "name_de": "Cherry Tomaten am Zweig (IFCO)", "name_es": "Tomates cherry", "quantity": 1.0, "unit": "kg", "unit_price": 10.10, "total_price": 10.10 },
+            { "name_de": "Zwiebelsprossen 100 g. (Beutel)", "name_es": "Brotes de cebolla", "quantity": 1.0, "unit": "unidad", "unit_price": 4.80, "total_price": 4.80 },
+            { "name_de": "Gala Aepfel Kl. I 12.5 kg. CH (IFCO)", "name_es": "Manzanas Gala", "quantity": 1.0, "unit": "kg", "unit_price": 2.70, "total_price": 2.70 },
+            { "name_de": "Conference 12.5 kg. (Karton)", "name_es": "Peras Conference", "quantity": 1.2, "unit": "kg", "unit_price": 2.95, "total_price": 3.55 },
+            { "name_de": "Trauben blau kernlos 10 x 500 g. Imp (Karton)", "name_es": "Uvas negras", "quantity": 1.0, "unit": "unidad", "unit_price": 7.90, "total_price": 7.90 },
+            { "name_de": "Trauben weiss kernlos 10 x 500 g. Imp (Karton)", "name_es": "Uvas blancas", "quantity": 1.0, "unit": "unidad", "unit_price": 3.95, "total_price": 3.95 },
+            { "name_de": "Orangen gross (IFCO)", "name_es": "Naranjas", "quantity": 1.6, "unit": "kg", "unit_price": 1.60, "total_price": 2.55 },
+            { "name_de": "Zitronen 6 kg. Imp (IFCO)", "name_es": "Limones", "quantity": 1.0, "unit": "kg", "unit_price": 3.75, "total_price": 3.75 },
+            { "name_de": "Avocados Hass 16 stk. Imp (Karton)", "name_es": "Aguacates", "quantity": 1.0, "unit": "unidad", "unit_price": 23.20, "total_price": 23.20 }
+          ]
+        },
+        {
+          "delivery_date": "2026-05-22",
+          "rechnung": "450917",
+          "items": [
+            { "name_de": "Erdbeeren 500 g. CH (IFCO)", "name_es": "Fresas", "quantity": 1.0, "unit": "unidad", "unit_price": 6.75, "total_price": 6.75 },
+            { "name_de": "Limes lose 4 kg. Imp (Karton)", "name_es": "Limas", "quantity": 1.0, "unit": "unidad", "unit_price": 15.20, "total_price": 15.20 },
+            { "name_de": "Pfefferminze grün Bündeli (Bund)", "name_es": "Hierbabuena", "quantity": 2.0, "unit": "unidad", "unit_price": 1.85, "total_price": 3.70 },
+            { "name_de": "Rucola lose 1 kg. Imp. (Colis)", "name_es": "Rucula", "quantity": 1.0, "unit": "unidad", "unit_price": 8.85, "total_price": 8.85 },
+            { "name_de": "Zwiebelsprossen 100 g. (Beutel)", "name_es": "Brotes de cebolla", "quantity": 1.0, "unit": "unidad", "unit_price": 4.80, "total_price": 4.80 },
+            { "name_de": "Gala Aepfel Kl. I 12.5 kg. CH (IFCO)", "name_es": "Manzanas Gala", "quantity": 1.0, "unit": "kg", "unit_price": 2.70, "total_price": 2.70 }
+          ]
+        },
+        {
+          "delivery_date": "2026-05-23",
+          "rechnung": "451058",
+          "items": [
+            { "name_de": "Limes lose 4 kg. Imp (Karton)", "name_es": "Limas", "quantity": 1.0, "unit": "unidad", "unit_price": 15.20, "total_price": 15.20 },
+            { "name_de": "Rucola lose 1 kg. Imp. (Colis)", "name_es": "Rucula", "quantity": 1.0, "unit": "unidad", "unit_price": 8.85, "total_price": 8.85 },
+            { "name_de": "Kartoffeln ERIKA festkochend 10 kg. CH (IFCO)", "name_es": "Patatas ERIKA", "quantity": 1.0, "unit": "kg", "unit_price": 1.80, "total_price": 1.80 },
+            { "name_de": "Zwiebeln gross (IFCO)", "name_es": "Cebollas grandes", "quantity": 1.0, "unit": "kg", "unit_price": 1.80, "total_price": 1.80 },
+            { "name_de": "Cherry Tomaten am Zweig (IFCO)", "name_es": "Tomates cherry", "quantity": 1.7, "unit": "kg", "unit_price": 10.10, "total_price": 17.15 },
+            { "name_de": "Trauben blau kernlos 10 x 500 g. Imp (Karton)", "name_es": "Uvas negras", "quantity": 1.0, "unit": "kg", "unit_price": 7.90, "total_price": 7.90 },
+            { "name_de": "Avocados Hass 16 stk. Imp (Karton)", "name_es": "Aguacates", "quantity": 4.0, "unit": "unidad", "unit_price": 23.20, "total_price": 92.80 }
+          ]
+        },
+        {
+          "delivery_date": "2026-05-26",
+          "rechnung": "451250",
+          "items": [
+            { "name_de": "Kabis rot 10 kg. (IFCO)", "name_es": "Col lombarda", "quantity": 0.74, "unit": "kg", "unit_price": 2.45, "total_price": 1.80 },
+            { "name_de": "Karotten lose gross ch (IFCO)", "name_es": "Zanahorias", "quantity": 1.0, "unit": "kg", "unit_price": 1.65, "total_price": 1.65 },
+            { "name_de": "Zwiebelsprossen 100 g. (Beutel)", "name_es": "Brotes de cebolla", "quantity": 2.0, "unit": "unidad", "unit_price": 4.80, "total_price": 9.60 },
+            { "name_de": "Avocados Hass 16 stk. Imp (Karton)", "name_es": "Aguacates", "quantity": 1.0, "unit": "unidad", "unit_price": 23.20, "total_price": 23.20 }
+          ]
+        },
+        {
+          "delivery_date": "2026-05-28",
+          "rechnung": "451538",
+          "items": [
+            { "name_de": "Erdbeeren 500 g. CH (IFCO)", "name_es": "Fresas", "quantity": 1.0, "unit": "unidad", "unit_price": 6.75, "total_price": 6.75 },
+            { "name_de": "Heidelbeeren 250 g. (Gitter)", "name_es": "Arandanos", "quantity": 1.0, "unit": "unidad", "unit_price": 3.65, "total_price": 3.65 },
+            { "name_de": "Himbeeren 250g (Gitter)", "name_es": "Frambuesas", "quantity": 1.0, "unit": "unidad", "unit_price": 4.85, "total_price": 4.85 },
+            { "name_de": "Bananen Kl. I (Freie Marke) 18 kg. Imp (Karton)", "name_es": "Platanos", "quantity": 2.3, "unit": "kg", "unit_price": 2.90, "total_price": 6.65 },
+            { "name_de": "Limes lose 4 kg. Imp (Karton)", "name_es": "Limas", "quantity": 1.0, "unit": "unidad", "unit_price": 15.20, "total_price": 15.20 },
+            { "name_de": "Gurken 12 Stk. (IFCO)", "name_es": "Pepinos", "quantity": 2.0, "unit": "unidad", "unit_price": 2.40, "total_price": 4.80 },
+            { "name_de": "Gala Aepfel Kl. I 12.5 kg. CH (IFCO)", "name_es": "Manzanas Gala", "quantity": 1.0, "unit": "kg", "unit_price": 2.70, "total_price": 2.70 },
+            { "name_de": "Conference 12.5 kg. (Karton)", "name_es": "Peras Conference", "quantity": 1.1, "unit": "kg", "unit_price": 2.95, "total_price": 3.25 },
+            { "name_de": "Trauben blau kernlos 10 x 500 g. Imp (Karton)", "name_es": "Uvas negras", "quantity": 1.0, "unit": "unidad", "unit_price": 3.95, "total_price": 3.95 },
+            { "name_de": "Trauben weiss kernlos 10 x 500 g. Imp (Karton)", "name_es": "Uvas blancas", "quantity": 1.0, "unit": "unidad", "unit_price": 3.95, "total_price": 3.95 },
+            { "name_de": "Orangen gross (IFCO)", "name_es": "Naranjas", "quantity": 1.6, "unit": "kg", "unit_price": 1.60, "total_price": 2.55 },
+            { "name_de": "Avocados Hass 16 stk. Imp (Karton)", "name_es": "Aguacates", "quantity": 1.0, "unit": "unidad", "unit_price": 23.20, "total_price": 23.20 }
+          ]
+        },
+        {
+          "delivery_date": "2026-05-29",
+          "rechnung": "451666",
+          "items": [
+            { "name_de": "Pfefferminze grün Bündeli (Bund)", "name_es": "Hierbabuena", "quantity": 2.0, "unit": "unidad", "unit_price": 1.85, "total_price": 3.70 },
+            { "name_de": "Rucola lose 1 kg. Imp. (Colis)", "name_es": "Rucula", "quantity": 1.0, "unit": "unidad", "unit_price": 8.85, "total_price": 8.85 },
+            { "name_de": "Avocados Hass 16 stk. Imp (Karton)", "name_es": "Aguacates", "quantity": 5.0, "unit": "unidad", "unit_price": 23.20, "total_price": 116.00 }
+          ]
+        },
+        {
+          "delivery_date": "2026-05-30",
+          "rechnung": "451767",
+          "items": [
+            { "name_de": "Rucola lose 1 kg. Imp. (Colis)", "name_es": "Rucula", "quantity": 2.0, "unit": "kg", "unit_price": 8.85, "total_price": 17.70 },
+            { "name_de": "Zwiebelsprossen 100 g. (Beutel)", "name_es": "Brotes de cebolla", "quantity": 3.0, "unit": "unidad", "unit_price": 4.80, "total_price": 14.40 }
+          ]
+        }
+      ]
+    },
+    {
+      "invoice_number": "453792",
+      "invoice_date": "2026-06-15",
+      "currency": "CHF",
+      "deliveries": [
+        {
+          "delivery_date": "2026-06-04",
+          "rechnung": "452541",
+          "items": [
+            { "name_de": "Bananen Kl. I (Freie Marke) 18 kg. Imp (Karton)", "name_es": "Platanos", "quantity": 2.4, "unit": "kg", "unit_price": 2.90, "total_price": 6.95 },
+            { "name_de": "Pfefferminze grün Bündeli (Bund)", "name_es": "Hierbabuena", "quantity": 2.0, "unit": "unidad", "unit_price": 1.85, "total_price": 3.70 },
+            { "name_de": "Rucola lose 1 kg. Imp. (Colis)", "name_es": "Rucula", "quantity": 1.0, "unit": "kg", "unit_price": 8.85, "total_price": 8.85 },
+            { "name_de": "Gurken 12 Stk. (IFCO)", "name_es": "Pepinos", "quantity": 2.0, "unit": "unidad", "unit_price": 2.40, "total_price": 4.80 },
+            { "name_de": "Auberginen 5 kg. (Karton)", "name_es": "Berenjenas", "quantity": 6.0, "unit": "kg", "unit_price": 2.80, "total_price": 16.80 },
+            { "name_de": "Zwiebeln rot (IFCO)", "name_es": "Cebollas rojas", "quantity": 2.35, "unit": "kg", "unit_price": 1.90, "total_price": 4.45 },
+            { "name_de": "Karotten lose gross ch (IFCO)", "name_es": "Zanahorias", "quantity": 2.05, "unit": "kg", "unit_price": 1.65, "total_price": 3.40 },
+            { "name_de": "Cherrytomaten MIX 3 kg. CH (IFCO)", "name_es": "Tomates cherry mix", "quantity": 2.0, "unit": "kg", "unit_price": 10.95, "total_price": 21.90 },
+            { "name_de": "Zwiebelsprossen 100 g. (Beutel)", "name_es": "Brotes de cebolla", "quantity": 3.0, "unit": "unidad", "unit_price": 4.80, "total_price": 14.40 },
+            { "name_de": "Orangen gross (IFCO)", "name_es": "Naranjas", "quantity": 2.5, "unit": "kg", "unit_price": 1.60, "total_price": 4.00 },
+            { "name_de": "Zitronen 6 kg. Imp (IFCO)", "name_es": "Limones", "quantity": 1.0, "unit": "kg", "unit_price": 3.75, "total_price": 3.75 },
+            { "name_de": "Tomaten gedorrt 1 kg. Imp (Beutel)", "name_es": "Tomates secos", "quantity": 4.0, "unit": "kg", "unit_price": 10.50, "total_price": 42.00 }
+          ]
+        },
+        {
+          "delivery_date": "2026-06-05",
+          "rechnung": "452673",
+          "items": [
+            { "name_de": "Avocados Hass 16 stk. Imp (Karton)", "name_es": "Aguacates", "quantity": 5.0, "unit": "unidad", "unit_price": 23.20, "total_price": 116.00 }
+          ]
+        },
+        {
+          "delivery_date": "2026-06-06",
+          "rechnung": "452870",
+          "items": [
+            { "name_de": "Erdbeeren 500 g. CH (IFCO)", "name_es": "Fresas", "quantity": 2.0, "unit": "unidad", "unit_price": 5.60, "total_price": 11.20 },
+            { "name_de": "Rucola lose 1 kg. Imp. (Colis)", "name_es": "Rucula", "quantity": 1.0, "unit": "unidad", "unit_price": 8.85, "total_price": 8.85 },
+            { "name_de": "Zwiebelsprossen 100 g. (Beutel)", "name_es": "Brotes de cebolla", "quantity": 2.0, "unit": "unidad", "unit_price": 4.80, "total_price": 9.60 },
+            { "name_de": "Avocados Hass 16 stk. Imp (Karton)", "name_es": "Aguacates", "quantity": 4.0, "unit": "unidad", "unit_price": 23.20, "total_price": 92.80 }
+          ]
+        },
+        {
+          "delivery_date": "2026-06-09",
+          "rechnung": "453102",
+          "items": [
+            { "name_de": "Erdbeeren 500 g. CH (IFCO)", "name_es": "Fresas", "quantity": 1.0, "unit": "unidad", "unit_price": 5.45, "total_price": 5.45 },
+            { "name_de": "Himbeeren 250g (Gitter)", "name_es": "Frambuesas", "quantity": 1.0, "unit": "unidad", "unit_price": 5.55, "total_price": 5.55 },
+            { "name_de": "Bananen Kl. I (Freie Marke) 18 kg. Imp (Karton)", "name_es": "Platanos", "quantity": 1.9, "unit": "kg", "unit_price": 2.90, "total_price": 5.50 },
+            { "name_de": "Cherrytomaten MIX 3 kg. CH (IFCO)", "name_es": "Tomates cherry mix", "quantity": 2.0, "unit": "kg", "unit_price": 10.95, "total_price": 21.90 },
+            { "name_de": "Zwiebelsprossen 100 g. (Beutel)", "name_es": "Brotes de cebolla", "quantity": 2.0, "unit": "unidad", "unit_price": 4.80, "total_price": 9.60 },
+            { "name_de": "Conference 12.5 kg. (Karton)", "name_es": "Peras Conference", "quantity": 1.0, "unit": "kg", "unit_price": 2.95, "total_price": 2.95 },
+            { "name_de": "Trauben blau kernlos 10 x 500 g. Imp (Karton)", "name_es": "Uvas negras", "quantity": 1.0, "unit": "unidad", "unit_price": 4.15, "total_price": 4.15 },
+            { "name_de": "Trauben weiss kernlos 10 x 500 g. Imp (Karton)", "name_es": "Uvas blancas", "quantity": 1.0, "unit": "unidad", "unit_price": 3.80, "total_price": 3.80 }
+          ]
+        },
+        {
+          "delivery_date": "2026-06-10",
+          "rechnung": "453213",
+          "items": [
+            { "name_de": "Bananen Kl. I (Freie Marke) 18 kg. Imp (Karton)", "name_es": "Platanos", "quantity": 1.8, "unit": "kg", "unit_price": 2.90, "total_price": 5.20 },
+            { "name_de": "Rucola lose 1 kg. Imp. (Colis)", "name_es": "Rucula", "quantity": 1.0, "unit": "kg", "unit_price": 8.85, "total_price": 8.85 },
+            { "name_de": "Avocados Hass 16 stk. Imp (Karton)", "name_es": "Aguacates", "quantity": 1.0, "unit": "unidad", "unit_price": 23.20, "total_price": 23.20 }
+          ]
+        },
+        {
+          "delivery_date": "2026-06-13",
+          "rechnung": "453547",
+          "items": [
+            { "name_de": "Erdbeeren 500 g. CH (IFCO)", "name_es": "Fresas", "quantity": 1.0, "unit": "unidad", "unit_price": 5.45, "total_price": 5.45 },
+            { "name_de": "Heidelbeeren 250 g. (Gitter)", "name_es": "Arandanos", "quantity": 1.0, "unit": "unidad", "unit_price": 3.65, "total_price": 3.65 },
+            { "name_de": "Himbeeren 250g (Gitter)", "name_es": "Frambuesas", "quantity": 1.0, "unit": "unidad", "unit_price": 5.55, "total_price": 5.55 },
+            { "name_de": "Limes lose 4 kg. Imp (Karton)", "name_es": "Limas", "quantity": 1.0, "unit": "unidad", "unit_price": 13.60, "total_price": 13.60 },
+            { "name_de": "Pfefferminze grün Bündeli (Bund)", "name_es": "Hierbabuena", "quantity": 1.0, "unit": "unidad", "unit_price": 1.85, "total_price": 1.85 },
+            { "name_de": "Rucola lose 1 kg. Imp. (Colis)", "name_es": "Rucula", "quantity": 2.0, "unit": "unidad", "unit_price": 8.85, "total_price": 17.70 },
+            { "name_de": "Zwiebelsprossen 100 g. (Beutel)", "name_es": "Brotes de cebolla", "quantity": 2.0, "unit": "unidad", "unit_price": 4.80, "total_price": 9.60 },
+            { "name_de": "Orangen gross (IFCO)", "name_es": "Naranjas", "quantity": 1.0, "unit": "kg", "unit_price": 1.60, "total_price": 1.60 },
+            { "name_de": "Zitronen 6 kg. Imp (IFCO)", "name_es": "Limones", "quantity": 1.0, "unit": "kg", "unit_price": 3.75, "total_price": 3.75 },
+            { "name_de": "Avocados Hass 16 stk. Imp (Karton)", "name_es": "Aguacates", "quantity": 4.0, "unit": "unidad", "unit_price": 23.20, "total_price": 92.80 }
+          ]
+        }
+      ]
+    }
+  ]
+}

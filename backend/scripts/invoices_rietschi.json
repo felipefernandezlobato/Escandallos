@@ -1,0 +1,100 @@
+[
+  {
+    "supplier": "Rietschi",
+    "invoice_date": "2026-04-09",
+    "invoice_number": "3981106",
+    "items": [
+      {"name": "ChariTea Green Bio Grüner Tee Ingwer Honig 33cl", "quantity": 20, "unit": "unidad", "unit_price": 1.70, "total": 34.00},
+      {"name": "ChariTea Red Bio Rooibos Tee mit Passionsfrucht 33cl", "quantity": 40, "unit": "unidad", "unit_price": 1.70, "total": 68.00},
+      {"name": "LemonAid Ingwer Bio MW 33cl", "quantity": 40, "unit": "unidad", "unit_price": 1.70, "total": 68.00},
+      {"name": "LemonAid Maracuja Bio 33cl", "quantity": 100, "unit": "unidad", "unit_price": 1.70, "total": 170.00},
+      {"name": "Vivi Soda Apfelschorle BIO 33cl", "quantity": 72, "unit": "unidad", "unit_price": 1.84, "total": 132.48},
+      {"name": "Vivi Soda Zitrone&Ingwer BIO 33cl", "quantity": 24, "unit": "unidad", "unit_price": 1.84, "total": 44.16},
+      {"name": "EU Coca Cola 33cl", "quantity": 72, "unit": "unidad", "unit_price": 0.99, "total": 71.28},
+      {"name": "EU Coca Cola Zero 33cl", "quantity": 48, "unit": "unidad", "unit_price": 0.99, "total": 47.52}
+    ]
+  },
+  {
+    "supplier": "Rietschi",
+    "invoice_date": "2026-04-28",
+    "invoice_number": "3981804",
+    "items": [
+      {"name": "Evian 50cl", "quantity": 120, "unit": "unidad", "unit_price": 1.01, "total": 121.20},
+      {"name": "San Pellegrino 50cl", "quantity": 60, "unit": "unidad", "unit_price": 1.05, "total": 63.00},
+      {"name": "EU Schweppes Tonic 20cl", "quantity": 24, "unit": "unidad", "unit_price": 1.05, "total": 25.20}
+    ]
+  },
+  {
+    "supplier": "Rietschi",
+    "invoice_date": "2026-04-30",
+    "invoice_number": "3982024",
+    "items": [
+      {"name": "Evian 50cl", "quantity": -100, "unit": "unidad", "unit_price": 1.01, "total": -101.00},
+      {"name": "Evian PET 6-Pack 50cl", "quantity": 144, "unit": "unidad", "unit_price": 0.98, "total": 141.12}
+    ]
+  },
+  {
+    "supplier": "Rietschi",
+    "invoice_date": "2026-04-30",
+    "invoice_number": "3982025",
+    "items": [
+      {"name": "Aperol Aperitif 100cl 11%", "quantity": 6, "unit": "unidad", "unit_price": 17.90, "total": 107.40}
+    ]
+  },
+  {
+    "supplier": "Rietschi",
+    "invoice_date": "2026-04-30",
+    "invoice_number": "3982026",
+    "items": [
+      {"name": "Aperol Aperitif 70cl 11%", "quantity": 6, "unit": "unidad", "unit_price": 13.20, "total": 79.20}
+    ]
+  },
+  {
+    "supplier": "Rietschi",
+    "invoice_date": "2026-05-12",
+    "invoice_number": "3982856",
+    "items": [
+      {"name": "Unser Bier Weizen Bio 50cl", "quantity": 30, "unit": "unidad", "unit_price": 2.75, "total": 82.50},
+      {"name": "Birtel Red Ale EW 33cl", "quantity": 48, "unit": "unidad", "unit_price": 2.50, "total": 120.00},
+      {"name": "LemonAid Blutorange Bio 33cl", "quantity": 40, "unit": "unidad", "unit_price": 1.70, "total": 68.00},
+      {"name": "LemonAid Limette Bio 33cl", "quantity": 40, "unit": "unidad", "unit_price": 1.70, "total": 68.00},
+      {"name": "LemonAid Maracuja Bio 33cl", "quantity": 80, "unit": "unidad", "unit_price": 1.70, "total": 136.00},
+      {"name": "Vivi Soda Apfelschorle BIO 33cl", "quantity": 48, "unit": "unidad", "unit_price": 1.84, "total": 88.32},
+      {"name": "Vivi Soda Blutorange&Ingwer BIO 33cl", "quantity": 48, "unit": "unidad", "unit_price": 1.84, "total": 88.32},
+      {"name": "Vivi Soda Zitrone&Ingwer BIO 33cl", "quantity": 48, "unit": "unidad", "unit_price": 1.84, "total": 88.32}
+    ]
+  },
+  {
+    "supplier": "Rietschi",
+    "invoice_date": "2026-05-31",
+    "invoice_number": "3983520",
+    "items": [
+      {"name": "LemonAid Ingwer Bio MW 33cl", "quantity": 80, "unit": "unidad", "unit_price": 1.70, "total": 136.00},
+      {"name": "LemonAid Limette Bio 33cl", "quantity": 80, "unit": "unidad", "unit_price": 1.70, "total": 136.00},
+      {"name": "LemonAid Maracuja Bio 33cl", "quantity": 80, "unit": "unidad", "unit_price": 1.70, "total": 136.00},
+      {"name": "Vivi Soda Apfelschorle BIO 33cl", "quantity": 48, "unit": "unidad", "unit_price": 1.84, "total": 88.32},
+      {"name": "Vivi Soda Zitrone&Ingwer BIO 33cl", "quantity": 48, "unit": "unidad", "unit_price": 1.84, "total": 88.32},
+      {"name": "Fever-Tree Ginger Beer 20cl", "quantity": 48, "unit": "unidad", "unit_price": 1.72, "total": 82.56},
+      {"name": "EU Coca Cola 33cl", "quantity": 72, "unit": "unidad", "unit_price": 0.99, "total": 71.28},
+      {"name": "EU Coca Cola Zero 33cl", "quantity": 72, "unit": "unidad", "unit_price": 0.99, "total": 71.28},
+      {"name": "EU Schweppes Tonic 20cl", "quantity": 48, "unit": "unidad", "unit_price": 1.05, "total": 50.40}
+    ]
+  },
+  {
+    "supplier": "Rietschi",
+    "invoice_date": "2026-06-04",
+    "invoice_number": "3984189",
+    "items": [
+      {"name": "San Pellegrino 50cl", "quantity": 80, "unit": "unidad", "unit_price": 1.05, "total": 84.00},
+      {"name": "San Pellegrino 4x6 PET 50cl", "quantity": 48, "unit": "unidad", "unit_price": 1.03, "total": 49.44}
+    ]
+  },
+  {
+    "supplier": "Rietschi",
+    "invoice_date": "2026-06-10",
+    "invoice_number": "3984410",
+    "items": [
+      {"name": "Limoncello della Costiera 70cl 25%", "quantity": 4, "unit": "unidad", "unit_price": 11.50, "total": 46.00}
+    ]
+  }
+]

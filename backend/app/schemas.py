@@ -214,3 +214,142 @@ class TendenciaItem(BaseModel):
     fecha: str
     valor: float
     nombre: str
+
+
+# --- Inventario ---
+
+class InventarioRegistroCreate(BaseModel):
+    ingrediente_id: int
+    cantidad: float
+    unidad: str
+    notas: Optional[str] = None
+
+
+class InventarioSnapshotCreate(BaseModel):
+    fecha: Optional[str] = None
+    registros: list[InventarioRegistroCreate]
+
+
+class InventarioRegistroOut(BaseModel):
+    id: int
+    ingrediente_id: int
+    cantidad: float
+    unidad: str
+    fecha_registro: date
+    notas: Optional[str] = None
+    ingrediente_nombre: str = ""
+
+    model_config = {"from_attributes": True}
+
+
+class InventarioSnapshotOut(BaseModel):
+    fecha: date
+    registros: list[InventarioRegistroOut]
+    total_items: int = 0
+
+
+# --- Pedidos ---
+
+class LineaPedidoCreate(BaseModel):
+    ingrediente_id: int
+    cantidad_pedida: float
+    unidad: str
+    precio_unitario: Optional[float] = None
+
+
+class LineaPedidoOut(BaseModel):
+    id: int
+    ingrediente_id: int
+    cantidad_pedida: float
+    unidad: str
+    cantidad_recibida: Optional[float] = None
+    precio_unitario: Optional[float] = None
+    ingrediente_nombre: str = ""
+
+    model_config = {"from_attributes": True}
+
+
+class PedidoCreate(BaseModel):
+    proveedor: str
+    notas: Optional[str] = None
+    lineas: list[LineaPedidoCreate] = []
+
+
+class PedidoUpdate(BaseModel):
+    proveedor: Optional[str] = None
+    estado: Optional[str] = None
+    notas: Optional[str] = None
+    lineas: Optional[list[LineaPedidoCreate]] = None
+
+
+class PedidoOut(BaseModel):
+    id: int
+    fecha: date
+    proveedor: str
+    estado: str
+    notas: Optional[str] = None
+    fecha_recepcion: Optional[date] = None
+    num_lineas: int = 0
+    total_estimado: float = 0.0
+
+    model_config = {"from_attributes": True}
+
+
+class PedidoDetailOut(PedidoOut):
+    lineas: list[LineaPedidoOut] = []
+
+
+class RecibirLineaItem(BaseModel):
+    linea_id: int
+    cantidad_recibida: float
+    precio_unitario: Optional[float] = None
+
+
+class RecibirPedidoRequest(BaseModel):
+    lineas: list[RecibirLineaItem]
+
+
+# --- Recomendación ---
+
+class RecomendacionItem(BaseModel):
+    ingrediente_id: int
+    ingrediente_nombre: str
+    proveedor: str
+    stock_actual: float
+    unidad: str
+    consumo_medio_semanal: float
+    cantidad_sugerida: float
+    dias_stock: Optional[float] = None
+
+
+class RecomendacionOut(BaseModel):
+    fecha: date
+    items: list[RecomendacionItem]
+
+
+# --- Consumo ---
+
+class ConsumoSemanalItem(BaseModel):
+    semana: str
+    cantidad: float
+    unidad: str
+
+
+class StockHistorialItem(BaseModel):
+    fecha: str
+    cantidad: float
+    unidad: str
+
+
+class ConsumoOut(BaseModel):
+    ingrediente_id: int
+    ingrediente_nombre: str
+    consumo_medio: float
+    unidad: str
+    tendencia: str = "estable"
+    reorder_point: Optional[float] = None
+    eoq: Optional[float] = None
+    safety_stock: Optional[float] = None
+    par_level: Optional[float] = None
+    historial: list[ConsumoSemanalItem] = []
+    stock_historial: list[StockHistorialItem] = []
