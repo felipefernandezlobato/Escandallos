@@ -207,15 +207,27 @@ def ultimo_conteo(
     db: Session = Depends(get_db),
     user=Depends(get_current_user),
 ):
-    rows = (
+    subq = (
         db.query(
             InventarioRegistro.ingrediente_id,
-            func.max(InventarioRegistro.fecha_registro).label("ultima_fecha"),
+            func.max(InventarioRegistro.fecha_registro).label("max_fecha"),
         )
         .group_by(InventarioRegistro.ingrediente_id)
+        .subquery()
+    )
+    rows = (
+        db.query(InventarioRegistro.ingrediente_id, InventarioRegistro.fecha_registro, InventarioRegistro.unidad)
+        .join(
+            subq,
+            (InventarioRegistro.ingrediente_id == subq.c.ingrediente_id)
+            & (InventarioRegistro.fecha_registro == subq.c.max_fecha),
+        )
         .all()
     )
-    return {str(ing_id): str(fecha) for ing_id, fecha in rows}
+    return {
+        str(ing_id): {"fecha": str(fecha), "unidad": unidad}
+        for ing_id, fecha, unidad in rows
+    }
 
 
 @router.get("/alertas-stock")

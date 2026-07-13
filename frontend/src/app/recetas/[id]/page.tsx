@@ -249,8 +249,12 @@ export default function RecetaDetailPage() {
           <p className="text-xl font-bold">{receta.precio_venta ? `${receta.precio_venta.toFixed(2)} CHF` : "—"}</p>
         </div>
         <div className="bg-white border border-[#E8DFD3] rounded-lg p-4">
-          <p className="text-xs text-[#6B5E52]">Margen</p>
-          <div className="mt-1"><MargenBadge margen={receta.margen_real} /></div>
+          <p className="text-xs text-[#6B5E52]">Multiplicador</p>
+          <p className="text-xl font-bold">
+            {receta.precio_venta && receta.coste_por_porcion > 0
+              ? `x${(receta.precio_venta / receta.coste_por_porcion).toFixed(1)}`
+              : "—"}
+          </p>
         </div>
       </div>
 

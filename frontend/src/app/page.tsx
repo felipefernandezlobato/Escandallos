@@ -7,7 +7,7 @@ import type { Receta } from "@/lib/types";
 import Link from "next/link";
 
 export default function MenuPage() {
-  const [recipeMap, setRecipeMap] = useState<Record<string, { coste: number; id: number }>>({});
+  const [recipeMap, setRecipeMap] = useState<Record<string, { coste: number; id: number; pvp: number | null }>>({});
   const [ingredientMap, setIngredientMap] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
 
@@ -17,9 +17,9 @@ export default function MenuPage() {
       apiFetch<any[]>("/api/ingredientes"),
     ])
       .then(([recetas, ingredientes]) => {
-        const rMap: Record<string, { coste: number; id: number }> = {};
+        const rMap: Record<string, { coste: number; id: number; pvp: number | null }> = {};
         for (const r of recetas) {
-          rMap[r.nombre] = { coste: r.coste_por_porcion, id: r.id };
+          rMap[r.nombre] = { coste: r.coste_por_porcion, id: r.id, pvp: r.precio_venta };
         }
         setRecipeMap(rMap);
         const iMap: Record<string, number> = {};
@@ -71,7 +71,6 @@ export default function MenuPage() {
                     <>
                       <th className="px-4 py-2 font-medium text-right w-20">Coste</th>
                       <th className="px-4 py-2 font-medium text-right w-20">PVP</th>
-                      <th className="px-4 py-2 font-medium text-right w-20">Margen</th>
                       <th className="px-4 py-2 font-medium text-right w-20">x</th>
                     </>
                   )}
@@ -83,15 +82,16 @@ export default function MenuPage() {
                   const ingCoste = item.ingredientName ? ingredientMap[item.ingredientName] : undefined;
                   const coste = recipe?.coste ?? ingCoste;
                   const recipeId = recipe?.id;
-                  const pvp = item.pvp;
+                  const pvp = recipe?.pvp ?? item.pvp;
                   const multi = coste !== undefined && pvp && coste > 0 ? pvp / coste : null;
 
                   const multiColor = (m: number | null) => getMultiColor(m, section.title);
 
                   if (hasDualColumns) {
                     const secondRecipeName = isWine ? item.recipeNameBottle : item.recipeNameIced;
-                    const secondPvp = isWine ? item.pvpBottle : item.pvpIced;
+                    const secondPvpHardcoded = isWine ? item.pvpBottle : item.pvpIced;
                     const secondRecipe = secondRecipeName ? recipeMap[secondRecipeName] : undefined;
+                    const secondPvp = secondRecipe?.pvp ?? secondPvpHardcoded;
                     const costeSecond = secondRecipe?.coste;
                     const multiSecond = costeSecond !== undefined && secondPvp && costeSecond > 0 ? secondPvp / costeSecond : null;
 
@@ -139,9 +139,6 @@ export default function MenuPage() {
                       </td>
                       <td className="px-4 py-1.5 text-right text-sm">
                         {pvp ? pvp.toFixed(2) : "—"}
-                      </td>
-                      <td className="px-4 py-1.5 text-right text-sm">
-                        {coste !== undefined && pvp ? (pvp - coste).toFixed(2) : "—"}
                       </td>
                       <td className={`px-4 py-1.5 text-right text-sm ${multiColor(multi)}`}>
                         {multi !== null ? `x${multi.toFixed(1)}` : "—"}

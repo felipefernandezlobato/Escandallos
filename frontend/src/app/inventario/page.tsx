@@ -73,7 +73,7 @@ export default function InventarioPage() {
   } | null>(null);
   const [selectedIngId, setSelectedIngId] = useState<number | null>(null);
   const [vista, setVista] = useState<"cocina" | "cafe">("cocina");
-  const [ultimoConteo, setUltimoConteo] = useState<Record<string, string>>({});
+  const [ultimoConteo, setUltimoConteo] = useState<Record<string, { fecha: string; unidad: string }>>({});
   const [recomendaciones, setRecomendaciones] = useState<RecomendacionItem[]>([]);
   const [showRecomendaciones, setShowRecomendaciones] = useState(false);
   const [cantidadesPedido, setCantidadesPedido] = useState<Record<number, string>>({});
@@ -85,7 +85,7 @@ export default function InventarioPage() {
       apiFetch<Ingrediente[]>("/api/ingredientes"),
       apiFetch<Categoria[]>("/api/categorias?tipo=ingrediente"),
       apiFetch<{ fechas: string[]; snapshot: InventarioSnapshot | null }>("/api/inventario"),
-      apiFetch<Record<string, string>>("/api/inventario/ultimo-conteo"),
+      apiFetch<Record<string, { fecha: string; unidad: string }>>("/api/inventario/ultimo-conteo"),
     ])
       .then(([ings, cats, inv, conteo]) => {
         setUltimoConteo(conteo);
@@ -95,13 +95,13 @@ export default function InventarioPage() {
 
         const initial: Record<number, StockEntry> = {};
         for (const ing of ings) {
+          const lastUnit = conteo[String(ing.id)]?.unidad;
           initial[ing.id] = {
             ingrediente_id: ing.id,
             cantidad: "",
-            unidad: ing.unidad_uso,
+            unidad: lastUnit || ing.unidad_compra,
           };
         }
-        // Start empty — user fills in current stock from scratch
         setStock(initial);
       })
       .finally(() => setLoading(false));
@@ -183,7 +183,7 @@ export default function InventarioPage() {
       setLastSaved(new Date().toLocaleTimeString("es"));
       const inv = await apiFetch<{ fechas: string[] }>("/api/inventario");
       setFechas(inv.fechas || []);
-      const conteo = await apiFetch<Record<string, string>>("/api/inventario/ultimo-conteo");
+      const conteo = await apiFetch<Record<string, { fecha: string; unidad: string }>>("/api/inventario/ultimo-conteo");
       setUltimoConteo(conteo);
 
       const ids = registros.map((r) => r.ingrediente_id).join(",");
@@ -207,10 +207,11 @@ export default function InventarioPage() {
   const handleClear = () => {
     const cleared: Record<number, StockEntry> = {};
     for (const ing of ingredientes) {
+      const lastUnit = ultimoConteo[String(ing.id)]?.unidad;
       cleared[ing.id] = {
         ingrediente_id: ing.id,
         cantidad: "",
-        unidad: ing.unidad_uso,
+        unidad: lastUnit || ing.unidad_compra,
       };
     }
     setStock(cleared);
@@ -221,8 +222,9 @@ export default function InventarioPage() {
   ).length;
 
   const formatUltimoConteo = (ingId: number): string => {
-    const fecha = ultimoConteo[String(ingId)];
-    if (!fecha) return "—";
+    const entry = ultimoConteo[String(ingId)];
+    if (!entry) return "—";
+    const fecha = entry.fecha;
     const diff = Math.floor(
       (Date.now() - new Date(fecha + "T00:00:00").getTime()) / 86400000
     );
