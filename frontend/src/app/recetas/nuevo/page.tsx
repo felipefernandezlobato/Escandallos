@@ -3,12 +3,14 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/api";
+import { useToast } from "@/components/Toast";
 import type { Categoria, Ingrediente, Receta, LineaRecetaInput } from "@/lib/types";
 import Link from "next/link";
 
 const UNIDADES = ["kg", "g", "mg", "litro", "ml", "cl", "unidad"];
 
 export default function NuevaRecetaPage() {
+  const toast = useToast();
   const router = useRouter();
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [ingredientes, setIngredientes] = useState<Ingrediente[]>([]);
@@ -74,7 +76,7 @@ export default function NuevaRecetaPage() {
       });
       router.push(`/recetas/${result.id}`);
     } catch (err) {
-      alert("Error al crear: " + (err as Error).message);
+      toast("Error al crear: " + (err as Error).message, "error");
     }
   };
 

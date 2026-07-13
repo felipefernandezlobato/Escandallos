@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { apiFetch } from "@/lib/api";
+import { useToast } from "@/components/Toast";
 import type { Pedido } from "@/lib/types";
 
 type Tab = "historial" | "pivot";
@@ -18,6 +19,7 @@ interface PivotData {
 }
 
 export default function PedidosPage() {
+  const toast = useToast();
   const [tab, setTab] = useState<Tab>("historial");
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
   const [pivot, setPivot] = useState<PivotData | null>(null);
@@ -39,7 +41,7 @@ export default function PedidosPage() {
       await apiFetch(`/api/pedidos/${id}/enviar`, { method: "POST" });
       fetchData();
     } catch (err) {
-      alert("Error: " + (err as Error).message);
+      toast("Error: " + (err as Error).message, "error");
     }
   };
 
@@ -49,7 +51,7 @@ export default function PedidosPage() {
       await apiFetch(`/api/pedidos/${id}`, { method: "DELETE" });
       fetchData();
     } catch (err) {
-      alert("Error: " + (err as Error).message);
+      toast("Error: " + (err as Error).message, "error");
     }
   };
 

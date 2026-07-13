@@ -2,11 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api";
+import { useToast } from "@/components/Toast";
 import type { Categoria } from "@/lib/types";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export default function ConfiguracionPage() {
+  const toast = useToast();
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -60,7 +62,7 @@ export default function ConfiguracionPage() {
       await apiFetch(`/api/categorias/${id}`, { method: "DELETE" });
       fetchCategorias();
     } catch (err: any) {
-      alert(err.message);
+      toast(err.message, "error");
     }
   };
 
@@ -200,10 +202,10 @@ export default function ConfiguracionPage() {
                         body: formData,
                       });
                       if (!res.ok) {
-                        alert("Error al restaurar backup");
+                        toast("Error al restaurar backup", "error");
                         return;
                       }
-                      alert("Backup restaurado. Recarga la página.");
+                      toast("Backup restaurado. Recargando...");
                       window.location.reload();
                     }}
                   />

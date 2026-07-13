@@ -7,11 +7,14 @@ from sqlalchemy.orm import Session, joinedload
 from app.auth import get_current_user
 from app.database import get_db
 from app.models import (
-    HistorialPrecio,
     Ingrediente,
+    InventarioRegistro,
     LineaPedido,
     Pedido,
 )
+from app.services.conversiones import to_week_key
+from app.services.consumo import recomendacion_pedido
+from app.services.costes import crear_historial_precio
 from app.schemas import (
     LineaPedidoOut,
     PedidoCreate,
@@ -83,14 +86,8 @@ def pedidos_pivot(
         .all()
     )
 
-    from datetime import timedelta
-
     fechas_set: set[str] = set()
     by_ing: dict[int, dict] = {}
-
-    def to_week_key(d):
-        iso = d.isocalendar()
-        return f"w{iso[1]}.{str(iso[0])[2:]}"
 
     for l in lineas:
         pedido = db.get(Pedido, l.pedido_id)
@@ -138,8 +135,6 @@ def pedidos_por_proveedor(
     db: Session = Depends(get_db),
     user=Depends(get_current_user),
 ):
-    from app.services.consumo import recomendacion_pedido
-
     items = recomendacion_pedido(db)
     por_proveedor: dict[str, list] = {}
     for item in items:
@@ -310,19 +305,34 @@ def recibir_pedido(
 
             ing = db.get(Ingrediente, linea.ingrediente_id)
             if ing and item.precio_unitario != ing.precio_compra:
-                historial = HistorialPrecio(
-                    ingrediente_id=ing.id,
-                    precio_anterior=ing.precio_compra,
-                    precio_nuevo=item.precio_unitario,
-                    fecha_cambio=date.today(),
-                )
-                db.add(historial)
+                crear_historial_precio(db, ing.id, ing.precio_compra, item.precio_unitario)
                 ing.precio_compra = item.precio_unitario
                 ing.fecha_actualizacion = date.today()
                 precios_actualizados += 1
 
     p.estado = "recibido"
     p.fecha_recepcion = date.today()
+
+    for linea in p.lineas:
+        if not linea.cantidad_recibida or linea.cantidad_recibida <= 0:
+            continue
+        ultimo = (
+            db.query(InventarioRegistro)
+            .filter(InventarioRegistro.ingrediente_id == linea.ingrediente_id)
+            .order_by(InventarioRegistro.fecha_registro.desc())
+            .first()
+        )
+        stock_actual = ultimo.cantidad if ultimo else 0
+        nueva_cantidad = stock_actual + linea.cantidad_recibida
+        unidad = ultimo.unidad if ultimo else linea.unidad
+        db.add(InventarioRegistro(
+            ingrediente_id=linea.ingrediente_id,
+            cantidad=nueva_cantidad,
+            unidad=unidad,
+            fecha_registro=date.today(),
+            notas=f"Pedido #{p.id} recibido",
+        ))
+
     db.commit()
 
     return {"ok": True, "precios_actualizados": precios_actualizados}

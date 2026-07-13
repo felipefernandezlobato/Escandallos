@@ -1,5 +1,5 @@
 from datetime import date
-from typing import List, Optional
+from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session, joinedload
@@ -18,6 +18,7 @@ from app.services.costes import (
     coste_por_racion,
     coste_por_unidad_uso,
     coste_total_receta,
+    crear_historial_precio,
     margen_real,
     recetas_afectadas_por_ingrediente,
 )
@@ -126,12 +127,7 @@ def actualizar_ingrediente(
     precio_cambio = "precio_compra" in updates and updates["precio_compra"] != ing.precio_compra
 
     if precio_cambio:
-        historial = HistorialPrecio(
-            ingrediente_id=ing.id,
-            precio_anterior=ing.precio_compra,
-            precio_nuevo=updates["precio_compra"],
-        )
-        db.add(historial)
+        crear_historial_precio(db, ing.id, ing.precio_compra, updates["precio_compra"])
 
     for key, val in updates.items():
         setattr(ing, key, val)

@@ -8,6 +8,15 @@ from app.models import Ingrediente, LineaReceta, Receta
 from app.services.conversiones import cantidad_en_unidades_uso, convertir
 
 
+def crear_historial_precio(db: Session, ingrediente_id: int, precio_anterior: float, precio_nuevo: float):
+    from app.models import HistorialPrecio
+    db.add(HistorialPrecio(
+        ingrediente_id=ingrediente_id,
+        precio_anterior=precio_anterior,
+        precio_nuevo=precio_nuevo,
+    ))
+
+
 def coste_por_unidad_uso(ingrediente: Ingrediente) -> float:
     cantidad_uso = cantidad_en_unidades_uso(
         ingrediente.cantidad_compra,

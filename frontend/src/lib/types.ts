@@ -180,4 +180,9 @@ export interface ConsumoData {
   unidad: string;
   tendencia: string;
   historial: ConsumoSemanal[];
+  reorder_point?: number | null;
+  eoq?: number | null;
+  safety_stock?: number | null;
+  par_level?: number | null;
+  stock_historial?: Array<{ fecha: string; cantidad: number; unidad: string }>;
 }

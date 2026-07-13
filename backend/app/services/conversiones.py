@@ -36,3 +36,8 @@ def cantidad_en_unidades_uso(
     cantidad_compra: float, unidad_compra: str, unidad_uso: str
 ) -> float:
     return convertir(cantidad_compra, unidad_compra, unidad_uso)
+
+
+def to_week_key(d) -> str:
+    iso = d.isocalendar()
+    return f"w{iso[1]}.{str(iso[0])[2:]}"

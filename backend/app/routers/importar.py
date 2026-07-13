@@ -9,7 +9,8 @@ from sqlalchemy.orm import Session
 
 from app.auth import get_current_user
 from app.database import get_db
-from app.models import Categoria, HistorialPrecio, Ingrediente
+from app.models import Categoria, Ingrediente
+from app.services.costes import crear_historial_precio
 from app.schemas import (
     ImportarConfirmItem,
     ImportarConfirmRequest,
@@ -109,12 +110,7 @@ def confirmar_importacion(data: ImportarConfirmRequest, db: Session = Depends(ge
             if not ing:
                 continue
             if ing.precio_compra != item.precio_compra:
-                historial = HistorialPrecio(
-                    ingrediente_id=ing.id,
-                    precio_anterior=ing.precio_compra,
-                    precio_nuevo=item.precio_compra,
-                )
-                db.add(historial)
+                crear_historial_precio(db, ing.id, ing.precio_compra, item.precio_compra)
             ing.precio_compra = item.precio_compra
             ing.cantidad_compra = item.cantidad_compra
             ing.proveedor = data.proveedor

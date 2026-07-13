@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/api";
+import { useToast } from "@/components/Toast";
 import type { Ingrediente, HistorialPrecio, Receta } from "@/lib/types";
 import Link from "next/link";
 
@@ -20,6 +21,7 @@ interface ComparacionProveedores {
 }
 
 export default function IngredienteDetailPage() {
+  const toast = useToast();
   const params = useParams<{ id: string }>();
   const router = useRouter();
   const id = params.id;
@@ -66,7 +68,7 @@ export default function IngredienteDetailPage() {
       await apiFetch(`/api/ingredientes/${id}`, { method: "DELETE" });
       router.push("/ingredientes");
     } catch (err: any) {
-      alert(err.message);
+      toast(err.message, "error");
     }
   };
 

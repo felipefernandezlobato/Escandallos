@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/api";
+import { useToast } from "@/components/Toast";
 import type { PedidoDetail } from "@/lib/types";
 
 interface RecibirLinea {
@@ -12,6 +13,7 @@ interface RecibirLinea {
 }
 
 export default function RecibirPedidoPage() {
+  const toast = useToast();
   const params = useParams();
   const router = useRouter();
   const id = params.id as string;
@@ -51,7 +53,7 @@ export default function RecibirPedidoPage() {
         `/api/pedidos/${id}/recibir`,
         { method: "POST", body: JSON.stringify(data) }
       );
-      alert(
+      toast(
         `Pedido recibido. ${
           result.precios_actualizados > 0
             ? `${result.precios_actualizados} precio(s) actualizado(s).`
@@ -60,7 +62,7 @@ export default function RecibirPedidoPage() {
       );
       router.push("/pedidos");
     } catch (err) {
-      alert("Error: " + (err as Error).message);
+      toast("Error: " + (err as Error).message, "error");
     } finally {
       setSaving(false);
     }

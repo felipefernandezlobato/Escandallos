@@ -2,12 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api";
+import { useToast } from "@/components/Toast";
 import type { Categoria, Ingrediente } from "@/lib/types";
 import Link from "next/link";
 
 const UNIDADES = ["kg", "g", "mg", "litro", "ml", "cl", "unidad"];
 
 export default function IngredientesPage() {
+  const toast = useToast();
   const [ingredientes, setIngredientes] = useState<Ingrediente[]>([]);
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [filtroCategoria, setFiltroCategoria] = useState("");
@@ -100,7 +102,7 @@ export default function IngredientesPage() {
       });
       fetchData();
     } catch (err) {
-      alert("Error al actualizar precio: " + (err as Error).message);
+      toast("Error al actualizar precio: " + (err as Error).message, "error");
     } finally {
       setEditingPrice(null);
     }
@@ -112,7 +114,7 @@ export default function IngredientesPage() {
       await apiFetch(`/api/ingredientes/${id}`, { method: "DELETE" });
       fetchData();
     } catch (err: any) {
-      alert(err.message);
+      toast(err.message, "error");
     }
   };
 

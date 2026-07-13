@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { apiFetch } from "@/lib/api";
+import { useToast } from "@/components/Toast";
 import type { Ingrediente, Categoria, RecomendacionItem } from "@/lib/types";
 
 interface StockEntry {
@@ -26,6 +27,7 @@ interface InventarioSnapshot {
 }
 
 export default function InventarioPage() {
+  const toast = useToast();
   const [ingredientes, setIngredientes] = useState<Ingrediente[]>([]);
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [stock, setStock] = useState<Record<number, StockEntry>>({});
@@ -170,7 +172,7 @@ export default function InventarioPage() {
       }));
 
     if (registros.length === 0) {
-      alert("No hay datos para guardar. Introduce al menos una cantidad.");
+      toast("No hay datos para guardar. Introduce al menos una cantidad.", "error");
       setSaving(false);
       return;
     }
@@ -198,7 +200,7 @@ export default function InventarioPage() {
       setCantidadesPedido(initial);
       setShowRecomendaciones(true);
     } catch (err) {
-      alert("Error al guardar: " + (err as Error).message);
+      toast("Error al guardar: " + (err as Error).message, "error");
     } finally {
       setSaving(false);
     }
@@ -249,7 +251,7 @@ export default function InventarioPage() {
       }));
 
     if (lineas.length === 0) {
-      alert("No hay items con cantidad > 0 para este proveedor.");
+      toast("No hay items con cantidad > 0 para este proveedor.", "error");
       return;
     }
 
@@ -259,9 +261,9 @@ export default function InventarioPage() {
         method: "POST",
         body: JSON.stringify({ proveedor, lineas }),
       });
-      alert(`Pedido para ${proveedor} creado como borrador.`);
+      toast(`Pedido para ${proveedor} creado como borrador.`);
     } catch (err) {
-      alert("Error: " + (err as Error).message);
+      toast("Error: " + (err as Error).message, "error");
     } finally {
       setCreatingOrder(false);
     }

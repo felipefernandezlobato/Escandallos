@@ -1,3 +1,4 @@
+import math
 from datetime import date, timedelta
 from typing import Optional
 
@@ -115,8 +116,6 @@ def recomendacion_pedido(
     When ingrediente_ids is provided, only calculate for those ingredients.
     Always includes items even when cantidad_sugerida is 0.
     """
-    import math
-
     if ingrediente_ids:
         ingredientes = (
             db.query(Ingrediente)

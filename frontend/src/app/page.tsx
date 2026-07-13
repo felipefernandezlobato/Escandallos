@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api";
 import { MENU, getMultiColor } from "@/lib/menu-data";
-import type { Receta } from "@/lib/types";
+import type { Receta, Ingrediente } from "@/lib/types";
 import Link from "next/link";
 
 export default function MenuPage() {
@@ -14,7 +14,7 @@ export default function MenuPage() {
   useEffect(() => {
     Promise.all([
       apiFetch<Receta[]>("/api/recetas"),
-      apiFetch<any[]>("/api/ingredientes"),
+      apiFetch<Ingrediente[]>("/api/ingredientes"),
     ])
       .then(([recetas, ingredientes]) => {
         const rMap: Record<string, { coste: number; id: number; pvp: number | null }> = {};

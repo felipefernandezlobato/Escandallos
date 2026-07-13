@@ -1,3 +1,4 @@
+import math
 from datetime import date, datetime, timedelta
 from typing import Optional
 
@@ -8,6 +9,7 @@ from sqlalchemy.orm import Session
 from app.auth import get_current_user
 from app.database import get_db
 from app.models import Ingrediente, InventarioRegistro, LineaPedido, Pedido
+from app.services.conversiones import to_week_key
 from app.schemas import (
     ConsumoOut,
     ConsumoSemanalItem,
@@ -80,9 +82,11 @@ def listar_inventario(
         .filter(InventarioRegistro.fecha_registro == target)
         .all()
     )
+    ing_ids = {r.ingrediente_id for r in registros}
+    ings = {i.id: i for i in db.query(Ingrediente).filter(Ingrediente.id.in_(ing_ids)).all()}
     items = []
     for r in registros:
-        ing = db.get(Ingrediente, r.ingrediente_id)
+        ing = ings.get(r.ingrediente_id)
         items.append({
             "id": r.id,
             "ingrediente_id": r.ingrediente_id,
@@ -113,17 +117,17 @@ def inventario_pivot(
         .order_by(InventarioRegistro.fecha_registro.desc())
         .all()
     )
-    def to_week(d):
-        iso = d.isocalendar()
-        return f"w{iso[1]}.{str(iso[0])[2:]}"
+
+    ing_ids = {r.ingrediente_id for r in registros}
+    ings = {i.id: i for i in db.query(Ingrediente).filter(Ingrediente.id.in_(ing_ids)).all()}
 
     fechas_set: set[str] = set()
     by_ing: dict[int, dict] = {}
     for r in registros:
-        week = to_week(r.fecha_registro)
+        week = to_week_key(r.fecha_registro)
         fechas_set.add(week)
         if r.ingrediente_id not in by_ing:
-            ing = db.get(Ingrediente, r.ingrediente_id)
+            ing = ings.get(r.ingrediente_id)
             by_ing[r.ingrediente_id] = {
                 "ingrediente_id": r.ingrediente_id,
                 "ingrediente_nombre": ing.nombre if ing else "",
@@ -176,9 +180,11 @@ def stock_actual_todos(
         )
         .all()
     )
+    ing_ids = {r.ingrediente_id for r in registros}
+    ings = {i.id: i for i in db.query(Ingrediente).filter(Ingrediente.id.in_(ing_ids)).all()}
     result = []
     for r in registros:
-        ing = db.get(Ingrediente, r.ingrediente_id)
+        ing = ings.get(r.ingrediente_id)
         result.append({
             "ingrediente_id": r.ingrediente_id,
             "ingrediente_nombre": ing.nombre if ing else "",
@@ -332,7 +338,6 @@ def obtener_consumo(
     rop = None  # safety stock level
     eoq = None  # target stock (par level)
     if media > 0 and len(historial) >= 3:
-        import math
         weekly_vals = [h["cantidad"] for h in historial]
         avg = sum(weekly_vals) / len(weekly_vals)
         variance = sum((v - avg) ** 2 for v in weekly_vals) / len(weekly_vals)

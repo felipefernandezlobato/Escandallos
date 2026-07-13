@@ -3,13 +3,14 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/api";
-import { MargenBadge } from "@/components/MargenBadge";
+import { useToast } from "@/components/Toast";
 import type { Categoria, RecetaDetail, Ingrediente, Receta, LineaRecetaInput } from "@/lib/types";
 import Link from "next/link";
 
 const UNIDADES = ["kg", "g", "mg", "litro", "ml", "cl", "unidad"];
 
 export default function RecetaDetailPage() {
+  const toast = useToast();
   const params = useParams();
   const router = useRouter();
   const id = params.id as string;
@@ -81,7 +82,7 @@ export default function RecetaDetailPage() {
       setEditing(false);
       fetchReceta();
     } catch (err) {
-      alert("Error al guardar: " + (err as Error).message);
+      toast("Error al guardar: " + (err as Error).message, "error");
     }
   };
 
@@ -91,7 +92,7 @@ export default function RecetaDetailPage() {
       await apiFetch(`/api/recetas/${id}`, { method: "DELETE" });
       router.push("/recetas");
     } catch (err: any) {
-      alert(err.message);
+      toast(err.message, "error");
     }
   };
 
