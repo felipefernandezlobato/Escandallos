@@ -181,7 +181,7 @@ export default function PedidosPage() {
                     <th className="pb-2 pr-4 font-medium sticky left-0 bg-[#F5F0E8] z-10">
                       Ingrediente
                     </th>
-                    <th className="pb-2 px-2 font-medium">Ud</th>
+                    <th className="pb-2 px-2 font-medium whitespace-nowrap">Ud</th>
                     {pivot.fechas.map((f) => (
                       <th
                         key={f}
@@ -206,7 +206,7 @@ export default function PedidosPage() {
                           {ing.ingrediente_nombre}
                         </Link>
                       </td>
-                      <td className="py-1.5 px-2 text-[#6B5E52]">{ing.unidad}</td>
+                      <td className="py-1.5 px-2 text-[#6B5E52] whitespace-nowrap">{ing.unidad}</td>
                       {pivot.fechas.map((f) => (
                         <td key={f} className="py-1.5 px-2 text-center">
                           {ing.fechas[f] !== undefined ? ing.fechas[f] : ""}

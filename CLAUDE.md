@@ -74,20 +74,29 @@ escandallos/
 └── CLAUDE.md    # This file — business rules and project context
 ```
 
-## HARD RULE: Download prod DB before ANY commit
+## HARD RULE: DB sync workflow
 
 The database file is tracked in git — it IS the persistence on Render free tier (no persistent disk).
-Every deploy overwrites the prod DB with whatever is in git. If the head chef made changes on the
-website (inventory, orders, etc.) and you push without downloading first, THOSE CHANGES ARE LOST.
+Every deploy overwrites the prod DB with whatever is in git.
 
-**BEFORE EVERY COMMIT, run this:**
+### At the START of every session (before any local work):
+Download the prod DB so you have the latest website changes:
 ```
 PROD_TOKEN=$(curl -s -X POST "https://bru-escandallos-api.onrender.com/api/auth/login" -H "Content-Type: application/json" -d '{"password":"bruteam"}' | python3 -c "import sys,json; print(json.load(sys.stdin)['token'])")
 curl -s "https://bru-escandallos-api.onrender.com/api/backup/descargar" -H "Authorization: Bearer $PROD_TOKEN" -o backend/data/escandallos.db
 ```
-Then `git add backend/data/escandallos.db` with your other changes.
 
-NO EXCEPTIONS. Do this even if you think nobody used the website. Do it at the start of every session AND before every push.
+### When committing and deploying:
+1. Do NOT download prod DB again (it would overwrite local work done during this session)
+2. `git add backend/data/escandallos.db` with your other changes
+3. `git push` + trigger Render deploy
+4. The local DB becomes the new prod DB
+
+### Key rules:
+- Download prod DB ONLY at session start, NEVER mid-session
+- Always include `backend/data/escandallos.db` in commits
+- Local data imports (Excel, invoices) go into the local DB, then get deployed via git push
+- Website changes by the team are captured by the session-start download
 
 ## Deploy Checklist
 
