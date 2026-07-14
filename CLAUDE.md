@@ -74,6 +74,15 @@ escandallos/
 └── CLAUDE.md    # This file — business rules and project context
 ```
 
+## Dev Workflow
+
+Before starting any session, sync prod DB to local:
+```
+PROD_TOKEN=$(curl -s -X POST "https://bru-escandallos-api.onrender.com/api/auth/login" -H "Content-Type: application/json" -d '{"password":"bruteam"}' | python3 -c "import sys,json; print(json.load(sys.stdin)['token'])")
+curl -s "https://bru-escandallos-api.onrender.com/api/backup/descargar" -H "Authorization: Bearer $PROD_TOKEN" -o backend/data/escandallos.db
+```
+This ensures local always has the latest real data from production.
+
 ## Deploy Checklist
 
 After making changes, ALWAYS:
