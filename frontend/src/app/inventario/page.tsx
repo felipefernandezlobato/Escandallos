@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState, useCallback } from "react";
 import Link from "next/link";
+import { useSearchParams, useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/api";
 import { useToast } from "@/components/Toast";
 import type { Ingrediente, Categoria, RecomendacionItem } from "@/lib/types";
@@ -60,7 +61,35 @@ function loadDraft(): Record<number, StockEntry> | null {
 }
 
 export default function InventarioPage() {
+  return (
+    <Suspense fallback={<p className="text-[#6B5E52] text-center py-10">Cargando...</p>}>
+      <InventarioContent />
+    </Suspense>
+  );
+}
+
+function InventarioContent() {
   const toast = useToast();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const urlTab = searchParams.get("tab") as "registrar" | "historial" | "analisis" | null;
+  const urlSemana = searchParams.get("semana");
+  const tab = urlTab || "registrar";
+  const historialFecha = urlSemana || "";
+
+  const setTab = useCallback((newTab: "registrar" | "historial" | "analisis") => {
+    router.push(`/inventario?tab=${newTab}`);
+  }, [router]);
+
+  const setHistorialFecha = useCallback((semana: string) => {
+    if (semana) {
+      router.push(`/inventario?tab=historial&semana=${semana}`);
+    } else {
+      router.push(`/inventario?tab=historial`);
+    }
+  }, [router]);
+
   const [ingredientes, setIngredientes] = useState<Ingrediente[]>([]);
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [stock, setStock] = useState<Record<number, StockEntry>>({});
@@ -68,10 +97,8 @@ export default function InventarioPage() {
   const [filtroCategoria, setFiltroCategoria] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [tab, setTab] = useState<"registrar" | "historial" | "analisis">("registrar");
   const [fechas, setFechas] = useState<string[]>([]);
   const [semanas, setSemanas] = useState<string[]>([]);
-  const [historialFecha, setHistorialFecha] = useState("");
   const [historial, setHistorial] = useState<InventarioSnapshot | null>(null);
   const [pivot, setPivot] = useState<{
     fechas: string[];
@@ -219,7 +246,9 @@ export default function InventarioPage() {
       setEditingRegistro(null);
       setEditCantidad("");
       fetchRegistrosHoy();
-      if (historialFecha) fetchHistorial(historialFecha);
+      if (historialFecha) {
+        apiFetch<{ snapshot: InventarioSnapshot | null }>(`/api/inventario?semana=${historialFecha}`).then((data) => setHistorial(data.snapshot));
+      }
       const conteo = await apiFetch<Record<string, { fecha: string; unidad: string }>>("/api/inventario/ultimo-conteo");
       setUltimoConteo(conteo);
       toast("Registro actualizado", "success");
@@ -245,14 +274,17 @@ export default function InventarioPage() {
     );
   };
 
-  const fetchHistorial = (semana: string) => {
-    setHistorialFecha(semana);
-    apiFetch<{ snapshot: InventarioSnapshot | null }>(
-      `/api/inventario?semana=${semana}`
-    ).then((data) => {
-      setHistorial(data.snapshot);
-    });
-  };
+  useEffect(() => {
+    if (urlSemana) {
+      apiFetch<{ snapshot: InventarioSnapshot | null }>(
+        `/api/inventario?semana=${urlSemana}`
+      ).then((data) => {
+        setHistorial(data.snapshot);
+      });
+    } else {
+      setHistorial(null);
+    }
+  }, [urlSemana]);
 
   const fetchPivot = () => {
     apiFetch<typeof pivot>("/api/inventario/pivot").then(setPivot);
@@ -396,7 +428,9 @@ export default function InventarioPage() {
     try {
       await apiFetch(`/api/inventario/${registroId}`, { method: "DELETE" });
       fetchRegistrosHoy();
-      if (historialFecha) fetchHistorial(historialFecha);
+      if (historialFecha) {
+        apiFetch<{ snapshot: InventarioSnapshot | null }>(`/api/inventario?semana=${historialFecha}`).then((data) => setHistorial(data.snapshot));
+      }
       const conteo = await apiFetch<Record<string, { fecha: string; unidad: string }>>("/api/inventario/ultimo-conteo");
       setUltimoConteo(conteo);
       toast("Registro eliminado", "success");
@@ -808,7 +842,7 @@ export default function InventarioPage() {
             <select
               value={historialFecha}
               onChange={(e) => {
-                if (e.target.value) fetchHistorial(e.target.value);
+                if (e.target.value) setHistorialFecha(e.target.value);
               }}
               className="border border-[#D4C4A8] rounded-lg px-3 py-2 text-sm"
             >
@@ -819,10 +853,10 @@ export default function InventarioPage() {
             </select>
             {historialFecha && (
               <button
-                onClick={() => { setHistorialFecha(""); setHistorial(null); }}
+                onClick={() => router.back()}
                 className="text-sm text-[#6B5E52] hover:text-[#8B1A2B]"
               >
-                Ver pivot
+                ← Ver pivot
               </button>
             )}
           </div>
