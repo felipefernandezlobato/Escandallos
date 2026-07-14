@@ -26,15 +26,16 @@ This is an internal tool for a coffee shop that serves brunch and drinks. The te
 
 ### Data
 - No authentication or user roles — small team, everyone has full access
-- SQLite database (file-based, no external database service)
-- Manual backups via download from the app. No automated cloud backups in v1
+- **Production:** Neon PostgreSQL (free tier, EU Frankfurt) — persists across Render sleep/wake
+- **Local dev:** SQLite (file-based, zero config) — or connect to Neon with DATABASE_URL
+- Backups via JSON download from `/api/backup/descargar`
 - Price history is tracked: every ingredient price change is recorded with date and old/new values
 
 ## Tech Stack
 
 - **Frontend:** Next.js (React) + Tailwind CSS — hosted on Vercel (free tier)
-- **Backend:** FastAPI (Python) + SQLAlchemy — hosted on Render or Railway (free tier)
-- **Database:** SQLite (file on the backend server)
+- **Backend:** FastAPI (Python) + SQLAlchemy — hosted on Render (free tier)
+- **Database:** Neon PostgreSQL (production) / SQLite (local dev)
 - **Total hosting cost:** 0 EUR
 
 ## UI Language
@@ -62,7 +63,7 @@ Ingredients define a purchase unit and a usage unit. The system converts between
 - Must be 100% free to host and run (no paid APIs, no paid databases, no paid hosting)
 - No authentication — keep it simple
 - Mobile-friendly — kitchen staff may use it on phones/tablets
-- Data must be exportable (CSV) and backupable (SQLite file download)
+- Data must be exportable (CSV) and backupable (JSON download)
 
 ## Project Structure
 
@@ -91,9 +92,12 @@ The `DATABASE_URL` env var controls which database to use:
 5. Run data import: `DATABASE_URL="postgresql://..." python migrate_to_neon.py`
 
 ### Local dev:
-- No env var needed — SQLite is the default
-- The local `data/escandallos.db` is for development only
-- To get prod data locally, use the JSON backup: `/api/backup/descargar`
+Two options:
+1. **Connect to Neon (recommended)** — same data as production, no sync needed:
+   ```
+   DATABASE_URL="postgresql://neondb_owner:npg_HxCRZJiBM3K0@ep-sparkling-morning-asxoz7zv.c-4.eu-central-1.aws.neon.tech/neondb?sslmode=require" python -m uvicorn app.main:app --port 8000
+   ```
+2. **Use local SQLite** — no env var needed, isolated dev database
 
 ## Deploy Checklist
 

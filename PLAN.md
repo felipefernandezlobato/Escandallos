@@ -12,9 +12,10 @@ Aplicacion web para gestionar los escandallos (fichas de coste) de una cafeteria
 |---|---|---|
 | Frontend | Next.js + React + Tailwind CSS | UI responsive, mobile-friendly |
 | Backend | FastAPI (Python) | API REST, auto-documentacion en /docs |
-| Base de datos | SQLite | Fichero local, sin coste, sin setup |
-| Hosting frontend | Vercel (free tier) | Hecho por el equipo de Next.js |
-| Hosting backend | Render o Railway (free tier) | Soporte Python nativo |
+| Base de datos (prod) | Neon PostgreSQL (free tier) | EU Frankfurt, persiste entre sleep/wake de Render |
+| Base de datos (dev) | SQLite | Fichero local, sin coste, sin setup |
+| Hosting frontend | Vercel (free tier) | Auto-deploy on push |
+| Hosting backend | Render (free tier) | Soporte Python nativo |
 | Coste total | 0 EUR | Free tiers cubren todo |
 
 **Nota:** Los free tiers pueden "dormir" el backend tras inactividad (~10-30s de cold start en la primera peticion del dia). Una vez que alguien lo usa por la manana, se mantiene activo todo el dia.
@@ -486,7 +487,73 @@ Objetivo: Reemplazar el sistema actual de pedidos/inventario en Google Sheets po
 #### 11.8 — Tests y Deploy
 - [x] 11.8.1 Tests de endpoints de inventario y pedidos (25 tests, 72 total)
 - [x] 11.8.2 Test de cálculo de consumo medio, recomendación, alertas, coste semanal
-- [ ] 11.8.3 Deploy a producción (push → auto-deploy)
+- [x] 11.8.3 Deploy a producción (push → auto-deploy)
+
+### Fase 12 — Mejoras UX Inventario y Pedidos (2026-07-14)
+
+#### 12.1 — Pedidos: Historial y visibilidad
+- [x] 12.1.1 Nueva pestaña "Activos" separando borradores (amarillo) y enviados (azul) con acciones claras
+- [x] 12.1.2 Pestaña "Historial" con filtros por estado (Todos/Borradores/Enviados/Recibidos)
+- [x] 12.1.3 Layout de cards en vez de tabla (mobile-friendly)
+- [x] 12.1.4 Badge con contador de pedidos activos
+
+#### 12.2 — Inventario: "Registrado hoy" mejorado
+- [x] 12.2.1 Tabla agrupada por categoría con cabeceras
+- [x] 12.2.2 Edición inline (click en cantidad para editar)
+- [x] 12.2.3 Botón eliminar por registro
+
+#### 12.3 — Persistencia de formulario
+- [x] 12.3.1 localStorage guarda borrador automáticamente al escribir
+- [x] 12.3.2 Restaura valores al volver a la página
+- [x] 12.3.3 Aviso beforeunload si hay datos sin guardar
+- [x] 12.3.4 Se limpia al guardar o vaciar
+
+#### 12.4 — Edición de historial
+- [x] 12.4.1 Backend: PUT /api/inventario/{id} para editar registros
+- [x] 12.4.2 Backend: PUT /api/pedidos/{id}/lineas/{id} para editar líneas (cualquier estado)
+- [x] 12.4.3 Pedidos recibidos permiten editar notas y fecha_recepcion
+- [x] 12.4.4 Frontend: edición inline en detalle de pedido (cantidad, recibido, precio)
+- [x] 12.4.5 Frontend: sección de notas editable en detalle de pedido
+- [x] 12.4.6 Inventario historial: selector por semana con edición por fecha
+
+#### 12.5 — Mejora del flow de pedidos
+- [x] 12.5.1 Detalle de pedido: total calculado, columna precio unitario
+- [x] 12.5.2 Tabla scrollable en móvil (overflow-x-auto + min-width)
+
+#### 12.6 — Unidades de medida
+- [x] 12.6.1 Auditoría de 43 ingredientes con registros de inventario
+- [x] 12.6.2 4 items (Canela, Chilli Flakes, Philadelphia, Vainilla) usan unidad con peso — correcto per "track bottles/pots/boxes"
+- [x] 12.6.3 Pan Viejo excluido de inventario (excluir_pedidos = true)
+
+#### 12.7 — Tests
+- [x] 12.7.1 Tests para PUT inventario (3 tests)
+- [x] 12.7.2 Tests para PUT líneas de pedido (4 tests)
+- [x] 12.7.3 Test para edición de pedido recibido (solo notas)
+- [x] 12.7.4 Tests para filtro por semana (2 tests)
+- [x] 12.7.5 Test end-to-end: recibir pedido crea inventario
+- [x] 12.7.6 **Total: 82 tests, todos pasando**
+
+### Fase 13 — Migración a Neon PostgreSQL (2026-07-14)
+
+#### 13.1 — Preparación del código
+- [x] 13.1.1 Añadir psycopg2-binary a requirements.txt
+- [x] 13.1.2 database.py: pool settings para PostgreSQL, PRAGMAs condicionales solo para SQLite
+- [x] 13.1.3 models.py: server_default compatible (sa.text("false") en vez de "0")
+- [x] 13.1.4 alembic/env.py: leer DATABASE_URL de variable de entorno
+- [x] 13.1.5 start.sh: simplificado a `alembic upgrade head` + `uvicorn`
+- [x] 13.1.6 backup.py: reescrito como export JSON (en vez de fichero SQLite)
+
+#### 13.2 — Migración de datos
+- [x] 13.2.1 Script migrate_to_neon.py con limpieza de orphan FKs y conversión de booleans
+- [x] 13.2.2 Crear tablas en Neon con alembic + columnas/tablas extra (unidad_rendimiento, proveedores, precios_proveedor)
+- [x] 13.2.3 Migrar: 17 categorias, 217 ingredientes, 165 recetas, 676 líneas, 366 historial, 459 inventario, 15 pedidos, 215 líneas pedido, 5 proveedores, 160 precios proveedor
+- [x] 13.2.4 Tests: 82/82 pasan (tests usan SQLite in-memory, no afectados)
+
+#### 13.3 — Deploy
+- [x] 13.3.1 Configurar DATABASE_URL en Render → Neon connection string
+- [x] 13.3.2 Deploy backend exitoso, conectado a Neon
+- [x] 13.3.3 Forzar redeploy frontend en Vercel
+- [x] 13.3.4 Verificado: datos persisten, todos los endpoints funcionan
 
 ---
 
@@ -521,7 +588,7 @@ Objetivo: Reemplazar el sistema actual de pedidos/inventario en Google Sheets po
 |---|---|---|
 | Idioma UI | Espanol | Equipo trabaja en espanol |
 | Autenticacion | Ninguna | Equipo pequeno, todos con acceso completo |
-| Base de datos | SQLite | Gratis, sin setup, suficiente para el volumen |
+| Base de datos | Neon PostgreSQL (prod) + SQLite (dev) | Gratis, persiste en Render free tier |
 | Procesamiento de facturas | Externo via Claude | Sin coste adicional, aprovecha suscripcion existente |
 | Hosting | Vercel + Render free tiers | Coste total: 0 EUR |
 | Sub-recetas | Si | Esencial para preparaciones base compartidas |
