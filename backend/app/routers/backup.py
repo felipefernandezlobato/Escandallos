@@ -1,50 +1,95 @@
 import csv
 import io
-import shutil
-import tempfile
-from pathlib import Path
+import json
 
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
-from fastapi.responses import FileResponse, StreamingResponse
+from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session, joinedload
-from starlette.background import BackgroundTask
 
 from app.auth import get_current_user
 from app.database import get_db
-from app.models import Ingrediente, LineaReceta, Receta
+from app.models import (
+    Categoria, Ingrediente, Receta, LineaReceta, HistorialPrecio,
+    Proveedor, PrecioProveedor, InventarioRegistro, Pedido, LineaPedido,
+)
 from app.services.costes import coste_por_racion, coste_total_receta, margen_real
 
 router = APIRouter(prefix="/api", tags=["backup"])
 
-DB_PATH = Path("data/escandallos.db")
-
 
 @router.get("/backup/descargar")
-def descargar_backup(user=Depends(get_current_user)):
-    if not DB_PATH.exists():
-        return {"error": "Base de datos no encontrada"}
-    tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".db")
-    shutil.copy2(DB_PATH, tmp.name)
-    tmp_path = tmp.name
-    tmp.close()
-    return FileResponse(
-        tmp_path,
-        filename="escandallos_backup.db",
-        media_type="application/octet-stream",
-        background=BackgroundTask(lambda: Path(tmp_path).unlink(missing_ok=True)),
+def descargar_backup(db: Session = Depends(get_db), user=Depends(get_current_user)):
+    """Export all data as JSON for backup purposes."""
+    data = {
+        "categorias": [
+            {"id": c.id, "nombre": c.nombre, "tipo": c.tipo, "margen_objetivo": c.margen_objetivo}
+            for c in db.query(Categoria).all()
+        ],
+        "ingredientes": [
+            {
+                "id": i.id, "nombre": i.nombre, "categoria_id": i.categoria_id,
+                "unidad_compra": i.unidad_compra, "cantidad_compra": i.cantidad_compra,
+                "precio_compra": i.precio_compra, "unidad_uso": i.unidad_uso,
+                "merma_porcentaje": i.merma_porcentaje, "proveedor": i.proveedor,
+                "notas": i.notas, "fecha_actualizacion": str(i.fecha_actualizacion) if i.fecha_actualizacion else None,
+                "excluir_pedidos": i.excluir_pedidos,
+            }
+            for i in db.query(Ingrediente).all()
+        ],
+        "recetas": [
+            {
+                "id": r.id, "nombre": r.nombre, "categoria_id": r.categoria_id,
+                "porciones_por_lote": r.porciones_por_lote, "precio_venta": r.precio_venta,
+                "es_subreceta": r.es_subreceta, "unidad_rendimiento": r.unidad_rendimiento,
+                "notas": r.notas,
+            }
+            for r in db.query(Receta).all()
+        ],
+        "lineas_receta": [
+            {
+                "id": l.id, "receta_id": l.receta_id, "ingrediente_id": l.ingrediente_id,
+                "subreceta_id": l.subreceta_id, "cantidad": l.cantidad, "unidad": l.unidad,
+            }
+            for l in db.query(LineaReceta).all()
+        ],
+        "historial_precios": [
+            {
+                "id": h.id, "ingrediente_id": h.ingrediente_id,
+                "precio_anterior": h.precio_anterior, "precio_nuevo": h.precio_nuevo,
+                "fecha_cambio": str(h.fecha_cambio) if h.fecha_cambio else None,
+            }
+            for h in db.query(HistorialPrecio).all()
+        ],
+        "inventario_registros": [
+            {
+                "id": r.id, "ingrediente_id": r.ingrediente_id, "cantidad": r.cantidad,
+                "unidad": r.unidad, "fecha_registro": str(r.fecha_registro), "notas": r.notas,
+            }
+            for r in db.query(InventarioRegistro).all()
+        ],
+        "pedidos": [
+            {
+                "id": p.id, "fecha": str(p.fecha), "proveedor": p.proveedor,
+                "estado": p.estado, "notas": p.notas,
+                "fecha_recepcion": str(p.fecha_recepcion) if p.fecha_recepcion else None,
+            }
+            for p in db.query(Pedido).all()
+        ],
+        "lineas_pedido": [
+            {
+                "id": l.id, "pedido_id": l.pedido_id, "ingrediente_id": l.ingrediente_id,
+                "cantidad_pedida": l.cantidad_pedida, "unidad": l.unidad,
+                "cantidad_recibida": l.cantidad_recibida, "precio_unitario": l.precio_unitario,
+            }
+            for l in db.query(LineaPedido).all()
+        ],
+    }
+    content = json.dumps(data, ensure_ascii=False, indent=2)
+    return StreamingResponse(
+        io.BytesIO(content.encode("utf-8")),
+        media_type="application/json",
+        headers={"Content-Disposition": "attachment; filename=escandallos_backup.json"},
     )
-
-
-@router.post("/backup/restaurar")
-async def restaurar_backup(file: UploadFile = File(...), user=Depends(get_current_user)):
-    content = await file.read()
-    # Validate SQLite magic header (first 16 bytes)
-    if content[:16] != b"SQLite format 3\000":
-        raise HTTPException(400, "El archivo no es una base de datos SQLite válida")
-    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
-    with open(DB_PATH, "wb") as f:
-        f.write(content)
-    return {"ok": True, "mensaje": "Backup restaurado. Reinicia el servidor para aplicar."}
 
 
 @router.get("/export/ingredientes")

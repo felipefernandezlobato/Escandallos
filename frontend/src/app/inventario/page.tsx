@@ -26,6 +26,39 @@ interface InventarioSnapshot {
   total_items: number;
 }
 
+const STORAGE_KEY = "bru_inventario_draft";
+
+function saveDraft(stock: Record<number, StockEntry>) {
+  const filled: Record<number, StockEntry> = {};
+  for (const [id, entry] of Object.entries(stock)) {
+    if (entry.cantidad !== "" && parseFloat(entry.cantidad) >= 0) {
+      filled[Number(id)] = entry;
+    }
+  }
+  if (Object.keys(filled).length > 0) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ ts: Date.now(), data: filled }));
+  } else {
+    localStorage.removeItem(STORAGE_KEY);
+  }
+}
+
+function loadDraft(): Record<number, StockEntry> | null {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (!raw) return null;
+  try {
+    const parsed = JSON.parse(raw);
+    const ageMs = Date.now() - (parsed.ts || 0);
+    if (ageMs > 24 * 60 * 60 * 1000) {
+      localStorage.removeItem(STORAGE_KEY);
+      return null;
+    }
+    return parsed.data;
+  } catch {
+    localStorage.removeItem(STORAGE_KEY);
+    return null;
+  }
+}
+
 export default function InventarioPage() {
   const toast = useToast();
   const [ingredientes, setIngredientes] = useState<Ingrediente[]>([]);
@@ -37,6 +70,7 @@ export default function InventarioPage() {
   const [saving, setSaving] = useState(false);
   const [tab, setTab] = useState<"registrar" | "historial" | "analisis">("registrar");
   const [fechas, setFechas] = useState<string[]>([]);
+  const [semanas, setSemanas] = useState<string[]>([]);
   const [historialFecha, setHistorialFecha] = useState("");
   const [historial, setHistorial] = useState<InventarioSnapshot | null>(null);
   const [pivot, setPivot] = useState<{
@@ -89,6 +123,8 @@ export default function InventarioPage() {
     unidad: string;
     notas: string | null;
   }>>([]);
+  const [editingRegistro, setEditingRegistro] = useState<number | null>(null);
+  const [editCantidad, setEditCantidad] = useState("");
 
   const fetchRegistrosHoy = () => {
     const hoy = new Date().toISOString().slice(0, 10);
@@ -103,7 +139,7 @@ export default function InventarioPage() {
     Promise.all([
       apiFetch<Ingrediente[]>("/api/ingredientes"),
       apiFetch<Categoria[]>("/api/categorias?tipo=ingrediente"),
-      apiFetch<{ fechas: string[]; snapshot: InventarioSnapshot | null }>("/api/inventario"),
+      apiFetch<{ fechas: string[]; semanas: string[]; snapshot: InventarioSnapshot | null }>("/api/inventario"),
       apiFetch<Record<string, { fecha: string; unidad: string }>>("/api/inventario/ultimo-conteo"),
       apiFetch<number[]>("/api/inventario/con-registros"),
     ])
@@ -114,6 +150,7 @@ export default function InventarioPage() {
         setIngredientes(ings);
         setCategorias(cats);
         setFechas(inv.fechas || []);
+        setSemanas(inv.semanas || []);
 
         const initial: Record<number, StockEntry> = {};
         for (const ing of ings) {
@@ -124,10 +161,72 @@ export default function InventarioPage() {
             unidad: lastUnit || ing.unidad_compra,
           };
         }
+
+        const draft = loadDraft();
+        if (draft) {
+          let restoredCount = 0;
+          for (const [id, entry] of Object.entries(draft)) {
+            const numId = Number(id);
+            if (initial[numId]) {
+              initial[numId] = { ...initial[numId], cantidad: entry.cantidad, unidad: entry.unidad };
+              restoredCount++;
+            }
+          }
+          if (restoredCount > 0) {
+            toast(`${restoredCount} valores restaurados del borrador anterior.`, "success");
+          }
+        }
+
         setStock(initial);
+        setTimeout(() => setDraftReady(true), 0);
       })
       .finally(() => setLoading(false));
   }, []);
+
+  // Save draft to localStorage whenever stock changes (skip during initial load)
+  const [draftReady, setDraftReady] = useState(false);
+  useEffect(() => {
+    if (draftReady) {
+      saveDraft(stock);
+    }
+  }, [stock, draftReady]);
+
+  // Warn on page unload if there are unsaved entries
+  useEffect(() => {
+    const filledEntries = Object.values(stock).filter(
+      (s) => s.cantidad !== "" && parseFloat(s.cantidad) >= 0
+    );
+    if (filledEntries.length === 0) return;
+
+    const handler = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+    };
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, [stock]);
+
+  const handleEditRegistro = async (registroId: number) => {
+    const qty = parseFloat(editCantidad);
+    if (isNaN(qty) || qty < 0) {
+      toast("Cantidad invalida", "error");
+      return;
+    }
+    try {
+      await apiFetch(`/api/inventario/${registroId}`, {
+        method: "PUT",
+        body: JSON.stringify({ cantidad: qty }),
+      });
+      setEditingRegistro(null);
+      setEditCantidad("");
+      fetchRegistrosHoy();
+      if (historialFecha) fetchHistorial(historialFecha);
+      const conteo = await apiFetch<Record<string, { fecha: string; unidad: string }>>("/api/inventario/ultimo-conteo");
+      setUltimoConteo(conteo);
+      toast("Registro actualizado", "success");
+    } catch (err) {
+      toast("Error: " + (err as Error).message, "error");
+    }
+  };
 
   const fetchAnalisis = () => {
     Promise.all([
@@ -146,10 +245,10 @@ export default function InventarioPage() {
     );
   };
 
-  const fetchHistorial = (fecha: string) => {
-    setHistorialFecha(fecha);
-    apiFetch<{ fechas: string[]; snapshot: InventarioSnapshot | null }>(
-      `/api/inventario?fecha=${fecha}`
+  const fetchHistorial = (semana: string) => {
+    setHistorialFecha(semana);
+    apiFetch<{ snapshot: InventarioSnapshot | null }>(
+      `/api/inventario?semana=${semana}`
     ).then((data) => {
       setHistorial(data.snapshot);
     });
@@ -202,6 +301,7 @@ export default function InventarioPage() {
         method: "POST",
         body: JSON.stringify({ registros }),
       });
+      localStorage.removeItem(STORAGE_KEY);
       setLastSaved(new Date().toLocaleTimeString("es"));
       const inv = await apiFetch<{ fechas: string[] }>("/api/inventario");
       setFechas(inv.fechas || []);
@@ -238,6 +338,7 @@ export default function InventarioPage() {
       };
     }
     setStock(cleared);
+    localStorage.removeItem(STORAGE_KEY);
   };
 
   const filledCount = Object.values(stock).filter(
@@ -295,6 +396,7 @@ export default function InventarioPage() {
     try {
       await apiFetch(`/api/inventario/${registroId}`, { method: "DELETE" });
       fetchRegistrosHoy();
+      if (historialFecha) fetchHistorial(historialFecha);
       const conteo = await apiFetch<Record<string, { fecha: string; unidad: string }>>("/api/inventario/ultimo-conteo");
       setUltimoConteo(conteo);
       toast("Registro eliminado", "success");
@@ -459,30 +561,107 @@ export default function InventarioPage() {
           )}
           </>)}
 
-          {!showRecomendaciones && registrosHoy.length > 0 && (
-            <div className="mt-4">
-              <h3 className="text-sm font-semibold text-[#6B5E52] mb-2">Registrado hoy</h3>
-              <div className="flex flex-wrap gap-2">
-                {registrosHoy.map((r) => (
-                  <div
-                    key={r.id}
-                    className="flex items-center gap-2 bg-white border border-[#E8DFD3] rounded-lg px-3 py-1.5 text-sm"
-                  >
-                    <span className="font-medium">{r.ingrediente_nombre}</span>
-                    <span className="text-[#6B5E52]">{r.cantidad} {r.unidad}</span>
-                    {r.notas && <span className="text-[10px] text-[#6B5E52]/60">({r.notas})</span>}
-                    <button
-                      onClick={() => handleDeleteRegistro(r.id)}
-                      className="text-red-400 hover:text-red-600 ml-1"
-                      title="Eliminar"
-                    >
-                      ✕
-                    </button>
-                  </div>
-                ))}
+          {!showRecomendaciones && registrosHoy.length > 0 && (() => {
+            const grouped: Record<string, typeof registrosHoy> = {};
+            for (const r of registrosHoy) {
+              const ing = ingredientes.find((i) => i.id === r.ingrediente_id);
+              const catId = ing?.categoria_id;
+              const cat = categorias.find((c) => c.id === catId);
+              const catName = cat?.nombre || "Otros";
+              if (!grouped[catName]) grouped[catName] = [];
+              grouped[catName].push(r);
+            }
+            return (
+              <div className="mt-6 bg-white border border-[#E8DFD3] rounded-lg overflow-hidden">
+                <div className="px-4 py-3 bg-[#F5F0E8] border-b border-[#E8DFD3] flex items-center justify-between">
+                  <h3 className="font-semibold text-[#8B1A2B]">
+                    Registrado hoy ({registrosHoy.length} items)
+                  </h3>
+                </div>
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-[#E8DFD3] text-left text-[#6B5E52]">
+                      <th className="px-4 py-2 font-medium">Ingrediente</th>
+                      <th className="px-4 py-2 font-medium text-right">Cantidad</th>
+                      <th className="px-4 py-2 font-medium text-right">Unidad</th>
+                      <th className="px-4 py-2 font-medium text-right w-20"></th>
+                    </tr>
+                  </thead>
+                    {Object.entries(grouped).sort(([a], [b]) => a.localeCompare(b, "es")).map(([catName, items]) => (
+                      <tbody key={catName}>
+                        <tr className="bg-[#F5F0E8]/50">
+                          <td colSpan={4} className="px-4 py-1.5 text-xs font-semibold text-[#8B1A2B] uppercase tracking-wider">
+                            {catName}
+                          </td>
+                        </tr>
+                        {items.map((r) => (
+                          <tr key={r.id} className="border-b border-[#E8DFD3]/50 hover:bg-[#F5F0E8]">
+                            <td className="px-4 py-2">
+                              <Link href={`/ingredientes/${r.ingrediente_id}`} className="text-[#8B1A2B] hover:underline">
+                                {r.ingrediente_nombre}
+                              </Link>
+                              {r.notas && <span className="text-[10px] text-[#6B5E52]/60 ml-2">({r.notas})</span>}
+                            </td>
+                            <td className="px-4 py-2 text-right">
+                              {editingRegistro === r.id ? (
+                                <input
+                                  type="number"
+                                  step="any"
+                                  min="0"
+                                  value={editCantidad}
+                                  onChange={(e) => setEditCantidad(e.target.value)}
+                                  onKeyDown={(e) => {
+                                    if (e.key === "Enter") handleEditRegistro(r.id);
+                                    if (e.key === "Escape") { setEditingRegistro(null); setEditCantidad(""); }
+                                  }}
+                                  className="w-20 border border-[#8B1A2B] rounded px-2 py-0.5 text-sm text-right"
+                                  autoFocus
+                                />
+                              ) : (
+                                <span
+                                  className="cursor-pointer hover:text-[#8B1A2B]"
+                                  onClick={() => { setEditingRegistro(r.id); setEditCantidad(String(r.cantidad)); }}
+                                  title="Click para editar"
+                                >
+                                  {r.cantidad}
+                                </span>
+                              )}
+                            </td>
+                            <td className="px-4 py-2 text-right text-[#6B5E52]">{r.unidad}</td>
+                            <td className="px-4 py-2 text-right">
+                              {editingRegistro === r.id ? (
+                                <div className="flex gap-1 justify-end">
+                                  <button
+                                    onClick={() => handleEditRegistro(r.id)}
+                                    className="text-xs text-green-600 hover:text-green-800"
+                                  >
+                                    OK
+                                  </button>
+                                  <button
+                                    onClick={() => { setEditingRegistro(null); setEditCantidad(""); }}
+                                    className="text-xs text-[#6B5E52] hover:text-[#8B1A2B]"
+                                  >
+                                    No
+                                  </button>
+                                </div>
+                              ) : (
+                                <button
+                                  onClick={() => handleDeleteRegistro(r.id)}
+                                  className="text-xs text-red-400 hover:text-red-600"
+                                  title="Eliminar"
+                                >
+                                  Eliminar
+                                </button>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    ))}
+                </table>
               </div>
-            </div>
-          )}
+            );
+          })()}
 
           {!showRecomendaciones && (
             <div className="sticky bottom-16 md:bottom-0 bg-[#F5F0E8] border-t border-[#E8DFD3] -mx-6 px-6 py-3 flex items-center justify-between">
@@ -624,44 +803,160 @@ export default function InventarioPage() {
 
       {tab === "historial" && (
         <div className="space-y-4">
-          {!pivot || pivot.ingredientes.length === 0 ? (
-            <p className="text-[#6B5E52] text-center py-10">
-              No hay registros de inventario todavia.
-            </p>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="text-sm border-collapse">
-                <thead>
-                  <tr className="border-b border-[#E8DFD3] text-left text-[#6B5E52]">
-                    <th className="pb-2 pr-4 font-medium sticky left-0 bg-[#F5F0E8] z-10">Ingrediente</th>
-                    <th className="pb-2 px-2 font-medium whitespace-nowrap">Ud</th>
-                    {pivot.fechas.map((f) => (
-                      <th key={f} className="pb-2 px-2 font-medium text-center whitespace-nowrap">
-                        {f}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {pivot.ingredientes.map((ing) => (
-                    <tr key={ing.ingrediente_id} className="border-b border-[#E8DFD3]/50 hover:bg-[#F5F0E8]">
-                      <td className="py-1.5 pr-4 sticky left-0 bg-[#F5F0E8] z-10 font-medium">
-                        <Link href={`/ingredientes/${ing.ingrediente_id}`} className="text-[#8B1A2B] hover:underline">
-                          {ing.ingrediente_nombre}
-                        </Link>
-                      </td>
-                      <td className="py-1.5 px-2 text-[#6B5E52] whitespace-nowrap">{ing.unidad}</td>
+          {/* Week selector for editing records */}
+          <div className="flex flex-wrap gap-3 items-center">
+            <select
+              value={historialFecha}
+              onChange={(e) => {
+                if (e.target.value) fetchHistorial(e.target.value);
+              }}
+              className="border border-[#D4C4A8] rounded-lg px-3 py-2 text-sm"
+            >
+              <option value="">Selecciona una semana...</option>
+              {semanas.map((s) => (
+                <option key={s} value={s}>Semana {s}</option>
+              ))}
+            </select>
+            {historialFecha && (
+              <button
+                onClick={() => { setHistorialFecha(""); setHistorial(null); }}
+                className="text-sm text-[#6B5E52] hover:text-[#8B1A2B]"
+              >
+                Ver pivot
+              </button>
+            )}
+          </div>
+
+          {historialFecha && historial ? (
+            <div className="bg-white border border-[#E8DFD3] rounded-lg overflow-hidden">
+              <div className="px-4 py-3 bg-[#F5F0E8] border-b border-[#E8DFD3]">
+                <h3 className="font-semibold text-[#8B1A2B]">
+                  Semana {historialFecha} ({historial.registros.length} registros)
+                </h3>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-[#E8DFD3] text-left text-[#6B5E52]">
+                      <th className="px-4 py-2 font-medium">Ingrediente</th>
+                      <th className="px-4 py-2 font-medium text-right">Cantidad</th>
+                      <th className="px-4 py-2 font-medium text-right">Unidad</th>
+                      <th className="px-4 py-2 font-medium text-right w-20"></th>
+                    </tr>
+                  </thead>
+                  {(() => {
+                    const byDate: Record<string, typeof historial.registros> = {};
+                    for (const r of historial.registros) {
+                      const d = String(r.fecha_registro);
+                      if (!byDate[d]) byDate[d] = [];
+                      byDate[d].push(r);
+                    }
+                    const sortedDates = Object.keys(byDate).sort((a, b) => b.localeCompare(a));
+                    return sortedDates.map((d) => (
+                      <tbody key={d}>
+                        {sortedDates.length > 1 && (
+                          <tr className="bg-[#F5F0E8]/50">
+                            <td colSpan={4} className="px-4 py-1.5 text-xs font-semibold text-[#8B1A2B] uppercase tracking-wider">
+                              {d}
+                            </td>
+                          </tr>
+                        )}
+                        {byDate[d].map((r) => (
+                          <tr key={r.id} className="border-b border-[#E8DFD3]/50 hover:bg-[#F5F0E8]">
+                            <td className="px-4 py-2">
+                              <Link href={`/ingredientes/${r.ingrediente_id}`} className="text-[#8B1A2B] hover:underline">
+                                {r.ingrediente_nombre}
+                              </Link>
+                            </td>
+                            <td className="px-4 py-2 text-right">
+                              {editingRegistro === r.id ? (
+                                <input
+                                  type="number"
+                                  step="any"
+                                  min="0"
+                                  value={editCantidad}
+                                  onChange={(e) => setEditCantidad(e.target.value)}
+                                  onKeyDown={(e) => {
+                                    if (e.key === "Enter") handleEditRegistro(r.id);
+                                    if (e.key === "Escape") { setEditingRegistro(null); setEditCantidad(""); }
+                                  }}
+                                  className="w-20 border border-[#8B1A2B] rounded px-2 py-0.5 text-sm text-right"
+                                  autoFocus
+                                />
+                              ) : (
+                                <span
+                                  className="cursor-pointer hover:text-[#8B1A2B]"
+                                  onClick={() => { setEditingRegistro(r.id); setEditCantidad(String(r.cantidad)); }}
+                                  title="Click para editar"
+                                >
+                                  {r.cantidad}
+                                </span>
+                              )}
+                            </td>
+                            <td className="px-4 py-2 text-right text-[#6B5E52]">{r.unidad}</td>
+                            <td className="px-4 py-2 text-right">
+                              {editingRegistro === r.id ? (
+                                <div className="flex gap-1 justify-end">
+                                  <button onClick={() => handleEditRegistro(r.id)} className="text-xs text-green-600 hover:text-green-800">OK</button>
+                                  <button onClick={() => { setEditingRegistro(null); setEditCantidad(""); }} className="text-xs text-[#6B5E52]">No</button>
+                                </div>
+                              ) : (
+                                <button
+                                  onClick={() => handleDeleteRegistro(r.id)}
+                                  className="text-xs text-red-400 hover:text-red-600"
+                                >
+                                  Eliminar
+                                </button>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    ));
+                  })()}
+                </table>
+              </div>
+            </div>
+          ) : !historialFecha ? (
+            !pivot || pivot.ingredientes.length === 0 ? (
+              <p className="text-[#6B5E52] text-center py-10">
+                No hay registros de inventario todavia.
+              </p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="text-sm border-collapse">
+                  <thead>
+                    <tr className="border-b border-[#E8DFD3] text-left text-[#6B5E52]">
+                      <th className="pb-2 pr-4 font-medium sticky left-0 bg-[#F5F0E8] z-10">Ingrediente</th>
+                      <th className="pb-2 px-2 font-medium whitespace-nowrap">Ud</th>
                       {pivot.fechas.map((f) => (
-                        <td key={f} className="py-1.5 px-2 text-center">
-                          {ing.fechas[f] !== undefined ? ing.fechas[f] : ""}
-                        </td>
+                        <th key={f} className="pb-2 px-2 font-medium text-center whitespace-nowrap">
+                          {f}
+                        </th>
                       ))}
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+                  </thead>
+                  <tbody>
+                    {pivot.ingredientes.map((ing) => (
+                      <tr key={ing.ingrediente_id} className="border-b border-[#E8DFD3]/50 hover:bg-[#F5F0E8]">
+                        <td className="py-1.5 pr-4 sticky left-0 bg-[#F5F0E8] z-10 font-medium">
+                          <Link href={`/ingredientes/${ing.ingrediente_id}`} className="text-[#8B1A2B] hover:underline">
+                            {ing.ingrediente_nombre}
+                          </Link>
+                        </td>
+                        <td className="py-1.5 px-2 text-[#6B5E52] whitespace-nowrap">{ing.unidad}</td>
+                        {pivot.fechas.map((f) => (
+                          <td key={f} className="py-1.5 px-2 text-center">
+                            {ing.fechas[f] !== undefined ? ing.fechas[f] : ""}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )
+          ) : null}
         </div>
       )}
 

@@ -14,6 +14,7 @@ from app.schemas import (
     ConsumoOut,
     ConsumoSemanalItem,
     InventarioRegistroOut,
+    InventarioRegistroUpdate,
     InventarioSnapshotCreate,
     InventarioSnapshotOut,
     RecomendacionItem,
@@ -76,9 +77,39 @@ def eliminar_registro_inventario(
     return {"ok": True}
 
 
+@router.put("/{registro_id}")
+def actualizar_registro_inventario(
+    registro_id: int,
+    data: InventarioRegistroUpdate,
+    db: Session = Depends(get_db),
+    user=Depends(get_current_user),
+):
+    reg = db.get(InventarioRegistro, registro_id)
+    if not reg:
+        raise HTTPException(404, "Registro no encontrado")
+
+    updates = data.model_dump(exclude_unset=True)
+    for key, val in updates.items():
+        setattr(reg, key, val)
+
+    db.commit()
+
+    ing = db.get(Ingrediente, reg.ingrediente_id)
+    return {
+        "id": reg.id,
+        "ingrediente_id": reg.ingrediente_id,
+        "cantidad": reg.cantidad,
+        "unidad": reg.unidad,
+        "fecha_registro": reg.fecha_registro,
+        "notas": reg.notas,
+        "ingrediente_nombre": ing.nombre if ing else "",
+    }
+
+
 @router.get("")
 def listar_inventario(
     fecha: Optional[str] = None,
+    semana: Optional[str] = None,
     db: Session = Depends(get_db),
     user=Depends(get_current_user),
 ):
@@ -90,12 +121,53 @@ def listar_inventario(
     )
     fechas_list = [f[0] for f in fechas]
 
+    # Group dates by week for the week selector
+    semanas_list = []
+    seen_weeks = set()
+    for f in fechas_list:
+        wk = to_week_key(f)
+        if wk not in seen_weeks:
+            seen_weeks.add(wk)
+            semanas_list.append(wk)
+
+    if semana:
+        # Filter records by week key (e.g. "w28.26")
+        registros = (
+            db.query(InventarioRegistro)
+            .order_by(InventarioRegistro.fecha_registro.desc())
+            .all()
+        )
+        registros = [r for r in registros if to_week_key(r.fecha_registro) == semana]
+        ing_ids = {r.ingrediente_id for r in registros}
+        ings = {i.id: i for i in db.query(Ingrediente).filter(Ingrediente.id.in_(ing_ids)).all()}
+        items = []
+        for r in registros:
+            ing = ings.get(r.ingrediente_id)
+            items.append({
+                "id": r.id,
+                "ingrediente_id": r.ingrediente_id,
+                "cantidad": r.cantidad,
+                "unidad": r.unidad,
+                "fecha_registro": r.fecha_registro,
+                "notas": r.notas,
+                "ingrediente_nombre": ing.nombre if ing else "",
+            })
+        return {
+            "fechas": [str(f) for f in fechas_list],
+            "semanas": semanas_list,
+            "snapshot": {
+                "fecha": semana,
+                "registros": items,
+                "total_items": len(items),
+            },
+        }
+
     if fecha:
         target = date.fromisoformat(fecha)
     elif fechas_list:
         target = fechas_list[0]
     else:
-        return {"fechas": [], "snapshot": None}
+        return {"fechas": [], "semanas": [], "snapshot": None}
 
     registros = (
         db.query(InventarioRegistro)
@@ -119,6 +191,7 @@ def listar_inventario(
 
     return {
         "fechas": [str(f) for f in fechas_list],
+        "semanas": semanas_list,
         "snapshot": {
             "fecha": str(target),
             "registros": items,
@@ -351,12 +424,13 @@ def obtener_consumo(
         .all()
     )
 
-    # Order-Up-To (Par Level) system for fixed weekly ordering
-    # target_stock = consumo_medio + safety_stock
-    # safety_stock = 1.65 × std_dev (95% service level)
-    # order_qty = target_stock - current_stock
-    rop = None  # safety stock level
-    eoq = None  # target stock (par level)
+    # Determine display unit from inventory records (actual tracking unit)
+    display_unit = ing.unidad_compra
+    if registros_stock:
+        display_unit = registros_stock[-1].unidad
+
+    rop = None
+    eoq = None
     if media > 0 and len(historial) >= 3:
         weekly_vals = [h["cantidad"] for h in historial]
         avg = sum(weekly_vals) / len(weekly_vals)
@@ -371,14 +445,14 @@ def obtener_consumo(
         ingrediente_id=ing.id,
         ingrediente_nombre=ing.nombre,
         consumo_medio=media,
-        unidad=ing.unidad_uso,
+        unidad=display_unit,
         tendencia=trend,
         reorder_point=rop,
         eoq=eoq,
         safety_stock=rop,
         par_level=eoq,
         historial=[
-            ConsumoSemanalItem(semana=h["semana"], cantidad=h["cantidad"], unidad=ing.unidad_uso)
+            ConsumoSemanalItem(semana=h["semana"], cantidad=h["cantidad"], unidad=display_unit)
             for h in historial
         ],
         stock_historial=[

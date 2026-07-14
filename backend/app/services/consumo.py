@@ -8,6 +8,34 @@ from sqlalchemy.orm import Session
 from app.models import InventarioRegistro, LineaPedido, Pedido, Ingrediente
 
 
+def _base_unit(unit_str: str) -> str:
+    """Extract the base unit family from a unit string.
+    'kg' → 'kg', 'unidad (450g)' → 'unidad', 'litro' → 'litro'
+    """
+    u = unit_str.strip().lower()
+    if u.startswith("unidad"):
+        return "unidad"
+    return u
+
+
+def _units_compatible(a: str, b: str) -> bool:
+    ba, bb = _base_unit(a), _base_unit(b)
+    if ba == bb:
+        return True
+    from app.services.conversiones import son_compatibles
+    return son_compatibles(ba, bb)
+
+
+def _convert_qty(qty: float, from_unit: str, to_unit: str) -> float:
+    if from_unit == to_unit or _base_unit(from_unit) == _base_unit(to_unit) == "unidad":
+        return qty
+    from app.services.conversiones import convertir, son_compatibles
+    bf, bt = _base_unit(from_unit), _base_unit(to_unit)
+    if son_compatibles(bf, bt):
+        return convertir(qty, bf, bt)
+    return qty
+
+
 def consumo_semanal(ingrediente_id: int, db: Session, semanas: int = 12) -> list[dict]:
     """Calculate weekly consumption based on received orders and inventory changes.
 
@@ -22,8 +50,24 @@ def consumo_semanal(ingrediente_id: int, db: Session, semanas: int = 12) -> list
         return []
     inicio = most_recent - timedelta(weeks=semanas)
 
+    # Determine target unit from inventory records or ingredient
+    ing = db.query(Ingrediente).get(ingrediente_id)
+    inventarios = (
+        db.query(InventarioRegistro)
+        .filter(
+            InventarioRegistro.ingrediente_id == ingrediente_id,
+            InventarioRegistro.fecha_registro >= inicio,
+        )
+        .order_by(InventarioRegistro.fecha_registro)
+        .all()
+    )
+    if inventarios:
+        target_unit = inventarios[-1].unidad
+    else:
+        target_unit = ing.unidad_compra if ing else "unidad"
+
     pedidos_recibidos = (
-        db.query(LineaPedido.cantidad_recibida, Pedido.fecha_recepcion)
+        db.query(LineaPedido.cantidad_recibida, LineaPedido.unidad, Pedido.fecha_recepcion)
         .join(Pedido)
         .filter(
             LineaPedido.ingrediente_id == ingrediente_id,
@@ -34,32 +78,27 @@ def consumo_semanal(ingrediente_id: int, db: Session, semanas: int = 12) -> list
         .all()
     )
 
-    inventarios = (
-        db.query(InventarioRegistro)
-        .filter(
-            InventarioRegistro.ingrediente_id == ingrediente_id,
-            InventarioRegistro.fecha_registro >= inicio,
-        )
-        .order_by(InventarioRegistro.fecha_registro)
-        .all()
-    )
-
     semana_data: dict[str, float] = {}
 
-    for qty, fecha in pedidos_recibidos:
+    for qty, order_unit, fecha in pedidos_recibidos:
         if qty and fecha:
             iso = fecha.isocalendar()
             key = f"w{iso[1]}.{str(iso[0])[2:]}"
-            semana_data[key] = semana_data.get(key, 0) + qty
+            converted = _convert_qty(qty, order_unit or target_unit, target_unit)
+            semana_data[key] = semana_data.get(key, 0) + converted
 
     if inventarios and len(inventarios) >= 2:
         for i in range(1, len(inventarios)):
             prev = inventarios[i - 1]
             curr = inventarios[i]
+            if not _units_compatible(prev.unidad, curr.unidad):
+                continue
             iso = curr.fecha_registro.isocalendar()
             key = f"w{iso[1]}.{str(iso[0])[2:]}"
+            prev_qty = _convert_qty(prev.cantidad, prev.unidad, target_unit)
+            curr_qty = _convert_qty(curr.cantidad, curr.unidad, target_unit)
             pedido_semana = semana_data.get(key, 0)
-            consumo = prev.cantidad + pedido_semana - curr.cantidad
+            consumo = prev_qty + pedido_semana - curr_qty
             if consumo > 0:
                 semana_data[key] = consumo
 
@@ -75,7 +114,7 @@ def consumo_medio_semanal(ingrediente_id: int, db: Session, semanas: int = 8) ->
     if not historial:
         return 0.0
     total = sum(h["cantidad"] for h in historial)
-    return round(total / len(historial), 2)
+    return round(total / semanas, 2)
 
 
 def stock_actual(ingrediente_id: int, db: Session) -> Optional[dict]:

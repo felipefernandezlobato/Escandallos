@@ -11,6 +11,7 @@ from sqlalchemy import (
     String,
     Text,
     func,
+    text as sa_text,
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -43,7 +44,7 @@ class Ingrediente(Base):
     proveedor: Mapped[Optional[str]] = mapped_column(String(200), nullable=True)
     notas: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     fecha_actualizacion: Mapped[date] = mapped_column(Date, default=func.current_date())
-    excluir_pedidos: Mapped[bool] = mapped_column(Boolean, default=False, server_default="0")
+    excluir_pedidos: Mapped[bool] = mapped_column(Boolean, default=False, server_default=sa_text("false"))
 
     categoria_rel: Mapped["Categoria"] = relationship(back_populates="ingredientes")
     historial_precios: Mapped[List["HistorialPrecio"]] = relationship(

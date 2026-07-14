@@ -74,42 +74,30 @@ escandallos/
 └── CLAUDE.md    # This file — business rules and project context
 ```
 
-## HARD RULE: DB sync workflow
+## Database
 
-The database file is tracked in git — it IS the persistence on Render free tier (no persistent disk).
-Every deploy overwrites the prod DB with whatever is in git.
+**Production uses Neon PostgreSQL** (free tier) — data persists across Render sleep/wake cycles.
+**Local dev uses SQLite** (file-based, zero config).
 
-### At the START of every session (before any local work):
-Download the prod DB so you have the latest website changes:
-```
-PROD_TOKEN=$(curl -s -X POST "https://bru-escandallos-api.onrender.com/api/auth/login" -H "Content-Type: application/json" -d '{"password":"bruteam"}' | python3 -c "import sys,json; print(json.load(sys.stdin)['token'])")
-curl -s "https://bru-escandallos-api.onrender.com/api/backup/descargar" -H "Authorization: Bearer $PROD_TOKEN" -o backend/data/escandallos.db
-```
+The `DATABASE_URL` env var controls which database to use:
+- Not set → defaults to `sqlite:///data/escandallos.db` (local dev)
+- Set to Neon URL → connects to PostgreSQL (production on Render)
 
-### When committing and deploying:
-1. Do NOT download prod DB again (it would overwrite local work done during this session)
-2. Checkpoint the WAL first (SQLite stores changes in a separate WAL file that git doesn't track):
-   ```
-   cd backend && source .venv/bin/activate && python -c "
-   from sqlalchemy import create_engine, text
-   engine = create_engine('sqlite:///./data/escandallos.db')
-   with engine.connect() as conn:
-       conn.execute(text('PRAGMA wal_checkpoint(TRUNCATE)'))
-   "
-   ```
-3. `git add backend/data/escandallos.db` with your other changes
-4. `git push` + trigger Render deploy
-5. The local DB becomes the new prod DB
+### First-time Neon setup:
+1. Create a free account at https://neon.tech
+2. Create a project, get the connection string
+3. Set `DATABASE_URL` in Render dashboard env vars
+4. Run migration: `DATABASE_URL="postgresql://..." alembic upgrade head`
+5. Run data import: `DATABASE_URL="postgresql://..." python migrate_to_neon.py`
 
-### Key rules:
-- Download prod DB ONLY at session start, NEVER mid-session
-- Always include `backend/data/escandallos.db` in commits
-- Local data imports (Excel, invoices) go into the local DB, then get deployed via git push
-- Website changes by the team are captured by the session-start download
+### Local dev:
+- No env var needed — SQLite is the default
+- The local `data/escandallos.db` is for development only
+- To get prod data locally, use the JSON backup: `/api/backup/descargar`
 
 ## Deploy Checklist
 
-After downloading prod DB and committing:
+After making changes:
 1. `git push` — triggers Vercel auto-deploy for frontend
 2. Trigger Render deploy: `curl -s "https://api.render.com/deploy/srv-d99vh8u7r5hc73bvaf9g?key=W1tZafHDZ9U"`
 3. Wait ~2-3 min, then verify: `curl -s -o /dev/null -w "%{http_code}" https://bru-escandallos-api.onrender.com/api/categorias` (expect 401)

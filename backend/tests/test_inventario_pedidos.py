@@ -120,6 +120,7 @@ class TestInventarioListar:
         assert resp.status_code == 200
         data = resp.json()
         assert data["fechas"] == []
+        assert data["semanas"] == []
         assert data["snapshot"] is None
 
     def test_listar_con_datos(self, client, seed):
@@ -131,8 +132,39 @@ class TestInventarioListar:
         resp = client.get("/api/inventario")
         data = resp.json()
         assert len(data["fechas"]) == 1
+        assert len(data["semanas"]) == 1
         assert data["snapshot"]["total_items"] == 1
         assert data["snapshot"]["registros"][0]["ingrediente_nombre"] == "Fresas"
+
+    def test_listar_por_semana(self, client, seed):
+        """Filtering by semana returns all records from that week."""
+        client.post("/api/inventario", json={
+            "registros": [
+                {"ingrediente_id": seed["fresas"].id, "cantidad": 5, "unidad": "kg"},
+                {"ingrediente_id": seed["leche"].id, "cantidad": 10, "unidad": "litro"},
+            ]
+        })
+        # Get the week key from the listing
+        listing = client.get("/api/inventario").json()
+        semana = listing["semanas"][0]
+
+        resp = client.get(f"/api/inventario?semana={semana}")
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["snapshot"]["total_items"] == 2
+        assert data["snapshot"]["fecha"] == semana
+
+    def test_listar_por_semana_inexistente(self, client, seed):
+        """Filtering by a non-existent week returns empty snapshot."""
+        client.post("/api/inventario", json={
+            "registros": [
+                {"ingrediente_id": seed["fresas"].id, "cantidad": 5, "unidad": "kg"},
+            ]
+        })
+        resp = client.get("/api/inventario?semana=w99.99")
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["snapshot"]["total_items"] == 0
 
 
 class TestStockActual:
@@ -274,7 +306,8 @@ class TestPedidoActualizar:
         assert resp.status_code == 200
         assert resp.json()["notas"] == "Urgente"
 
-    def test_no_actualizar_recibido(self, client, seed):
+    def test_recibido_solo_notas(self, client, seed):
+        """Received orders allow only notas/fecha_recepcion updates."""
         create = client.post("/api/pedidos", json={
             "proveedor": "Pfaff",
             "lineas": [
@@ -287,8 +320,14 @@ class TestPedidoActualizar:
         client.post(f"/api/pedidos/{pid}/recibir", json={
             "lineas": [{"linea_id": lid, "cantidad_recibida": 5}]
         })
+        # Notas update should work on received orders
         resp = client.put(f"/api/pedidos/{pid}", json={"notas": "test"})
-        assert resp.status_code == 400
+        assert resp.status_code == 200
+        assert resp.json()["notas"] == "test"
+        # Proveedor update should be silently ignored on received orders
+        resp = client.put(f"/api/pedidos/{pid}", json={"proveedor": "Otro"})
+        assert resp.status_code == 200
+        assert resp.json()["proveedor"] == "Pfaff"  # unchanged
 
 
 class TestPedidoEliminar:
@@ -341,6 +380,33 @@ class TestPedidoRecibir:
         assert pedido["estado"] == "recibido"
         assert pedido["lineas"][0]["cantidad_recibida"] == 4.8
 
+    def test_recibir_crea_inventario(self, client, seed):
+        """Receiving an order creates inventory records for each line."""
+        # Register initial stock
+        client.post("/api/inventario", json={
+            "registros": [
+                {"ingrediente_id": seed["fresas"].id, "cantidad": 2, "unidad": "kg"},
+            ]
+        })
+        # Create, send, and receive order
+        create = client.post("/api/pedidos", json={
+            "proveedor": "Pfaff",
+            "lineas": [
+                {"ingrediente_id": seed["fresas"].id, "cantidad_pedida": 5, "unidad": "kg"},
+            ]
+        })
+        pid = create.json()["id"]
+        lid = create.json()["lineas"][0]["id"]
+        client.post(f"/api/pedidos/{pid}/enviar")
+        client.post(f"/api/pedidos/{pid}/recibir", json={
+            "lineas": [{"linea_id": lid, "cantidad_recibida": 5}]
+        })
+        # Stock should be initial (2) + received (5) = 7
+        # The recibir endpoint creates a new record with the summed quantity
+        stock = client.get("/api/inventario/actual").json()
+        fresas_stock = [s for s in stock if s["ingrediente_id"] == seed["fresas"].id]
+        assert any(s["cantidad"] == 7 for s in fresas_stock)
+
     def test_no_recibir_ya_recibido(self, client, seed):
         create = client.post("/api/pedidos", json={
             "proveedor": "Pfaff",
@@ -358,6 +424,83 @@ class TestPedidoRecibir:
             "lineas": [{"linea_id": lid, "cantidad_recibida": 5}]
         })
         assert resp.status_code == 400
+
+
+class TestInventarioActualizar:
+    def test_actualizar_cantidad(self, client, seed):
+        client.post("/api/inventario", json={
+            "registros": [
+                {"ingrediente_id": seed["fresas"].id, "cantidad": 5, "unidad": "kg"},
+            ]
+        })
+        inv = client.get("/api/inventario").json()
+        reg_id = inv["snapshot"]["registros"][0]["id"]
+        resp = client.put(f"/api/inventario/{reg_id}", json={"cantidad": 3.5})
+        assert resp.status_code == 200
+        assert resp.json()["cantidad"] == 3.5
+        assert resp.json()["ingrediente_nombre"] == "Fresas"
+
+    def test_actualizar_notas(self, client, seed):
+        client.post("/api/inventario", json={
+            "registros": [
+                {"ingrediente_id": seed["fresas"].id, "cantidad": 2, "unidad": "kg"},
+            ]
+        })
+        inv = client.get("/api/inventario").json()
+        reg_id = inv["snapshot"]["registros"][0]["id"]
+        resp = client.put(f"/api/inventario/{reg_id}", json={"notas": "conteo parcial"})
+        assert resp.status_code == 200
+        assert resp.json()["notas"] == "conteo parcial"
+
+    def test_actualizar_no_existe(self, client, seed):
+        resp = client.put("/api/inventario/9999", json={"cantidad": 1})
+        assert resp.status_code == 404
+
+
+class TestLineaPedidoActualizar:
+    def test_actualizar_linea_borrador(self, client, seed):
+        create = client.post("/api/pedidos", json={
+            "proveedor": "Pfaff",
+            "lineas": [
+                {"ingrediente_id": seed["fresas"].id, "cantidad_pedida": 5, "unidad": "kg"},
+            ]
+        })
+        pid = create.json()["id"]
+        lid = create.json()["lineas"][0]["id"]
+        resp = client.put(f"/api/pedidos/{pid}/lineas/{lid}", json={"cantidad_pedida": 10})
+        assert resp.status_code == 200
+        assert resp.json()["cantidad_pedida"] == 10
+
+    def test_actualizar_linea_recibido(self, client, seed):
+        """Can edit lines even on received orders."""
+        create = client.post("/api/pedidos", json={
+            "proveedor": "Pfaff",
+            "lineas": [
+                {"ingrediente_id": seed["fresas"].id, "cantidad_pedida": 5, "unidad": "kg"},
+            ]
+        })
+        pid = create.json()["id"]
+        lid = create.json()["lineas"][0]["id"]
+        client.post(f"/api/pedidos/{pid}/enviar")
+        client.post(f"/api/pedidos/{pid}/recibir", json={
+            "lineas": [{"linea_id": lid, "cantidad_recibida": 5}]
+        })
+        resp = client.put(f"/api/pedidos/{pid}/lineas/{lid}", json={
+            "cantidad_recibida": 4.5, "precio_unitario": 3.20
+        })
+        assert resp.status_code == 200
+        assert resp.json()["cantidad_recibida"] == 4.5
+        assert resp.json()["precio_unitario"] == 3.20
+
+    def test_actualizar_linea_no_existe(self, client, seed):
+        create = client.post("/api/pedidos", json={"proveedor": "Pfaff"})
+        pid = create.json()["id"]
+        resp = client.put(f"/api/pedidos/{pid}/lineas/9999", json={"cantidad_pedida": 1})
+        assert resp.status_code == 404
+
+    def test_actualizar_linea_pedido_no_existe(self, client, seed):
+        resp = client.put("/api/pedidos/9999/lineas/1", json={"cantidad_pedida": 1})
+        assert resp.status_code == 404
 
 
 class TestPedidoPorProveedor:

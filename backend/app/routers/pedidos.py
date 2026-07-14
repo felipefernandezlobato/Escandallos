@@ -17,6 +17,7 @@ from app.services.consumo import recomendacion_pedido
 from app.services.costes import crear_historial_precio
 from app.schemas import (
     LineaPedidoOut,
+    LineaPedidoUpdate,
     PedidoCreate,
     PedidoDetailOut,
     PedidoOut,
@@ -213,20 +214,23 @@ def actualizar_pedido(
     p = db.get(Pedido, pedido_id)
     if not p:
         raise HTTPException(404, "Pedido no encontrado")
-    if p.estado == "recibido":
-        raise HTTPException(400, "No se puede modificar un pedido ya recibido")
 
     updates = data.model_dump(exclude_unset=True)
     lineas_nuevas = updates.pop("lineas", None)
 
-    for key, val in updates.items():
-        setattr(p, key, val)
-
-    if lineas_nuevas is not None:
-        db.query(LineaPedido).filter(LineaPedido.pedido_id == pedido_id).delete()
-        for linea_data in lineas_nuevas:
-            linea = LineaPedido(pedido_id=pedido_id, **linea_data)
-            db.add(linea)
+    if p.estado == "recibido":
+        # Only allow notas and fecha_recepcion updates on received orders
+        allowed = {k: v for k, v in updates.items() if k in ("notas", "fecha_recepcion")}
+        for key, val in allowed.items():
+            setattr(p, key, val)
+    else:
+        for key, val in updates.items():
+            setattr(p, key, val)
+        if lineas_nuevas is not None:
+            db.query(LineaPedido).filter(LineaPedido.pedido_id == pedido_id).delete()
+            for linea_data in lineas_nuevas:
+                linea = LineaPedido(pedido_id=pedido_id, **linea_data)
+                db.add(linea)
 
     db.commit()
 
@@ -241,6 +245,44 @@ def actualizar_pedido(
     out = _pedido_to_out(p)
     out["lineas"] = [_linea_to_out(l) for l in p.lineas]
     return out
+
+
+@router.put("/{pedido_id}/lineas/{linea_id}")
+def actualizar_linea_pedido(
+    pedido_id: int,
+    linea_id: int,
+    data: LineaPedidoUpdate,
+    db: Session = Depends(get_db),
+    user=Depends(get_current_user),
+):
+    p = db.get(Pedido, pedido_id)
+    if not p:
+        raise HTTPException(404, "Pedido no encontrado")
+
+    linea = (
+        db.query(LineaPedido)
+        .filter(LineaPedido.id == linea_id, LineaPedido.pedido_id == pedido_id)
+        .first()
+    )
+    if not linea:
+        raise HTTPException(404, "Linea no encontrada")
+
+    updates = data.model_dump(exclude_unset=True)
+    for key, val in updates.items():
+        setattr(linea, key, val)
+
+    db.commit()
+
+    ing = db.get(Ingrediente, linea.ingrediente_id)
+    return {
+        "id": linea.id,
+        "ingrediente_id": linea.ingrediente_id,
+        "cantidad_pedida": linea.cantidad_pedida,
+        "unidad": linea.unidad,
+        "cantidad_recibida": linea.cantidad_recibida,
+        "precio_unitario": linea.precio_unitario,
+        "ingrediente_nombre": ing.nombre if ing else "",
+    }
 
 
 @router.delete("/{pedido_id}")

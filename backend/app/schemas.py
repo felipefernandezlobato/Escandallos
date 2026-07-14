@@ -226,6 +226,12 @@ class InventarioRegistroCreate(BaseModel):
     notas: Optional[str] = None
 
 
+class InventarioRegistroUpdate(BaseModel):
+    cantidad: Optional[float] = None
+    unidad: Optional[str] = None
+    notas: Optional[str] = None
+
+
 class InventarioSnapshotCreate(BaseModel):
     fecha: Optional[str] = None
     registros: list[InventarioRegistroCreate]
@@ -258,6 +264,13 @@ class LineaPedidoCreate(BaseModel):
     precio_unitario: Optional[float] = None
 
 
+class LineaPedidoUpdate(BaseModel):
+    cantidad_pedida: Optional[float] = None
+    cantidad_recibida: Optional[float] = None
+    precio_unitario: Optional[float] = None
+    unidad: Optional[str] = None
+
+
 class LineaPedidoOut(BaseModel):
     id: int
     ingrediente_id: int
@@ -281,6 +294,7 @@ class PedidoUpdate(BaseModel):
     estado: Optional[str] = None
     notas: Optional[str] = None
     lineas: Optional[list[LineaPedidoCreate]] = None
+    fecha_recepcion: Optional[date] = None
 
 
 class PedidoOut(BaseModel):
