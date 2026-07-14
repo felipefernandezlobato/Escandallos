@@ -1,6 +1,6 @@
 import math
 from datetime import date, timedelta
-from typing import Optional
+from typing import List, Optional
 
 from sqlalchemy import func
 from sqlalchemy.orm import Session
@@ -108,7 +108,7 @@ def tendencia_consumo(historial: list[dict]) -> str:
 
 
 def recomendacion_pedido(
-    db: Session, ingrediente_ids: list[int] | None = None
+    db: Session, ingrediente_ids: Optional[List[int]] = None
 ) -> list[dict]:
     """Order-Up-To system: pedir = par_level - stock_actual.
     Par level = consumo_medio + safety_stock (1.65 × std_dev).

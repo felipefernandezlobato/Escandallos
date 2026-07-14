@@ -74,6 +74,7 @@ export default function InventarioPage() {
     stock_historial?: Array<{ fecha: string; cantidad: number; unidad: string }>;
   } | null>(null);
   const [selectedIngId, setSelectedIngId] = useState<number | null>(null);
+  const [idsConRegistros, setIdsConRegistros] = useState<number[]>([]);
   const [vista, setVista] = useState<"cocina" | "cafe">("cocina");
   const [ultimoConteo, setUltimoConteo] = useState<Record<string, { fecha: string; unidad: string }>>({});
   const [recomendaciones, setRecomendaciones] = useState<RecomendacionItem[]>([]);
@@ -104,8 +105,10 @@ export default function InventarioPage() {
       apiFetch<Categoria[]>("/api/categorias?tipo=ingrediente"),
       apiFetch<{ fechas: string[]; snapshot: InventarioSnapshot | null }>("/api/inventario"),
       apiFetch<Record<string, { fecha: string; unidad: string }>>("/api/inventario/ultimo-conteo"),
+      apiFetch<number[]>("/api/inventario/con-registros"),
     ])
-      .then(([ings, cats, inv, conteo]) => {
+      .then(([ings, cats, inv, conteo, conReg]) => {
+        setIdsConRegistros(conReg);
         fetchRegistrosHoy();
         setUltimoConteo(conteo);
         setIngredientes(ings);
@@ -569,7 +572,7 @@ export default function InventarioPage() {
                                   )}
                                 </div>
                               </td>
-                              <td className="px-4 py-2 text-right">
+                              <td className="px-4 py-2 text-right whitespace-nowrap">
                                 <span
                                   className={
                                     item.dias_stock !== null && item.dias_stock < 2
@@ -580,7 +583,7 @@ export default function InventarioPage() {
                                   {item.stock_actual} {item.unidad}
                                 </span>
                               </td>
-                              <td className="px-4 py-2 text-right text-[#6B5E52]">
+                              <td className="px-4 py-2 text-right text-[#6B5E52] whitespace-nowrap">
                                 {item.par_level > 0
                                   ? `${item.par_level} ${item.unidad}`
                                   : "—"}
@@ -631,7 +634,7 @@ export default function InventarioPage() {
                 <thead>
                   <tr className="border-b border-[#E8DFD3] text-left text-[#6B5E52]">
                     <th className="pb-2 pr-4 font-medium sticky left-0 bg-[#F5F0E8] z-10">Ingrediente</th>
-                    <th className="pb-2 px-2 font-medium">Ud</th>
+                    <th className="pb-2 px-2 font-medium whitespace-nowrap">Ud</th>
                     {pivot.fechas.map((f) => (
                       <th key={f} className="pb-2 px-2 font-medium text-center whitespace-nowrap">
                         {f}
@@ -647,7 +650,7 @@ export default function InventarioPage() {
                           {ing.ingrediente_nombre}
                         </Link>
                       </td>
-                      <td className="py-1.5 px-2 text-[#6B5E52]">{ing.unidad}</td>
+                      <td className="py-1.5 px-2 text-[#6B5E52] whitespace-nowrap">{ing.unidad}</td>
                       {pivot.fechas.map((f) => (
                         <td key={f} className="py-1.5 px-2 text-center">
                           {ing.fechas[f] !== undefined ? ing.fechas[f] : ""}
@@ -762,7 +765,7 @@ export default function InventarioPage() {
                     const W = 600;
                     const H = 200;
                     const PAD_L = 48;
-                    const PAD_R = 12;
+                    const PAD_R = 100;
                     const PAD_T = 12;
                     const PAD_B = 36;
                     const plotW = W - PAD_L - PAD_R;
@@ -770,7 +773,11 @@ export default function InventarioPage() {
                     const maxVal = Math.max(...data.map((d) => d.cantidad), rop ?? 0, eoq ?? 0);
                     const minVal = 0;
                     const range = maxVal - minVal || 1;
-                    const xOf = (i: number) => PAD_L + (i / Math.max(data.length - 1, 1)) * plotW;
+                    const timestamps = data.map((d) => new Date(d.fecha).getTime());
+                    const tMin = Math.min(...timestamps);
+                    const tMax = Math.max(...timestamps);
+                    const tRange = tMax - tMin || 1;
+                    const xOf = (i: number) => PAD_L + ((timestamps[i] - tMin) / tRange) * plotW;
                     const yOf = (v: number) => PAD_T + plotH - ((v - minVal) / range) * plotH;
                     const points = data.map((d, i) => `${xOf(i)},${yOf(d.cantidad)}`).join(" ");
                     // Y-axis ticks: 4 steps
@@ -835,8 +842,8 @@ export default function InventarioPage() {
                             <>
                               <line x1={PAD_L} y1={yOf(rop)} x2={W - PAD_R} y2={yOf(rop)}
                                 stroke="#dc2626" strokeWidth="1" strokeDasharray="6,4" />
-                              <text x={W - PAD_R - 2} y={yOf(rop) - 4} textAnchor="end"
-                                fontSize="9" fill="#dc2626" fontWeight="600">Stk Seguridad</text>
+                              <text x={W - PAD_R + 6} y={yOf(rop) + 4} textAnchor="start"
+                                fontSize="11" fill="#dc2626" fontWeight="600">Seguridad: {rop}</text>
                             </>
                           )}
                           {/* Par level line */}
@@ -844,8 +851,8 @@ export default function InventarioPage() {
                             <>
                               <line x1={PAD_L} y1={yOf(eoq)} x2={W - PAD_R} y2={yOf(eoq)}
                                 stroke="#2563eb" strokeWidth="1" strokeDasharray="6,4" />
-                              <text x={W - PAD_R - 2} y={yOf(eoq) - 4} textAnchor="end"
-                                fontSize="9" fill="#2563eb" fontWeight="600">Stk Deseado</text>
+                              <text x={W - PAD_R + 6} y={yOf(eoq) + 4} textAnchor="start"
+                                fontSize="11" fill="#2563eb" fontWeight="600">Deseado: {eoq}</text>
                             </>
                           )}
                           {/* Line */}
@@ -936,7 +943,9 @@ export default function InventarioPage() {
               className="border border-[#D4C4A8] rounded-lg px-3 py-2 text-sm w-full max-w-md"
             >
               <option value="">Selecciona un ingrediente...</option>
-              {ingredientes.map((ing) => (
+              {ingredientes
+                .filter((ing) => idsConRegistros.includes(ing.id))
+                .map((ing) => (
                 <option key={ing.id} value={ing.id}>
                   {ing.nombre}
                 </option>

@@ -171,6 +171,16 @@ def historial_precios(ingrediente_id: int, db: Session = Depends(get_db), user=D
     )
 
 
+@router.delete("/{ingrediente_id}/historial/{historial_id}")
+def eliminar_historial_precio(ingrediente_id: int, historial_id: int, db: Session = Depends(get_db), user=Depends(get_current_user)):
+    entry = db.get(HistorialPrecio, historial_id)
+    if not entry or entry.ingrediente_id != ingrediente_id:
+        raise HTTPException(404, "Registro no encontrado")
+    db.delete(entry)
+    db.commit()
+    return {"ok": True}
+
+
 @router.get("/{ingrediente_id}/recetas", response_model=list[RecetaOut])
 def recetas_con_ingrediente(ingrediente_id: int, db: Session = Depends(get_db), user=Depends(get_current_user)):
     ing = db.get(Ingrediente, ingrediente_id)

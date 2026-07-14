@@ -74,24 +74,29 @@ escandallos/
 └── CLAUDE.md    # This file — business rules and project context
 ```
 
-## Dev Workflow
+## HARD RULE: Download prod DB before ANY commit
 
-Before starting any session, sync prod DB to local:
+The database file is tracked in git — it IS the persistence on Render free tier (no persistent disk).
+Every deploy overwrites the prod DB with whatever is in git. If the head chef made changes on the
+website (inventory, orders, etc.) and you push without downloading first, THOSE CHANGES ARE LOST.
+
+**BEFORE EVERY COMMIT, run this:**
 ```
 PROD_TOKEN=$(curl -s -X POST "https://bru-escandallos-api.onrender.com/api/auth/login" -H "Content-Type: application/json" -d '{"password":"bruteam"}' | python3 -c "import sys,json; print(json.load(sys.stdin)['token'])")
 curl -s "https://bru-escandallos-api.onrender.com/api/backup/descargar" -H "Authorization: Bearer $PROD_TOKEN" -o backend/data/escandallos.db
 ```
-This ensures local always has the latest real data from production.
+Then `git add backend/data/escandallos.db` with your other changes.
+
+NO EXCEPTIONS. Do this even if you think nobody used the website. Do it at the start of every session AND before every push.
 
 ## Deploy Checklist
 
-After making changes, ALWAYS:
+After downloading prod DB and committing:
 1. `git push` — triggers Vercel auto-deploy for frontend
 2. Trigger Render deploy: `curl -s "https://api.render.com/deploy/srv-d99vh8u7r5hc73bvaf9g?key=W1tZafHDZ9U"`
 3. Wait ~2-3 min, then verify: `curl -s -o /dev/null -w "%{http_code}" https://bru-escandallos-api.onrender.com/api/categorias` (expect 401)
-4. If local DB has new data for prod: sync via API endpoints (NOT backup/restaurar — it crashes the server)
-5. Frontend: https://frontend-bruteam.vercel.app
-6. Backend: https://bru-escandallos-api.onrender.com
+4. Frontend: https://frontend-bruteam.vercel.app
+5. Backend: https://bru-escandallos-api.onrender.com
 
 Render start command is `bash start.sh` (set in dashboard, NOT render.yaml). It auto-handles alembic migrations.
 

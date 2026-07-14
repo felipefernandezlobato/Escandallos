@@ -41,6 +41,8 @@ export default function IngredienteDetailPage() {
   } | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [editingPrice, setEditingPrice] = useState(false);
+  const [newPrice, setNewPrice] = useState("");
 
   useEffect(() => {
     setLoading(true);
@@ -104,9 +106,44 @@ export default function IngredienteDetailPage() {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <div className="bg-white border border-[#E8DFD3] rounded-lg p-4">
           <p className="text-xs text-[#6B5E52]">Precio compra</p>
-          <p className="text-xl font-bold">
-            {ingrediente.precio_compra.toFixed(2)} CHF
-          </p>
+          {editingPrice ? (
+            <div className="flex items-center gap-1 mt-1">
+              <input
+                type="number"
+                step="0.01"
+                value={newPrice}
+                onChange={(e) => setNewPrice(e.target.value)}
+                className="w-24 border border-[#D4C4A8] rounded px-2 py-1 text-sm"
+                autoFocus
+                onKeyDown={(e) => {
+                  if (e.key === "Escape") setEditingPrice(false);
+                  if (e.key === "Enter") {
+                    const val = parseFloat(newPrice);
+                    if (isNaN(val) || val <= 0) return;
+                    apiFetch(`/api/ingredientes/${id}`, { method: "PUT", body: JSON.stringify({ precio_compra: val }) })
+                      .then(() => {
+                        toast("Precio actualizado");
+                        setEditingPrice(false);
+                        return Promise.all([
+                          apiFetch<Ingrediente>(`/api/ingredientes/${id}`).then(setIngrediente),
+                          apiFetch<HistorialPrecio[]>(`/api/ingredientes/${id}/historial`).then(setHistorial),
+                        ]);
+                      })
+                      .catch(() => toast("Error al actualizar precio", "error"));
+                  }
+                }}
+              />
+              <span className="text-sm text-[#6B5E52]">CHF</span>
+            </div>
+          ) : (
+            <p
+              className="text-xl font-bold cursor-pointer hover:text-[#8B1A2B] transition-colors"
+              onClick={() => { setNewPrice(ingrediente.precio_compra.toFixed(2)); setEditingPrice(true); }}
+              title="Click para editar"
+            >
+              {ingrediente.precio_compra.toFixed(2)} CHF
+            </p>
+          )}
           <p className="text-xs text-[#6B5E52]">
             {ingrediente.cantidad_compra > 1
               ? `${ingrediente.cantidad_compra} ${ingrediente.unidad_compra}`
@@ -207,6 +244,7 @@ export default function IngredienteDetailPage() {
                 <th className="px-4 py-2 font-medium text-right">Precio Anterior</th>
                 <th className="px-4 py-2 font-medium text-right">Precio Nuevo</th>
                 <th className="px-4 py-2 font-medium text-right">Cambio</th>
+                <th className="px-4 py-2 font-medium w-10"></th>
               </tr>
             </thead>
             <tbody>
@@ -235,6 +273,23 @@ export default function IngredienteDetailPage() {
                         {cambio > 0 ? "+" : ""}
                         {cambio.toFixed(1)}%
                       </span>
+                    </td>
+                    <td className="px-4 py-2 text-right">
+                      <button
+                        onClick={() => {
+                          if (!confirm("¿Eliminar este registro de precio?")) return;
+                          apiFetch(`/api/ingredientes/${id}/historial/${h.id}`, { method: "DELETE" })
+                            .then(() => {
+                              toast("Registro eliminado");
+                              setHistorial((prev) => prev.filter((x) => x.id !== h.id));
+                            })
+                            .catch(() => toast("Error al eliminar", "error"));
+                        }}
+                        className="text-red-400 hover:text-red-600 text-xs"
+                        title="Eliminar registro"
+                      >
+                        &times;
+                      </button>
                     </td>
                   </tr>
                 );
@@ -267,9 +322,13 @@ export default function IngredienteDetailPage() {
             const rop = consumo.reorder_point;
             const eoq = consumo.eoq;
             const maxVal = Math.max(...pts.map(p => p.cantidad), rop ?? 0, eoq ?? 0, 1);
-            const w = 600, h = 160, pad = 40, padR = 10, padB = 20;
+            const w = 600, h = 160, pad = 40, padR = 90, padB = 20;
             const plotW = w - pad - padR, plotH = h - padB;
-            const xScale = (i: number) => pad + (i / Math.max(pts.length - 1, 1)) * plotW;
+            const timestamps = pts.map(p => new Date(p.fecha).getTime());
+            const tMin = Math.min(...timestamps);
+            const tMax = Math.max(...timestamps);
+            const tRange = tMax - tMin || 1;
+            const xScale = (i: number) => pad + ((timestamps[i] - tMin) / tRange) * plotW;
             const yScale = (v: number) => plotH - (v / maxVal) * (plotH - 10);
             const polyline = pts.map((p, i) => `${xScale(i)},${yScale(p.cantidad)}`).join(" ");
             const gridLines = 4;
@@ -292,12 +351,20 @@ export default function IngredienteDetailPage() {
                     );
                   })}
                   {rop != null && (
-                    <line x1={pad} y1={yScale(rop)} x2={w - padR} y2={yScale(rop)}
-                      stroke="#dc2626" strokeWidth="1" strokeDasharray="6,4" />
+                    <>
+                      <line x1={pad} y1={yScale(rop)} x2={w - padR} y2={yScale(rop)}
+                        stroke="#dc2626" strokeWidth="1" strokeDasharray="6,4" />
+                      <text x={w - padR + 6} y={yScale(rop) + 4} textAnchor="start"
+                        fontSize="11" fill="#dc2626" fontWeight="600">Seguridad: {rop}</text>
+                    </>
                   )}
                   {eoq != null && (
-                    <line x1={pad} y1={yScale(eoq)} x2={w - padR} y2={yScale(eoq)}
-                      stroke="#2563eb" strokeWidth="1" strokeDasharray="6,4" />
+                    <>
+                      <line x1={pad} y1={yScale(eoq)} x2={w - padR} y2={yScale(eoq)}
+                        stroke="#2563eb" strokeWidth="1" strokeDasharray="6,4" />
+                      <text x={w - padR + 6} y={yScale(eoq) + 4} textAnchor="start"
+                        fontSize="11" fill="#2563eb" fontWeight="600">Deseado: {eoq}</text>
+                    </>
                   )}
                   <polyline points={polyline} fill="none" stroke="#8B1A2B" strokeWidth="2" />
                   {pts.map((p, i) => (

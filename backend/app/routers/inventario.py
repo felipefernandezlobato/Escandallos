@@ -3,7 +3,7 @@ from datetime import date, datetime, timedelta
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import func
+from sqlalchemy import distinct, func
 from sqlalchemy.orm import Session
 
 from app.auth import get_current_user
@@ -29,6 +29,12 @@ from app.services.consumo import (
 )
 
 router = APIRouter(prefix="/api/inventario", tags=["inventario"])
+
+
+@router.get("/con-registros")
+def ingredientes_con_registros(db: Session = Depends(get_db), user=Depends(get_current_user)):
+    ids = [r[0] for r in db.query(distinct(InventarioRegistro.ingrediente_id)).all()]
+    return ids
 
 
 @router.post("", status_code=201)
