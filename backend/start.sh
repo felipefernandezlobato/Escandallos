@@ -7,32 +7,35 @@ engine = create_engine('sqlite:///./data/escandallos.db')
 with engine.connect() as conn:
     inspector = inspect(engine)
 
-    # If no alembic_version table, stamp to the correct state
-    if not inspector.has_table('alembic_version'):
-        # Figure out which migration the DB is actually at
-        has_inventario = inspector.has_table('inventario_registros')
-        cols = [c['name'] for c in inspector.get_columns('ingredientes')] if inspector.has_table('ingredientes') else []
-        has_excluir = 'excluir_pedidos' in cols
+    # Detect actual DB state based on which tables/columns exist
+    has_categorias = inspector.has_table('categorias')
+    has_inventario = inspector.has_table('inventario_registros')
+    cols = [c['name'] for c in inspector.get_columns('ingredientes')] if inspector.has_table('ingredientes') else []
+    has_excluir = 'excluir_pedidos' in cols
 
-        if has_excluir:
-            rev = '0ade3c6521f7'
-        elif has_inventario:
-            rev = '23223cfeee9c'
-        else:
-            rev = '5b3701069a72'
+    print(f'DB state: categorias={has_categorias}, inventario={has_inventario}, excluir_pedidos={has_excluir}')
 
-        import subprocess
-        subprocess.run(['alembic', 'stamp', rev], check=True)
-        print(f'Alembic stamped to {rev}')
+    if has_excluir:
+        target = '0ade3c6521f7'
+    elif has_inventario:
+        target = '23223cfeee9c'
+    elif has_categorias:
+        target = '5b3701069a72'
     else:
-        # Check if stamp is wrong (stamped head but column missing)
-        cols = [c['name'] for c in inspector.get_columns('ingredientes')]
-        if 'excluir_pedidos' not in cols:
-            conn.execute(text('UPDATE alembic_version SET version_num = :v'), {'v': '23223cfeee9c'})
-            conn.commit()
-            print('Fixed alembic stamp: excluir_pedidos column missing, reset to 23223cfeee9c')
+        target = None
 
-print('Starting alembic upgrade...')
+    if target:
+        # Force stamp to detected state (whether or not alembic_version exists)
+        if inspector.has_table('alembic_version'):
+            conn.execute(text('DELETE FROM alembic_version'))
+            conn.commit()
+        import subprocess
+        subprocess.run(['alembic', 'stamp', target], check=True)
+        print(f'Stamped to {target}')
+    else:
+        print('Empty database, alembic will create everything')
+
+print('Running alembic upgrade head...')
 "
 alembic upgrade head
 exec uvicorn app.main:app --host 0.0.0.0 --port $PORT
