@@ -155,12 +155,20 @@ export default function PedidosPage() {
                     </>
                   )}
                   {p.estado === "enviado" && (
-                    <Link
-                      href={`/pedidos/${p.id}/recibir`}
-                      className="text-xs text-green-600 hover:text-green-800"
-                    >
-                      Recibir
-                    </Link>
+                    <>
+                      <Link
+                        href={`/pedidos/${p.id}/recibir`}
+                        className="text-xs text-green-600 hover:text-green-800"
+                      >
+                        Recibir
+                      </Link>
+                      <button
+                        onClick={() => handleEliminar(p.id)}
+                        className="text-xs text-red-500 hover:text-red-700"
+                      >
+                        Eliminar
+                      </button>
+                    </>
                   )}
                 </div>
               </div>

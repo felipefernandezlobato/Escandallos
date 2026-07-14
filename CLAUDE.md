@@ -88,9 +88,18 @@ curl -s "https://bru-escandallos-api.onrender.com/api/backup/descargar" -H "Auth
 
 ### When committing and deploying:
 1. Do NOT download prod DB again (it would overwrite local work done during this session)
-2. `git add backend/data/escandallos.db` with your other changes
-3. `git push` + trigger Render deploy
-4. The local DB becomes the new prod DB
+2. Checkpoint the WAL first (SQLite stores changes in a separate WAL file that git doesn't track):
+   ```
+   cd backend && source .venv/bin/activate && python -c "
+   from sqlalchemy import create_engine, text
+   engine = create_engine('sqlite:///./data/escandallos.db')
+   with engine.connect() as conn:
+       conn.execute(text('PRAGMA wal_checkpoint(TRUNCATE)'))
+   "
+   ```
+3. `git add backend/data/escandallos.db` with your other changes
+4. `git push` + trigger Render deploy
+5. The local DB becomes the new prod DB
 
 ### Key rules:
 - Download prod DB ONLY at session start, NEVER mid-session
