@@ -74,6 +74,18 @@ escandallos/
 └── CLAUDE.md    # This file — business rules and project context
 ```
 
+## Deploy Checklist
+
+After making changes, ALWAYS:
+1. `git push` — triggers Vercel auto-deploy for frontend
+2. Trigger Render deploy: `curl -s "https://api.render.com/deploy/srv-d99vh8u7r5hc73bvaf9g?key=W1tZafHDZ9U"`
+3. Wait ~2-3 min, then verify: `curl -s -o /dev/null -w "%{http_code}" https://bru-escandallos-api.onrender.com/api/categorias` (expect 401)
+4. If local DB has new data for prod: sync via API endpoints (NOT backup/restaurar — it crashes the server)
+5. Frontend: https://frontend-bruteam.vercel.app
+6. Backend: https://bru-escandallos-api.onrender.com
+
+Render start command is `bash start.sh` (set in dashboard, NOT render.yaml). It auto-handles alembic migrations.
+
 ## Backlog (not in v1)
 
 - Price change impact simulator
