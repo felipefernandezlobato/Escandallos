@@ -98,12 +98,6 @@ export default function IngredienteDetailPage() {
           </Link>
           <h1 className="text-2xl font-bold mt-1">{ingrediente.nombre}</h1>
         </div>
-        <button
-          onClick={handleDelete}
-          className="bg-red-100 text-red-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-200"
-        >
-          Eliminar
-        </button>
       </div>
 
       {/* Summary Cards */}
@@ -111,7 +105,12 @@ export default function IngredienteDetailPage() {
         <div className="bg-white border border-[#E8DFD3] rounded-lg p-4">
           <p className="text-xs text-[#6B5E52]">Precio compra</p>
           <p className="text-xl font-bold">
-            {ingrediente.precio_compra.toFixed(2)} CHF/{ingrediente.unidad_compra}
+            {ingrediente.precio_compra.toFixed(2)} CHF
+          </p>
+          <p className="text-xs text-[#6B5E52]">
+            {ingrediente.cantidad_compra > 1
+              ? `${ingrediente.cantidad_compra} ${ingrediente.unidad_compra}`
+              : `1 ${ingrediente.unidad_compra}`}
           </p>
         </div>
         <div className="bg-white border border-[#E8DFD3] rounded-lg p-4">

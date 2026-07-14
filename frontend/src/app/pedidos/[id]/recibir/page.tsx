@@ -118,7 +118,6 @@ export default function RecibirPedidoPage() {
               <th className="pb-2 font-medium">Ingrediente</th>
               <th className="pb-2 font-medium text-right">Pedido</th>
               <th className="pb-2 font-medium text-right">Recibido</th>
-              <th className="pb-2 font-medium text-right">Precio unit.</th>
             </tr>
           </thead>
           <tbody>
@@ -141,22 +140,6 @@ export default function RecibirPedidoPage() {
                       }))
                     }
                     className="w-20 border border-[#D4C4A8] rounded px-2 py-1 text-sm text-right"
-                  />
-                </td>
-                <td className="py-2 text-right">
-                  <input
-                    type="number"
-                    step="any"
-                    min="0"
-                    placeholder="—"
-                    value={lineas[l.id]?.precio_unitario ?? ""}
-                    onChange={(e) =>
-                      setLineas((prev) => ({
-                        ...prev,
-                        [l.id]: { ...prev[l.id], precio_unitario: e.target.value },
-                      }))
-                    }
-                    className="w-24 border border-[#D4C4A8] rounded px-2 py-1 text-sm text-right"
                   />
                 </td>
               </tr>

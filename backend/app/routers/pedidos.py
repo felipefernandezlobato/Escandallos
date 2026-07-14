@@ -82,7 +82,7 @@ def pedidos_pivot(
     lineas = (
         db.query(LineaPedido)
         .join(Pedido)
-        .filter(Pedido.estado == "recibido")
+        .filter(Pedido.estado.in_(["enviado", "recibido"]))
         .all()
     )
 
@@ -91,9 +91,10 @@ def pedidos_pivot(
 
     for l in lineas:
         pedido = db.get(Pedido, l.pedido_id)
-        if not pedido or not pedido.fecha_recepcion:
+        if not pedido:
             continue
-        fecha_str = to_week_key(pedido.fecha_recepcion)
+        ref_date = pedido.fecha_recepcion or pedido.fecha
+        fecha_str = to_week_key(ref_date)
         fechas_set.add(fecha_str)
 
         if l.ingrediente_id not in by_ing:
@@ -293,22 +294,12 @@ def recibir_pedido(
         raise HTTPException(400, "Este pedido ya fue recibido")
 
     lineas_map = {l.id: l for l in p.lineas}
-    precios_actualizados = 0
 
     for item in data.lineas:
         linea = lineas_map.get(item.linea_id)
         if not linea:
             continue
         linea.cantidad_recibida = item.cantidad_recibida
-        if item.precio_unitario is not None:
-            linea.precio_unitario = item.precio_unitario
-
-            ing = db.get(Ingrediente, linea.ingrediente_id)
-            if ing and item.precio_unitario != ing.precio_compra:
-                crear_historial_precio(db, ing.id, ing.precio_compra, item.precio_unitario)
-                ing.precio_compra = item.precio_unitario
-                ing.fecha_actualizacion = date.today()
-                precios_actualizados += 1
 
     p.estado = "recibido"
     p.fecha_recepcion = date.today()
@@ -335,4 +326,4 @@ def recibir_pedido(
 
     db.commit()
 
-    return {"ok": True, "precios_actualizados": precios_actualizados}
+    return {"ok": True}

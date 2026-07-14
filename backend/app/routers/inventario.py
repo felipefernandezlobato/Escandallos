@@ -56,6 +56,20 @@ def registrar_inventario(
     return {"ok": True, "registros_creados": creados}
 
 
+@router.delete("/{registro_id}")
+def eliminar_registro_inventario(
+    registro_id: int,
+    db: Session = Depends(get_db),
+    user=Depends(get_current_user),
+):
+    reg = db.get(InventarioRegistro, registro_id)
+    if not reg:
+        raise HTTPException(404, "Registro no encontrado")
+    db.delete(reg)
+    db.commit()
+    return {"ok": True}
+
+
 @router.get("")
 def listar_inventario(
     fecha: Optional[str] = None,

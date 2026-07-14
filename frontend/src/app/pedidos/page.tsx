@@ -132,6 +132,12 @@ export default function PedidosPage() {
                   </p>
                 </div>
                 <div className="flex gap-2">
+                  <Link
+                    href={`/pedidos/${p.id}`}
+                    className="text-xs text-[#8B1A2B] hover:underline"
+                  >
+                    Ver
+                  </Link>
                   {p.estado === "borrador" && (
                     <>
                       <button

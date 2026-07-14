@@ -330,13 +330,12 @@ class TestPedidoRecibir:
 
         resp = client.post(f"/api/pedidos/{pid}/recibir", json={
             "lineas": [
-                {"linea_id": lid, "cantidad_recibida": 4.8, "precio_unitario": 5.00},
+                {"linea_id": lid, "cantidad_recibida": 4.8},
             ]
         })
         assert resp.status_code == 200
         data = resp.json()
         assert data["ok"] is True
-        assert data["precios_actualizados"] == 1
 
         pedido = client.get(f"/api/pedidos/{pid}").json()
         assert pedido["estado"] == "recibido"

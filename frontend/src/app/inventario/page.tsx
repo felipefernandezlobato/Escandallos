@@ -80,6 +80,22 @@ export default function InventarioPage() {
   const [showRecomendaciones, setShowRecomendaciones] = useState(false);
   const [cantidadesPedido, setCantidadesPedido] = useState<Record<number, string>>({});
   const [creatingOrder, setCreatingOrder] = useState(false);
+  const [registrosHoy, setRegistrosHoy] = useState<Array<{
+    id: number;
+    ingrediente_id: number;
+    ingrediente_nombre: string;
+    cantidad: number;
+    unidad: string;
+    notas: string | null;
+  }>>([]);
+
+  const fetchRegistrosHoy = () => {
+    const hoy = new Date().toISOString().slice(0, 10);
+    apiFetch<{ snapshot: InventarioSnapshot | null }>(`/api/inventario?fecha=${hoy}`)
+      .then((data) => {
+        setRegistrosHoy(data.snapshot?.registros || []);
+      });
+  };
 
   useEffect(() => {
     setLoading(true);
@@ -90,6 +106,7 @@ export default function InventarioPage() {
       apiFetch<Record<string, { fecha: string; unidad: string }>>("/api/inventario/ultimo-conteo"),
     ])
       .then(([ings, cats, inv, conteo]) => {
+        fetchRegistrosHoy();
         setUltimoConteo(conteo);
         setIngredientes(ings);
         setCategorias(cats);
@@ -187,6 +204,7 @@ export default function InventarioPage() {
       setFechas(inv.fechas || []);
       const conteo = await apiFetch<Record<string, { fecha: string; unidad: string }>>("/api/inventario/ultimo-conteo");
       setUltimoConteo(conteo);
+      fetchRegistrosHoy();
 
       const ids = registros.map((r) => r.ingrediente_id).join(",");
       const rec = await apiFetch<{ items: RecomendacionItem[] }>(
@@ -257,6 +275,7 @@ export default function InventarioPage() {
 
     setCreatingOrder(true);
     try {
+
       await apiFetch("/api/pedidos", {
         method: "POST",
         body: JSON.stringify({ proveedor, lineas }),
@@ -266,6 +285,18 @@ export default function InventarioPage() {
       toast("Error: " + (err as Error).message, "error");
     } finally {
       setCreatingOrder(false);
+    }
+  };
+
+  const handleDeleteRegistro = async (registroId: number) => {
+    try {
+      await apiFetch(`/api/inventario/${registroId}`, { method: "DELETE" });
+      fetchRegistrosHoy();
+      const conteo = await apiFetch<Record<string, { fecha: string; unidad: string }>>("/api/inventario/ultimo-conteo");
+      setUltimoConteo(conteo);
+      toast("Registro eliminado", "success");
+    } catch (err) {
+      toast("Error: " + (err as Error).message, "error");
     }
   };
 
@@ -424,6 +455,31 @@ export default function InventarioPage() {
             </div>
           )}
           </>)}
+
+          {!showRecomendaciones && registrosHoy.length > 0 && (
+            <div className="mt-4">
+              <h3 className="text-sm font-semibold text-[#6B5E52] mb-2">Registrado hoy</h3>
+              <div className="flex flex-wrap gap-2">
+                {registrosHoy.map((r) => (
+                  <div
+                    key={r.id}
+                    className="flex items-center gap-2 bg-white border border-[#E8DFD3] rounded-lg px-3 py-1.5 text-sm"
+                  >
+                    <span className="font-medium">{r.ingrediente_nombre}</span>
+                    <span className="text-[#6B5E52]">{r.cantidad} {r.unidad}</span>
+                    {r.notas && <span className="text-[10px] text-[#6B5E52]/60">({r.notas})</span>}
+                    <button
+                      onClick={() => handleDeleteRegistro(r.id)}
+                      className="text-red-400 hover:text-red-600 ml-1"
+                      title="Eliminar"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {!showRecomendaciones && (
             <div className="sticky bottom-16 md:bottom-0 bg-[#F5F0E8] border-t border-[#E8DFD3] -mx-6 px-6 py-3 flex items-center justify-between">

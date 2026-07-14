@@ -176,7 +176,6 @@ export const MENU: MenuSection[] = [
       { name: "San Pellegrino 50cl Cristal", pvp: 3.9, ingredientName: "San Pellegrino 50cl Cristal" },
       { name: "San Pellegrino 50cl PET", pvp: 3.9, ingredientName: "San Pellegrino 50cl PET" },
       { name: "Coca Cola / Zero", pvp: 3.9, ingredientName: "Coca Cola" },
-      { name: "Vivi Kola / Zero", pvp: 4.9, ingredientName: "Vivi Kola" },
       { name: "Vivi Soda Zitrone", pvp: 5.9, ingredientName: "Vivi Soda Zitrone" },
       { name: "Vivi Soda Apfelschorle", pvp: 5.9, ingredientName: "Vivi Soda Apfelschorle" },
       { name: "Vivi Soda Mate", pvp: 5.9, ingredientName: "Vivi Soda Mate" },
