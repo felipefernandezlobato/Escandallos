@@ -17,7 +17,9 @@ from app.database import Base, engine, get_db, SessionLocal
 from app.routers import categorias, ingredientes, recetas, importar, dashboard, backup, proveedores, inventario, pedidos
 from app.models import Categoria
 
-Base.metadata.create_all(bind=engine)
+# Tables are managed by alembic migrations (start.sh).
+# Do NOT use create_all here — it runs at import time during Render builds
+# and creates an empty DB that overwrites the persistent disk.
 
 app = FastAPI(
     title="Escandallos API",
@@ -66,6 +68,11 @@ app.include_router(pedidos.router)
 @app.get("/api/health")
 def health_check():
     return {"status": "ok"}
+
+
+@app.on_event("startup")
+def startup():
+    Base.metadata.create_all(bind=engine)
 
 
 @app.on_event("startup")
