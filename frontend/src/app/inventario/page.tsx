@@ -568,6 +568,7 @@ function InventarioContent() {
                         </div>
                         <input
                           type="number"
+                          inputMode="decimal"
                           step="any"
                           min="0"
                           placeholder="0"
@@ -640,6 +641,7 @@ function InventarioContent() {
                               {editingRegistro === r.id ? (
                                 <input
                                   type="number"
+                                  inputMode="decimal"
                                   step="any"
                                   min="0"
                                   value={editCantidad}
@@ -804,6 +806,7 @@ function InventarioContent() {
                               <td className="px-4 py-2 text-right">
                                 <input
                                   type="number"
+                                  inputMode="decimal"
                                   step="any"
                                   min="0"
                                   value={
@@ -906,6 +909,7 @@ function InventarioContent() {
                               {editingRegistro === r.id ? (
                                 <input
                                   type="number"
+                                  inputMode="decimal"
                                   step="any"
                                   min="0"
                                   value={editCantidad}
