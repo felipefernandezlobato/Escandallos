@@ -13,7 +13,7 @@ from app.auth import (
     get_current_user,
     verify_password,
 )
-from app.database import Base, engine, get_db, SessionLocal
+from app.database import get_db, SessionLocal
 from app.routers import categorias, ingredientes, recetas, importar, dashboard, backup, proveedores, inventario, pedidos
 from app.models import Categoria
 
@@ -68,11 +68,6 @@ app.include_router(pedidos.router)
 @app.get("/api/health")
 def health_check():
     return {"status": "ok"}
-
-
-@app.on_event("startup")
-def startup():
-    Base.metadata.create_all(bind=engine)
 
 
 @app.on_event("startup")
