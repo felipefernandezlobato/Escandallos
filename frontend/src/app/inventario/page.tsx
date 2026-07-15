@@ -567,21 +567,21 @@ function InventarioContent() {
                           </span>
                         </div>
                         <input
-                          type="number"
+                          type="text"
                           inputMode="decimal"
-                          step="any"
-                          min="0"
                           placeholder="0"
                           value={stock[ing.id]?.cantidad ?? ""}
-                          onChange={(e) =>
-                            setStock((prev) => ({
-                              ...prev,
-                              [ing.id]: {
-                                ...prev[ing.id],
-                                cantidad: e.target.value,
-                              },
-                            }))
-                          }
+                          onChange={(e) => {
+                            const v = e.target.value.replace(",", ".");
+                            if (v === "" || /^\d*\.?\d*$/.test(v))
+                              setStock((prev) => ({
+                                ...prev,
+                                [ing.id]: {
+                                  ...prev[ing.id],
+                                  cantidad: v,
+                                },
+                              }));
+                          }}
                           className="w-20 border border-[#D4C4A8] rounded px-2 py-1 text-sm text-right"
                         />
                         <span className="text-xs text-[#6B5E52] w-8">
@@ -640,12 +640,13 @@ function InventarioContent() {
                             <td className="px-4 py-2 text-right">
                               {editingRegistro === r.id ? (
                                 <input
-                                  type="number"
+                                  type="text"
                                   inputMode="decimal"
-                                  step="any"
-                                  min="0"
                                   value={editCantidad}
-                                  onChange={(e) => setEditCantidad(e.target.value)}
+                                  onChange={(e) => {
+                                    const v = e.target.value.replace(",", ".");
+                                    if (v === "" || /^\d*\.?\d*$/.test(v)) setEditCantidad(v);
+                                  }}
                                   onKeyDown={(e) => {
                                     if (e.key === "Enter") handleEditRegistro(r.id);
                                     if (e.key === "Escape") { setEditingRegistro(null); setEditCantidad(""); }
@@ -805,19 +806,19 @@ function InventarioContent() {
                               </td>
                               <td className="px-4 py-2 text-right">
                                 <input
-                                  type="number"
+                                  type="text"
                                   inputMode="decimal"
-                                  step="any"
-                                  min="0"
                                   value={
                                     cantidadesPedido[item.ingrediente_id] || ""
                                   }
-                                  onChange={(e) =>
-                                    setCantidadesPedido((prev) => ({
-                                      ...prev,
-                                      [item.ingrediente_id]: e.target.value,
-                                    }))
-                                  }
+                                  onChange={(e) => {
+                                    const v = e.target.value.replace(",", ".");
+                                    if (v === "" || /^\d*\.?\d*$/.test(v))
+                                      setCantidadesPedido((prev) => ({
+                                        ...prev,
+                                        [item.ingrediente_id]: v,
+                                      }));
+                                  }}
                                   className={`w-20 border rounded px-2 py-1 text-sm text-right ${
                                     item.cantidad_sugerida === 0
                                       ? "border-green-300 bg-green-50"
@@ -908,12 +909,13 @@ function InventarioContent() {
                             <td className="px-4 py-2 text-right">
                               {editingRegistro === r.id ? (
                                 <input
-                                  type="number"
+                                  type="text"
                                   inputMode="decimal"
-                                  step="any"
-                                  min="0"
                                   value={editCantidad}
-                                  onChange={(e) => setEditCantidad(e.target.value)}
+                                  onChange={(e) => {
+                                    const v = e.target.value.replace(",", ".");
+                                    if (v === "" || /^\d*\.?\d*$/.test(v)) setEditCantidad(v);
+                                  }}
                                   onKeyDown={(e) => {
                                     if (e.key === "Enter") handleEditRegistro(r.id);
                                     if (e.key === "Escape") { setEditingRegistro(null); setEditCantidad(""); }
