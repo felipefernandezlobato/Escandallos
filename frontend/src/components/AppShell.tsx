@@ -14,7 +14,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <ToastProvider>
       <AuthGuard>
         {!isLogin && <Sidebar />}
-        <main className={isLogin ? "flex-1" : "flex-1 md:ml-56 pb-20 md:pb-0"}>
+        <main className={isLogin ? "flex-1" : "flex-1 md:ml-56 pb-24 md:pb-0"}>
           {isLogin ? (
             children
           ) : (

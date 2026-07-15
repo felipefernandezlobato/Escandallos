@@ -44,3 +44,7 @@ body {
 .animate-toast-in {
   animation: toast-in 0.3s ease-out;
 }
+
+@media screen and (max-width: 768px) {
+  input, select, textarea { font-size: 16px !important; }
+}

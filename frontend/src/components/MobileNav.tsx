@@ -16,7 +16,7 @@ export function MobileNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="md:hidden fixed bottom-0 inset-x-0 bg-white border-t border-[#E8DFD3] z-30 flex">
+    <nav className="md:hidden fixed bottom-0 inset-x-0 bg-white border-t border-[#E8DFD3] z-30 flex pb-[env(safe-area-inset-bottom)]">
       {MOBILE_ITEMS.map((item) => {
         const active =
           item.href === "/"
