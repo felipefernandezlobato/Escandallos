@@ -43,6 +43,8 @@ export default function IngredienteDetailPage() {
   const [notFound, setNotFound] = useState(false);
   const [editingPrice, setEditingPrice] = useState(false);
   const [newPrice, setNewPrice] = useState("");
+  const [editingField, setEditingField] = useState<string | null>(null);
+  const [editValue, setEditValue] = useState("");
 
   useEffect(() => {
     setLoading(true);
@@ -84,6 +86,21 @@ export default function IngredienteDetailPage() {
       });
     } catch {
       return fecha;
+    }
+  };
+
+  const saveField = async (field: string, value: string) => {
+    try {
+      await apiFetch(`/api/ingredientes/${id}`, {
+        method: "PUT",
+        body: JSON.stringify({ [field]: value }),
+      });
+      const updated = await apiFetch<Ingrediente>(`/api/ingredientes/${id}`);
+      setIngrediente(updated);
+      setEditingField(null);
+      toast("Actualizado");
+    } catch {
+      toast("Error al actualizar", "error");
     }
   };
 
@@ -173,7 +190,29 @@ export default function IngredienteDetailPage() {
             Categoria: <strong className="text-[#1A1A1A]">{ingrediente.categoria_nombre}</strong>
           </span>
           <span>
-            Proveedor: <strong className="text-[#1A1A1A]">{ingrediente.proveedor || "—"}</strong>
+            Proveedor:{" "}
+            {editingField === "proveedor" ? (
+              <input
+                type="text"
+                value={editValue}
+                onChange={(e) => setEditValue(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") saveField("proveedor", editValue);
+                  if (e.key === "Escape") setEditingField(null);
+                }}
+                onBlur={() => saveField("proveedor", editValue)}
+                className="border border-[#D4C4A8] rounded px-2 py-0.5 text-sm w-32"
+                autoFocus
+              />
+            ) : (
+              <strong
+                className="text-[#1A1A1A] cursor-pointer hover:text-[#8B1A2B] border-b border-dashed border-[#D4C4A8]"
+                onClick={() => { setEditingField("proveedor"); setEditValue(ingrediente.proveedor || ""); }}
+                title="Click para editar"
+              >
+                {ingrediente.proveedor || "—"}
+              </strong>
+            )}
           </span>
           <span>
             Unidad compra → uso:{" "}

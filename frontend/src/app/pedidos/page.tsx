@@ -46,6 +46,7 @@ export default function PedidosPage() {
   const [showCrear, setShowCrear] = useState(false);
   const [ingredientes, setIngredientes] = useState<Ingrediente[]>([]);
   const [categorias, setCategorias] = useState<Categoria[]>([]);
+  const [ultimoConteo, setUltimoConteo] = useState<Record<string, { fecha: string; unidad: string }>>({});
   const [cantidades, setCantidades] = useState<Record<number, string>>({});
   const [creando, setCreando] = useState(false);
   const [busqueda, setBusqueda] = useState("");
@@ -64,14 +65,18 @@ export default function PedidosPage() {
 
   const normalize = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 
+  const unidadPedido = (ing: Ingrediente) => ultimoConteo[String(ing.id)]?.unidad || ing.unidad_compra;
+
   const openCrear = () => {
     if (ingredientes.length === 0) {
       Promise.all([
         apiFetch<Ingrediente[]>("/api/ingredientes"),
         apiFetch<Categoria[]>("/api/categorias?tipo=ingrediente"),
-      ]).then(([ings, cats]) => {
+        apiFetch<Record<string, { fecha: string; unidad: string }>>("/api/inventario/ultimo-conteo"),
+      ]).then(([ings, cats, conteo]) => {
         setIngredientes(ings);
         setCategorias(cats);
+        setUltimoConteo(conteo);
       });
     }
     setShowCrear(true);
@@ -103,7 +108,7 @@ export default function PedidosPage() {
         return {
           ingrediente_id: ing.id,
           cantidad_pedida: parseFloat(v),
-          unidad: ing.unidad_compra,
+          unidad: unidadPedido(ing),
           proveedor: mejorProveedor(ing),
         };
       });
@@ -326,7 +331,7 @@ export default function PedidosPage() {
                         }}
                         className="w-20 border border-[#D4C4A8] rounded px-2 py-1 text-sm text-right"
                       />
-                      <span className="text-xs text-[#6B5E52] w-10">{ing.unidad_compra}</span>
+                      <span className="text-xs text-[#6B5E52] w-10">{unidadPedido(ing)}</span>
                     </div>
                   ))}
                 </div>
