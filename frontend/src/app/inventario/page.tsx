@@ -179,6 +179,10 @@ function InventarioContent() {
         setFechas(inv.fechas || []);
         setSemanas(inv.semanas || []);
 
+        if (urlTab === "historial" && !urlSemana && inv.semanas?.length > 0) {
+          router.replace(`/inventario?tab=historial&semana=${inv.semanas[0]}`);
+        }
+
         const initial: Record<number, StockEntry> = {};
         for (const ing of ings) {
           const lastUnit = conteo[String(ing.id)]?.unidad;
@@ -456,7 +460,11 @@ function InventarioContent() {
           </button>
           <button
             onClick={() => {
-              setTab("historial");
+              if (semanas.length > 0) {
+                router.push(`/inventario?tab=historial&semana=${semanas[0]}`);
+              } else {
+                setTab("historial");
+              }
               fetchPivot();
             }}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
