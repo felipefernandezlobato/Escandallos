@@ -137,12 +137,11 @@ def listar_inventario(
             .all()
         )
         week_registros = [r for r in all_registros if to_week_key(r.fecha_registro) == semana]
-        seen: dict[int, bool] = {}
-        registros = []
-        for r in week_registros:
-            if r.ingrediente_id not in seen:
-                seen[r.ingrediente_id] = True
-                registros.append(r)
+        if not week_registros:
+            registros = []
+        else:
+            latest_date = week_registros[0].fecha_registro
+            registros = [r for r in week_registros if r.fecha_registro == latest_date]
         ing_ids = {r.ingrediente_id for r in registros}
         ings = {i.id: i for i in db.query(Ingrediente).filter(Ingrediente.id.in_(ing_ids)).all()}
         items = []
