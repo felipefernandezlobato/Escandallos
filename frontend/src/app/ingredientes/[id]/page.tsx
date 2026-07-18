@@ -54,7 +54,7 @@ export default function IngredienteDetailPage() {
       apiFetch<HistorialPrecio[]>(`/api/ingredientes/${id}/historial`),
       apiFetch<Receta[]>(`/api/ingredientes/${id}/recetas`),
       apiFetch<ComparacionProveedores>(`/api/proveedores/comparar/${id}`).catch(() => ({ ingrediente: { id: 0, nombre: "", precio_actual: 0 }, precios: [] })),
-      apiFetch<typeof consumo>(`/api/inventario/consumo/${id}`).catch(() => null),
+      apiFetch<typeof consumo>(`/api/inventario/consumo/${id}?semanas=52`).catch(() => null),
     ])
       .then(([ing, hist, rec, comp, cons]) => {
         setIngrediente(ing);
@@ -343,10 +343,21 @@ export default function IngredienteDetailPage() {
       {consumo && (consumo.historial.length > 0 || (consumo.stock_historial && consumo.stock_historial.length > 0)) && (() => {
         const threeMonthsAgo = new Date();
         threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
-        const cutoff = threeMonthsAgo.toISOString().slice(0, 10);
-        const filterByRange = <T extends { fecha?: string; semana?: string }>(items: T[]): T[] => {
+        const cutoffDate = threeMonthsAgo.toISOString().slice(0, 10);
+        const cutoffWeek = (() => {
+          const iso = threeMonthsAgo.toISOString().slice(0, 10);
+          const d = new Date(iso);
+          const dayOfYear = Math.floor((d.getTime() - new Date(d.getFullYear(), 0, 0).getTime()) / 86400000);
+          const weekNum = Math.ceil((dayOfYear + new Date(d.getFullYear(), 0, 1).getDay()) / 7);
+          return `w${weekNum}.${String(d.getFullYear()).slice(2)}`;
+        })();
+        const filterStock = <T extends { fecha: string }>(items: T[]): T[] => {
           if (chartRange === "all") return items;
-          return items.filter((item) => (item.fecha || item.semana || "") >= cutoff);
+          return items.filter((item) => item.fecha >= cutoffDate);
+        };
+        const filterConsumo = <T extends { semana: string }>(items: T[]): T[] => {
+          if (chartRange === "all") return items;
+          return items.slice(-13);
         };
         return (
         <div className="bg-white border border-[#E8DFD3] rounded-lg p-4 space-y-4">
@@ -386,7 +397,7 @@ export default function IngredienteDetailPage() {
 
           {/* Stock Control Chart */}
           {consumo.stock_historial && consumo.stock_historial.length > 0 && (() => {
-            const pts = filterByRange(consumo.stock_historial);
+            const pts = filterStock(consumo.stock_historial);
             if (pts.length === 0) return null;
             const rop = consumo.reorder_point;
             const eoq = consumo.eoq;
@@ -456,7 +467,7 @@ export default function IngredienteDetailPage() {
 
           {/* Consumption bars */}
           {consumo.historial.length > 0 && (() => {
-            const filteredHist = filterByRange(consumo.historial.map(h => ({ ...h, fecha: h.semana })));
+            const filteredHist = filterConsumo(consumo.historial);
             if (filteredHist.length === 0) return null;
             return (
             <div>
