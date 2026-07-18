@@ -45,6 +45,7 @@ export default function IngredienteDetailPage() {
   const [newPrice, setNewPrice] = useState("");
   const [editingField, setEditingField] = useState<string | null>(null);
   const [editValue, setEditValue] = useState("");
+  const [chartRange, setChartRange] = useState<"3m" | "all">("3m");
 
   useEffect(() => {
     setLoading(true);
@@ -339,25 +340,54 @@ export default function IngredienteDetailPage() {
       </div>
 
       {/* Consumo y Stock */}
-      {consumo && (consumo.historial.length > 0 || (consumo.stock_historial && consumo.stock_historial.length > 0)) && (
+      {consumo && (consumo.historial.length > 0 || (consumo.stock_historial && consumo.stock_historial.length > 0)) && (() => {
+        const threeMonthsAgo = new Date();
+        threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+        const cutoff = threeMonthsAgo.toISOString().slice(0, 10);
+        const filterByRange = <T extends { fecha?: string; semana?: string }>(items: T[]): T[] => {
+          if (chartRange === "all") return items;
+          return items.filter((item) => (item.fecha || item.semana || "") >= cutoff);
+        };
+        return (
         <div className="bg-white border border-[#E8DFD3] rounded-lg p-4 space-y-4">
-          <div>
-            <h2 className="text-lg font-semibold">Consumo y Stock</h2>
-            <p className="text-sm text-[#6B5E52]">
-              Media: {consumo.consumo_medio} {consumo.unidad}/semana — Tendencia:{" "}
-              <span className={
-                consumo.tendencia === "subiendo" ? "text-red-600" :
-                consumo.tendencia === "bajando" ? "text-green-600" : "text-[#6B5E52]"
-              }>
-                {consumo.tendencia === "subiendo" ? "↑ Subiendo" :
-                 consumo.tendencia === "bajando" ? "↓ Bajando" : "→ Estable"}
-              </span>
-            </p>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h2 className="text-lg font-semibold">Consumo y Stock</h2>
+              <p className="text-sm text-[#6B5E52]">
+                Media: {consumo.consumo_medio} {consumo.unidad}/semana — Tendencia:{" "}
+                <span className={
+                  consumo.tendencia === "subiendo" ? "text-red-600" :
+                  consumo.tendencia === "bajando" ? "text-green-600" : "text-[#6B5E52]"
+                }>
+                  {consumo.tendencia === "subiendo" ? "↑ Subiendo" :
+                   consumo.tendencia === "bajando" ? "↓ Bajando" : "→ Estable"}
+                </span>
+              </p>
+            </div>
+            <div className="flex gap-1">
+              <button
+                onClick={() => setChartRange("3m")}
+                className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
+                  chartRange === "3m" ? "bg-[#8B1A2B] text-white" : "bg-[#F5F0E8] text-[#6B5E52] hover:bg-[#E8DFD3]"
+                }`}
+              >
+                3 meses
+              </button>
+              <button
+                onClick={() => setChartRange("all")}
+                className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
+                  chartRange === "all" ? "bg-[#8B1A2B] text-white" : "bg-[#F5F0E8] text-[#6B5E52] hover:bg-[#E8DFD3]"
+                }`}
+              >
+                Todo
+              </button>
+            </div>
           </div>
 
           {/* Stock Control Chart */}
           {consumo.stock_historial && consumo.stock_historial.length > 0 && (() => {
-            const pts = consumo.stock_historial;
+            const pts = filterByRange(consumo.stock_historial);
+            if (pts.length === 0) return null;
             const rop = consumo.reorder_point;
             const eoq = consumo.eoq;
             const maxVal = Math.max(...pts.map(p => p.cantidad), rop ?? 0, eoq ?? 0, 1);
@@ -425,14 +455,17 @@ export default function IngredienteDetailPage() {
           })()}
 
           {/* Consumption bars */}
-          {consumo.historial.length > 0 && (
+          {consumo.historial.length > 0 && (() => {
+            const filteredHist = filterByRange(consumo.historial.map(h => ({ ...h, fecha: h.semana })));
+            if (filteredHist.length === 0) return null;
+            return (
             <div>
               <p className="text-xs text-[#6B5E52] mb-1 font-medium">Consumo Semanal</p>
               <div className="space-y-1">
                 <div className="flex items-end gap-1" style={{ height: 80 }}>
                   {(() => {
-                    const max = Math.max(...consumo.historial.map(x => x.cantidad));
-                    return consumo.historial.map((h, i) => {
+                    const max = Math.max(...filteredHist.map(x => x.cantidad));
+                    return filteredHist.map((h, i) => {
                       const barH = max > 0 ? Math.max((h.cantidad / max) * 65, 3) : 3;
                       return (
                         <div key={i} className="flex-1 flex flex-col items-center justify-end"
@@ -445,15 +478,17 @@ export default function IngredienteDetailPage() {
                   })()}
                 </div>
                 <div className="flex gap-1 text-[8px] text-[#6B5E52]">
-                  {consumo.historial.map((h, i) => (
+                  {filteredHist.map((h, i) => (
                     <div key={i} className="flex-1 text-center truncate">{h.semana.replace(/^\d{4}-/, "")}</div>
                   ))}
                 </div>
               </div>
             </div>
-          )}
+            );
+          })()}
         </div>
-      )}
+        );
+      })()}
 
       {/* Recetas que lo usan */}
       <div className="bg-white border border-[#E8DFD3] rounded-lg overflow-hidden">
