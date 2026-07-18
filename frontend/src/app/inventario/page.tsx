@@ -274,7 +274,7 @@ function InventarioContent() {
     );
   };
 
-  const activeSemana = urlSemanaVal || (tab === "historial" && semanas.length > 0 ? semanas[0] : "");
+  const activeSemana = urlSemanaVal;
   const [loadingHistorial, setLoadingHistorial] = useState(false);
 
   useEffect(() => {
@@ -460,11 +460,7 @@ function InventarioContent() {
           </button>
           <button
             onClick={() => {
-              if (semanas.length > 0) {
-                router.push(`/inventario?tab=historial&semana=${semanas[0]}`);
-              } else {
-                setTab("historial");
-              }
+              setTab("historial");
               fetchPivot();
             }}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
