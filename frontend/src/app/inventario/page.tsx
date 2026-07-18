@@ -76,7 +76,7 @@ function InventarioContent() {
   const urlTab = searchParams.get("tab") as "registrar" | "historial" | "analisis" | null;
   const urlSemana = searchParams.get("semana");
   const tab = urlTab || "registrar";
-  const historialFecha = urlSemana || "";
+  const urlSemanaVal = urlSemana || "";
 
   const setTab = useCallback((newTab: "registrar" | "historial" | "analisis") => {
     router.push(`/inventario?tab=${newTab}`);
@@ -179,10 +179,6 @@ function InventarioContent() {
         setFechas(inv.fechas || []);
         setSemanas(inv.semanas || []);
 
-        if (urlTab === "historial" && !urlSemana && inv.semanas?.length > 0) {
-          router.replace(`/inventario?tab=historial&semana=${inv.semanas[0]}`);
-        }
-
         const initial: Record<number, StockEntry> = {};
         for (const ing of ings) {
           const lastUnit = conteo[String(ing.id)]?.unidad;
@@ -250,8 +246,8 @@ function InventarioContent() {
       setEditingRegistro(null);
       setEditCantidad("");
       fetchRegistrosHoy();
-      if (historialFecha) {
-        apiFetch<{ snapshot: InventarioSnapshot | null }>(`/api/inventario?semana=${historialFecha}`).then((data) => setHistorial(data.snapshot));
+      if (activeSemana) {
+        apiFetch<{ snapshot: InventarioSnapshot | null }>(`/api/inventario?semana=${activeSemana}`).then((data) => setHistorial(data.snapshot));
       }
       const conteo = await apiFetch<Record<string, { fecha: string; unidad: string }>>("/api/inventario/ultimo-conteo");
       setUltimoConteo(conteo);
@@ -278,17 +274,19 @@ function InventarioContent() {
     );
   };
 
+  const activeSemana = urlSemanaVal || (tab === "historial" && semanas.length > 0 ? semanas[0] : "");
+
   useEffect(() => {
-    if (urlSemana) {
+    if (activeSemana) {
       apiFetch<{ snapshot: InventarioSnapshot | null }>(
-        `/api/inventario?semana=${urlSemana}`
+        `/api/inventario?semana=${activeSemana}`
       ).then((data) => {
         setHistorial(data.snapshot);
       });
     } else {
       setHistorial(null);
     }
-  }, [urlSemana]);
+  }, [activeSemana]);
 
   const fetchPivot = () => {
     apiFetch<typeof pivot>("/api/inventario/pivot").then(setPivot);
@@ -432,8 +430,8 @@ function InventarioContent() {
     try {
       await apiFetch(`/api/inventario/${registroId}`, { method: "DELETE" });
       fetchRegistrosHoy();
-      if (historialFecha) {
-        apiFetch<{ snapshot: InventarioSnapshot | null }>(`/api/inventario?semana=${historialFecha}`).then((data) => setHistorial(data.snapshot));
+      if (activeSemana) {
+        apiFetch<{ snapshot: InventarioSnapshot | null }>(`/api/inventario?semana=${activeSemana}`).then((data) => setHistorial(data.snapshot));
       }
       const conteo = await apiFetch<Record<string, { fecha: string; unidad: string }>>("/api/inventario/ultimo-conteo");
       setUltimoConteo(conteo);
@@ -852,7 +850,7 @@ function InventarioContent() {
           {/* Week selector for editing records */}
           <div className="flex flex-wrap gap-3 items-center">
             <select
-              value={historialFecha}
+              value={activeSemana}
               onChange={(e) => {
                 if (e.target.value) setHistorialFecha(e.target.value);
               }}
@@ -863,7 +861,7 @@ function InventarioContent() {
                 <option key={s} value={s}>Semana {s}</option>
               ))}
             </select>
-            {historialFecha && (
+            {activeSemana && (
               <button
                 onClick={() => router.back()}
                 className="text-sm text-[#6B5E52] hover:text-[#8B1A2B]"
@@ -873,11 +871,11 @@ function InventarioContent() {
             )}
           </div>
 
-          {historialFecha && historial ? (
+          {activeSemana && historial ? (
             <div className="bg-white border border-[#E8DFD3] rounded-lg overflow-hidden">
               <div className="px-4 py-3 bg-[#F5F0E8] border-b border-[#E8DFD3]">
                 <h3 className="font-semibold text-[#8B1A2B]">
-                  Semana {historialFecha} ({historial.registros.length} registros)
+                  Semana {activeSemana} ({historial.registros.length} registros)
                 </h3>
               </div>
               <div className="overflow-x-auto">
@@ -965,7 +963,7 @@ function InventarioContent() {
                 </table>
               </div>
             </div>
-          ) : !historialFecha ? (
+          ) : !activeSemana ? (
             !pivot || pivot.ingredientes.length === 0 ? (
               <p className="text-[#6B5E52] text-center py-10">
                 No hay registros de inventario todavia.
