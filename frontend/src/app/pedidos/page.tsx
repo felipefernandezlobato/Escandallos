@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { apiFetch } from "@/lib/api";
 import { useToast } from "@/components/Toast";
-import type { Ingrediente, Pedido } from "@/lib/types";
+import type { Categoria, Ingrediente, Pedido } from "@/lib/types";
 
 type Tab = "activos" | "historial" | "pivot";
 type FiltroEstado = "todos" | "borrador" | "enviado" | "recibido";
@@ -17,12 +17,6 @@ interface PivotData {
     unidad: string;
     fechas: Record<string, number>;
   }>;
-}
-
-interface NuevaLinea {
-  ingrediente_id: number;
-  cantidad: string;
-  proveedor: string;
 }
 
 function mejorProveedor(ing: Ingrediente): string {
@@ -51,9 +45,11 @@ export default function PedidosPage() {
 
   const [showCrear, setShowCrear] = useState(false);
   const [ingredientes, setIngredientes] = useState<Ingrediente[]>([]);
-  const [lineas, setLineas] = useState<NuevaLinea[]>([]);
+  const [categorias, setCategorias] = useState<Categoria[]>([]);
+  const [cantidades, setCantidades] = useState<Record<number, string>>({});
   const [creando, setCreando] = useState(false);
   const [busqueda, setBusqueda] = useState("");
+  const [filtroCategoria, setFiltroCategoria] = useState("");
 
   useEffect(() => {
     fetchData();
@@ -66,73 +62,83 @@ export default function PedidosPage() {
       .finally(() => setLoading(false));
   };
 
+  const normalize = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+
   const openCrear = () => {
     if (ingredientes.length === 0) {
-      apiFetch<Ingrediente[]>("/api/ingredientes").then(setIngredientes);
+      Promise.all([
+        apiFetch<Ingrediente[]>("/api/ingredientes"),
+        apiFetch<Categoria[]>("/api/categorias?tipo=ingrediente"),
+      ]).then(([ings, cats]) => {
+        setIngredientes(ings);
+        setCategorias(cats);
+      });
     }
     setShowCrear(true);
-    setLineas([]);
+    setCantidades({});
     setBusqueda("");
+    setFiltroCategoria("");
   };
 
   const ingredientesFiltrados = ingredientes
     .filter((i) => !i.excluir_pedidos)
-    .filter((i) => !busqueda || i.nombre.toLowerCase().includes(busqueda.toLowerCase()))
-    .filter((i) => !lineas.some((l) => l.ingrediente_id === i.id));
+    .filter((i) => !busqueda || normalize(i.nombre).includes(normalize(busqueda)))
+    .filter((i) => !filtroCategoria || String(i.categoria_id) === filtroCategoria);
 
-  const addLinea = (ing: Ingrediente) => {
-    setLineas((prev) => [...prev, { ingrediente_id: ing.id, cantidad: "", proveedor: mejorProveedor(ing) }]);
-    setBusqueda("");
-  };
+  const porCategoria = categorias
+    .map((c) => ({
+      id: c.id,
+      nombre: c.nombre,
+      items: ingredientesFiltrados.filter((i) => i.categoria_id === c.id),
+    }))
+    .filter((g) => g.items.length > 0);
 
-  const removeLinea = (idx: number) => {
-    setLineas((prev) => prev.filter((_, i) => i !== idx));
-  };
-
-  const updateCantidad = (idx: number, val: string) => {
-    const v = val.replace(",", ".");
-    if (v === "" || /^\d*\.?\d*$/.test(v)) {
-      setLineas((prev) => prev.map((l, i) => (i === idx ? { ...l, cantidad: v } : l)));
-    }
-  };
-
-  const lineasPorProveedor = lineas.reduce<Record<string, NuevaLinea[]>>((acc, l) => {
-    acc[l.proveedor] = acc[l.proveedor] || [];
-    acc[l.proveedor].push(l);
-    return acc;
-  }, {});
+  const filledCount = Object.values(cantidades).filter((v) => v && parseFloat(v) > 0).length;
 
   const handleCrearPedidos = async () => {
-    const grupos = Object.entries(lineasPorProveedor);
-    let creados = 0;
+    const lineasConCantidad = Object.entries(cantidades)
+      .filter(([, v]) => v && parseFloat(v) > 0)
+      .map(([idStr, v]) => {
+        const ing = ingredientes.find((i) => i.id === Number(idStr))!;
+        return {
+          ingrediente_id: ing.id,
+          cantidad_pedida: parseFloat(v),
+          unidad: ing.unidad_compra,
+          proveedor: mejorProveedor(ing),
+        };
+      });
+
+    if (lineasConCantidad.length === 0) {
+      toast("Pon cantidad > 0 en al menos un ingrediente", "error");
+      return;
+    }
+
+    const porProv: Record<string, typeof lineasConCantidad> = {};
+    for (const l of lineasConCantidad) {
+      porProv[l.proveedor] = porProv[l.proveedor] || [];
+      porProv[l.proveedor].push(l);
+    }
 
     setCreando(true);
     try {
-      for (const [prov, items] of grupos) {
-        const lineasValidas = items
-          .filter((l) => l.cantidad && parseFloat(l.cantidad) > 0)
-          .map((l) => {
-            const ing = ingredientes.find((i) => i.id === l.ingrediente_id)!;
-            return {
-              ingrediente_id: l.ingrediente_id,
-              cantidad_pedida: parseFloat(l.cantidad),
-              unidad: ing.unidad_compra,
-            };
-          });
-        if (lineasValidas.length === 0) continue;
+      let creados = 0;
+      for (const [prov, items] of Object.entries(porProv)) {
         await apiFetch("/api/pedidos", {
           method: "POST",
-          body: JSON.stringify({ proveedor: prov, lineas: lineasValidas }),
+          body: JSON.stringify({
+            proveedor: prov,
+            lineas: items.map((l) => ({
+              ingrediente_id: l.ingrediente_id,
+              cantidad_pedida: l.cantidad_pedida,
+              unidad: l.unidad,
+            })),
+          }),
         });
         creados++;
       }
-      if (creados === 0) {
-        toast("Agrega al menos un ingrediente con cantidad > 0", "error");
-      } else {
-        toast(`${creados} pedido${creados > 1 ? "s" : ""} creado${creados > 1 ? "s" : ""} como borrador`, "success");
-        setShowCrear(false);
-        fetchData();
-      }
+      toast(`${creados} pedido${creados > 1 ? "s" : ""} creado${creados > 1 ? "s" : ""} como borrador`, "success");
+      setShowCrear(false);
+      fetchData();
     } catch (err) {
       toast("Error: " + (err as Error).message, "error");
     } finally {
@@ -253,80 +259,92 @@ export default function PedidosPage() {
       )}
 
       {showCrear && (
-        <div className="bg-white border border-[#E8DFD3] rounded-lg p-4 space-y-4">
+        <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="font-semibold text-[#8B1A2B]">Nuevo Pedido</h2>
-            <button onClick={() => setShowCrear(false)} className="text-sm text-[#6B5E52] hover:text-[#8B1A2B]">
-              Cancelar
-            </button>
+            <h2 className="font-semibold text-[#8B1A2B]">Nuevo Pedido — {filledCount} items</h2>
+            <div className="flex gap-3">
+              {filledCount > 0 && (
+                <button onClick={() => setCantidades({})} className="text-sm text-red-500 hover:text-red-700">
+                  Vaciar todo
+                </button>
+              )}
+              <button onClick={() => setShowCrear(false)} className="text-sm text-[#6B5E52] hover:text-[#8B1A2B]">
+                Cancelar
+              </button>
+            </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-[#6B5E52] mb-1">Buscar ingrediente</label>
+          <div className="flex flex-wrap gap-3 items-center">
             <input
               type="text"
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
-              placeholder="Escribir para buscar..."
-              className="w-full border border-[#D4C4A8] rounded-lg px-3 py-2 text-sm"
+              placeholder="Buscar ingrediente..."
+              className="border border-[#D4C4A8] rounded-lg px-3 py-2 text-sm flex-1 min-w-[200px]"
             />
-            {busqueda && ingredientesFiltrados.length > 0 && (
-              <div className="mt-1 border border-[#D4C4A8] rounded-lg max-h-48 overflow-y-auto bg-white shadow-lg">
-                {ingredientesFiltrados.slice(0, 15).map((ing) => (
-                  <button
-                    key={ing.id}
-                    onClick={() => addLinea(ing)}
-                    className="w-full text-left px-3 py-2 text-sm hover:bg-[#F5F0E8] border-b border-[#E8DFD3]/50 last:border-0"
-                  >
-                    <span className="font-medium">{ing.nombre}</span>
-                    <span className="text-[#6B5E52] ml-2">({ing.unidad_compra})</span>
-                    <span className="text-xs text-[#6B5E52] ml-2">— {mejorProveedor(ing)}</span>
-                  </button>
-                ))}
-              </div>
-            )}
+            <select
+              value={filtroCategoria}
+              onChange={(e) => setFiltroCategoria(e.target.value)}
+              className="border border-[#D4C4A8] rounded-lg px-3 py-2 text-sm"
+            >
+              <option value="">Todas las categorías</option>
+              {categorias.map((c) => (
+                <option key={c.id} value={c.id}>{c.nombre}</option>
+              ))}
+            </select>
           </div>
 
-          {lineas.length > 0 && (
-            <div className="space-y-3">
-              {Object.entries(lineasPorProveedor).map(([prov, items]) => (
-                <div key={prov}>
-                  <h3 className="text-sm font-semibold text-[#8B1A2B] uppercase tracking-wider mb-1.5">{prov}</h3>
-                  <div className="space-y-1.5">
-                    {items.map((l) => {
-                      const idx = lineas.indexOf(l);
-                      const ing = ingredientes.find((i) => i.id === l.ingrediente_id)!;
-                      return (
-                        <div key={l.ingrediente_id} className="flex items-center gap-3 bg-[#F5F0E8] rounded-lg px-3 py-2">
-                          <span className="flex-1 text-sm font-medium">{ing.nombre}</span>
-                          <input
-                            type="text"
-                            inputMode="decimal"
-                            value={l.cantidad}
-                            onChange={(e) => updateCantidad(idx, e.target.value)}
-                            placeholder="0"
-                            className="w-20 border border-[#D4C4A8] rounded px-2 py-1 text-sm text-right"
-                          />
-                          <span className="text-xs text-[#6B5E52] w-12">{ing.unidad_compra}</span>
-                          <button onClick={() => removeLinea(idx)} className="text-red-500 hover:text-red-700 text-xs">
-                            Quitar
-                          </button>
-                        </div>
-                      );
-                    })}
-                  </div>
+          <div className="space-y-6">
+            {porCategoria.map((grupo) => (
+              <div key={grupo.id}>
+                <h3 className="text-sm font-semibold text-[#8B1A2B] uppercase tracking-wider mb-2 border-b border-[#E8DFD3] pb-1">
+                  {grupo.nombre}
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                  {grupo.items.map((ing) => (
+                    <div
+                      key={ing.id}
+                      className={`flex items-center gap-2 border rounded-lg px-3 py-2 ${
+                        cantidades[ing.id] && parseFloat(cantidades[ing.id]) > 0
+                          ? "bg-[#F5F0E8] border-[#8B1A2B]/30"
+                          : "bg-white border-[#E8DFD3]"
+                      }`}
+                    >
+                      <div className="flex-1 min-w-0">
+                        <span className="text-sm truncate block">{ing.nombre}</span>
+                        <span className="text-[10px] text-[#6B5E52]/60">{mejorProveedor(ing)}</span>
+                      </div>
+                      <input
+                        type="text"
+                        inputMode="decimal"
+                        placeholder="0"
+                        value={cantidades[ing.id] || ""}
+                        onChange={(e) => {
+                          const v = e.target.value.replace(",", ".");
+                          if (v === "" || /^\d*\.?\d*$/.test(v))
+                            setCantidades((prev) => ({ ...prev, [ing.id]: v }));
+                        }}
+                        className="w-20 border border-[#D4C4A8] rounded px-2 py-1 text-sm text-right"
+                      />
+                      <span className="text-xs text-[#6B5E52] w-10">{ing.unidad_compra}</span>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              </div>
+            ))}
+          </div>
+
+          {filledCount > 0 && (
+            <div className="sticky bottom-4">
+              <button
+                onClick={handleCrearPedidos}
+                disabled={creando}
+                className="w-full bg-[#8B1A2B] text-white px-4 py-3 rounded-lg text-sm font-medium hover:bg-[#6D1422] transition-colors disabled:opacity-50 shadow-lg"
+              >
+                {creando ? "Creando..." : `Crear Pedido (${filledCount} items)`}
+              </button>
             </div>
           )}
-
-          <button
-            onClick={handleCrearPedidos}
-            disabled={creando || lineas.length === 0}
-            className="w-full bg-[#8B1A2B] text-white px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-[#6D1422] transition-colors disabled:opacity-50"
-          >
-            {creando ? "Creando..." : `Crear ${Object.keys(lineasPorProveedor).length > 1 ? Object.keys(lineasPorProveedor).length + " pedidos" : "Pedido"} como Borrador`}
-          </button>
         </div>
       )}
 
