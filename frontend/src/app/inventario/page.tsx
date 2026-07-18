@@ -275,14 +275,16 @@ function InventarioContent() {
   };
 
   const activeSemana = urlSemanaVal || (tab === "historial" && semanas.length > 0 ? semanas[0] : "");
+  const [loadingHistorial, setLoadingHistorial] = useState(false);
 
   useEffect(() => {
     if (activeSemana) {
+      setLoadingHistorial(true);
       apiFetch<{ snapshot: InventarioSnapshot | null }>(
         `/api/inventario?semana=${activeSemana}`
       ).then((data) => {
         setHistorial(data.snapshot);
-      });
+      }).finally(() => setLoadingHistorial(false));
     } else {
       setHistorial(null);
     }
@@ -871,7 +873,9 @@ function InventarioContent() {
             )}
           </div>
 
-          {activeSemana && historial ? (
+          {activeSemana && loadingHistorial ? (
+            <p className="text-[#6B5E52] text-center py-10">Cargando historial...</p>
+          ) : activeSemana && historial ? (
             <div className="bg-white border border-[#E8DFD3] rounded-lg overflow-hidden">
               <div className="px-4 py-3 bg-[#F5F0E8] border-b border-[#E8DFD3]">
                 <h3 className="font-semibold text-[#8B1A2B]">
