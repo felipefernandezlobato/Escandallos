@@ -294,6 +294,12 @@ function InventarioContent() {
     apiFetch<typeof pivot>("/api/inventario/pivot").then(setPivot);
   };
 
+  useEffect(() => {
+    if (tab === "historial" && !pivot) {
+      fetchPivot();
+    }
+  }, [tab]);
+
   const ingredientesFiltrados = ingredientes.filter((ing) => {
     if (ing.excluir_pedidos) return false;
     if (filtroCategoria && String(ing.categoria_id) !== filtroCategoria) return false;
