@@ -150,7 +150,7 @@ def listar_inventario(
             items.append({
                 "id": r.id,
                 "ingrediente_id": r.ingrediente_id,
-                "cantidad": r.cantidad,
+                "cantidad": round(r.cantidad, 3),
                 "unidad": r.unidad,
                 "fecha_registro": r.fecha_registro,
                 "notas": r.notas,
