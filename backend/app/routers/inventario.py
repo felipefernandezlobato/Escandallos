@@ -231,7 +231,8 @@ def inventario_pivot(
                 "unidad": r.unidad,
                 "fechas": {},
             }
-        by_ing[r.ingrediente_id]["fechas"][week] = r.cantidad
+        if week not in by_ing[r.ingrediente_id]["fechas"]:
+            by_ing[r.ingrediente_id]["fechas"][week] = r.cantidad
 
     fechas_sorted = sorted(fechas_set, reverse=True)
 
