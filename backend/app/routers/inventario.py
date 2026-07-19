@@ -441,10 +441,20 @@ def obtener_consumo(
         avg = sum(weekly_vals) / len(weekly_vals)
         variance = sum((v - avg) ** 2 for v in weekly_vals) / len(weekly_vals)
         std_dev = math.sqrt(variance)
-        safety = min(1.65 * std_dev, 0.5 * media)
-        safety = round(safety, 1)
-        rop = safety
-        eoq = round(media + safety, 1)
+
+        # Coffee is ordered monthly (4-week cycle) with 1-week lead time
+        is_coffee = "café en grano" in ing.nombre.lower()
+        if is_coffee:
+            lead_weeks = 1
+            cycle_weeks = 4
+            safety = round(1.65 * std_dev * math.sqrt(lead_weeks), 1)
+            rop = round(avg * lead_weeks + safety, 1)
+            eoq = round(avg * (cycle_weeks + lead_weeks) + safety, 1)
+        else:
+            safety = min(1.65 * std_dev, 0.5 * media)
+            safety = round(safety, 1)
+            rop = safety
+            eoq = round(media + safety, 1)
 
     return ConsumoOut(
         ingrediente_id=ing.id,
