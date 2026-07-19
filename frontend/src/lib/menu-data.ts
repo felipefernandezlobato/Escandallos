@@ -49,6 +49,50 @@ export function getMultiColor(multi: number | null, section: string): string {
   return "text-red-600 font-medium";
 }
 
+export type BarGroup = "drinks" | "wine" | "beer" | "cocktails";
+
+export const BAR_SECTIONS: BarGroup[] = ["drinks", "wine", "beer", "cocktails"];
+export const BAR_LABELS: Record<BarGroup, string> = { drinks: "Drinks", wine: "Wine", beer: "Beer", cocktails: "Cocktails" };
+
+let _recipeMap: Record<string, BarGroup> | null = null;
+let _ingredientMap: Record<string, BarGroup> | null = null;
+
+function buildBarMaps() {
+  if (_recipeMap) return;
+  _recipeMap = {};
+  _ingredientMap = {};
+  for (const section of MENU) {
+    const group = section.title.toLowerCase() as BarGroup;
+    if (!BAR_SECTIONS.includes(group)) continue;
+    for (const item of section.items) {
+      if (item.recipeName) _recipeMap[item.recipeName] = group;
+      if (item.recipeNameBottle) _recipeMap[item.recipeNameBottle] = group;
+      if (item.recipeNameIced) _recipeMap[item.recipeNameIced] = group;
+      if (item.ingredientName) _ingredientMap[item.ingredientName] = group;
+    }
+  }
+}
+
+export function getBarGroupForRecipe(name: string): BarGroup {
+  buildBarMaps();
+  return _recipeMap![name] || "cocktails";
+}
+
+export function getBarGroupForIngredient(name: string, categoryName: string): BarGroup {
+  buildBarMaps();
+  if (_ingredientMap![name]) return _ingredientMap![name];
+  const cat = categoryName.toLowerCase();
+  if (cat === "bebidas") return "drinks";
+  if (cat === "alcohol") {
+    const n = name.toLowerCase();
+    if (n.includes("estrella") || n.includes("ueli") || n.includes("unser bier") || n.includes("birtel")) return "beer";
+    if (n.includes("vodka") || n.includes("tequila") || n.includes("kahlua") || n.includes("cointreau") ||
+        n.includes("licor") || n.includes("aperol") || n.includes("sangría") || n.includes("xclnt")) return "cocktails";
+    return "wine";
+  }
+  return "drinks";
+}
+
 export const MENU: MenuSection[] = [
   {
     title: "COFFEE",

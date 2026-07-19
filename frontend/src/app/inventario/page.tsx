@@ -4,6 +4,7 @@ import { Suspense, useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/api";
+import { BAR_SECTIONS, BAR_LABELS, getBarGroupForIngredient } from "@/lib/menu-data";
 import { useToast } from "@/components/Toast";
 import type { Ingrediente, Categoria, RecomendacionItem } from "@/lib/types";
 
@@ -318,7 +319,7 @@ function InventarioContent() {
   const BAR_CATS = ["alcohol", "bebidas"];
   const CAFE_CATS = ["café"];
 
-  const porCategoria = (() => {
+  const porCategoria: Array<{ id: number; nombre: string; items: Ingrediente[] }> = (() => {
     if (filtroCategoria) {
       return categorias
         .filter((c) => c.tipo === "ingrediente")
@@ -338,9 +339,23 @@ function InventarioContent() {
       return groups;
     }
 
-    const catSet = vista === "cocina" ? COCINA_CATS : BAR_CATS;
+    if (vista === "bar") {
+      const barIngs = ingredientesFiltrados.filter((i) => {
+        const cat = categorias.find((c) => c.id === i.categoria_id);
+        return cat && BAR_CATS.includes(cat.nombre.toLowerCase());
+      });
+      return BAR_SECTIONS.map((group) => {
+        const items = barIngs.filter((i) => {
+          const cat = categorias.find((c) => c.id === i.categoria_id);
+          return getBarGroupForIngredient(i.nombre, cat?.nombre || "") === group;
+        });
+        if (items.length === 0) return null;
+        return { id: -100 - BAR_SECTIONS.indexOf(group), nombre: BAR_LABELS[group], tipo: "ingrediente", margen_objetivo: null, items } as any;
+      }).filter(Boolean);
+    }
+
     return categorias
-      .filter((c) => c.tipo === "ingrediente" && catSet.includes(c.nombre.toLowerCase()))
+      .filter((c) => c.tipo === "ingrediente" && COCINA_CATS.includes(c.nombre.toLowerCase()))
       .map((c) => ({ ...c, items: ingredientesFiltrados.filter((i) => i.categoria_id === c.id) }))
       .filter((g) => g.items.length > 0);
   })();

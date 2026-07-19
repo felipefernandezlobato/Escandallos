@@ -103,6 +103,7 @@ Two options:
 
 After making changes:
 1. `git push` — triggers Vercel auto-deploy for frontend
+1b. Trigger Vercel deploy (if needed): `curl -s "https://api.vercel.com/v1/integrations/deploy/prj_VpRYLvM9NtDVZY2xJf0Ehc53fREb/iLu6M7L1mE"`
 2. Trigger Render deploy: `curl -s "https://api.render.com/deploy/srv-d99vh8u7r5hc73bvaf9g?key=W1tZafHDZ9U"`
 3. Wait ~2-3 min, then verify: `curl -s -o /dev/null -w "%{http_code}" https://bru-escandallos-api.onrender.com/api/categorias` (expect 401)
 4. Frontend: https://escandallos-bruteam.vercel.app
