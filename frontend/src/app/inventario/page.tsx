@@ -82,7 +82,14 @@ function InventarioContent() {
     router.push(`/inventario?tab=${newTab}`);
   }, [router]);
 
+  const [selectedSemana, setSelectedSemana] = useState(urlSemanaVal);
+
+  useEffect(() => {
+    setSelectedSemana(urlSemanaVal);
+  }, [urlSemanaVal]);
+
   const setHistorialFecha = useCallback((semana: string) => {
+    setSelectedSemana(semana);
     if (semana) {
       router.push(`/inventario?tab=historial&semana=${semana}`);
     } else {
@@ -274,7 +281,7 @@ function InventarioContent() {
     );
   };
 
-  const activeSemana = urlSemanaVal;
+  const activeSemana = selectedSemana;
   const [loadingHistorial, setLoadingHistorial] = useState(false);
 
   useEffect(() => {
