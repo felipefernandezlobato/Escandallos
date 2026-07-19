@@ -143,7 +143,7 @@ function InventarioContent() {
   } | null>(null);
   const [selectedIngId, setSelectedIngId] = useState<number | null>(null);
   const [idsConRegistros, setIdsConRegistros] = useState<number[]>([]);
-  const [vista, setVista] = useState<"cocina" | "cafe">("cocina");
+  const [vista, setVista] = useState<"cocina" | "cafe" | "bar">("cocina");
   const [ultimoConteo, setUltimoConteo] = useState<Record<string, { fecha: string; unidad: string }>>({});
   const [recomendaciones, setRecomendaciones] = useState<RecomendacionItem[]>([]);
   const [showRecomendaciones, setShowRecomendaciones] = useState(false);
@@ -315,19 +315,35 @@ function InventarioContent() {
   });
 
   const COCINA_CATS = ["carne", "especias", "fruta", "huevos", "lácteo", "otros", "panadería", "seco", "verdura"];
+  const BAR_CATS = ["alcohol", "bebidas"];
+  const CAFE_CATS = ["café"];
 
-  const porCategoria = categorias
-    .filter((c) => {
-      if (c.tipo !== "ingrediente") return false;
-      if (filtroCategoria) return true;
-      const isCocina = COCINA_CATS.includes(c.nombre.toLowerCase());
-      return vista === "cocina" ? isCocina : !isCocina;
-    })
-    .map((c) => ({
-      ...c,
-      items: ingredientesFiltrados.filter((i) => i.categoria_id === c.id),
-    }))
-    .filter((g) => g.items.length > 0);
+  const porCategoria = (() => {
+    if (filtroCategoria) {
+      return categorias
+        .filter((c) => c.tipo === "ingrediente")
+        .map((c) => ({ ...c, items: ingredientesFiltrados.filter((i) => i.categoria_id === c.id) }))
+        .filter((g) => g.items.length > 0);
+    }
+
+    if (vista === "cafe") {
+      const groups = categorias
+        .filter((c) => c.tipo === "ingrediente" && CAFE_CATS.includes(c.nombre.toLowerCase()))
+        .map((c) => ({ ...c, items: ingredientesFiltrados.filter((i) => i.categoria_id === c.id) }))
+        .filter((g) => g.items.length > 0);
+      const sibaristItems = ingredientesFiltrados.filter((i) => i.nombre.toLowerCase().includes("sibarist"));
+      if (sibaristItems.length > 0) {
+        groups.push({ id: -1, nombre: "Sibarist", tipo: "ingrediente", margen_objetivo: null, items: sibaristItems } as any);
+      }
+      return groups;
+    }
+
+    const catSet = vista === "cocina" ? COCINA_CATS : BAR_CATS;
+    return categorias
+      .filter((c) => c.tipo === "ingrediente" && catSet.includes(c.nombre.toLowerCase()))
+      .map((c) => ({ ...c, items: ingredientesFiltrados.filter((i) => i.categoria_id === c.id) }))
+      .filter((g) => g.items.length > 0);
+  })();
 
   const handleSave = async () => {
     setSaving(true);
@@ -523,6 +539,16 @@ function InventarioContent() {
               }`}
             >
               Cafe
+            </button>
+            <button
+              onClick={() => setVista("bar")}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                vista === "bar"
+                  ? "bg-[#8B1A2B] text-white"
+                  : "bg-white border border-[#D4C4A8] text-[#6B5E52] hover:bg-[#F5F0E8]"
+              }`}
+            >
+              Bar
             </button>
           </div>
           <div className="flex flex-wrap gap-3 items-center">
