@@ -426,7 +426,7 @@ escandallos/
 - [x] 10.5 Botones de backup y export en la pagina de Configuracion
 - [x] 10.6 Manejo de errores y estados vacios en todo el frontend
 - [x] 10.7 Test final responsive (probar en movil real)
-- [x] 10.8 Deploy frontend a Vercel (https://frontend-bruteam.vercel.app)
+- [x] 10.8 Deploy frontend a Vercel (https://escandallos.vercel.app)
 - [x] 10.9 Deploy backend a Render (https://bru-escandallos-api.onrender.com)
 - [x] 10.10 Verificacion end-to-end en produccion
 - [x] 10.11 Autenticacion con password compartido (HMAC token, 7 dias)

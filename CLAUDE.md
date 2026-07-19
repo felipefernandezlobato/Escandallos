@@ -105,7 +105,7 @@ After making changes:
 1. `git push` — triggers Vercel auto-deploy for frontend
 2. Trigger Render deploy: `curl -s "https://api.render.com/deploy/srv-d99vh8u7r5hc73bvaf9g?key=W1tZafHDZ9U"`
 3. Wait ~2-3 min, then verify: `curl -s -o /dev/null -w "%{http_code}" https://bru-escandallos-api.onrender.com/api/categorias` (expect 401)
-4. Frontend: https://frontend-bruteam.vercel.app
+4. Frontend: https://escandallos.vercel.app
 5. Backend: https://bru-escandallos-api.onrender.com
 
 Render start command is `bash start.sh` (set in dashboard, NOT render.yaml). It auto-handles alembic migrations.
