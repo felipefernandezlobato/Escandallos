@@ -443,7 +443,7 @@ def obtener_consumo(
         std_dev = math.sqrt(variance)
 
         # Coffee is ordered monthly (4-week cycle) with 1-week lead time
-        is_coffee = "café en grano" in ing.nombre.lower()
+        is_coffee = "café en grano" in ing.nombre.lower() or "coffee retail" in ing.nombre.lower()
         if is_coffee:
             lead_weeks = 1
             cycle_weeks = 4
