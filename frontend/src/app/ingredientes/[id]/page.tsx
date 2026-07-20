@@ -113,9 +113,9 @@ export default function IngredienteDetailPage() {
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <Link href="/ingredientes" className="text-sm text-[#8B1A2B] hover:underline">
-            &larr; Ingredientes
-          </Link>
+          <button onClick={() => router.back()} className="text-sm text-[#8B1A2B] hover:underline">
+            &larr; Volver
+          </button>
           <h1 className="text-2xl font-bold mt-1">{ingrediente.nombre}</h1>
         </div>
       </div>
