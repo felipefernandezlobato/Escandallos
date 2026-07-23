@@ -456,55 +456,10 @@ def obtener_consumo(
             rop = safety
             eoq = round(media + safety, 1)
 
-    received_by_date: dict[date, float] = {}
-    for lp in (
-        db.query(LineaPedido.cantidad_recibida, Pedido.fecha_recepcion)
-        .join(Pedido)
-        .filter(
-            LineaPedido.ingrediente_id == ingrediente_id,
-            Pedido.estado == "recibido",
-            LineaPedido.cantidad_recibida.isnot(None),
-            Pedido.fecha_recepcion.isnot(None),
-        )
-        .all()
-    ):
-        if lp.cantidad_recibida and lp.fecha_recepcion:
-            received_by_date[lp.fecha_recepcion] = (
-                received_by_date.get(lp.fecha_recepcion, 0) + lp.cantidad_recibida
-            )
-
-    stock_points: list[StockHistorialItem] = []
-    for idx, r in enumerate(registros_stock):
-        received = received_by_date.get(r.fecha_registro, 0)
-        post_qty = r.cantidad
-        pre_qty = round(r.cantidad - received, 2) if received > 0 else r.cantidad
-
-        if idx > 0:
-            prev = registros_stock[idx - 1]
-            prev_qty = prev.cantidad
-            days_gap = (r.fecha_registro - prev.fecha_registro).days
-            if days_gap > 1:
-                daily_drop = (prev_qty - pre_qty) / days_gap
-                for d in range(1, days_gap):
-                    interp_date = prev.fecha_registro + timedelta(days=d)
-                    interp_qty = round(prev_qty - daily_drop * d, 2)
-                    stock_points.append(StockHistorialItem(
-                        fecha=str(interp_date),
-                        cantidad=max(0, interp_qty),
-                        unidad=r.unidad,
-                    ))
-
-        if received > 0:
-            stock_points.append(StockHistorialItem(
-                fecha=str(r.fecha_registro),
-                cantidad=pre_qty,
-                unidad=r.unidad,
-            ))
-        stock_points.append(StockHistorialItem(
-            fecha=str(r.fecha_registro),
-            cantidad=post_qty,
-            unidad=r.unidad,
-        ))
+    stock_points: list[StockHistorialItem] = [
+        StockHistorialItem(fecha=str(r.fecha_registro), cantidad=r.cantidad, unidad=r.unidad)
+        for r in registros_stock
+    ]
 
     return ConsumoOut(
         ingrediente_id=ing.id,
