@@ -477,8 +477,9 @@ def obtener_consumo(
     for r in registros_stock:
         received = received_by_date.get(r.fecha_registro, 0)
         if received > 0:
+            pre_date = r.fecha_registro - timedelta(days=1)
             stock_points.append(StockHistorialItem(
-                fecha=str(r.fecha_registro),
+                fecha=str(pre_date),
                 cantidad=round(r.cantidad - received, 2),
                 unidad=r.unidad,
             ))
