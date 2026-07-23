@@ -456,6 +456,38 @@ def obtener_consumo(
             rop = safety
             eoq = round(media + safety, 1)
 
+    received_by_date: dict[date, float] = {}
+    for lp in (
+        db.query(LineaPedido.cantidad_recibida, Pedido.fecha_recepcion)
+        .join(Pedido)
+        .filter(
+            LineaPedido.ingrediente_id == ingrediente_id,
+            Pedido.estado == "recibido",
+            LineaPedido.cantidad_recibida.isnot(None),
+            Pedido.fecha_recepcion.isnot(None),
+        )
+        .all()
+    ):
+        if lp.cantidad_recibida and lp.fecha_recepcion:
+            received_by_date[lp.fecha_recepcion] = (
+                received_by_date.get(lp.fecha_recepcion, 0) + lp.cantidad_recibida
+            )
+
+    stock_points: list[StockHistorialItem] = []
+    for r in registros_stock:
+        received = received_by_date.get(r.fecha_registro, 0)
+        if received > 0:
+            stock_points.append(StockHistorialItem(
+                fecha=str(r.fecha_registro),
+                cantidad=round(r.cantidad - received, 2),
+                unidad=r.unidad,
+            ))
+        stock_points.append(StockHistorialItem(
+            fecha=str(r.fecha_registro),
+            cantidad=r.cantidad,
+            unidad=r.unidad,
+        ))
+
     return ConsumoOut(
         ingrediente_id=ing.id,
         ingrediente_nombre=ing.nombre,
@@ -470,12 +502,5 @@ def obtener_consumo(
             ConsumoSemanalItem(semana=h["semana"], cantidad=h["cantidad"], unidad=display_unit)
             for h in historial
         ],
-        stock_historial=[
-            StockHistorialItem(
-                fecha=str(r.fecha_registro),
-                cantidad=r.cantidad,
-                unidad=r.unidad,
-            )
-            for r in registros_stock
-        ],
+        stock_historial=stock_points,
     )
