@@ -114,7 +114,7 @@ def consumo_medio_semanal(ingrediente_id: int, db: Session, semanas: int = 8) ->
     if not historial:
         return 0.0
     total = sum(h["cantidad"] for h in historial)
-    return round(total / semanas, 2)
+    return round(total / len(historial), 2)
 
 
 def stock_actual(ingrediente_id: int, db: Session) -> Optional[dict]:
