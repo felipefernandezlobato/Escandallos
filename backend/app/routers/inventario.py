@@ -474,18 +474,35 @@ def obtener_consumo(
             )
 
     stock_points: list[StockHistorialItem] = []
-    for r in registros_stock:
+    for idx, r in enumerate(registros_stock):
         received = received_by_date.get(r.fecha_registro, 0)
+        post_qty = r.cantidad
+        pre_qty = round(r.cantidad - received, 2) if received > 0 else r.cantidad
+
+        if idx > 0:
+            prev = registros_stock[idx - 1]
+            prev_qty = prev.cantidad
+            days_gap = (r.fecha_registro - prev.fecha_registro).days
+            if days_gap > 1:
+                daily_drop = (prev_qty - pre_qty) / days_gap
+                for d in range(1, days_gap):
+                    interp_date = prev.fecha_registro + timedelta(days=d)
+                    interp_qty = round(prev_qty - daily_drop * d, 2)
+                    stock_points.append(StockHistorialItem(
+                        fecha=str(interp_date),
+                        cantidad=max(0, interp_qty),
+                        unidad=r.unidad,
+                    ))
+
         if received > 0:
-            pre_date = r.fecha_registro - timedelta(days=1)
             stock_points.append(StockHistorialItem(
-                fecha=str(pre_date),
-                cantidad=round(r.cantidad - received, 2),
+                fecha=str(r.fecha_registro),
+                cantidad=pre_qty,
                 unidad=r.unidad,
             ))
         stock_points.append(StockHistorialItem(
             fecha=str(r.fecha_registro),
-            cantidad=r.cantidad,
+            cantidad=post_qty,
             unidad=r.unidad,
         ))
 
