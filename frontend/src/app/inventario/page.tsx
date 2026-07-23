@@ -317,7 +317,7 @@ function InventarioContent() {
 
   const COCINA_CATS = ["carne", "especias", "fruta", "huevos", "lácteo", "otros", "panadería", "seco", "verdura"];
   const BAR_CATS = ["alcohol", "bebidas"];
-  const CAFE_CATS = ["café"];
+  const CAFE_CATS = ["café", "té+"];
 
   const porCategoria: Array<{ id: number; nombre: string; items: Ingrediente[] }> = (() => {
     if (filtroCategoria) {
