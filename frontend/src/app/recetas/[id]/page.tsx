@@ -32,6 +32,7 @@ export default function RecetaDetailPage() {
     es_subreceta: false,
     unidad_rendimiento: null as string | null,
     notas: "",
+    descripcion: "",
     lineas: [] as LineaRecetaInput[],
   });
 
@@ -65,6 +66,7 @@ export default function RecetaDetailPage() {
       es_subreceta: receta.es_subreceta,
       unidad_rendimiento: receta.unidad_rendimiento || null,
       notas: receta.notas || "",
+      descripcion: receta.descripcion || "",
       lineas: receta.lineas.map((l) => ({
         ingrediente_id: l.ingrediente_id,
         subreceta_id: l.subreceta_id,
@@ -184,6 +186,11 @@ export default function RecetaDetailPage() {
             <label className="block text-xs text-[#6B5E52] mb-1">Notas</label>
             <textarea value={editForm.notas} onChange={(e) => setEditForm({ ...editForm, notas: e.target.value })} className="w-full border border-[#D4C4A8] rounded px-3 py-2 text-sm" rows={2} />
           </div>
+        </div>
+
+        <div>
+          <label className="block text-xs text-[#6B5E52] mb-1">Preparación</label>
+          <textarea value={editForm.descripcion} onChange={(e) => setEditForm({ ...editForm, descripcion: e.target.value })} className="w-full border border-[#D4C4A8] rounded px-3 py-2 text-sm" rows={6} placeholder="Instrucciones de preparación..." />
         </div>
 
         {/* Edit lines */}
@@ -362,6 +369,13 @@ export default function RecetaDetailPage() {
           </tfoot>
         </table>
       </div>
+
+      {receta.descripcion && (
+        <div className="bg-white border border-[#E8DFD3] rounded-lg p-4">
+          <h3 className="text-sm font-semibold mb-2">Preparación</h3>
+          <p className="text-sm text-[#6B5E52] whitespace-pre-wrap">{receta.descripcion}</p>
+        </div>
+      )}
 
       {receta.notas && (
         <div className="bg-white border border-[#E8DFD3] rounded-lg p-4">

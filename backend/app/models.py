@@ -68,6 +68,7 @@ class Receta(Base):
     es_subreceta: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     unidad_rendimiento: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
     notas: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    descripcion: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     fecha_creacion: Mapped[datetime] = mapped_column(DateTime, default=func.now())
     fecha_modificacion: Mapped[datetime] = mapped_column(DateTime, default=func.now(), onupdate=func.now())
 

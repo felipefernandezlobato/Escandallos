@@ -52,6 +52,7 @@ export interface Receta {
   es_subreceta: boolean;
   unidad_rendimiento: string | null;
   notas: string | null;
+  descripcion: string | null;
   coste_total: number;
   coste_por_porcion: number;
   margen_real: number | null;

@@ -116,6 +116,7 @@ class RecetaBase(BaseModel):
     es_subreceta: bool = False
     unidad_rendimiento: Optional[str] = None
     notas: Optional[str] = None
+    descripcion: Optional[str] = None
 
 
 class RecetaCreate(RecetaBase):
@@ -131,6 +132,7 @@ class RecetaUpdate(BaseModel):
     es_subreceta: Optional[bool] = None
     unidad_rendimiento: Optional[str] = None
     notas: Optional[str] = None
+    descripcion: Optional[str] = None
     lineas: Optional[list[LineaRecetaCreate]] = None
 
 
