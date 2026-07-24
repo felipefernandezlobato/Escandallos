@@ -259,6 +259,44 @@ export default function RecetaDetailPage() {
         </div>
       </div>
 
+      {/* Bru2 cost row — only shown when recipe has excluded ingredients */}
+      {(() => {
+        const BRU2_EXCLUDE_ING = ["brotes de cebolla", "chilli flakes", "mohn", "rúcola"];
+        const BRU2_EXCLUDE_SUB = ["rúcola tostada"];
+        const excludedCost = receta.lineas.reduce((sum, l) => {
+          if (l.nombre_ingrediente && BRU2_EXCLUDE_ING.includes(l.nombre_ingrediente.toLowerCase())) return sum + l.coste_linea;
+          if (l.nombre_subreceta && BRU2_EXCLUDE_SUB.includes(l.nombre_subreceta.toLowerCase())) return sum + l.coste_linea;
+          return sum;
+        }, 0);
+        if (excludedCost <= 0) return null;
+        const bru2Total = receta.coste_total - excludedCost;
+        const bru2PerPortion = bru2Total / receta.porciones_por_lote;
+        return (
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div className="bg-[#F2E8EA] border border-[#8B1A2B]/20 rounded-lg p-4">
+              <p className="text-xs text-[#8B1A2B]">Coste total Bru2</p>
+              <p className="text-xl font-bold">{bru2Total.toFixed(2)} CHF</p>
+            </div>
+            <div className="bg-[#F2E8EA] border border-[#8B1A2B]/20 rounded-lg p-4">
+              <p className="text-xs text-[#8B1A2B]">Coste/{receta.unidad_rendimiento || "ración"} Bru2</p>
+              <p className="text-xl font-bold">{bru2PerPortion.toFixed(2)} CHF</p>
+            </div>
+            <div className="bg-[#F2E8EA] border border-[#8B1A2B]/20 rounded-lg p-4">
+              <p className="text-xs text-[#8B1A2B]">Precio venta</p>
+              <p className="text-xl font-bold">{receta.precio_venta ? `${receta.precio_venta.toFixed(2)} CHF` : "—"}</p>
+            </div>
+            <div className="bg-[#F2E8EA] border border-[#8B1A2B]/20 rounded-lg p-4">
+              <p className="text-xs text-[#8B1A2B]">Multiplicador Bru2</p>
+              <p className="text-xl font-bold">
+                {receta.precio_venta && bru2PerPortion > 0
+                  ? `x${(receta.precio_venta / bru2PerPortion).toFixed(1)}`
+                  : "—"}
+              </p>
+            </div>
+          </div>
+        );
+      })()}
+
       {/* Info */}
       <div className="flex flex-wrap gap-4 text-sm text-[#6B5E52]">
         <span>Categoría: <strong className="text-[#1A1A1A]">{receta.categoria_nombre}</strong></span>
