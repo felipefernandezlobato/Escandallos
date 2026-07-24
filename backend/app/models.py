@@ -64,6 +64,7 @@ class Receta(Base):
     categoria_id: Mapped[int] = mapped_column(Integer, ForeignKey("categorias.id"), nullable=False)
     porciones_por_lote: Mapped[float] = mapped_column(Float, nullable=False, default=1)
     precio_venta: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    precio_venta_bru2: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     es_subreceta: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     unidad_rendimiento: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
     notas: Mapped[Optional[str]] = mapped_column(Text, nullable=True)

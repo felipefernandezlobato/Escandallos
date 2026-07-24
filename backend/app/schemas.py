@@ -112,6 +112,7 @@ class RecetaBase(BaseModel):
     categoria_id: int
     porciones_por_lote: float = Field(default=1, gt=0)
     precio_venta: Optional[float] = None
+    precio_venta_bru2: Optional[float] = None
     es_subreceta: bool = False
     unidad_rendimiento: Optional[str] = None
     notas: Optional[str] = None
@@ -126,6 +127,7 @@ class RecetaUpdate(BaseModel):
     categoria_id: Optional[int] = None
     porciones_por_lote: Optional[float] = None
     precio_venta: Optional[float] = None
+    precio_venta_bru2: Optional[float] = None
     es_subreceta: Optional[bool] = None
     unidad_rendimiento: Optional[str] = None
     notas: Optional[str] = None

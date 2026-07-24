@@ -48,6 +48,7 @@ export interface Receta {
   categoria_id: number;
   porciones_por_lote: number; // kg for sub-recipes, servings for regular
   precio_venta: number | null;
+  precio_venta_bru2: number | null;
   es_subreceta: boolean;
   unidad_rendimiento: string | null;
   notas: string | null;

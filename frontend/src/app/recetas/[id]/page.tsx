@@ -28,6 +28,7 @@ export default function RecetaDetailPage() {
     categoria_id: 0,
     porciones_por_lote: 1,
     precio_venta: null as number | null,
+    precio_venta_bru2: null as number | null,
     es_subreceta: false,
     unidad_rendimiento: null as string | null,
     notas: "",
@@ -60,6 +61,7 @@ export default function RecetaDetailPage() {
       categoria_id: receta.categoria_id,
       porciones_por_lote: receta.porciones_por_lote,
       precio_venta: receta.precio_venta,
+      precio_venta_bru2: receta.precio_venta_bru2,
       es_subreceta: receta.es_subreceta,
       unidad_rendimiento: receta.unidad_rendimiento || null,
       notas: receta.notas || "",
@@ -157,6 +159,10 @@ export default function RecetaDetailPage() {
             <div>
               <label className="block text-xs text-[#6B5E52] mb-1">Precio venta (CHF)</label>
               <input type="number" step="any" value={editForm.precio_venta ?? ""} onChange={(e) => setEditForm({ ...editForm, precio_venta: e.target.value ? parseFloat(e.target.value) : null })} className="w-full border border-[#D4C4A8] rounded px-3 py-2 text-sm" />
+            </div>
+            <div>
+              <label className="block text-xs text-[#6B5E52] mb-1">Precio venta Bru2 (CHF)</label>
+              <input type="number" step="any" value={editForm.precio_venta_bru2 ?? ""} onChange={(e) => setEditForm({ ...editForm, precio_venta_bru2: e.target.value ? parseFloat(e.target.value) : null })} className="w-full border border-[#D4C4A8] rounded px-3 py-2 text-sm" />
             </div>
             <div className="flex items-center gap-2 pt-5">
               <input type="checkbox" checked={editForm.es_subreceta} onChange={(e) => setEditForm({ ...editForm, es_subreceta: e.target.checked })} />
@@ -282,14 +288,14 @@ export default function RecetaDetailPage() {
               <p className="text-xl font-bold">{bru2PerPortion.toFixed(2)} CHF</p>
             </div>
             <div className="bg-[#F2E8EA] border border-[#8B1A2B]/20 rounded-lg p-4">
-              <p className="text-xs text-[#8B1A2B]">Precio venta</p>
-              <p className="text-xl font-bold">{receta.precio_venta ? `${receta.precio_venta.toFixed(2)} CHF` : "—"}</p>
+              <p className="text-xs text-[#8B1A2B]">Precio venta Bru2</p>
+              <p className="text-xl font-bold">{receta.precio_venta_bru2 ? `${receta.precio_venta_bru2.toFixed(2)} CHF` : "—"}</p>
             </div>
             <div className="bg-[#F2E8EA] border border-[#8B1A2B]/20 rounded-lg p-4">
               <p className="text-xs text-[#8B1A2B]">Multiplicador Bru2</p>
               <p className="text-xl font-bold">
-                {receta.precio_venta && bru2PerPortion > 0
-                  ? `x${(receta.precio_venta / bru2PerPortion).toFixed(1)}`
+                {receta.precio_venta_bru2 && bru2PerPortion > 0
+                  ? `x${(receta.precio_venta_bru2 / bru2PerPortion).toFixed(1)}`
                   : "—"}
               </p>
             </div>
