@@ -25,6 +25,8 @@ class Categoria(Base):
     nombre: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
     tipo: Mapped[str] = mapped_column(String(20), nullable=False)
     margen_objetivo: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    orden: Mapped[Optional[int]] = mapped_column(Integer, nullable=True, default=0)
+    seccion: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
 
     ingredientes: Mapped[List["Ingrediente"]] = relationship(back_populates="categoria_rel")
     recetas: Mapped[List["Receta"]] = relationship(back_populates="categoria_rel")

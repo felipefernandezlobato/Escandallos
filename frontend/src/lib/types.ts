@@ -3,6 +3,8 @@ export interface Categoria {
   nombre: string;
   tipo: "ingrediente" | "receta";
   margen_objetivo: number | null;
+  orden: number;
+  seccion: string | null;
 }
 
 export interface Ingrediente {

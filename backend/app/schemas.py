@@ -12,6 +12,8 @@ class CategoriaBase(BaseModel):
     nombre: str
     tipo: str = Field(pattern="^(ingrediente|receta)$")
     margen_objetivo: Optional[float] = None
+    orden: Optional[int] = 0
+    seccion: Optional[str] = None
 
 
 class CategoriaCreate(CategoriaBase):

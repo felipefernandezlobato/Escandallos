@@ -4,7 +4,6 @@ import { Suspense, useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/api";
-import { BAR_SECTIONS, BAR_LABELS, getBarGroupForIngredient } from "@/lib/menu-data";
 import { useToast } from "@/components/Toast";
 import type { Ingrediente, Categoria, RecomendacionItem } from "@/lib/types";
 
@@ -315,21 +314,26 @@ function InventarioContent() {
     return true;
   });
 
-  const COCINA_CATS = ["carne", "especias", "fruta", "huevos", "lácteo", "otros", "panadería", "seco", "verdura"];
-  const BAR_CATS = ["alcohol", "bebidas"];
-  const CAFE_CATS = ["café", "té+"];
+  const cocinaCategories = categorias.filter((c) => c.seccion === "cocina").sort((a, b) => (a.orden ?? 0) - (b.orden ?? 0));
+  const cafeCategories = categorias.filter((c) => c.seccion === "cafe").sort((a, b) => (a.orden ?? 0) - (b.orden ?? 0));
+  const barCategories = categorias.filter((c) => c.seccion === "bar").sort((a, b) => (a.orden ?? 0) - (b.orden ?? 0));
 
-  const matchesVista = (ingredienteId: number, ingredienteNombre: string): boolean => {
-    const ing = ingredientes.find((i) => i.id === ingredienteId);
-    const cat = ing ? categorias.find((c) => c.id === ing.categoria_id) : null;
-    const catName = cat?.nombre?.toLowerCase() || "";
-    if (vista === "cocina") return COCINA_CATS.includes(catName);
-    if (vista === "cafe") return CAFE_CATS.includes(catName) || ingredienteNombre.toLowerCase().includes("sibarist");
-    if (vista === "bar") return BAR_CATS.includes(catName);
-    return true;
+  const SIBARIST_FAMILIES = ["Cone", "Hybrid", "Flat 2", "Flat", "Wave", "Disc", "Batch Brew", "Origami", "Espresso", "Booster", "Halo", "Dripper"];
+  const getSibaristFamily = (name: string): string => {
+    const n = name.replace("Sibarist ", "");
+    return SIBARIST_FAMILIES.find((f) => n.startsWith(f)) || "Otros";
   };
 
-  const porCategoria: Array<{ id: number; nombre: string; items: Ingrediente[] }> = (() => {
+  const matchesVista = (ingredienteId: number, ingredienteNombre: string): boolean => {
+    if (ingredienteNombre.toLowerCase().includes("sibarist")) return vista === "cafe";
+    const fullIng = ingredientes.find((i) => i.id === ingredienteId);
+    if (!fullIng) return false;
+    const cat = categorias.find((c) => c.id === fullIng.categoria_id);
+    if (!cat) return false;
+    return cat.seccion === vista;
+  };
+
+  const porCategoria: Array<{ id: number; nombre: string; items: Ingrediente[]; sibaristFamilies?: Array<{ family: string; items: Ingrediente[] }> }> = (() => {
     if (filtroCategoria) {
       return categorias
         .filter((c) => c.tipo === "ingrediente")
@@ -338,34 +342,36 @@ function InventarioContent() {
     }
 
     if (vista === "cafe") {
-      const groups = categorias
-        .filter((c) => c.tipo === "ingrediente" && CAFE_CATS.includes(c.nombre.toLowerCase()))
+      const groups: Array<{ id: number; nombre: string; items: Ingrediente[]; sibaristFamilies?: Array<{ family: string; items: Ingrediente[] }> }> = cafeCategories
         .map((c) => ({ ...c, items: ingredientesFiltrados.filter((i) => i.categoria_id === c.id) }))
         .filter((g) => g.items.length > 0);
       const sibaristItems = ingredientesFiltrados.filter((i) => i.nombre.toLowerCase().includes("sibarist"));
       if (sibaristItems.length > 0) {
-        groups.push({ id: -1, nombre: "Sibarist", tipo: "ingrediente", margen_objetivo: null, items: sibaristItems } as any);
+        const familyMap: Record<string, Ingrediente[]> = {};
+        for (const item of sibaristItems) {
+          const family = getSibaristFamily(item.nombre);
+          if (!familyMap[family]) familyMap[family] = [];
+          familyMap[family].push(item);
+        }
+        const sibaristFamilies = SIBARIST_FAMILIES
+          .filter((f) => familyMap[f]?.length > 0)
+          .map((f) => ({ family: f, items: familyMap[f] }));
+        const otrosFamily = familyMap["Otros"];
+        if (otrosFamily?.length > 0) {
+          sibaristFamilies.push({ family: "Otros", items: otrosFamily });
+        }
+        groups.push({ id: -1, nombre: "Sibarist", items: sibaristItems, sibaristFamilies });
       }
       return groups;
     }
 
     if (vista === "bar") {
-      const barIngs = ingredientesFiltrados.filter((i) => {
-        const cat = categorias.find((c) => c.id === i.categoria_id);
-        return cat && BAR_CATS.includes(cat.nombre.toLowerCase());
-      });
-      return BAR_SECTIONS.map((group) => {
-        const items = barIngs.filter((i) => {
-          const cat = categorias.find((c) => c.id === i.categoria_id);
-          return getBarGroupForIngredient(i.nombre, cat?.nombre || "") === group;
-        });
-        if (items.length === 0) return null;
-        return { id: -100 - BAR_SECTIONS.indexOf(group), nombre: BAR_LABELS[group], tipo: "ingrediente", margen_objetivo: null, items } as any;
-      }).filter(Boolean);
+      return barCategories
+        .map((c) => ({ ...c, items: ingredientesFiltrados.filter((i) => i.categoria_id === c.id) }))
+        .filter((g) => g.items.length > 0);
     }
 
-    return categorias
-      .filter((c) => c.tipo === "ingrediente" && COCINA_CATS.includes(c.nombre.toLowerCase()))
+    return cocinaCategories
       .map((c) => ({ ...c, items: ingredientesFiltrados.filter((i) => i.categoria_id === c.id) }))
       .filter((g) => g.items.length > 0);
   })();
@@ -620,44 +626,93 @@ function InventarioContent() {
                   <h2 className="text-sm font-semibold text-[#8B1A2B] uppercase tracking-wider mb-2 border-b border-[#E8DFD3] pb-1">
                     {grupo.nombre}
                   </h2>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-                    {grupo.items.map((ing) => (
-                      <div
-                        key={ing.id}
-                        className="flex items-center gap-2 bg-white border border-[#E8DFD3] rounded-lg px-3 py-2"
-                      >
-                        <div className="flex-1 min-w-0">
-                          <Link href={`/ingredientes/${ing.id}`} className="text-sm truncate block text-[#8B1A2B] hover:underline" title={ing.nombre}>
-                            {ing.nombre}
-                          </Link>
-                          <span className="text-[10px] text-[#6B5E52]/60">
-                            {formatUltimoConteo(ing.id)}
+                  {grupo.sibaristFamilies ? (
+                    <div>
+                      {grupo.sibaristFamilies.map((fam, fi) => (
+                        <div key={fam.family}>
+                          {fi > 0 && <div className="border-t border-[#D4C4A8] my-2" />}
+                          <p className="text-xs text-[#6B5E52]/70 font-medium mb-1 mt-1">{fam.family}</p>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                            {fam.items.map((ing) => (
+                              <div
+                                key={ing.id}
+                                className="flex items-center gap-2 bg-white border border-[#E8DFD3] rounded-lg px-3 py-2"
+                              >
+                                <div className="flex-1 min-w-0">
+                                  <Link href={`/ingredientes/${ing.id}`} className="text-sm truncate block text-[#8B1A2B] hover:underline" title={ing.nombre}>
+                                    {ing.nombre}
+                                  </Link>
+                                  <span className="text-[10px] text-[#6B5E52]/60">
+                                    {formatUltimoConteo(ing.id)}
+                                  </span>
+                                </div>
+                                <input
+                                  type="text"
+                                  inputMode="decimal"
+                                  placeholder="0"
+                                  value={stock[ing.id]?.cantidad ?? ""}
+                                  onChange={(e) => {
+                                    const v = e.target.value.replace(",", ".");
+                                    if (v === "" || /^\d*\.?\d*$/.test(v))
+                                      setStock((prev) => ({
+                                        ...prev,
+                                        [ing.id]: {
+                                          ...prev[ing.id],
+                                          cantidad: v,
+                                        },
+                                      }));
+                                  }}
+                                  className="w-20 border border-[#D4C4A8] rounded px-2 py-1 text-sm text-right"
+                                />
+                                <span className="text-xs text-[#6B5E52] w-8">
+                                  {stock[ing.id]?.unidad || ing.unidad_uso}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                      {grupo.items.map((ing) => (
+                        <div
+                          key={ing.id}
+                          className="flex items-center gap-2 bg-white border border-[#E8DFD3] rounded-lg px-3 py-2"
+                        >
+                          <div className="flex-1 min-w-0">
+                            <Link href={`/ingredientes/${ing.id}`} className="text-sm truncate block text-[#8B1A2B] hover:underline" title={ing.nombre}>
+                              {ing.nombre}
+                            </Link>
+                            <span className="text-[10px] text-[#6B5E52]/60">
+                              {formatUltimoConteo(ing.id)}
+                            </span>
+                          </div>
+                          <input
+                            type="text"
+                            inputMode="decimal"
+                            placeholder="0"
+                            value={stock[ing.id]?.cantidad ?? ""}
+                            onChange={(e) => {
+                              const v = e.target.value.replace(",", ".");
+                              if (v === "" || /^\d*\.?\d*$/.test(v))
+                                setStock((prev) => ({
+                                  ...prev,
+                                  [ing.id]: {
+                                    ...prev[ing.id],
+                                    cantidad: v,
+                                  },
+                                }));
+                            }}
+                            className="w-20 border border-[#D4C4A8] rounded px-2 py-1 text-sm text-right"
+                          />
+                          <span className="text-xs text-[#6B5E52] w-8">
+                            {stock[ing.id]?.unidad || ing.unidad_uso}
                           </span>
                         </div>
-                        <input
-                          type="text"
-                          inputMode="decimal"
-                          placeholder="0"
-                          value={stock[ing.id]?.cantidad ?? ""}
-                          onChange={(e) => {
-                            const v = e.target.value.replace(",", ".");
-                            if (v === "" || /^\d*\.?\d*$/.test(v))
-                              setStock((prev) => ({
-                                ...prev,
-                                [ing.id]: {
-                                  ...prev[ing.id],
-                                  cantidad: v,
-                                },
-                              }));
-                          }}
-                          className="w-20 border border-[#D4C4A8] rounded px-2 py-1 text-sm text-right"
-                        />
-                        <span className="text-xs text-[#6B5E52] w-8">
-                          {stock[ing.id]?.unidad || ing.unidad_uso}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -1080,31 +1135,24 @@ function InventarioContent() {
                   </thead>
                   {(() => {
                     const filtered = pivot.ingredientes.filter((ing) => matchesVista(ing.ingrediente_id, ing.ingrediente_nombre));
-                    const getGroup = (ingId: number, ingName: string): string => {
-                      if (ingName.toLowerCase().includes("sibarist")) return "Sibarist";
+                    const getGroup = (ingId: number, ingName: string): { name: string; orden: number } => {
+                      if (ingName.toLowerCase().includes("sibarist")) return { name: "Sibarist", orden: 999 };
                       const fullIng = ingredientes.find((i) => i.id === ingId);
                       if (fullIng) {
                         const cat = categorias.find((c) => c.id === fullIng.categoria_id);
-                        if (cat) return cat.nombre;
+                        if (cat) return { name: cat.nombre, orden: cat.orden ?? 0 };
                       }
-                      return "Otros";
+                      return { name: "Otros", orden: 9999 };
                     };
-                    const grouped: Record<string, typeof filtered> = {};
+                    const grouped: Record<string, { orden: number; items: typeof filtered }> = {};
                     for (const ing of filtered) {
                       const g = getGroup(ing.ingrediente_id, ing.ingrediente_nombre);
-                      if (!grouped[g]) grouped[g] = [];
-                      grouped[g].push(ing);
+                      if (!grouped[g.name]) grouped[g.name] = { orden: g.orden, items: [] };
+                      grouped[g.name].items.push(ing);
                     }
-                    const groupOrder = vista === "cocina"
-                      ? COCINA_CATS.map((c) => c.charAt(0).toUpperCase() + c.slice(1))
-                      : vista === "cafe"
-                      ? ["Café", "Té+", "Sibarist"]
-                      : Object.keys(grouped);
-                    const sortedEntries = Object.entries(grouped).sort(([a], [b]) => {
-                      const ia = groupOrder.findIndex((g) => g.toLowerCase() === a.toLowerCase());
-                      const ib = groupOrder.findIndex((g) => g.toLowerCase() === b.toLowerCase());
-                      return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
-                    });
+                    const sortedEntries = Object.entries(grouped)
+                      .sort(([, a], [, b]) => a.orden - b.orden)
+                      .map(([name, val]) => [name, val.items] as [string, typeof filtered]);
                     return sortedEntries.map(([group, items]) => (
                       <tbody key={group}>
                         {Object.keys(grouped).length > 1 && (
