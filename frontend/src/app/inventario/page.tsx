@@ -1095,7 +1095,17 @@ function InventarioContent() {
                       if (!grouped[g]) grouped[g] = [];
                       grouped[g].push(ing);
                     }
-                    return Object.entries(grouped).map(([group, items]) => (
+                    const groupOrder = vista === "cocina"
+                      ? COCINA_CATS.map((c) => c.charAt(0).toUpperCase() + c.slice(1))
+                      : vista === "cafe"
+                      ? ["Café", "Té+", "Sibarist"]
+                      : Object.keys(grouped);
+                    const sortedEntries = Object.entries(grouped).sort(([a], [b]) => {
+                      const ia = groupOrder.findIndex((g) => g.toLowerCase() === a.toLowerCase());
+                      const ib = groupOrder.findIndex((g) => g.toLowerCase() === b.toLowerCase());
+                      return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
+                    });
+                    return sortedEntries.map(([group, items]) => (
                       <tbody key={group}>
                         {Object.keys(grouped).length > 1 && (
                           <tr className="bg-[#F5F0E8]">
