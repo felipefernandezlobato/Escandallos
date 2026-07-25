@@ -319,6 +319,16 @@ function InventarioContent() {
   const BAR_CATS = ["alcohol", "bebidas"];
   const CAFE_CATS = ["café", "té+"];
 
+  const matchesVista = (ingredienteId: number, ingredienteNombre: string): boolean => {
+    const ing = ingredientes.find((i) => i.id === ingredienteId);
+    const cat = ing ? categorias.find((c) => c.id === ing.categoria_id) : null;
+    const catName = cat?.nombre?.toLowerCase() || "";
+    if (vista === "cocina") return COCINA_CATS.includes(catName);
+    if (vista === "cafe") return CAFE_CATS.includes(catName) || ingredienteNombre.toLowerCase().includes("sibarist");
+    if (vista === "bar") return BAR_CATS.includes(catName);
+    return true;
+  };
+
   const porCategoria: Array<{ id: number; nombre: string; items: Ingrediente[] }> = (() => {
     if (filtroCategoria) {
       return categorias
@@ -899,7 +909,38 @@ function InventarioContent() {
 
       {tab === "historial" && (
         <div className="space-y-4">
-          {/* Week selector for editing records */}
+          <div className="flex gap-2 items-center">
+            <button
+              onClick={() => setVista("cocina")}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                vista === "cocina"
+                  ? "bg-[#8B1A2B] text-white"
+                  : "bg-white border border-[#D4C4A8] text-[#6B5E52] hover:bg-[#F5F0E8]"
+              }`}
+            >
+              Cocina
+            </button>
+            <button
+              onClick={() => setVista("cafe")}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                vista === "cafe"
+                  ? "bg-[#8B1A2B] text-white"
+                  : "bg-white border border-[#D4C4A8] text-[#6B5E52] hover:bg-[#F5F0E8]"
+              }`}
+            >
+              Cafe
+            </button>
+            <button
+              onClick={() => setVista("bar")}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                vista === "bar"
+                  ? "bg-[#8B1A2B] text-white"
+                  : "bg-white border border-[#D4C4A8] text-[#6B5E52] hover:bg-[#F5F0E8]"
+              }`}
+            >
+              Bar
+            </button>
+          </div>
           <div className="flex flex-wrap gap-3 items-center">
             <select
               value={activeSemana}
@@ -943,8 +984,9 @@ function InventarioContent() {
                     </tr>
                   </thead>
                   {(() => {
+                    const filteredRegistros = historial.registros.filter((r) => matchesVista(r.ingrediente_id, r.ingrediente_nombre));
                     const byDate: Record<string, typeof historial.registros> = {};
-                    for (const r of historial.registros) {
+                    for (const r of filteredRegistros) {
                       const d = String(r.fecha_registro);
                       if (!byDate[d]) byDate[d] = [];
                       byDate[d].push(r);
@@ -1037,7 +1079,7 @@ function InventarioContent() {
                     </tr>
                   </thead>
                   <tbody>
-                    {pivot.ingredientes.map((ing) => (
+                    {pivot.ingredientes.filter((ing) => matchesVista(ing.ingrediente_id, ing.ingrediente_nombre)).map((ing) => (
                       <tr key={ing.ingrediente_id} className="border-b border-[#E8DFD3]/50 hover:bg-[#F5F0E8]">
                         <td className="py-1.5 pr-4 sticky left-0 bg-[#F5F0E8] z-10 font-medium">
                           <Link href={`/ingredientes/${ing.ingrediente_id}`} className="text-[#8B1A2B] hover:underline">
