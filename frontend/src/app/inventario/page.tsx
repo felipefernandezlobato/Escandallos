@@ -1078,23 +1078,50 @@ function InventarioContent() {
                       ))}
                     </tr>
                   </thead>
-                  <tbody>
-                    {pivot.ingredientes.filter((ing) => matchesVista(ing.ingrediente_id, ing.ingrediente_nombre)).map((ing) => (
-                      <tr key={ing.ingrediente_id} className="border-b border-[#E8DFD3]/50 hover:bg-[#F5F0E8]">
-                        <td className="py-1.5 pr-4 sticky left-0 bg-[#F5F0E8] z-10 font-medium">
-                          <Link href={`/ingredientes/${ing.ingrediente_id}`} className="text-[#8B1A2B] hover:underline">
-                            {ing.ingrediente_nombre}
-                          </Link>
-                        </td>
-                        <td className="py-1.5 px-2 text-[#6B5E52] whitespace-nowrap">{ing.unidad}</td>
-                        {pivot.fechas.map((f) => (
-                          <td key={f} className="py-1.5 px-2 text-center">
-                            {ing.fechas[f] !== undefined ? ing.fechas[f] : ""}
-                          </td>
+                  {(() => {
+                    const filtered = pivot.ingredientes.filter((ing) => matchesVista(ing.ingrediente_id, ing.ingrediente_nombre));
+                    const getGroup = (ingId: number, ingName: string): string => {
+                      if (ingName.toLowerCase().includes("sibarist")) return "Sibarist";
+                      const fullIng = ingredientes.find((i) => i.id === ingId);
+                      if (fullIng) {
+                        const cat = categorias.find((c) => c.id === fullIng.categoria_id);
+                        if (cat) return cat.nombre;
+                      }
+                      return "Otros";
+                    };
+                    const grouped: Record<string, typeof filtered> = {};
+                    for (const ing of filtered) {
+                      const g = getGroup(ing.ingrediente_id, ing.ingrediente_nombre);
+                      if (!grouped[g]) grouped[g] = [];
+                      grouped[g].push(ing);
+                    }
+                    return Object.entries(grouped).map(([group, items]) => (
+                      <tbody key={group}>
+                        {Object.keys(grouped).length > 1 && (
+                          <tr className="bg-[#F5F0E8]">
+                            <td colSpan={pivot.fechas.length + 2} className="py-1.5 pr-4 sticky left-0 bg-[#F5F0E8] z-10 text-xs font-semibold text-[#8B1A2B] uppercase tracking-wider">
+                              {group}
+                            </td>
+                          </tr>
+                        )}
+                        {items.map((ing) => (
+                          <tr key={ing.ingrediente_id} className="border-b border-[#E8DFD3]/50 hover:bg-[#F5F0E8]">
+                            <td className="py-1.5 pr-4 sticky left-0 bg-[#F5F0E8] z-10 font-medium">
+                              <Link href={`/ingredientes/${ing.ingrediente_id}`} className="text-[#8B1A2B] hover:underline">
+                                {ing.ingrediente_nombre}
+                              </Link>
+                            </td>
+                            <td className="py-1.5 px-2 text-[#6B5E52] whitespace-nowrap">{ing.unidad}</td>
+                            {pivot.fechas.map((f) => (
+                              <td key={f} className="py-1.5 px-2 text-center">
+                                {ing.fechas[f] !== undefined ? ing.fechas[f] : ""}
+                              </td>
+                            ))}
+                          </tr>
                         ))}
-                      </tr>
-                    ))}
-                  </tbody>
+                      </tbody>
+                    ));
+                  })()}
                 </table>
               </div>
             )
