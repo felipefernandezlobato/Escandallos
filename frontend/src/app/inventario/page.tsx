@@ -1011,7 +1011,7 @@ function InventarioContent() {
             </select>
             {activeSemana && (
               <button
-                onClick={() => router.back()}
+                onClick={() => setHistorialFecha("")}
                 className="text-sm text-[#6B5E52] hover:text-[#8B1A2B]"
               >
                 ← Ver pivot

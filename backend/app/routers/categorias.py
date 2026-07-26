@@ -16,7 +16,7 @@ def listar_categorias(tipo: Optional[str] = None, db: Session = Depends(get_db),
     q = db.query(Categoria)
     if tipo:
         q = q.filter(Categoria.tipo == tipo)
-    return q.order_by(Categoria.nombre).all()
+    return q.order_by(Categoria.orden, Categoria.nombre).all()
 
 
 @router.get("/{categoria_id}", response_model=CategoriaOut)
