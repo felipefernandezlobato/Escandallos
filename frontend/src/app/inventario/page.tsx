@@ -1124,7 +1124,7 @@ function InventarioContent() {
                 <table className="text-sm border-collapse">
                   <thead>
                     <tr className="border-b border-[#E8DFD3] text-left text-[#6B5E52]">
-                      <th className="pb-2 pr-4 font-medium sticky left-0 bg-[#F5F0E8] z-10">Ingrediente</th>
+                      <th className="pb-2 pr-4 font-medium sticky left-0 bg-[#F5F0E8] z-10 min-w-[180px]">Ingrediente</th>
                       <th className="pb-2 px-2 font-medium whitespace-nowrap">Ud</th>
                       {pivot.fechas.map((f) => (
                         <th key={f} className="pb-2 px-2 font-medium text-center whitespace-nowrap">
