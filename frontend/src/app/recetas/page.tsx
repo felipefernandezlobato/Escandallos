@@ -16,13 +16,8 @@ export default function RecetasPage() {
 
   const fetchData = () => {
     setLoading(true);
-    const params = new URLSearchParams();
-    if (filtroCategoria) params.set("categoria_id", filtroCategoria);
-    if (buscar) params.set("buscar", buscar);
-    if (!showSubrecetas) params.set("es_subreceta", "false");
-
     Promise.all([
-      apiFetch<Receta[]>(`/api/recetas?${params}`),
+      apiFetch<Receta[]>("/api/recetas"),
       apiFetch<Categoria[]>("/api/categorias?tipo=receta"),
     ])
       .then(([r, c]) => {
@@ -34,7 +29,16 @@ export default function RecetasPage() {
 
   useEffect(() => {
     fetchData();
-  }, [filtroCategoria, buscar, showSubrecetas]);
+  }, []);
+
+  const normalize = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+
+  const recetasFiltradas = recetas.filter((r) => {
+    if (buscar && !normalize(r.nombre).includes(normalize(buscar))) return false;
+    if (filtroCategoria && String(r.categoria_id) !== filtroCategoria) return false;
+    if (!showSubrecetas && r.es_subreceta) return false;
+    return true;
+  });
 
   return (
     <div className="space-y-6">
@@ -82,18 +86,22 @@ export default function RecetasPage() {
       {/* Recipe cards grouped by category */}
       {loading ? (
         <p className="text-[#6B5E52] text-center py-10">Cargando...</p>
-      ) : recetas.length === 0 ? (
-        <p className="text-[#6B5E52] text-center py-10">No hay recetas. Crea una para empezar.</p>
+      ) : recetasFiltradas.length === 0 ? (
+        <p className="text-[#6B5E52] text-center py-10">
+          {recetas.length === 0
+            ? "No hay recetas. Crea una para empezar."
+            : "No hay recetas que coincidan con los filtros."}
+        </p>
       ) : (
         <div className="space-y-8">
           {(() => {
             const preferredOrder = ["Cafetería", "Postre", "Brunch", "Snack", "Bebida"];
-            const allCatNames = categorias.filter(c => recetas.some(r => r.categoria_nombre === c.nombre)).map(c => c.nombre);
+            const allCatNames = categorias.filter(c => recetasFiltradas.some(r => r.categoria_nombre === c.nombre)).map(c => c.nombre);
             const orderedCats = [...preferredOrder.filter(n => allCatNames.includes(n)), ...allCatNames.filter(n => !preferredOrder.includes(n))];
             return orderedCats.map((nombre) => categorias.find((c) => c.nombre === nombre)).filter((cat): cat is Categoria => cat !== undefined);
           })()
             .flatMap((cat) => {
-              const catRecetas = recetas.filter((r) => r.categoria_nombre === cat.nombre);
+              const catRecetas = recetasFiltradas.filter((r) => r.categoria_nombre === cat.nombre);
               const renderCard = (r: Receta) => (
                 <Link
                   key={r.id}
