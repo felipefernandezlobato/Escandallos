@@ -405,8 +405,9 @@ export default function IngredienteDetailPage() {
             const w = 600, h = 160, pad = 40, padR = 90, padB = 20;
             const plotW = w - pad - padR, plotH = h - padB;
             const timestamps = pts.map(p => new Date(p.fecha).getTime());
-            const tMin = Math.min(...timestamps);
-            const tMax = Math.max(...timestamps);
+            const now = Date.now();
+            const tMin = chartRange === "3m" ? threeMonthsAgo.getTime() : Math.min(...timestamps);
+            const tMax = chartRange === "3m" ? now : Math.max(...timestamps);
             const tRange = tMax - tMin || 1;
             const xScale = (i: number) => pad + ((timestamps[i] - tMin) / tRange) * plotW;
             const yScale = (v: number) => plotH - (v / maxVal) * (plotH - 10);

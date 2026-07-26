@@ -36,9 +36,7 @@ export default function IngredientesPage() {
   const fetchData = () => {
     setLoading(true);
     Promise.all([
-      apiFetch<Ingrediente[]>(
-        `/api/ingredientes?${buscar ? `buscar=${encodeURIComponent(buscar)}` : ""}`
-      ),
+      apiFetch<Ingrediente[]>("/api/ingredientes"),
       apiFetch<Categoria[]>("/api/categorias?tipo=ingrediente"),
     ])
       .then(([i, c]) => {
@@ -53,7 +51,7 @@ export default function IngredientesPage() {
 
   useEffect(() => {
     fetchData();
-  }, [buscar]);
+  }, []);
 
   // Derive unique proveedores from the full ingredient list
   const proveedores = Array.from(
@@ -64,8 +62,10 @@ export default function IngredientesPage() {
     )
   ).sort((a, b) => a.localeCompare(b, "es"));
 
-  // Apply client-side filters for categoría and proveedor
+  const normalize = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+
   const ingredientesFiltrados = ingredientes.filter((ing) => {
+    if (buscar && !normalize(ing.nombre).includes(normalize(buscar))) return false;
     if (filtroCategoria && String(ing.categoria_id) !== filtroCategoria) return false;
     if (filtroProveedor && ing.proveedor !== filtroProveedor) return false;
     return true;
