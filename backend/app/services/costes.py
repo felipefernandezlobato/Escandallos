@@ -49,7 +49,17 @@ def coste_linea(
             return 0.0
         porciones = sub.porciones_por_lote if sub.porciones_por_lote > 0 else 1
         coste_por_porcion = coste_total_receta(sub, db, visited) / porciones
-        return coste_por_porcion * linea.cantidad
+        # Convert quantity to the sub-recipe's yield unit so that
+        # e.g. 70 g of a sub-recipe yielding 8.947 kg becomes 0.070 kg.
+        cantidad = linea.cantidad
+        if sub.unidad_rendimiento and linea.unidad != sub.unidad_rendimiento:
+            try:
+                cantidad = convertir(
+                    linea.cantidad, linea.unidad, sub.unidad_rendimiento
+                )
+            except ValueError:
+                pass  # incompatible units — fall back to raw quantity
+        return coste_por_porcion * cantidad
 
     return 0.0
 
