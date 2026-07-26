@@ -93,14 +93,27 @@ def consumo_semanal(ingrediente_id: int, db: Session, semanas: int = 12) -> list
             curr = inventarios[i]
             if not _units_compatible(prev.unidad, curr.unidad):
                 continue
-            iso = curr.fecha_registro.isocalendar()
-            key = f"w{iso[1]}.{str(iso[0])[2:]}"
             prev_qty = _convert_qty(prev.cantidad, prev.unidad, target_unit)
             curr_qty = _convert_qty(curr.cantidad, curr.unidad, target_unit)
-            pedido_semana = semana_data.get(key, 0)
-            consumo = prev_qty + pedido_semana - curr_qty
+            days_gap = (curr.fecha_registro - prev.fecha_registro).days
+            weeks_spanned = max(1, round(days_gap / 7))
+
+            received_between = 0
+            for qty_r, unit_r, fecha_r in pedidos_recibidos:
+                if qty_r and fecha_r and prev.fecha_registro < fecha_r <= curr.fecha_registro:
+                    received_between += _convert_qty(qty_r, unit_r or target_unit, target_unit)
+
+            consumo = prev_qty + received_between - curr_qty
             if consumo > 0:
-                semana_data[key] = consumo
+                weekly = round(consumo / weeks_spanned, 2)
+                d = prev.fecha_registro
+                for w in range(weeks_spanned):
+                    week_date = d + timedelta(weeks=w + 1)
+                    if week_date > curr.fecha_registro:
+                        week_date = curr.fecha_registro
+                    iso = week_date.isocalendar()
+                    key = f"w{iso[1]}.{str(iso[0])[2:]}"
+                    semana_data[key] = semana_data.get(key, 0) + weekly
 
     result = []
     for key in sorted(semana_data.keys()):
