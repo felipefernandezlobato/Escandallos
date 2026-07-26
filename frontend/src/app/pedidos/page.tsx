@@ -51,6 +51,7 @@ export default function PedidosPage() {
   const [creando, setCreando] = useState(false);
   const [busqueda, setBusqueda] = useState("");
   const [filtroCategoria, setFiltroCategoria] = useState("");
+  const [vista, setVista] = useState<"cocina" | "cafe" | "bar">("cocina");
 
   useEffect(() => {
     fetchData();
@@ -90,11 +91,24 @@ export default function PedidosPage() {
     .filter((i) => !busqueda || normalize(i.nombre).includes(normalize(busqueda)))
     .filter((i) => !filtroCategoria || String(i.categoria_id) === filtroCategoria);
 
-  const porCategoria = categorias
+  const vistaCategories = categorias
+    .filter((c) => {
+      if (filtroCategoria) return true;
+      if (c.seccion === vista) return true;
+      if (vista === "cafe" && c.nombre === "Cafetería") return true;
+      return false;
+    })
+    .sort((a, b) => (a.orden ?? 0) - (b.orden ?? 0));
+
+  const porCategoria = vistaCategories
     .map((c) => ({
       id: c.id,
       nombre: c.nombre,
-      items: ingredientesFiltrados.filter((i) => i.categoria_id === c.id),
+      items: ingredientesFiltrados.filter((i) => {
+        if (i.categoria_id === c.id) return true;
+        if (vista === "cafe" && c.nombre === "Cafetería" && i.nombre.toLowerCase().includes("sibarist")) return true;
+        return false;
+      }),
     }))
     .filter((g) => g.items.length > 0);
 
@@ -265,6 +279,13 @@ export default function PedidosPage() {
 
       {showCrear && (
         <div className="space-y-4">
+          <div className="flex gap-2 items-center">
+            {(["cocina", "cafe", "bar"] as const).map((v) => (
+              <button key={v} onClick={() => setVista(v)} className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${vista === v ? "bg-[#8B1A2B] text-white" : "bg-white border border-[#D4C4A8] text-[#6B5E52] hover:bg-[#F5F0E8]"}`}>
+                {v === "cocina" ? "Cocina" : v === "cafe" ? "Cafe" : "Bar"}
+              </button>
+            ))}
+          </div>
           <div className="flex items-center justify-between">
             <h2 className="font-semibold text-[#8B1A2B]">Nuevo Pedido — {filledCount} items</h2>
             <div className="flex gap-3">
@@ -293,7 +314,7 @@ export default function PedidosPage() {
               className="border border-[#D4C4A8] rounded-lg px-3 py-2 text-sm"
             >
               <option value="">Todas las categorías</option>
-              {categorias.map((c) => (
+              {vistaCategories.map((c) => (
                 <option key={c.id} value={c.id}>{c.nombre}</option>
               ))}
             </select>
