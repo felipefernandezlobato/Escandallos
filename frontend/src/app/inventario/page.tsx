@@ -1156,8 +1156,8 @@ function InventarioContent() {
                     return sortedEntries.map(([group, items]) => (
                       <tbody key={group}>
                         {Object.keys(grouped).length > 1 && (
-                          <tr className="bg-[#F5F0E8]">
-                            <td colSpan={pivot.fechas.length + 2} className="py-1.5 pr-4 sticky left-0 bg-[#F5F0E8] z-10 text-xs font-semibold text-[#8B1A2B] uppercase tracking-wider">
+                          <tr className="bg-[#F5F0E8] border-t-2 border-[#D4C4A8]">
+                            <td colSpan={pivot.fechas.length + 2} className="pt-3 pb-1.5 pr-4 sticky left-0 bg-[#F5F0E8] z-10 text-xs font-semibold text-[#8B1A2B] uppercase tracking-wider">
                               {group}
                             </td>
                           </tr>
