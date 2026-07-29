@@ -234,7 +234,8 @@ def calcular_par_y_safety(
     cycle_weeks = cycle_override if cycle_override else ciclo_pedido_semanas(ingrediente_id, db)
     lead_weeks = _lead_time_weeks(ingrediente_id, db)
 
-    safety = round(1.65 * std_dev * math.sqrt(lead_weeks), 1)
+    min_safety = media * 2 / 7  # at least 2 days of consumption
+    safety = round(max(1.65 * std_dev * math.sqrt(lead_weeks), min_safety), 1)
     safety = min(safety, media * cycle_weeks * 0.5)
     par_level = round(media * (cycle_weeks + lead_weeks) + safety, 1)
     safety = round(safety, 1)
