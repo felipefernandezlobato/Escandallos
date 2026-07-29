@@ -789,73 +789,48 @@ function InventarioContent() {
                   .filter(Boolean) as Ingrediente[];
 
                 const cafeSections: { title: string; keywords: string[] }[] = [
-                  { title: "Cafés de Kilo", keywords: ["kilo", "grano"] },
-                  { title: "Cafés de 200g", keywords: ["200g"] },
-                  { title: "Cafés de 130g / Competition", keywords: ["130g", "gold"] },
-                  { title: "Cápsulas", keywords: ["cápsula", "capsula"] },
-                  { title: "Frozen Tubes", keywords: ["frozen", "tubo"] },
+                  { title: "CAFÉS DE KILO", keywords: ["kilo", "grano"] },
+                  { title: "CAFÉS DE 200G", keywords: ["200g"] },
+                  { title: "CAFÉS DE 130G / COMPETITION", keywords: ["130g", "gold"] },
+                  { title: "CÁPSULAS", keywords: ["cápsula", "capsula"] },
+                  { title: "FROZEN TUBES", keywords: ["frozen", "tubo"] },
                 ];
 
                 const assigned = new Set<number>();
 
-                const renderParentCard = (parent: Ingrediente) => {
-                  const children = (childrenByParent[parent.id] || []).filter(
-                    (c) => c.activo !== false
-                  );
-                  if (children.length === 0) return null;
-                  const unit = children[0]?.unidad_compra || "kg";
-                  const total = children.reduce((sum, c) => {
-                    const val = parseFloat(stock[c.id]?.cantidad || "0");
-                    return sum + (isNaN(val) ? 0 : val);
-                  }, 0);
-                  return (
-                    <div key={parent.id} className="bg-white border border-[#E8DFD3] rounded-lg overflow-hidden">
-                      <div className="px-4 py-2.5 bg-[#F5F0E8] border-b border-[#E8DFD3] flex items-center justify-between">
-                        <h3 className="text-sm font-semibold text-[#8B1A2B] uppercase tracking-wider">
-                          {parent.nombre}
-                        </h3>
-                        <span className="text-sm font-medium text-[#6B5E52]">
-                          Total: {total > 0 ? total.toFixed(2) : "0"} {unit}
-                        </span>
-                      </div>
-                      <div className="p-3 space-y-2">
-                        {children.map((ing) => (
-                          <div key={ing.id} className="flex items-center gap-2">
-                            <div className="flex-1 min-w-0">
-                              <Link href={`/ingredientes/${ing.id}`} className="text-sm truncate block text-[#8B1A2B] hover:underline" title={ing.nombre}>
-                                {ing.nombre}
-                              </Link>
-                              <span className="text-[10px] text-[#6B5E52]/60">
-                                {formatUltimoConteo(ing.id)}
-                              </span>
-                            </div>
-                            <input
-                              type="text"
-                              inputMode="decimal"
-                              placeholder="0"
-                              value={stock[ing.id]?.cantidad ?? ""}
-                              onChange={(e) => {
-                                const v = e.target.value.replace(",", ".");
-                                if (v === "" || /^\d*\.?\d*$/.test(v))
-                                  setStock((prev) => ({
-                                    ...prev,
-                                    [ing.id]: {
-                                      ...prev[ing.id],
-                                      cantidad: v,
-                                    },
-                                  }));
-                              }}
-                              className="w-20 border border-[#D4C4A8] rounded px-2 py-1 text-sm text-right"
-                            />
-                            <span className="text-xs text-[#6B5E52] w-8">
-                              {stock[ing.id]?.unidad || ing.unidad_compra}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
+                const renderItem = (ing: Ingrediente) => (
+                  <div key={ing.id} className="flex items-center gap-2 bg-white border border-[#E8DFD3] rounded-lg px-3 py-2">
+                    <div className="flex-1 min-w-0">
+                      <Link href={`/ingredientes/${ing.id}`} className="text-sm truncate block text-[#8B1A2B] hover:underline" title={ing.nombre}>
+                        {ing.nombre}
+                      </Link>
+                      <span className="text-[10px] text-[#6B5E52]/60">
+                        {formatUltimoConteo(ing.id)}
+                      </span>
                     </div>
-                  );
-                };
+                    <input
+                      type="text"
+                      inputMode="decimal"
+                      placeholder="0"
+                      value={stock[ing.id]?.cantidad ?? ""}
+                      onChange={(e) => {
+                        const v = e.target.value.replace(",", ".");
+                        if (v === "" || /^\d*\.?\d*$/.test(v))
+                          setStock((prev) => ({
+                            ...prev,
+                            [ing.id]: {
+                              ...prev[ing.id],
+                              cantidad: v,
+                            },
+                          }));
+                      }}
+                      className="w-20 border border-[#D4C4A8] rounded px-2 py-1 text-sm text-right"
+                    />
+                    <span className="text-xs text-[#6B5E52] w-8">
+                      {stock[ing.id]?.unidad || ing.unidad_compra}
+                    </span>
+                  </div>
+                );
 
                 return (
                   <>
@@ -866,17 +841,29 @@ function InventarioContent() {
                         return section.keywords.some((kw) => n.includes(kw));
                       });
                       sectionParents.forEach((p) => assigned.add(p.id));
-                      const cards = sectionParents
+                      const parentsWithChildren = sectionParents
                         .sort((a, b) => a.nombre.localeCompare(b.nombre, "es"))
-                        .map(renderParentCard)
-                        .filter(Boolean);
-                      if (cards.length === 0) return null;
+                        .filter((p) => (childrenByParent[p.id] || []).some((c) => c.activo !== false));
+                      if (parentsWithChildren.length === 0) return null;
                       return (
-                        <div key={section.title} className="space-y-3">
-                          <h3 className="text-base font-bold text-[#3D2E22] border-b border-[#D4C4A8] pb-1">
+                        <div key={section.title}>
+                          <h2 className="text-sm font-semibold text-[#8B1A2B] uppercase tracking-wider mb-2 border-b border-[#E8DFD3] pb-1">
                             {section.title}
-                          </h3>
-                          {cards}
+                          </h2>
+                          {parentsWithChildren.map((parent, pi) => {
+                            const children = (childrenByParent[parent.id] || []).filter(
+                              (c) => c.activo !== false
+                            );
+                            return (
+                              <div key={parent.id}>
+                                {pi > 0 && <div className="border-t border-[#D4C4A8] my-2" />}
+                                <p className="text-xs text-[#6B5E52]/70 font-medium mb-1 mt-1">{parent.nombre}</p>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                                  {children.map(renderItem)}
+                                </div>
+                              </div>
+                            );
+                          })}
                         </div>
                       );
                     })}
