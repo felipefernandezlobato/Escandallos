@@ -427,7 +427,7 @@ function InventarioContent() {
     if (vista === "cafe") {
       // Non-grouped cafe items (no grupo_ingrediente_id, not a parent)
       const nonGrouped = ingredientesFiltrados.filter(
-        (i) => !i.grupo_ingrediente_id && !parentIds.has(i.id)
+        (i) => !i.grupo_ingrediente_id && !parentIds.has(i.id) && i.activo !== false
       );
       // Organize Té+ items into thematic sections
       const teItems = nonGrouped.filter((i) => {
