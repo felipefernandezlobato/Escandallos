@@ -841,8 +841,18 @@ function InventarioContent() {
                         return section.keywords.some((kw) => n.includes(kw));
                       });
                       sectionParents.forEach((p) => assigned.add(p.id));
+                      const colorOrder = ["marrón", "marron", "rojo", "black", "negro", "gold", "oro", "dorado"];
                       const parentsWithChildren = sectionParents
-                        .sort((a, b) => a.nombre.localeCompare(b.nombre, "es"))
+                        .sort((a, b) => {
+                          const na = a.nombre.toLowerCase();
+                          const nb = b.nombre.toLowerCase();
+                          const ia = colorOrder.findIndex((c) => na.includes(c));
+                          const ib = colorOrder.findIndex((c) => nb.includes(c));
+                          if (ia !== -1 && ib !== -1) return ia - ib;
+                          if (ia !== -1) return -1;
+                          if (ib !== -1) return 1;
+                          return na.localeCompare(nb, "es");
+                        })
                         .filter((p) => (childrenByParent[p.id] || []).some((c) => c.activo !== false));
                       if (parentsWithChildren.length === 0) return null;
                       return (
