@@ -769,8 +769,10 @@ function InventarioContent() {
           </>)}
 
           {!showRecomendaciones && registrosHoy.length > 0 && (() => {
+            const vistaRegistros = registrosHoy.filter((r) => matchesVista(r.ingrediente_id, r.ingrediente_nombre));
+            if (vistaRegistros.length === 0) return null;
             const grouped: Record<string, typeof registrosHoy> = {};
-            for (const r of registrosHoy) {
+            for (const r of vistaRegistros) {
               const ing = ingredientes.find((i) => i.id === r.ingrediente_id);
               const catId = ing?.categoria_id;
               const cat = categorias.find((c) => c.id === catId);
@@ -782,7 +784,7 @@ function InventarioContent() {
               <div className="mt-6 bg-white border border-[#E8DFD3] rounded-lg overflow-hidden">
                 <div className="px-4 py-3 bg-[#F5F0E8] border-b border-[#E8DFD3] flex items-center justify-between">
                   <h3 className="font-semibold text-[#8B1A2B]">
-                    Registrado hoy ({registrosHoy.length} items)
+                    Registrado hoy ({vistaRegistros.length} items)
                   </h3>
                 </div>
                 <table className="w-full text-sm">
@@ -874,8 +876,10 @@ function InventarioContent() {
 
           {!showRecomendaciones && (
             <div className="sticky bottom-16 md:bottom-0 bg-[#F5F0E8] border-t border-[#E8DFD3] -mx-6 px-6 py-3 flex items-center justify-between">
-              <div className="text-sm text-[#6B5E52] flex items-center gap-3">
+              <div className="text-sm text-[#6B5E52]">
                 {lastSaved && <span>Guardado a las {lastSaved}</span>}
+              </div>
+              <div className="flex items-center gap-2">
                 {loadRecomendaciones() && (
                   <button
                     onClick={() => {
@@ -886,19 +890,21 @@ function InventarioContent() {
                         setShowRecomendaciones(true);
                       }
                     }}
-                    className="text-[#8B1A2B] hover:underline font-medium"
+                    className="bg-white border border-[#8B1A2B] text-[#8B1A2B] px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#F2E8EA] transition-colors"
                   >
                     Ver recomendaciones
                   </button>
                 )}
+                {filledCount > 0 && (
+                  <button
+                    onClick={handleSave}
+                    disabled={saving}
+                    className="bg-[#8B1A2B] text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-[#6B1420] transition-colors disabled:opacity-50"
+                  >
+                    {saving ? "Guardando..." : `Guardar inventario (${filledCount})`}
+                  </button>
+                )}
               </div>
-              <button
-                onClick={handleSave}
-                disabled={saving || filledCount === 0}
-                className="bg-[#8B1A2B] text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-[#6B1420] transition-colors disabled:opacity-50"
-              >
-                {saving ? "Guardando..." : `Guardar y ver recomendacion (${filledCount})`}
-              </button>
             </div>
           )}
 
