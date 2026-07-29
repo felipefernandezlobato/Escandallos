@@ -28,31 +28,24 @@ interface InventarioSnapshot {
 }
 
 const STORAGE_KEY = "bru_inventario_draft";
-const REC_STORAGE_KEY = "bru_recomendaciones_v2";
+const REC_DRAFT_KEY = "bru_rec_draft";
 
-interface SavedRecomendaciones {
-  ts: number;
-  ids: number[];
-  items: RecomendacionItem[];
-  cantidades: Record<number, string>;
+function saveDraftCantidades(cantidades: Record<number, string>) {
+  localStorage.setItem(REC_DRAFT_KEY, JSON.stringify({ ts: Date.now(), cantidades }));
 }
 
-function saveRecomendaciones(ids: number[], items: RecomendacionItem[], cantidades: Record<number, string>) {
-  localStorage.setItem(REC_STORAGE_KEY, JSON.stringify({ ts: Date.now(), ids, items, cantidades }));
-}
-
-function loadRecomendaciones(): SavedRecomendaciones | null {
-  const raw = localStorage.getItem(REC_STORAGE_KEY);
+function loadDraftCantidades(): Record<number, string> | null {
+  const raw = localStorage.getItem(REC_DRAFT_KEY);
   if (!raw) return null;
   try {
     const parsed = JSON.parse(raw);
     if (Date.now() - (parsed.ts || 0) > 24 * 60 * 60 * 1000) {
-      localStorage.removeItem(REC_STORAGE_KEY);
+      localStorage.removeItem(REC_DRAFT_KEY);
       return null;
     }
-    return parsed;
+    return parsed.cantidades;
   } catch {
-    localStorage.removeItem(REC_STORAGE_KEY);
+    localStorage.removeItem(REC_DRAFT_KEY);
     return null;
   }
 }
@@ -250,22 +243,14 @@ function InventarioContent() {
             const regs = data.snapshot?.registros || [];
             if (regs.length === 0) return;
             const ids = regs.map((r) => r.ingrediente_id);
-            const savedRec = loadRecomendaciones();
-            // Skip re-fetch if localStorage already has all of today's IDs
-            if (savedRec && ids.every((id) => savedRec.ids.includes(id))) {
-              setRecomendaciones(savedRec.items);
-              setCantidadesPedido(savedRec.cantidades);
-              setHasRecomendaciones(true);
-              return;
-            }
             apiFetch<{ items: RecomendacionItem[] }>(
               `/api/inventario/recomendacion?ingrediente_ids=${ids.join(",")}`
             ).then((rec) => {
+              const draft = loadDraftCantidades();
               const cantidades: Record<number, string> = {};
               for (const item of rec.items) {
-                cantidades[item.ingrediente_id] = String(item.cantidad_sugerida);
+                cantidades[item.ingrediente_id] = draft?.[item.ingrediente_id] ?? String(item.cantidad_sugerida);
               }
-              saveRecomendaciones(ids, rec.items, cantidades);
               setRecomendaciones(rec.items);
               setCantidadesPedido(cantidades);
               setHasRecomendaciones(true);
@@ -285,10 +270,7 @@ function InventarioContent() {
 
   useEffect(() => {
     if (showRecomendaciones && recomendaciones.length > 0) {
-      const saved = loadRecomendaciones();
-      if (saved) {
-        saveRecomendaciones(saved.ids, recomendaciones, cantidadesPedido);
-      }
+      saveDraftCantidades(cantidadesPedido);
     }
   }, [cantidadesPedido, showRecomendaciones, recomendaciones]);
 
@@ -476,20 +458,17 @@ function InventarioContent() {
       const hoy = new Date().toISOString().slice(0, 10);
       const todayData = await apiFetch<{ snapshot: InventarioSnapshot | null }>(`/api/inventario?fecha=${hoy}`);
       const todayIds = (todayData.snapshot?.registros || []).map((r) => r.ingrediente_id);
-      const saved = loadRecomendaciones();
-      const allIds = Array.from(new Set([...(saved?.ids || []), ...todayIds]));
       const rec = await apiFetch<{ items: RecomendacionItem[] }>(
-        `/api/inventario/recomendacion?ingrediente_ids=${allIds.join(",")}`
+        `/api/inventario/recomendacion?ingrediente_ids=${todayIds.join(",")}`
       );
       setRecomendaciones(rec.items);
-      const initial: Record<number, string> = { ...(saved?.cantidades || {}) };
+      const draft = loadDraftCantidades();
+      const initial: Record<number, string> = {};
       for (const item of rec.items) {
-        if (!(item.ingrediente_id in initial)) {
-          initial[item.ingrediente_id] = String(item.cantidad_sugerida);
-        }
+        initial[item.ingrediente_id] = draft?.[item.ingrediente_id] ?? String(item.cantidad_sugerida);
       }
       setCantidadesPedido(initial);
-      saveRecomendaciones(allIds, rec.items, initial);
+      saveDraftCantidades(initial);
       setHasRecomendaciones(true);
       setShowRecomendaciones(true);
     } catch (err) {
@@ -910,11 +889,6 @@ function InventarioContent() {
                 {hasRecomendaciones && (
                   <button
                     onClick={() => {
-                      const saved = loadRecomendaciones();
-                      if (saved) {
-                        setRecomendaciones(saved.items);
-                        setCantidadesPedido(saved.cantidades);
-                      }
                       setShowRecomendaciones(true);
                     }}
                     className="bg-white border border-[#8B1A2B] text-[#8B1A2B] px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#F2E8EA] transition-colors"
