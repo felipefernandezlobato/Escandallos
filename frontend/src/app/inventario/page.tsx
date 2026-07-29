@@ -946,14 +946,30 @@ function InventarioContent() {
                   Volver a inventario
                 </button>
               </div>
+              <div className="flex gap-2 items-center">
+                {(["cocina", "cafe", "bar"] as const).map((v) => (
+                  <button
+                    key={v}
+                    onClick={() => setVista(v)}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      vista === v
+                        ? "bg-[#8B1A2B] text-white"
+                        : "bg-white border border-[#D4C4A8] text-[#6B5E52] hover:bg-[#F5F0E8]"
+                    }`}
+                  >
+                    {v === "cocina" ? "Cocina" : v === "cafe" ? "Cafe" : "Bar"}
+                  </button>
+                ))}
+              </div>
 
               {(() => {
+                const vistaRecs = recomendaciones.filter((r) => matchesVista(r.ingrediente_id, r.ingrediente_nombre));
                 const proveedores = Array.from(
-                  new Set(recomendaciones.map((r) => r.proveedor))
+                  new Set(vistaRecs.map((r) => r.proveedor))
                 ).sort((a, b) => a.localeCompare(b, "es"));
 
                 return proveedores.map((prov) => {
-                  const items = recomendaciones.filter(
+                  const items = vistaRecs.filter(
                     (r) => r.proveedor === prov
                   );
                   const hasPositive = items.some(
