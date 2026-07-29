@@ -266,7 +266,7 @@ function InventarioContent() {
             const ids = regs.map((r) => r.ingrediente_id);
             // Also include parent IDs so aggregated coffee recommendations appear
             const childIngIds = new Set(ids);
-            for (const ing of ingredientes) {
+            for (const ing of ings) {
               if (ing.grupo_ingrediente_id && childIngIds.has(ing.id)) {
                 ids.push(ing.grupo_ingrediente_id);
               }
