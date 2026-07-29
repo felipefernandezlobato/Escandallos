@@ -24,6 +24,8 @@ export interface Ingrediente {
   categoria_nombre: string;
   precios_proveedores?: Record<string, number>;
   excluir_pedidos?: boolean;
+  activo?: boolean;
+  grupo_ingrediente_id?: number | null;
 }
 
 export interface LineaReceta {

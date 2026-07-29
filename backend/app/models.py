@@ -47,8 +47,12 @@ class Ingrediente(Base):
     notas: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     fecha_actualizacion: Mapped[date] = mapped_column(Date, default=func.current_date())
     excluir_pedidos: Mapped[bool] = mapped_column(Boolean, default=False, server_default=sa_text("false"))
+    activo: Mapped[bool] = mapped_column(Boolean, default=True, server_default=sa_text("true"))
+    grupo_ingrediente_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey("ingredientes.id"), nullable=True)
 
     categoria_rel: Mapped["Categoria"] = relationship(back_populates="ingredientes")
+    hijos: Mapped[List["Ingrediente"]] = relationship(back_populates="grupo_padre", foreign_keys=[grupo_ingrediente_id])
+    grupo_padre: Mapped[Optional["Ingrediente"]] = relationship(back_populates="hijos", remote_side="Ingrediente.id", foreign_keys=[grupo_ingrediente_id])
     historial_precios: Mapped[List["HistorialPrecio"]] = relationship(
         back_populates="ingrediente_rel", cascade="all, delete-orphan"
     )
@@ -157,6 +161,7 @@ class InventarioRegistro(Base):
     unidad: Mapped[str] = mapped_column(String(20), nullable=False)
     fecha_registro: Mapped[date] = mapped_column(Date, default=func.current_date())
     notas: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    ubicacion: Mapped[Optional[str]] = mapped_column(String(10), nullable=True)
 
     ingrediente_rel: Mapped["Ingrediente"] = relationship()
 

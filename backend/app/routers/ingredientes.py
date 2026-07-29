@@ -158,6 +158,22 @@ def eliminar_ingrediente(ingrediente_id: int, db: Session = Depends(get_db), use
     return {"ok": True}
 
 
+@router.put("/{ingrediente_id}/activo")
+def toggle_activo(
+    ingrediente_id: int,
+    db: Session = Depends(get_db),
+    user=Depends(get_current_user),
+):
+    """Activar o desactivar un ingrediente."""
+    ing = db.get(Ingrediente, ingrediente_id)
+    if not ing:
+        raise HTTPException(404, "Ingrediente no encontrado")
+    ing.activo = not ing.activo
+    db.commit()
+    estado = "activado" if ing.activo else "desactivado"
+    return {"ok": True, "activo": ing.activo, "mensaje": f"Ingrediente {estado}"}
+
+
 @router.get("/{ingrediente_id}/historial", response_model=list[HistorialPrecioOut])
 def historial_precios(ingrediente_id: int, db: Session = Depends(get_db), user=Depends(get_current_user)):
     ing = db.get(Ingrediente, ingrediente_id)

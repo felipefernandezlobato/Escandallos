@@ -189,6 +189,11 @@ function InventarioContent() {
   }>>([]);
   const [editingRegistro, setEditingRegistro] = useState<number | null>(null);
   const [editCantidad, setEditCantidad] = useState("");
+  const [ubicacionCafe, setUbicacionCafe] = useState<"BRU1" | "BRU2">("BRU1");
+  const [showGestionarCafes, setShowGestionarCafes] = useState(false);
+  const [newCoffeeName, setNewCoffeeName] = useState("");
+  const [newCoffeeParent, setNewCoffeeParent] = useState<number | null>(null);
+  const [savingCoffeeToggle, setSavingCoffeeToggle] = useState<number | null>(null);
 
   const fetchRegistrosHoy = () => {
     const hoy = new Date().toISOString().slice(0, 10);
@@ -390,6 +395,27 @@ function InventarioContent() {
     return cat.seccion === vista;
   };
 
+  // Get parent ingredient IDs (groups) for cafe section
+  const parentIds = new Set(
+    ingredientes
+      .filter((i) => i.grupo_ingrediente_id != null)
+      .map((i) => i.grupo_ingrediente_id!)
+  );
+
+  // Get children grouped by parent
+  const cafeGrouped = ingredientes.filter(
+    (i) => i.grupo_ingrediente_id != null && i.activo !== false
+  );
+  const cafeGroupedIds = new Set(cafeGrouped.map((i) => i.id));
+
+  // Group children by parent
+  const childrenByParent: Record<number, Ingrediente[]> = {};
+  for (const ing of ingredientes.filter((i) => i.grupo_ingrediente_id != null)) {
+    const pid = ing.grupo_ingrediente_id!;
+    if (!childrenByParent[pid]) childrenByParent[pid] = [];
+    childrenByParent[pid].push(ing);
+  }
+
   const porCategoria: Array<{ id: number; nombre: string; items: Ingrediente[]; sibaristFamilies?: Array<{ family: string; items: Ingrediente[] }> }> = (() => {
     if (filtroCategoria) {
       return categorias
@@ -399,11 +425,24 @@ function InventarioContent() {
     }
 
     if (vista === "cafe") {
+      // Non-grouped cafe items (no grupo_ingrediente_id, not a parent)
+      const nonGrouped = ingredientesFiltrados.filter(
+        (i) => !i.grupo_ingrediente_id && !parentIds.has(i.id)
+      );
       const groups: Array<{ id: number; nombre: string; items: Ingrediente[]; sibaristFamilies?: Array<{ family: string; items: Ingrediente[] }> }> = cafeCategories
-        .map((c) => ({ ...c, items: ingredientesFiltrados.filter((i) => i.categoria_id === c.id) }))
+        .map((c) => ({ ...c, items: nonGrouped.filter((i) => i.categoria_id === c.id) }))
         .filter((g) => g.items.length > 0);
-      const sibaristItems = ingredientesFiltrados.filter((i) => i.nombre.toLowerCase().includes("sibarist"));
+      const sibaristItems = nonGrouped.filter((i) => i.nombre.toLowerCase().includes("sibarist"));
       if (sibaristItems.length > 0) {
+        // Remove sibarist items from their original category groups
+        for (const g of groups) {
+          g.items = g.items.filter((i) => !i.nombre.toLowerCase().includes("sibarist"));
+        }
+        // Remove empty groups after removing sibarist items
+        const filteredGroups = groups.filter((g) => g.items.length > 0);
+        groups.length = 0;
+        groups.push(...filteredGroups);
+
         const familyMap: Record<string, Ingrediente[]> = {};
         for (const item of sibaristItems) {
           const family = getSibaristFamily(item.nombre);
@@ -441,6 +480,7 @@ function InventarioContent() {
         ingrediente_id: s.ingrediente_id,
         cantidad: parseFloat(s.cantidad),
         unidad: s.unidad,
+        ...(cafeGroupedIds.has(s.ingrediente_id) ? { ubicacion: ubicacionCafe } : {}),
       }));
 
     if (registros.length === 0) {
@@ -679,6 +719,111 @@ function InventarioContent() {
               </button>
             )}
           </div>
+
+          {/* Cafe grouped coffees section */}
+          {vista === "cafe" && !loading && Object.keys(childrenByParent).length > 0 && (
+            <div className="space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium text-[#6B5E52]">Ubicacion:</span>
+                  <div className="flex rounded-lg overflow-hidden border border-[#D4C4A8]">
+                    <button
+                      onClick={() => setUbicacionCafe("BRU1")}
+                      className={`px-4 py-1.5 text-sm font-medium transition-colors ${
+                        ubicacionCafe === "BRU1"
+                          ? "bg-[#8B1A2B] text-white"
+                          : "bg-white text-[#6B5E52] hover:bg-[#F5F0E8]"
+                      }`}
+                    >
+                      BRU1
+                    </button>
+                    <button
+                      onClick={() => setUbicacionCafe("BRU2")}
+                      className={`px-4 py-1.5 text-sm font-medium transition-colors border-l border-[#D4C4A8] ${
+                        ubicacionCafe === "BRU2"
+                          ? "bg-[#8B1A2B] text-white"
+                          : "bg-white text-[#6B5E52] hover:bg-[#F5F0E8]"
+                      }`}
+                    >
+                      BRU2
+                    </button>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowGestionarCafes(true)}
+                  className="px-3 py-1.5 text-sm font-medium bg-white border border-[#D4C4A8] text-[#6B5E52] rounded-lg hover:bg-[#F5F0E8] transition-colors"
+                >
+                  Gestionar Cafes
+                </button>
+              </div>
+
+              {Array.from(parentIds)
+                .map((pid) => ingredientes.find((i) => i.id === pid))
+                .filter(Boolean)
+                .sort((a, b) => a!.nombre.localeCompare(b!.nombre, "es"))
+                .map((parent) => {
+                  const children = (childrenByParent[parent!.id] || []).filter(
+                    (c) => c.activo !== false
+                  );
+                  if (children.length === 0) return null;
+                  const unit = children[0]?.unidad_compra || "kg";
+                  const total = children.reduce((sum, c) => {
+                    const val = parseFloat(stock[c.id]?.cantidad || "0");
+                    return sum + (isNaN(val) ? 0 : val);
+                  }, 0);
+                  return (
+                    <div key={parent!.id} className="bg-white border border-[#E8DFD3] rounded-lg overflow-hidden">
+                      <div className="px-4 py-2.5 bg-[#F5F0E8] border-b border-[#E8DFD3] flex items-center justify-between">
+                        <h3 className="text-sm font-semibold text-[#8B1A2B] uppercase tracking-wider">
+                          {parent!.nombre}
+                        </h3>
+                        <span className="text-sm font-medium text-[#6B5E52]">
+                          Total: {total > 0 ? total.toFixed(2) : "0"} {unit}
+                        </span>
+                      </div>
+                      <div className="p-3 space-y-2">
+                        {children.map((ing) => (
+                          <div
+                            key={ing.id}
+                            className="flex items-center gap-2"
+                          >
+                            <div className="flex-1 min-w-0">
+                              <Link href={`/ingredientes/${ing.id}`} className="text-sm truncate block text-[#8B1A2B] hover:underline" title={ing.nombre}>
+                                {ing.nombre}
+                              </Link>
+                              <span className="text-[10px] text-[#6B5E52]/60">
+                                {formatUltimoConteo(ing.id)}
+                              </span>
+                            </div>
+                            <input
+                              type="text"
+                              inputMode="decimal"
+                              placeholder="0"
+                              value={stock[ing.id]?.cantidad ?? ""}
+                              onChange={(e) => {
+                                const v = e.target.value.replace(",", ".");
+                                if (v === "" || /^\d*\.?\d*$/.test(v))
+                                  setStock((prev) => ({
+                                    ...prev,
+                                    [ing.id]: {
+                                      ...prev[ing.id],
+                                      cantidad: v,
+                                    },
+                                  }));
+                              }}
+                              className="w-20 border border-[#D4C4A8] rounded px-2 py-1 text-sm text-right"
+                            />
+                            <span className="text-xs text-[#6B5E52] w-8">
+                              {stock[ing.id]?.unidad || ing.unidad_compra}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+            </div>
+          )}
 
           {loading ? (
             <p className="text-[#6B5E52] text-center py-10">Cargando...</p>
@@ -1632,6 +1777,157 @@ function InventarioContent() {
             )}
           </div>
           )}
+        </div>
+      )}
+      {/* Modal: Gestionar Cafes */}
+      {showGestionarCafes && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-[#F5F0E8] rounded-xl shadow-xl max-w-lg w-full max-h-[85vh] flex flex-col">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-[#E8DFD3]">
+              <h2 className="text-lg font-semibold text-[#8B1A2B]">Gestionar Cafes</h2>
+              <button
+                onClick={() => setShowGestionarCafes(false)}
+                className="text-[#6B5E52] hover:text-[#8B1A2B] text-xl leading-none"
+              >
+                &times;
+              </button>
+            </div>
+            <div className="overflow-y-auto flex-1 px-5 py-4 space-y-5">
+              {Array.from(parentIds)
+                .map((pid) => ingredientes.find((i) => i.id === pid))
+                .filter(Boolean)
+                .sort((a, b) => a!.nombre.localeCompare(b!.nombre, "es"))
+                .map((parent) => {
+                  const allChildren = ingredientes.filter(
+                    (i) => i.grupo_ingrediente_id === parent!.id
+                  );
+                  return (
+                    <div key={parent!.id}>
+                      <h3 className="text-sm font-semibold text-[#8B1A2B] uppercase tracking-wider mb-2">
+                        {parent!.nombre}
+                      </h3>
+                      <div className="space-y-1.5">
+                        {allChildren.map((child) => (
+                          <div
+                            key={child.id}
+                            className={`flex items-center justify-between gap-3 px-3 py-2 rounded-lg border ${
+                              child.activo !== false
+                                ? "bg-white border-[#E8DFD3]"
+                                : "bg-[#E8DFD3]/50 border-[#D4C4A8]/50"
+                            }`}
+                          >
+                            <span
+                              className={`text-sm ${
+                                child.activo !== false ? "text-[#2D2319]" : "text-[#6B5E52]/60 line-through"
+                              }`}
+                            >
+                              {child.nombre}
+                            </span>
+                            <button
+                              disabled={savingCoffeeToggle === child.id}
+                              onClick={async () => {
+                                setSavingCoffeeToggle(child.id);
+                                try {
+                                  await apiFetch(`/api/ingredientes/${child.id}/activo`, {
+                                    method: "PUT",
+                                  });
+                                  // Refresh ingredientes
+                                  const ings = await apiFetch<Ingrediente[]>("/api/ingredientes");
+                                  setIngredientes(ings);
+                                  toast(
+                                    child.activo !== false ? "Cafe desactivado" : "Cafe activado",
+                                    "success"
+                                  );
+                                } catch (err) {
+                                  toast("Error: " + (err as Error).message, "error");
+                                } finally {
+                                  setSavingCoffeeToggle(null);
+                                }
+                              }}
+                              className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                                child.activo !== false ? "bg-[#8B1A2B]" : "bg-[#D4C4A8]"
+                              } ${savingCoffeeToggle === child.id ? "opacity-50" : ""}`}
+                            >
+                              <span
+                                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                                  child.activo !== false ? "translate-x-5" : "translate-x-0"
+                                }`}
+                              />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+
+              {/* Add new coffee */}
+              <div className="border-t border-[#E8DFD3] pt-4">
+                <h3 className="text-sm font-semibold text-[#6B5E52] mb-2">Agregar nuevo cafe</h3>
+                <div className="flex flex-col gap-2">
+                  <input
+                    type="text"
+                    placeholder="Nombre del cafe..."
+                    value={newCoffeeName}
+                    onChange={(e) => setNewCoffeeName(e.target.value)}
+                    className="border border-[#D4C4A8] rounded-lg px-3 py-2 text-sm"
+                  />
+                  <select
+                    value={newCoffeeParent ?? ""}
+                    onChange={(e) => setNewCoffeeParent(e.target.value ? Number(e.target.value) : null)}
+                    className="border border-[#D4C4A8] rounded-lg px-3 py-2 text-sm"
+                  >
+                    <option value="">Selecciona grupo padre...</option>
+                    {Array.from(parentIds)
+                      .map((pid) => ingredientes.find((i) => i.id === pid))
+                      .filter(Boolean)
+                      .sort((a, b) => a!.nombre.localeCompare(b!.nombre, "es"))
+                      .map((p) => (
+                        <option key={p!.id} value={p!.id}>
+                          {p!.nombre}
+                        </option>
+                      ))}
+                  </select>
+                  <button
+                    onClick={async () => {
+                      if (!newCoffeeName.trim() || !newCoffeeParent) {
+                        toast("Introduce nombre y selecciona grupo padre", "error");
+                        return;
+                      }
+                      const parent = ingredientes.find((i) => i.id === newCoffeeParent);
+                      if (!parent) return;
+                      try {
+                        await apiFetch("/api/ingredientes", {
+                          method: "POST",
+                          body: JSON.stringify({
+                            nombre: newCoffeeName.trim(),
+                            categoria_id: parent.categoria_id,
+                            unidad_compra: parent.unidad_compra,
+                            cantidad_compra: parent.cantidad_compra,
+                            precio_compra: 0,
+                            unidad_uso: parent.unidad_uso,
+                            merma_porcentaje: parent.merma_porcentaje,
+                            grupo_ingrediente_id: newCoffeeParent,
+                          }),
+                        });
+                        const ings = await apiFetch<Ingrediente[]>("/api/ingredientes");
+                        setIngredientes(ings);
+                        setNewCoffeeName("");
+                        setNewCoffeeParent(null);
+                        toast("Cafe agregado", "success");
+                      } catch (err) {
+                        toast("Error: " + (err as Error).message, "error");
+                      }
+                    }}
+                    disabled={!newCoffeeName.trim() || !newCoffeeParent}
+                    className="bg-[#8B1A2B] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#6B1420] transition-colors disabled:opacity-50"
+                  >
+                    Agregar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>

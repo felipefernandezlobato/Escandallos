@@ -46,7 +46,7 @@ class IngredienteBase(BaseModel):
 
 
 class IngredienteCreate(IngredienteBase):
-    pass
+    grupo_ingrediente_id: Optional[int] = None
 
 
 class IngredienteUpdate(BaseModel):
@@ -59,6 +59,8 @@ class IngredienteUpdate(BaseModel):
     merma_porcentaje: Optional[float] = None
     proveedor: Optional[str] = None
     notas: Optional[str] = None
+    grupo_ingrediente_id: Optional[int] = None
+    activo: Optional[bool] = None
 
 
 class IngredienteOut(IngredienteBase):
@@ -69,6 +71,8 @@ class IngredienteOut(IngredienteBase):
     categoria_nombre: str = ""
     precios_proveedores: dict[str, float] = {}
     excluir_pedidos: bool = False
+    activo: bool = True
+    grupo_ingrediente_id: Optional[int] = None
 
     model_config = {"from_attributes": True}
 
@@ -230,12 +234,14 @@ class InventarioRegistroCreate(BaseModel):
     cantidad: float
     unidad: str
     notas: Optional[str] = None
+    ubicacion: Optional[str] = None
 
 
 class InventarioRegistroUpdate(BaseModel):
     cantidad: Optional[float] = None
     unidad: Optional[str] = None
     notas: Optional[str] = None
+    ubicacion: Optional[str] = None
 
 
 class InventarioSnapshotCreate(BaseModel):
@@ -251,6 +257,7 @@ class InventarioRegistroOut(BaseModel):
     fecha_registro: date
     notas: Optional[str] = None
     ingrediente_nombre: str = ""
+    ubicacion: Optional[str] = None
 
     model_config = {"from_attributes": True}
 

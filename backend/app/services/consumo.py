@@ -36,11 +36,20 @@ def _convert_qty(qty: float, from_unit: str, to_unit: str) -> float:
     return qty
 
 
-def consumo_semanal(ingrediente_id: int, db: Session, semanas: int = 12) -> list[dict]:
-    """Calculate weekly consumption based on received orders and inventory changes.
-
-    Uses the most recent N weeks of data available, not a fixed window from today.
+def _child_ids(ingrediente_id: int, db: Session) -> list[int]:
+    """Return list of child ingredient IDs if the ingredient is a parent (grupo).
+    Returns empty list if the ingredient has no children (is a leaf).
     """
+    hijos = (
+        db.query(Ingrediente.id)
+        .filter(Ingrediente.grupo_ingrediente_id == ingrediente_id)
+        .all()
+    )
+    return [h[0] for h in hijos]
+
+
+def _consumo_semanal_leaf(ingrediente_id: int, db: Session, semanas: int = 12) -> list[dict]:
+    """Calculate weekly consumption for a single (leaf) ingredient."""
     most_recent = (
         db.query(func.max(Pedido.fecha_recepcion))
         .filter(Pedido.estado == "recibido")
@@ -129,6 +138,29 @@ def consumo_semanal(ingrediente_id: int, db: Session, semanas: int = 12) -> list
     return result
 
 
+def consumo_semanal(ingrediente_id: int, db: Session, semanas: int = 12) -> list[dict]:
+    """Calculate weekly consumption based on received orders and inventory changes.
+
+    If the ingredient is a parent (has children), aggregates consumption from all children.
+    Uses the most recent N weeks of data available, not a fixed window from today.
+    """
+    children = _child_ids(ingrediente_id, db)
+    if not children:
+        return _consumo_semanal_leaf(ingrediente_id, db, semanas)
+
+    # Aggregate consumption from all children
+    merged: dict[str, float] = {}
+    for child_id in children:
+        child_data = _consumo_semanal_leaf(child_id, db, semanas)
+        for item in child_data:
+            merged[item["semana"]] = merged.get(item["semana"], 0) + item["cantidad"]
+
+    return [
+        {"semana": key, "cantidad": round(merged[key], 2)}
+        for key in sorted(merged.keys())
+    ]
+
+
 def consumo_medio_semanal(ingrediente_id: int, db: Session, semanas: int = 8) -> float:
     historial = consumo_semanal(ingrediente_id, db, semanas)
     if not historial:
@@ -137,7 +169,8 @@ def consumo_medio_semanal(ingrediente_id: int, db: Session, semanas: int = 8) ->
     return round(total / len(historial), 2)
 
 
-def stock_actual(ingrediente_id: int, db: Session) -> Optional[dict]:
+def _stock_actual_leaf(ingrediente_id: int, db: Session) -> Optional[dict]:
+    """Get latest stock for a single (leaf) ingredient."""
     ultimo = (
         db.query(InventarioRegistro)
         .filter(InventarioRegistro.ingrediente_id == ingrediente_id)
@@ -151,6 +184,74 @@ def stock_actual(ingrediente_id: int, db: Session) -> Optional[dict]:
         "unidad": ultimo.unidad,
         "fecha": ultimo.fecha_registro,
     }
+
+
+def stock_actual(ingrediente_id: int, db: Session) -> Optional[dict]:
+    """Get latest stock. If parent, sum latest stock of all children."""
+    children = _child_ids(ingrediente_id, db)
+    if not children:
+        return _stock_actual_leaf(ingrediente_id, db)
+
+    # Aggregate stock from all children
+    total = 0.0
+    unidad = None
+    latest_fecha = None
+    for child_id in children:
+        stk = _stock_actual_leaf(child_id, db)
+        if stk:
+            total += stk["cantidad"]
+            if unidad is None:
+                unidad = stk["unidad"]
+            if latest_fecha is None or stk["fecha"] > latest_fecha:
+                latest_fecha = stk["fecha"]
+
+    if unidad is None:
+        # No children have stock — check parent ingredient for unit
+        ing = db.query(Ingrediente).get(ingrediente_id)
+        return None
+
+    return {
+        "cantidad": round(total, 3),
+        "unidad": unidad,
+        "fecha": latest_fecha,
+    }
+
+
+def stock_por_ubicacion(ingrediente_id: int, db: Session) -> dict:
+    """Return stock breakdown by location for items with ubicacion data.
+
+    Returns dict like {"BRU1": {"cantidad": 5, "unidad": "kg"}, "BRU2": {"cantidad": 3, "unidad": "kg"}}.
+    For items without location data, returns empty dict.
+    Also aggregates children if the ingredient is a parent.
+    """
+    target_ids = _child_ids(ingrediente_id, db) or [ingrediente_id]
+
+    result: dict[str, dict] = {}
+    for tid in target_ids:
+        # Get the latest inventory record per location for this ingredient
+        registros = (
+            db.query(InventarioRegistro)
+            .filter(
+                InventarioRegistro.ingrediente_id == tid,
+                InventarioRegistro.ubicacion.isnot(None),
+            )
+            .order_by(InventarioRegistro.fecha_registro.desc())
+            .all()
+        )
+        seen_locations: set[str] = set()
+        for r in registros:
+            loc = r.ubicacion
+            if loc not in seen_locations:
+                seen_locations.add(loc)
+                if loc not in result:
+                    result[loc] = {"cantidad": 0.0, "unidad": r.unidad}
+                result[loc]["cantidad"] += r.cantidad
+
+    # Round quantities
+    for loc in result:
+        result[loc]["cantidad"] = round(result[loc]["cantidad"], 3)
+
+    return result
 
 
 def tendencia_consumo(historial: list[dict]) -> str:

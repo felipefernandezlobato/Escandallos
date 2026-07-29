@@ -25,6 +25,7 @@ from app.services.consumo import (
     consumo_semanal,
     recomendacion_pedido,
     stock_actual,
+    stock_por_ubicacion,
     tendencia_consumo,
 )
 
@@ -55,6 +56,7 @@ def registrar_inventario(
             unidad=reg.unidad,
             fecha_registro=fecha,
             notas=reg.notas,
+            ubicacion=reg.ubicacion,
         )
         db.add(registro)
         creados += 1
@@ -282,13 +284,21 @@ def stock_actual_todos(
     result = []
     for r in registros:
         ing = ings.get(r.ingrediente_id)
-        result.append({
+        item = {
             "ingrediente_id": r.ingrediente_id,
             "ingrediente_nombre": ing.nombre if ing else "",
             "cantidad": r.cantidad,
             "unidad": r.unidad,
             "fecha_registro": str(r.fecha_registro),
-        })
+            "activo": ing.activo if ing else True,
+            "grupo_ingrediente_id": ing.grupo_ingrediente_id if ing else None,
+            "ubicacion": r.ubicacion,
+        }
+        # Include location breakdown if the ingredient has location data
+        ubicaciones = stock_por_ubicacion(r.ingrediente_id, db)
+        if ubicaciones:
+            item["ubicaciones"] = ubicaciones
+        result.append(item)
     return result
 
 
