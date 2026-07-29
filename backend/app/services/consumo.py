@@ -52,7 +52,7 @@ def consumo_semanal(ingrediente_id: int, db: Session, semanas: int = 12) -> list
 
     # Determine target unit from inventory records or ingredient
     ing = db.query(Ingrediente).get(ingrediente_id)
-    inventarios = (
+    all_inventarios = (
         db.query(InventarioRegistro)
         .filter(
             InventarioRegistro.ingrediente_id == ingrediente_id,
@@ -61,8 +61,10 @@ def consumo_semanal(ingrediente_id: int, db: Session, semanas: int = 12) -> list
         .order_by(InventarioRegistro.fecha_registro)
         .all()
     )
-    if inventarios:
-        target_unit = inventarios[-1].unidad
+    # Exclude "Pedido recibido" records — they duplicate order data and inflate consumption
+    inventarios = [r for r in all_inventarios if not (r.notas and "recibido" in r.notas.lower())]
+    if all_inventarios:
+        target_unit = all_inventarios[-1].unidad
     else:
         target_unit = ing.unidad_compra if ing else "unidad"
 
@@ -80,12 +82,17 @@ def consumo_semanal(ingrediente_id: int, db: Session, semanas: int = 12) -> list
 
     semana_data: dict[str, float] = {}
 
-    for qty, order_unit, fecha in pedidos_recibidos:
-        if qty and fecha:
-            iso = fecha.isocalendar()
-            key = f"w{iso[1]}.{str(iso[0])[2:]}"
-            converted = _convert_qty(qty, order_unit or target_unit, target_unit)
-            semana_data[key] = semana_data.get(key, 0) + converted
+    if inventarios and len(inventarios) >= 2:
+        # Use inventory-based calculation (preferred — accounts for actual stock changes)
+        pass
+    else:
+        # Fallback: use received orders as proxy for consumption
+        for qty, order_unit, fecha in pedidos_recibidos:
+            if qty and fecha:
+                iso = fecha.isocalendar()
+                key = f"w{iso[1]}.{str(iso[0])[2:]}"
+                converted = _convert_qty(qty, order_unit or target_unit, target_unit)
+                semana_data[key] = semana_data.get(key, 0) + converted
 
     if inventarios and len(inventarios) >= 2:
         for i in range(1, len(inventarios)):

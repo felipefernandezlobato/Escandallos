@@ -28,6 +28,34 @@ interface InventarioSnapshot {
 }
 
 const STORAGE_KEY = "bru_inventario_draft";
+const REC_STORAGE_KEY = "bru_recomendaciones";
+
+interface SavedRecomendaciones {
+  ts: number;
+  ids: number[];
+  items: RecomendacionItem[];
+  cantidades: Record<number, string>;
+}
+
+function saveRecomendaciones(ids: number[], items: RecomendacionItem[], cantidades: Record<number, string>) {
+  localStorage.setItem(REC_STORAGE_KEY, JSON.stringify({ ts: Date.now(), ids, items, cantidades }));
+}
+
+function loadRecomendaciones(): SavedRecomendaciones | null {
+  const raw = localStorage.getItem(REC_STORAGE_KEY);
+  if (!raw) return null;
+  try {
+    const parsed = JSON.parse(raw);
+    if (Date.now() - (parsed.ts || 0) > 24 * 60 * 60 * 1000) {
+      localStorage.removeItem(REC_STORAGE_KEY);
+      return null;
+    }
+    return parsed;
+  } catch {
+    localStorage.removeItem(REC_STORAGE_KEY);
+    return null;
+  }
+}
 
 function saveDraft(stock: Record<number, StockEntry>) {
   const filled: Record<number, StockEntry> = {};
@@ -213,6 +241,13 @@ function InventarioContent() {
 
         setStock(initial);
         setTimeout(() => setDraftReady(true), 0);
+
+        const savedRec = loadRecomendaciones();
+        if (savedRec && savedRec.items.length > 0) {
+          setRecomendaciones(savedRec.items);
+          setCantidadesPedido(savedRec.cantidades);
+          setShowRecomendaciones(true);
+        }
       })
       .finally(() => setLoading(false));
   }, []);
@@ -224,6 +259,15 @@ function InventarioContent() {
       saveDraft(stock);
     }
   }, [stock, draftReady]);
+
+  useEffect(() => {
+    if (showRecomendaciones && recomendaciones.length > 0) {
+      const saved = loadRecomendaciones();
+      if (saved) {
+        saveRecomendaciones(saved.ids, recomendaciones, cantidadesPedido);
+      }
+    }
+  }, [cantidadesPedido, showRecomendaciones, recomendaciones]);
 
   // Warn on page unload if there are unsaved entries
   useEffect(() => {
@@ -405,16 +449,21 @@ function InventarioContent() {
       setUltimoConteo(conteo);
       fetchRegistrosHoy();
 
-      const ids = registros.map((r) => r.ingrediente_id).join(",");
+      const newIds = registros.map((r) => r.ingrediente_id);
+      const saved = loadRecomendaciones();
+      const allIds = Array.from(new Set([...(saved?.ids || []), ...newIds]));
       const rec = await apiFetch<{ items: RecomendacionItem[] }>(
-        `/api/inventario/recomendacion?ingrediente_ids=${ids}`
+        `/api/inventario/recomendacion?ingrediente_ids=${allIds.join(",")}`
       );
       setRecomendaciones(rec.items);
-      const initial: Record<number, string> = {};
+      const initial: Record<number, string> = { ...(saved?.cantidades || {}) };
       for (const item of rec.items) {
-        initial[item.ingrediente_id] = String(item.cantidad_sugerida);
+        if (!(item.ingrediente_id in initial)) {
+          initial[item.ingrediente_id] = String(item.cantidad_sugerida);
+        }
       }
       setCantidadesPedido(initial);
+      saveRecomendaciones(allIds, rec.items, initial);
       setShowRecomendaciones(true);
     } catch (err) {
       toast("Error al guardar: " + (err as Error).message, "error");
@@ -825,8 +874,23 @@ function InventarioContent() {
 
           {!showRecomendaciones && (
             <div className="sticky bottom-16 md:bottom-0 bg-[#F5F0E8] border-t border-[#E8DFD3] -mx-6 px-6 py-3 flex items-center justify-between">
-              <div className="text-sm text-[#6B5E52]">
+              <div className="text-sm text-[#6B5E52] flex items-center gap-3">
                 {lastSaved && <span>Guardado a las {lastSaved}</span>}
+                {loadRecomendaciones() && (
+                  <button
+                    onClick={() => {
+                      const saved = loadRecomendaciones();
+                      if (saved) {
+                        setRecomendaciones(saved.items);
+                        setCantidadesPedido(saved.cantidades);
+                        setShowRecomendaciones(true);
+                      }
+                    }}
+                    className="text-[#8B1A2B] hover:underline font-medium"
+                  >
+                    Ver recomendaciones
+                  </button>
+                )}
               </div>
               <button
                 onClick={handleSave}

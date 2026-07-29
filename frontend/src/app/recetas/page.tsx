@@ -123,7 +123,13 @@ export default function RecetasPage() {
                     )}
                   </div>
                   <div className="text-xs text-[#6B5E52] space-y-1">
-                    <p>Coste/{r.unidad_rendimiento || "ración"}: <span className="font-medium text-[#1A1A1A]">{r.coste_por_porcion.toFixed(2)} CHF</span></p>
+                    {r.es_subreceta && r.unidad_rendimiento === "g" ? (
+                      <p>Coste/kg: <span className="font-medium text-[#1A1A1A]">{(r.coste_por_porcion * 1000).toFixed(2)} CHF</span></p>
+                    ) : r.es_subreceta && r.unidad_rendimiento === "ml" ? (
+                      <p>Coste/litro: <span className="font-medium text-[#1A1A1A]">{(r.coste_por_porcion * 1000).toFixed(2)} CHF</span></p>
+                    ) : (
+                      <p>Coste/{r.unidad_rendimiento || "ración"}: <span className="font-medium text-[#1A1A1A]">{r.coste_por_porcion.toFixed(2)} CHF</span></p>
+                    )}
                     {r.precio_venta && (
                       <p>Precio venta: <span className="font-medium text-[#1A1A1A]">{r.precio_venta.toFixed(2)} CHF</span></p>
                     )}

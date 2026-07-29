@@ -254,9 +254,17 @@ export default function RecetaDetailPage() {
         </div>
         <div className="bg-white border border-[#E8DFD3] rounded-lg p-4">
           <p className="text-xs text-[#6B5E52]">
-            Coste/{receta.unidad_rendimiento || "ración"}
+            {receta.es_subreceta && receta.unidad_rendimiento === "g"
+              ? "Coste/kg"
+              : receta.es_subreceta && receta.unidad_rendimiento === "ml"
+              ? "Coste/litro"
+              : `Coste/${receta.unidad_rendimiento || "ración"}`}
           </p>
-          <p className="text-xl font-bold">{receta.coste_por_porcion.toFixed(2)} CHF</p>
+          <p className="text-xl font-bold">
+            {receta.es_subreceta && (receta.unidad_rendimiento === "g" || receta.unidad_rendimiento === "ml")
+              ? (receta.coste_por_porcion * 1000).toFixed(2)
+              : receta.coste_por_porcion.toFixed(2)} CHF
+          </p>
         </div>
         <div className="bg-white border border-[#E8DFD3] rounded-lg p-4">
           <p className="text-xs text-[#6B5E52]">Precio venta</p>
