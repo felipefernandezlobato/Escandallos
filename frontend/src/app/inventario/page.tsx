@@ -96,6 +96,7 @@ function InventarioContent() {
 
   const urlTab = searchParams.get("tab") as "registrar" | "historial" | "analisis" | null;
   const urlSemana = searchParams.get("semana");
+  const urlView = searchParams.get("view");
   const tab = urlTab || "registrar";
   const urlSemanaVal = urlSemana || "";
 
@@ -167,7 +168,14 @@ function InventarioContent() {
   const [vista, setVista] = useState<"cocina" | "cafe" | "bar">("cocina");
   const [ultimoConteo, setUltimoConteo] = useState<Record<string, { fecha: string; unidad: string }>>({});
   const [recomendaciones, setRecomendaciones] = useState<RecomendacionItem[]>([]);
-  const [showRecomendaciones, setShowRecomendaciones] = useState(false);
+  const showRecomendaciones = urlView === "recomendaciones";
+  const setShowRecomendaciones = useCallback((show: boolean) => {
+    if (show) {
+      router.push("/inventario?view=recomendaciones");
+    } else {
+      router.push("/inventario");
+    }
+  }, [router]);
   const [hasRecomendaciones, setHasRecomendaciones] = useState(false);
   const [cantidadesPedido, setCantidadesPedido] = useState<Record<number, string>>({});
   const [creatingOrder, setCreatingOrder] = useState(false);
