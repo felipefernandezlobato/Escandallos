@@ -247,6 +247,27 @@ function InventarioContent() {
           setRecomendaciones(savedRec.items);
           setCantidadesPedido(savedRec.cantidades);
           setShowRecomendaciones(true);
+        } else {
+          // No saved recommendations — check if there are registros from today
+          const hoy = new Date().toISOString().slice(0, 10);
+          apiFetch<{ snapshot: InventarioSnapshot | null }>(`/api/inventario?fecha=${hoy}`)
+            .then((data) => {
+              const regs = data.snapshot?.registros || [];
+              if (regs.length > 0) {
+                const ids = regs.map((r) => r.ingrediente_id);
+                apiFetch<{ items: RecomendacionItem[] }>(
+                  `/api/inventario/recomendacion?ingrediente_ids=${ids.join(",")}`
+                ).then((rec) => {
+                  const cantidades: Record<number, string> = {};
+                  for (const item of rec.items) {
+                    cantidades[item.ingrediente_id] = String(item.cantidad_sugerida);
+                  }
+                  saveRecomendaciones(ids, rec.items, cantidades);
+                  setRecomendaciones(rec.items);
+                  setCantidadesPedido(cantidades);
+                });
+              }
+            });
         }
       })
       .finally(() => setLoading(false));
