@@ -429,9 +429,35 @@ function InventarioContent() {
       const nonGrouped = ingredientesFiltrados.filter(
         (i) => !i.grupo_ingrediente_id && !parentIds.has(i.id)
       );
+      // Organize Té+ items into thematic sections
+      const teItems = nonGrouped.filter((i) => {
+        const cat = cafeCategories.find((c) => c.id === i.categoria_id);
+        return cat && cat.nombre.toLowerCase().includes("té");
+      });
+      const teSections: Array<{ title: string; keywords: string[]; items: Ingrediente[] }> = [
+        { title: "Matcha", keywords: ["matcha", "hojicha"], items: [] },
+        { title: "Chocolate", keywords: ["chocolate", "garcoa"], items: [] },
+        { title: "Chai & Té", keywords: ["chai", "prana", "tea", "te ", "del mar"], items: [] },
+      ];
+      for (const item of teItems) {
+        const n = item.nombre.toLowerCase();
+        const section = teSections.find((s) => s.keywords.some((kw) => n.includes(kw)));
+        if (section) section.items.push(item);
+        else teSections[2].items.push(item);
+      }
+      const teGroupIds = new Set(teItems.map((i) => i.id));
+
       const groups: Array<{ id: number; nombre: string; items: Ingrediente[]; sibaristFamilies?: Array<{ family: string; items: Ingrediente[] }> }> = cafeCategories
-        .map((c) => ({ ...c, items: nonGrouped.filter((i) => i.categoria_id === c.id) }))
+        .map((c) => ({ ...c, items: nonGrouped.filter((i) => i.categoria_id === c.id && !teGroupIds.has(i.id)) }))
         .filter((g) => g.items.length > 0);
+
+      // Add Té sections as separate groups
+      for (const ts of teSections) {
+        if (ts.items.length > 0) {
+          groups.push({ id: -100 - teSections.indexOf(ts), nombre: ts.title, items: ts.items });
+        }
+      }
+
       const sibaristItems = nonGrouped.filter((i) => i.nombre.toLowerCase().includes("sibarist"));
       if (sibaristItems.length > 0) {
         // Remove sibarist items from their original category groups
@@ -757,12 +783,23 @@ function InventarioContent() {
                 </button>
               </div>
 
-              {Array.from(parentIds)
-                .map((pid) => ingredientes.find((i) => i.id === pid))
-                .filter(Boolean)
-                .sort((a, b) => a!.nombre.localeCompare(b!.nombre, "es"))
-                .map((parent) => {
-                  const children = (childrenByParent[parent!.id] || []).filter(
+              {(() => {
+                const allParents = Array.from(parentIds)
+                  .map((pid) => ingredientes.find((i) => i.id === pid))
+                  .filter(Boolean) as Ingrediente[];
+
+                const cafeSections: { title: string; keywords: string[] }[] = [
+                  { title: "Cafés de Kilo", keywords: ["kilo", "grano"] },
+                  { title: "Cafés de 200g", keywords: ["200g"] },
+                  { title: "Cafés de 130g / Competition", keywords: ["130g", "gold"] },
+                  { title: "Cápsulas", keywords: ["cápsula", "capsula"] },
+                  { title: "Frozen Tubes", keywords: ["frozen", "tubo"] },
+                ];
+
+                const assigned = new Set<number>();
+
+                const renderParentCard = (parent: Ingrediente) => {
+                  const children = (childrenByParent[parent.id] || []).filter(
                     (c) => c.activo !== false
                   );
                   if (children.length === 0) return null;
@@ -772,10 +809,10 @@ function InventarioContent() {
                     return sum + (isNaN(val) ? 0 : val);
                   }, 0);
                   return (
-                    <div key={parent!.id} className="bg-white border border-[#E8DFD3] rounded-lg overflow-hidden">
+                    <div key={parent.id} className="bg-white border border-[#E8DFD3] rounded-lg overflow-hidden">
                       <div className="px-4 py-2.5 bg-[#F5F0E8] border-b border-[#E8DFD3] flex items-center justify-between">
                         <h3 className="text-sm font-semibold text-[#8B1A2B] uppercase tracking-wider">
-                          {parent!.nombre}
+                          {parent.nombre}
                         </h3>
                         <span className="text-sm font-medium text-[#6B5E52]">
                           Total: {total > 0 ? total.toFixed(2) : "0"} {unit}
@@ -783,10 +820,7 @@ function InventarioContent() {
                       </div>
                       <div className="p-3 space-y-2">
                         {children.map((ing) => (
-                          <div
-                            key={ing.id}
-                            className="flex items-center gap-2"
-                          >
+                          <div key={ing.id} className="flex items-center gap-2">
                             <div className="flex-1 min-w-0">
                               <Link href={`/ingredientes/${ing.id}`} className="text-sm truncate block text-[#8B1A2B] hover:underline" title={ing.nombre}>
                                 {ing.nombre}
@@ -821,7 +855,34 @@ function InventarioContent() {
                       </div>
                     </div>
                   );
-                })}
+                };
+
+                return (
+                  <>
+                    {cafeSections.map((section) => {
+                      const sectionParents = allParents.filter((p) => {
+                        if (assigned.has(p.id)) return false;
+                        const n = p.nombre.toLowerCase();
+                        return section.keywords.some((kw) => n.includes(kw));
+                      });
+                      sectionParents.forEach((p) => assigned.add(p.id));
+                      const cards = sectionParents
+                        .sort((a, b) => a.nombre.localeCompare(b.nombre, "es"))
+                        .map(renderParentCard)
+                        .filter(Boolean);
+                      if (cards.length === 0) return null;
+                      return (
+                        <div key={section.title} className="space-y-3">
+                          <h3 className="text-base font-bold text-[#3D2E22] border-b border-[#D4C4A8] pb-1">
+                            {section.title}
+                          </h3>
+                          {cards}
+                        </div>
+                      );
+                    })}
+                  </>
+                );
+              })()}
             </div>
           )}
 
