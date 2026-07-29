@@ -256,8 +256,16 @@ function InventarioContent() {
             const regs = data.snapshot?.registros || [];
             if (regs.length === 0) return;
             const ids = regs.map((r) => r.ingrediente_id);
+            // Also include parent IDs so aggregated coffee recommendations appear
+            const childIngIds = new Set(ids);
+            for (const ing of ingredientes) {
+              if (ing.grupo_ingrediente_id && childIngIds.has(ing.id)) {
+                ids.push(ing.grupo_ingrediente_id);
+              }
+            }
+            const uniqueIds = Array.from(new Set(ids));
             apiFetch<{ items: RecomendacionItem[] }>(
-              `/api/inventario/recomendacion?ingrediente_ids=${ids.join(",")}`
+              `/api/inventario/recomendacion?ingrediente_ids=${uniqueIds.join(",")}`
             ).then((rec) => {
               const draft = loadDraftCantidades();
               const cantidades: Record<number, string> = {};
@@ -1148,7 +1156,12 @@ function InventarioContent() {
               </div>
 
               {(() => {
-                const vistaRecs = recomendaciones.filter((r) => matchesVista(r.ingrediente_id, r.ingrediente_nombre));
+                const childIdsWithParent = new Set(
+                  ingredientes.filter((i) => i.grupo_ingrediente_id).map((i) => i.id)
+                );
+                const vistaRecs = recomendaciones
+                  .filter((r) => matchesVista(r.ingrediente_id, r.ingrediente_nombre))
+                  .filter((r) => !childIdsWithParent.has(r.ingrediente_id));
                 const proveedores = Array.from(
                   new Set(vistaRecs.map((r) => r.proveedor))
                 ).sort((a, b) => a.localeCompare(b, "es"));
