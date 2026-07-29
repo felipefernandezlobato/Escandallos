@@ -125,6 +125,8 @@ class Proveedor(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     nombre: Mapped[str] = mapped_column(String(200), nullable=False, unique=True)
     notas: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    lead_time_dias: Mapped[int] = mapped_column(Integer, nullable=False, default=2, server_default=sa_text("2"))
+    ciclo_pedido_dias: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
 
     precios: Mapped[List["PrecioProveedor"]] = relationship(back_populates="proveedor_rel", cascade="all, delete-orphan")
 

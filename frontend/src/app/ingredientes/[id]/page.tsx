@@ -36,6 +36,8 @@ export default function IngredienteDetailPage() {
     tendencia: string;
     reorder_point?: number | null;
     eoq?: number | null;
+    cycle_weeks?: number | null;
+    lead_weeks?: number | null;
     historial: Array<{ semana: string; cantidad: number; unidad: string }>;
     stock_historial: Array<{ fecha: string; cantidad: number; unidad: string }>;
   } | null>(null);
@@ -394,6 +396,34 @@ export default function IngredienteDetailPage() {
               </button>
             </div>
           </div>
+
+          {/* Supply Chain Stats */}
+          {(consumo.cycle_weeks != null || consumo.lead_weeks != null) && (
+            <div className="grid grid-cols-3 gap-3">
+              {consumo.lead_weeks != null && (
+                <div className="bg-[#F5F0E8] rounded-lg p-3 text-center">
+                  <p className="text-xs text-[#6B5E52] mb-1">Lead Time</p>
+                  <p className="text-lg font-bold text-[#3D2E22]">{Math.round(consumo.lead_weeks * 7)}d</p>
+                </div>
+              )}
+              {consumo.cycle_weeks != null && (
+                <div className="bg-[#F5F0E8] rounded-lg p-3 text-center">
+                  <p className="text-xs text-[#6B5E52] mb-1">Ciclo Pedido</p>
+                  <p className="text-lg font-bold text-[#3D2E22]">
+                    {consumo.cycle_weeks === 1 ? "semanal" : `${Math.round(consumo.cycle_weeks * 7)}d`}
+                  </p>
+                </div>
+              )}
+              {consumo.cycle_weeks != null && consumo.consumo_medio > 0 && (
+                <div className="bg-[#F5F0E8] rounded-lg p-3 text-center">
+                  <p className="text-xs text-[#6B5E52] mb-1">Consumo/Ciclo</p>
+                  <p className="text-lg font-bold text-[#3D2E22]">
+                    {Math.round(consumo.consumo_medio * consumo.cycle_weeks * 10) / 10} {consumo.unidad}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Stock Control Chart */}
           {consumo.stock_historial && consumo.stock_historial.length > 0 && (() => {

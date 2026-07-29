@@ -1374,6 +1374,9 @@ function InventarioContent() {
                     {(consumoDetalle as Record<string, unknown>).cycle_weeks != null && (
                       <> — Ciclo pedido: {(consumoDetalle as Record<string, unknown>).cycle_weeks === 1 ? "semanal" : `${(consumoDetalle as Record<string, unknown>).cycle_weeks} sem`}</>
                     )}
+                    {(consumoDetalle as Record<string, unknown>).lead_weeks != null && (
+                      <> — Lead time: {Math.round(((consumoDetalle as Record<string, unknown>).lead_weeks as number) * 7)}d</>
+                    )}
                     {consumoDetalle.reorder_point != null && (
                       <> — Seguridad: {consumoDetalle.reorder_point} {consumoDetalle.unidad}</>
                     )}

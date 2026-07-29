@@ -5,7 +5,7 @@ from typing import List, Optional
 from sqlalchemy import distinct, func
 from sqlalchemy.orm import Session
 
-from app.models import InventarioRegistro, LineaPedido, Pedido, Ingrediente
+from app.models import InventarioRegistro, LineaPedido, Pedido, Ingrediente, Proveedor
 
 
 def _base_unit(unit_str: str) -> str:
@@ -189,28 +189,50 @@ def ciclo_pedido_semanas(ingrediente_id: int, db: Session) -> float:
     return max(1.0, round(avg_days / 7, 1))
 
 
+def _lead_time_weeks(ingrediente_id: int, db: Session) -> float:
+    """Look up lead time from the ingredient's supplier. Default 2 days."""
+    ing = db.query(Ingrediente).get(ingrediente_id)
+    if ing and ing.proveedor:
+        prov = db.query(Proveedor).filter(Proveedor.nombre == ing.proveedor).first()
+        if prov:
+            return prov.lead_time_dias / 7.0
+    return 2.0 / 7.0
+
+
+def _supplier_cycle_override(ingrediente_id: int, db: Session) -> Optional[float]:
+    """Check if the supplier has a fixed ordering cycle override."""
+    ing = db.query(Ingrediente).get(ingrediente_id)
+    if ing and ing.proveedor:
+        prov = db.query(Proveedor).filter(Proveedor.nombre == ing.proveedor).first()
+        if prov and prov.ciclo_pedido_dias:
+            return prov.ciclo_pedido_dias / 7.0
+    return None
+
+
 def calcular_par_y_safety(
     ingrediente_id: int, db: Session
 ) -> dict:
-    """Calculate safety stock and par level using auto-detected ordering cycle.
-    Returns dict with cycle_weeks, safety_stock, par_level, or None values
-    when insufficient data.
+    """Calculate safety stock and par level using auto-detected ordering cycle
+    and supplier-specific lead time.
+    Returns dict with cycle_weeks, lead_weeks, safety_stock, par_level,
+    or None values when insufficient data.
     """
     media = consumo_medio_semanal(ingrediente_id, db)
     if media <= 0:
-        return {"cycle_weeks": 1.0, "safety_stock": None, "par_level": None}
+        return {"cycle_weeks": 1.0, "lead_weeks": None, "safety_stock": None, "par_level": None}
 
     historial = consumo_semanal(ingrediente_id, db)
     if len(historial) < 3:
-        return {"cycle_weeks": 1.0, "safety_stock": None, "par_level": None}
+        return {"cycle_weeks": 1.0, "lead_weeks": None, "safety_stock": None, "par_level": None}
 
     weekly_vals = [h["cantidad"] for h in historial]
     avg = sum(weekly_vals) / len(weekly_vals)
     variance = sum((v - avg) ** 2 for v in weekly_vals) / len(weekly_vals)
     std_dev = math.sqrt(variance)
 
-    cycle_weeks = ciclo_pedido_semanas(ingrediente_id, db)
-    lead_weeks = 1.0
+    cycle_override = _supplier_cycle_override(ingrediente_id, db)
+    cycle_weeks = cycle_override if cycle_override else ciclo_pedido_semanas(ingrediente_id, db)
+    lead_weeks = _lead_time_weeks(ingrediente_id, db)
 
     safety = round(1.65 * std_dev * math.sqrt(lead_weeks), 1)
     safety = min(safety, media * cycle_weeks * 0.5)
@@ -218,7 +240,8 @@ def calcular_par_y_safety(
     safety = round(safety, 1)
 
     return {
-        "cycle_weeks": cycle_weeks,
+        "cycle_weeks": round(cycle_weeks, 2),
+        "lead_weeks": round(lead_weeks, 2),
         "safety_stock": safety,
         "par_level": par_level,
     }

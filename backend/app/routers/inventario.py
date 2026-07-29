@@ -454,6 +454,7 @@ def obtener_consumo(
         safety_stock=rop,
         par_level=eoq,
         cycle_weeks=calc["cycle_weeks"],
+        lead_weeks=calc.get("lead_weeks"),
         historial=[
             ConsumoSemanalItem(semana=h["semana"], cantidad=h["cantidad"], unidad=display_unit)
             for h in historial
