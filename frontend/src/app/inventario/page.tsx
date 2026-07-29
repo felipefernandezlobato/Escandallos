@@ -472,9 +472,12 @@ function InventarioContent() {
       setUltimoConteo(conteo);
       fetchRegistrosHoy();
 
-      const newIds = registros.map((r) => r.ingrediente_id);
+      // Fetch ALL of today's registros to include everything, not just this batch
+      const hoy = new Date().toISOString().slice(0, 10);
+      const todayData = await apiFetch<{ snapshot: InventarioSnapshot | null }>(`/api/inventario?fecha=${hoy}`);
+      const todayIds = (todayData.snapshot?.registros || []).map((r) => r.ingrediente_id);
       const saved = loadRecomendaciones();
-      const allIds = Array.from(new Set([...(saved?.ids || []), ...newIds]));
+      const allIds = Array.from(new Set([...(saved?.ids || []), ...todayIds]));
       const rec = await apiFetch<{ items: RecomendacionItem[] }>(
         `/api/inventario/recomendacion?ingrediente_ids=${allIds.join(",")}`
       );
