@@ -243,34 +243,34 @@ function InventarioContent() {
         setStock(initial);
         setTimeout(() => setDraftReady(true), 0);
 
-        const savedRec = loadRecomendaciones();
-        if (savedRec && savedRec.items.length > 0) {
-          setRecomendaciones(savedRec.items);
-          setCantidadesPedido(savedRec.cantidades);
-          setHasRecomendaciones(true);
-          setShowRecomendaciones(true);
-        } else {
-          const hoy = new Date().toISOString().slice(0, 10);
-          apiFetch<{ snapshot: InventarioSnapshot | null }>(`/api/inventario?fecha=${hoy}`)
-            .then((data) => {
-              const regs = data.snapshot?.registros || [];
-              if (regs.length > 0) {
-                const ids = regs.map((r) => r.ingrediente_id);
-                apiFetch<{ items: RecomendacionItem[] }>(
-                  `/api/inventario/recomendacion?ingrediente_ids=${ids.join(",")}`
-                ).then((rec) => {
-                  const cantidades: Record<number, string> = {};
-                  for (const item of rec.items) {
-                    cantidades[item.ingrediente_id] = String(item.cantidad_sugerida);
-                  }
-                  saveRecomendaciones(ids, rec.items, cantidades);
-                  setRecomendaciones(rec.items);
-                  setCantidadesPedido(cantidades);
-                  setHasRecomendaciones(true);
-                });
+        // Always fetch today's registros to build complete recommendations
+        const hoy = new Date().toISOString().slice(0, 10);
+        apiFetch<{ snapshot: InventarioSnapshot | null }>(`/api/inventario?fecha=${hoy}`)
+          .then((data) => {
+            const regs = data.snapshot?.registros || [];
+            if (regs.length === 0) return;
+            const ids = regs.map((r) => r.ingrediente_id);
+            const savedRec = loadRecomendaciones();
+            // Skip re-fetch if localStorage already has all of today's IDs
+            if (savedRec && ids.every((id) => savedRec.ids.includes(id))) {
+              setRecomendaciones(savedRec.items);
+              setCantidadesPedido(savedRec.cantidades);
+              setHasRecomendaciones(true);
+              return;
+            }
+            apiFetch<{ items: RecomendacionItem[] }>(
+              `/api/inventario/recomendacion?ingrediente_ids=${ids.join(",")}`
+            ).then((rec) => {
+              const cantidades: Record<number, string> = {};
+              for (const item of rec.items) {
+                cantidades[item.ingrediente_id] = String(item.cantidad_sugerida);
               }
+              saveRecomendaciones(ids, rec.items, cantidades);
+              setRecomendaciones(rec.items);
+              setCantidadesPedido(cantidades);
+              setHasRecomendaciones(true);
             });
-        }
+          });
       })
       .finally(() => setLoading(false));
   }, []);
