@@ -194,6 +194,14 @@ function InventarioContent() {
   const [newCoffeeName, setNewCoffeeName] = useState("");
   const [newCoffeeParent, setNewCoffeeParent] = useState<number | null>(null);
   const [savingCoffeeToggle, setSavingCoffeeToggle] = useState<number | null>(null);
+  const [showCafeAnalisis, setShowCafeAnalisis] = useState(false);
+  const [cafeAnalisisData, setCafeAnalisisData] = useState<Array<{
+    id: number; nombre: string;
+    consumo_medio: number; unidad: string; tendencia: string;
+    safety_stock: number | null; par_level: number | null;
+    cycle_weeks: number | null; lead_weeks: number | null;
+    stock: number;
+  }>>([]);
 
   const fetchRegistrosHoy = () => {
     const hoy = new Date().toISOString().slice(0, 10);
@@ -783,13 +791,138 @@ function InventarioContent() {
                     </button>
                   </div>
                 </div>
-                <button
-                  onClick={() => setShowGestionarCafes(true)}
-                  className="px-3 py-1.5 text-sm font-medium bg-white border border-[#D4C4A8] text-[#6B5E52] rounded-lg hover:bg-[#F5F0E8] transition-colors"
-                >
-                  Gestionar Cafes
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={async () => {
+                      if (showCafeAnalisis) {
+                        setShowCafeAnalisis(false);
+                        return;
+                      }
+                      const pids = Array.from(parentIds);
+                      const results = await Promise.all(
+                        pids.map((pid) =>
+                          apiFetch<{ consumo_medio: number; unidad: string; tendencia: string; safety_stock?: number | null; par_level?: number | null; cycle_weeks?: number | null; lead_weeks?: number | null }>(
+                            `/api/inventario/consumo/${pid}?semanas=12`
+                          ).then((d) => ({ id: pid, ...d })).catch(() => null)
+                        )
+                      );
+                      const stockData = await Promise.all(
+                        pids.map((pid) =>
+                          apiFetch<Array<{ ingrediente_id: number; cantidad: number; unidad: string }>>(
+                            `/api/inventario/actual`
+                          ).then((items) => {
+                            const item = items.find((i: { ingrediente_id: number }) => i.ingrediente_id === pid);
+                            return { id: pid, stock: item ? item.cantidad : 0 };
+                          }).catch(() => ({ id: pid, stock: 0 }))
+                        )
+                      );
+                      const stockMap: Record<number, number> = {};
+                      for (const s of stockData) stockMap[s.id] = s.stock;
+                      const data = results
+                        .filter(Boolean)
+                        .map((r) => {
+                          const parent = ingredientes.find((i) => i.id === r!.id);
+                          return {
+                            id: r!.id,
+                            nombre: parent?.nombre || `#${r!.id}`,
+                            consumo_medio: r!.consumo_medio,
+                            unidad: r!.unidad,
+                            tendencia: r!.tendencia,
+                            safety_stock: r!.safety_stock ?? null,
+                            par_level: r!.par_level ?? null,
+                            cycle_weeks: r!.cycle_weeks ?? null,
+                            lead_weeks: r!.lead_weeks ?? null,
+                            stock: stockMap[r!.id] || 0,
+                          };
+                        })
+                        .filter((d) => d.consumo_medio > 0 || d.stock > 0);
+                      setCafeAnalisisData(data);
+                      setShowCafeAnalisis(true);
+                    }}
+                    className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
+                      showCafeAnalisis
+                        ? "bg-[#8B1A2B] text-white"
+                        : "bg-white border border-[#8B1A2B] text-[#8B1A2B] hover:bg-[#F2E8EA]"
+                    }`}
+                  >
+                    Analisis Cafe
+                  </button>
+                  <button
+                    onClick={() => setShowGestionarCafes(true)}
+                    className="px-3 py-1.5 text-sm font-medium bg-white border border-[#D4C4A8] text-[#6B5E52] rounded-lg hover:bg-[#F5F0E8] transition-colors"
+                  >
+                    Gestionar Cafes
+                  </button>
+                </div>
               </div>
+
+              {/* Cafe Analysis Panel */}
+              {showCafeAnalisis && cafeAnalisisData.length > 0 && (
+                <div className="bg-white border border-[#E8DFD3] rounded-lg overflow-hidden">
+                  <div className="px-4 py-3 bg-[#F5F0E8] border-b border-[#E8DFD3]">
+                    <h3 className="text-sm font-semibold text-[#8B1A2B] uppercase tracking-wider">
+                      Resumen Cafe — Pedidos
+                    </h3>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-[#E8DFD3] text-[#6B5E52]">
+                          <th className="text-left px-3 py-2 font-medium">Grupo</th>
+                          <th className="text-right px-3 py-2 font-medium">Stock</th>
+                          <th className="text-right px-3 py-2 font-medium">Consumo/sem</th>
+                          <th className="text-right px-3 py-2 font-medium">Stk Deseado</th>
+                          <th className="text-right px-3 py-2 font-medium">Pedir</th>
+                          <th className="text-right px-3 py-2 font-medium">Tendencia</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {cafeAnalisisData
+                          .sort((a, b) => {
+                            const colorOrder = ["marrón", "marron", "rojo", "black", "negro", "gold", "oro"];
+                            const na = a.nombre.toLowerCase();
+                            const nb = b.nombre.toLowerCase();
+                            const ia = colorOrder.findIndex((c) => na.includes(c));
+                            const ib = colorOrder.findIndex((c) => nb.includes(c));
+                            if (ia !== -1 && ib !== -1) return ia - ib;
+                            if (ia !== -1) return -1;
+                            if (ib !== -1) return 1;
+                            return na.localeCompare(nb, "es");
+                          })
+                          .map((d) => {
+                            const pedir = d.par_level ? Math.max(0, d.par_level - d.stock) : 0;
+                            return (
+                              <tr key={d.id} className="border-b border-[#E8DFD3] hover:bg-[#F5F0E8]/50">
+                                <td className="px-3 py-2">
+                                  <Link href={`/ingredientes/${d.id}`} className="text-[#8B1A2B] hover:underline font-medium">
+                                    {d.nombre}
+                                  </Link>
+                                </td>
+                                <td className="text-right px-3 py-2 font-medium">
+                                  {d.stock > 0 ? d.stock.toFixed(1) : "—"} {d.unidad}
+                                </td>
+                                <td className="text-right px-3 py-2">
+                                  {d.consumo_medio > 0 ? d.consumo_medio.toFixed(1) : "—"} {d.unidad}
+                                </td>
+                                <td className="text-right px-3 py-2">
+                                  {d.par_level ? d.par_level.toFixed(1) : "—"} {d.unidad}
+                                </td>
+                                <td className={`text-right px-3 py-2 font-bold ${pedir > 0 ? "text-[#8B1A2B]" : "text-green-600"}`}>
+                                  {pedir > 0 ? pedir.toFixed(1) : "0"}
+                                </td>
+                                <td className={`text-right px-3 py-2 ${
+                                  d.tendencia === "subiendo" ? "text-red-600" : d.tendencia === "bajando" ? "text-green-600" : "text-[#6B5E52]"
+                                }`}>
+                                  {d.tendencia === "subiendo" ? "↑" : d.tendencia === "bajando" ? "↓" : "→"}
+                                </td>
+                              </tr>
+                            );
+                          })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
 
               {(() => {
                 const allParents = Array.from(parentIds)
