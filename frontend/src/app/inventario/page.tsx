@@ -799,43 +799,65 @@ function InventarioContent() {
                         return;
                       }
                       const pids = Array.from(parentIds);
-                      const results = await Promise.all(
-                        pids.map((pid) =>
-                          apiFetch<{ consumo_medio: number; unidad: string; tendencia: string; safety_stock?: number | null; par_level?: number | null; cycle_weeks?: number | null; lead_weeks?: number | null }>(
-                            `/api/inventario/consumo/${pid}?semanas=12`
-                          ).then((d) => ({ id: pid, ...d })).catch(() => null)
-                        )
-                      );
-                      const stockData = await Promise.all(
-                        pids.map((pid) =>
-                          apiFetch<Array<{ ingrediente_id: number; cantidad: number; unidad: string }>>(
-                            `/api/inventario/actual`
-                          ).then((items) => {
-                            const item = items.find((i: { ingrediente_id: number }) => i.ingrediente_id === pid);
-                            return { id: pid, stock: item ? item.cantidad : 0 };
-                          }).catch(() => ({ id: pid, stock: 0 }))
-                        )
-                      );
+                      const [results, allStock] = await Promise.all([
+                        Promise.all(
+                          pids.map((pid) =>
+                            apiFetch<{ consumo_medio: number; unidad: string; tendencia: string; safety_stock?: number | null; par_level?: number | null; cycle_weeks?: number | null; lead_weeks?: number | null }>(
+                              `/api/inventario/consumo/${pid}?semanas=12`
+                            ).then((d) => ({ id: pid, ...d })).catch(() => null)
+                          )
+                        ),
+                        apiFetch<Array<{ ingrediente_id: number; cantidad: number; unidad: string; ubicaciones?: Record<string, { cantidad: number; unidad: string }> }>>(
+                          `/api/inventario/actual`
+                        ).catch(() => [] as Array<{ ingrediente_id: number; cantidad: number; unidad: string }>),
+                      ]);
                       const stockMap: Record<number, number> = {};
-                      for (const s of stockData) stockMap[s.id] = s.stock;
-                      const data = results
-                        .filter(Boolean)
-                        .map((r) => {
-                          const parent = ingredientes.find((i) => i.id === r!.id);
-                          return {
-                            id: r!.id,
-                            nombre: parent?.nombre || `#${r!.id}`,
-                            consumo_medio: r!.consumo_medio,
-                            unidad: r!.unidad,
-                            tendencia: r!.tendencia,
-                            safety_stock: r!.safety_stock ?? null,
-                            par_level: r!.par_level ?? null,
-                            cycle_weeks: r!.cycle_weeks ?? null,
-                            lead_weeks: r!.lead_weeks ?? null,
-                            stock: stockMap[r!.id] || 0,
-                          };
-                        })
-                        .filter((d) => d.consumo_medio > 0 || d.stock > 0);
+                      const ubicMap: Record<number, Record<string, number>> = {};
+                      for (const item of allStock) {
+                        stockMap[item.ingrediente_id] = item.cantidad;
+                        if ((item as Record<string, unknown>).ubicaciones) {
+                          ubicMap[item.ingrediente_id] = {};
+                          for (const [loc, val] of Object.entries((item as Record<string, unknown>).ubicaciones as Record<string, { cantidad: number }>)) {
+                            ubicMap[item.ingrediente_id][loc] = val.cantidad;
+                          }
+                        }
+                      }
+                      const data: typeof cafeAnalisisData = [];
+                      for (const r of results) {
+                        if (!r) continue;
+                        const parent = ingredientes.find((i) => i.id === r.id);
+                        const nombre = parent?.nombre || `#${r.id}`;
+                        const isFrozen = nombre.toLowerCase().includes("frozen") || nombre.toLowerCase().includes("tubo");
+                        if (isFrozen && ubicMap[r.id]) {
+                          for (const loc of ["BRU1", "BRU2"]) {
+                            data.push({
+                              id: r.id * 1000 + (loc === "BRU1" ? 1 : 2),
+                              nombre: `Frozen ${loc}`,
+                              consumo_medio: r.consumo_medio,
+                              unidad: r.unidad,
+                              tendencia: r.tendencia,
+                              safety_stock: r.safety_stock ?? null,
+                              par_level: r.par_level ?? null,
+                              cycle_weeks: r.cycle_weeks ?? null,
+                              lead_weeks: r.lead_weeks ?? null,
+                              stock: ubicMap[r.id]?.[loc] || 0,
+                            });
+                          }
+                        } else if (r.consumo_medio > 0 || (stockMap[r.id] || 0) > 0) {
+                          data.push({
+                            id: r.id,
+                            nombre,
+                            consumo_medio: r.consumo_medio,
+                            unidad: r.unidad,
+                            tendencia: r.tendencia,
+                            safety_stock: r.safety_stock ?? null,
+                            par_level: r.par_level ?? null,
+                            cycle_weeks: r.cycle_weeks ?? null,
+                            lead_weeks: r.lead_weeks ?? null,
+                            stock: stockMap[r.id] || 0,
+                          });
+                        }
+                      }
                       setCafeAnalisisData(data);
                       setShowCafeAnalisis(true);
                     }}
@@ -889,7 +911,9 @@ function InventarioContent() {
                             else if (n.includes("200") && n.includes("black")) { displayNames[d.id] = "200g BLACK"; sortOrder[d.id] = 5; }
                             else if (n.includes("gold") || n.includes("130")) { displayNames[d.id] = "130g GOLD"; sortOrder[d.id] = 6; }
                             else if (n.includes("cápsula") || n.includes("capsula")) { displayNames[d.id] = "Cápsulas"; sortOrder[d.id] = 7; }
-                            else if (n.includes("frozen") || n.includes("tubo")) { displayNames[d.id] = d.nombre; sortOrder[d.id] = 8; }
+                            else if (n === "frozen bru1") { displayNames[d.id] = "Frozen BRU1"; sortOrder[d.id] = 8; }
+                            else if (n === "frozen bru2") { displayNames[d.id] = "Frozen BRU2"; sortOrder[d.id] = 9; }
+                            else if (n.includes("frozen") || n.includes("tubo")) { displayNames[d.id] = d.nombre; sortOrder[d.id] = 10; }
                             else { displayNames[d.id] = d.nombre; sortOrder[d.id] = 99; }
                           }
                           return cafeAnalisisData
