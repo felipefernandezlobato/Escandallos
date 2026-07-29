@@ -822,6 +822,24 @@ function InventarioContent() {
                           }
                         }
                       }
+                      // Aggregate children stock to parents
+                      for (const pid of pids) {
+                        if (stockMap[pid] !== undefined) continue;
+                        const children = ingredientes.filter((i) => i.grupo_ingrediente_id === pid);
+                        if (children.length === 0) continue;
+                        let total = 0;
+                        const locTotals: Record<string, number> = {};
+                        for (const child of children) {
+                          total += stockMap[child.id] || 0;
+                          if (ubicMap[child.id]) {
+                            for (const [loc, qty] of Object.entries(ubicMap[child.id])) {
+                              locTotals[loc] = (locTotals[loc] || 0) + qty;
+                            }
+                          }
+                        }
+                        stockMap[pid] = total;
+                        if (Object.keys(locTotals).length > 0) ubicMap[pid] = locTotals;
+                      }
                       const data: typeof cafeAnalisisData = [];
                       for (const r of results) {
                         if (!r) continue;
