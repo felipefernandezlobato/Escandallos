@@ -877,25 +877,30 @@ function InventarioContent() {
                         </tr>
                       </thead>
                       <tbody>
-                        {cafeAnalisisData
-                          .sort((a, b) => {
-                            const colorOrder = ["marrón", "marron", "rojo", "black", "negro", "gold", "oro"];
-                            const na = a.nombre.toLowerCase();
-                            const nb = b.nombre.toLowerCase();
-                            const ia = colorOrder.findIndex((c) => na.includes(c));
-                            const ib = colorOrder.findIndex((c) => nb.includes(c));
-                            if (ia !== -1 && ib !== -1) return ia - ib;
-                            if (ia !== -1) return -1;
-                            if (ib !== -1) return 1;
-                            return na.localeCompare(nb, "es");
-                          })
+                        {(() => {
+                          const displayNames: Record<string, string> = {};
+                          const sortOrder: Record<string, number> = {};
+                          for (const d of cafeAnalisisData) {
+                            const n = d.nombre.toLowerCase();
+                            if (n.includes("grano") && n.includes("marr")) { displayNames[d.id] = "Kilo MARRÓN"; sortOrder[d.id] = 1; }
+                            else if (n.includes("grano") && n.includes("rojo")) { displayNames[d.id] = "Kilo ROJO"; sortOrder[d.id] = 2; }
+                            else if (n.includes("200") && n.includes("marr")) { displayNames[d.id] = "200g MARRÓN"; sortOrder[d.id] = 3; }
+                            else if (n.includes("200") && n.includes("rojo")) { displayNames[d.id] = "200g ROJO"; sortOrder[d.id] = 4; }
+                            else if (n.includes("200") && n.includes("black")) { displayNames[d.id] = "200g BLACK"; sortOrder[d.id] = 5; }
+                            else if (n.includes("gold") || n.includes("130")) { displayNames[d.id] = "130g GOLD"; sortOrder[d.id] = 6; }
+                            else if (n.includes("cápsula") || n.includes("capsula")) { displayNames[d.id] = "Cápsulas"; sortOrder[d.id] = 7; }
+                            else if (n.includes("frozen") || n.includes("tubo")) { displayNames[d.id] = d.nombre; sortOrder[d.id] = 8; }
+                            else { displayNames[d.id] = d.nombre; sortOrder[d.id] = 99; }
+                          }
+                          return cafeAnalisisData
+                          .sort((a, b) => (sortOrder[a.id] || 99) - (sortOrder[b.id] || 99))
                           .map((d) => {
                             const pedir = d.par_level ? Math.max(0, d.par_level - d.stock) : 0;
                             return (
                               <tr key={d.id} className="border-b border-[#E8DFD3] hover:bg-[#F5F0E8]/50">
                                 <td className="px-3 py-2">
                                   <Link href={`/ingredientes/${d.id}`} className="text-[#8B1A2B] hover:underline font-medium">
-                                    {d.nombre}
+                                    {displayNames[d.id] || d.nombre}
                                   </Link>
                                 </td>
                                 <td className="text-right px-3 py-2 font-medium">
@@ -917,7 +922,8 @@ function InventarioContent() {
                                 </td>
                               </tr>
                             );
-                          })}
+                          });
+                        })()}
                       </tbody>
                     </table>
                   </div>
