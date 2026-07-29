@@ -28,7 +28,7 @@ interface InventarioSnapshot {
 }
 
 const STORAGE_KEY = "bru_inventario_draft";
-const REC_STORAGE_KEY = "bru_recomendaciones";
+const REC_STORAGE_KEY = "bru_recomendaciones_v2";
 
 interface SavedRecomendaciones {
   ts: number;
