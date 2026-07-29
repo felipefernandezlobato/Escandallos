@@ -941,9 +941,13 @@ function InventarioContent() {
                             return (
                               <tr key={d.id} className="border-b border-[#E8DFD3] hover:bg-[#F5F0E8]/50">
                                 <td className="px-3 py-2">
-                                  <Link href={`/ingredientes/${d.id}`} className="text-[#8B1A2B] hover:underline font-medium">
-                                    {displayNames[d.id] || d.nombre}
-                                  </Link>
+                                  {d.id > 100000 ? (
+                                    <span className="text-[#8B1A2B] font-medium">{displayNames[d.id] || d.nombre}</span>
+                                  ) : (
+                                    <Link href={`/ingredientes/${d.id}`} className="text-[#8B1A2B] hover:underline font-medium">
+                                      {displayNames[d.id] || d.nombre}
+                                    </Link>
+                                  )}
                                 </td>
                                 <td className="text-right px-3 py-2 font-medium">
                                   {d.stock > 0 ? d.stock.toFixed(1) : "—"} {d.unidad}
