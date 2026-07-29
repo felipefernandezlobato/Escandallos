@@ -175,6 +175,7 @@ function InventarioContent() {
   const [ultimoConteo, setUltimoConteo] = useState<Record<string, { fecha: string; unidad: string }>>({});
   const [recomendaciones, setRecomendaciones] = useState<RecomendacionItem[]>([]);
   const [showRecomendaciones, setShowRecomendaciones] = useState(false);
+  const [hasRecomendaciones, setHasRecomendaciones] = useState(false);
   const [cantidadesPedido, setCantidadesPedido] = useState<Record<number, string>>({});
   const [creatingOrder, setCreatingOrder] = useState(false);
   const [registrosHoy, setRegistrosHoy] = useState<Array<{
@@ -246,9 +247,9 @@ function InventarioContent() {
         if (savedRec && savedRec.items.length > 0) {
           setRecomendaciones(savedRec.items);
           setCantidadesPedido(savedRec.cantidades);
+          setHasRecomendaciones(true);
           setShowRecomendaciones(true);
         } else {
-          // No saved recommendations — check if there are registros from today
           const hoy = new Date().toISOString().slice(0, 10);
           apiFetch<{ snapshot: InventarioSnapshot | null }>(`/api/inventario?fecha=${hoy}`)
             .then((data) => {
@@ -265,6 +266,7 @@ function InventarioContent() {
                   saveRecomendaciones(ids, rec.items, cantidades);
                   setRecomendaciones(rec.items);
                   setCantidadesPedido(cantidades);
+                  setHasRecomendaciones(true);
                 });
               }
             });
@@ -485,6 +487,7 @@ function InventarioContent() {
       }
       setCantidadesPedido(initial);
       saveRecomendaciones(allIds, rec.items, initial);
+      setHasRecomendaciones(true);
       setShowRecomendaciones(true);
     } catch (err) {
       toast("Error al guardar: " + (err as Error).message, "error");
@@ -901,15 +904,15 @@ function InventarioContent() {
                 {lastSaved && <span>Guardado a las {lastSaved}</span>}
               </div>
               <div className="flex items-center gap-2">
-                {loadRecomendaciones() && (
+                {hasRecomendaciones && (
                   <button
                     onClick={() => {
                       const saved = loadRecomendaciones();
                       if (saved) {
                         setRecomendaciones(saved.items);
                         setCantidadesPedido(saved.cantidades);
-                        setShowRecomendaciones(true);
                       }
+                      setShowRecomendaciones(true);
                     }}
                     className="bg-white border border-[#8B1A2B] text-[#8B1A2B] px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#F2E8EA] transition-colors"
                   >
