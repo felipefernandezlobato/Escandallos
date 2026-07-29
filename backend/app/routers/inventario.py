@@ -1,4 +1,3 @@
-import math
 from datetime import date, datetime, timedelta
 from typing import Optional
 
@@ -434,27 +433,10 @@ def obtener_consumo(
     if registros_stock:
         display_unit = registros_stock[-1].unidad
 
-    rop = None
-    eoq = None
-    if media > 0 and len(historial) >= 3:
-        weekly_vals = [h["cantidad"] for h in historial]
-        avg = sum(weekly_vals) / len(weekly_vals)
-        variance = sum((v - avg) ** 2 for v in weekly_vals) / len(weekly_vals)
-        std_dev = math.sqrt(variance)
-
-        # Coffee is ordered monthly (4-week cycle) with 1-week lead time
-        is_coffee = "café en grano" in ing.nombre.lower() or "coffee retail" in ing.nombre.lower()
-        if is_coffee:
-            lead_weeks = 1
-            cycle_weeks = 4
-            safety = round(1.65 * std_dev * math.sqrt(lead_weeks), 1)
-            rop = round(avg * lead_weeks + safety, 1)
-            eoq = round(avg * (cycle_weeks + lead_weeks) + safety, 1)
-        else:
-            safety = min(1.65 * std_dev, 0.5 * media)
-            safety = round(safety, 1)
-            rop = safety
-            eoq = round(media + safety, 1)
+    from app.services.consumo import calcular_par_y_safety
+    calc = calcular_par_y_safety(ingrediente_id, db)
+    rop = calc["safety_stock"]
+    eoq = calc["par_level"]
 
     stock_points: list[StockHistorialItem] = [
         StockHistorialItem(fecha=str(r.fecha_registro), cantidad=r.cantidad, unidad=r.unidad)
@@ -471,6 +453,7 @@ def obtener_consumo(
         eoq=eoq,
         safety_stock=rop,
         par_level=eoq,
+        cycle_weeks=calc["cycle_weeks"],
         historial=[
             ConsumoSemanalItem(semana=h["semana"], cantidad=h["cantidad"], unidad=display_unit)
             for h in historial

@@ -2,7 +2,7 @@ import math
 from datetime import date, timedelta
 from typing import List, Optional
 
-from sqlalchemy import func
+from sqlalchemy import distinct, func
 from sqlalchemy.orm import Session
 
 from app.models import InventarioRegistro, LineaPedido, Pedido, Ingrediente
@@ -166,6 +166,64 @@ def tendencia_consumo(historial: list[dict]) -> str:
     return "estable"
 
 
+def ciclo_pedido_semanas(ingrediente_id: int, db: Session) -> float:
+    """Auto-detect ordering cycle in weeks from order history.
+    Returns 1.0 (weekly) as default when insufficient data.
+    """
+    order_dates = (
+        db.query(distinct(Pedido.fecha_recepcion))
+        .join(LineaPedido)
+        .filter(
+            LineaPedido.ingrediente_id == ingrediente_id,
+            Pedido.estado == "recibido",
+            LineaPedido.cantidad_recibida.isnot(None),
+        )
+        .order_by(Pedido.fecha_recepcion)
+        .all()
+    )
+    if len(order_dates) < 3:
+        return 1.0
+    dates = [d[0] for d in order_dates]
+    gaps = [(dates[i + 1] - dates[i]).days for i in range(len(dates) - 1)]
+    avg_days = sum(gaps) / len(gaps)
+    return max(1.0, round(avg_days / 7, 1))
+
+
+def calcular_par_y_safety(
+    ingrediente_id: int, db: Session
+) -> dict:
+    """Calculate safety stock and par level using auto-detected ordering cycle.
+    Returns dict with cycle_weeks, safety_stock, par_level, or None values
+    when insufficient data.
+    """
+    media = consumo_medio_semanal(ingrediente_id, db)
+    if media <= 0:
+        return {"cycle_weeks": 1.0, "safety_stock": None, "par_level": None}
+
+    historial = consumo_semanal(ingrediente_id, db)
+    if len(historial) < 3:
+        return {"cycle_weeks": 1.0, "safety_stock": None, "par_level": None}
+
+    weekly_vals = [h["cantidad"] for h in historial]
+    avg = sum(weekly_vals) / len(weekly_vals)
+    variance = sum((v - avg) ** 2 for v in weekly_vals) / len(weekly_vals)
+    std_dev = math.sqrt(variance)
+
+    cycle_weeks = ciclo_pedido_semanas(ingrediente_id, db)
+    lead_weeks = 1.0
+
+    safety = round(1.65 * std_dev * math.sqrt(lead_weeks), 1)
+    safety = min(safety, media * cycle_weeks * 0.5)
+    par_level = round(media * (cycle_weeks + lead_weeks) + safety, 1)
+    safety = round(safety, 1)
+
+    return {
+        "cycle_weeks": cycle_weeks,
+        "safety_stock": safety,
+        "par_level": par_level,
+    }
+
+
 def recomendacion_pedido(
     db: Session, ingrediente_ids: Optional[List[int]] = None
 ) -> list[dict]:
@@ -208,8 +266,9 @@ def recomendacion_pedido(
             })
             continue
 
-        historial = consumo_semanal(ing.id, db)
-        if len(historial) < 3:
+        calc = calcular_par_y_safety(ing.id, db)
+
+        if calc["par_level"] is None:
             resultado.append({
                 "ingrediente_id": ing.id,
                 "ingrediente_nombre": ing.nombre,
@@ -224,13 +283,7 @@ def recomendacion_pedido(
             })
             continue
 
-        weekly_vals = [h["cantidad"] for h in historial]
-        avg = sum(weekly_vals) / len(weekly_vals)
-        variance = sum((v - avg) ** 2 for v in weekly_vals) / len(weekly_vals)
-        std_dev = math.sqrt(variance)
-        safety = min(1.65 * std_dev, 0.5 * media)
-        par_level = media + safety
-
+        par_level = calc["par_level"]
         cantidad_sugerida = max(0, round(par_level - stock_qty, 1))
 
         consumo_diario = media / 7

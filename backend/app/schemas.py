@@ -374,5 +374,6 @@ class ConsumoOut(BaseModel):
     eoq: Optional[float] = None
     safety_stock: Optional[float] = None
     par_level: Optional[float] = None
+    cycle_weeks: Optional[float] = None
     historial: list[ConsumoSemanalItem] = []
     stock_historial: list[StockHistorialItem] = []

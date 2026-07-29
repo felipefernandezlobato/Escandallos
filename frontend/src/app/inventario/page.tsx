@@ -1322,11 +1322,14 @@ function InventarioContent() {
                         ? "↓ Bajando"
                         : "→ Estable"}
                     </span>
+                    {(consumoDetalle as Record<string, unknown>).cycle_weeks != null && (
+                      <> — Ciclo pedido: {(consumoDetalle as Record<string, unknown>).cycle_weeks === 1 ? "semanal" : `${(consumoDetalle as Record<string, unknown>).cycle_weeks} sem`}</>
+                    )}
                     {consumoDetalle.reorder_point != null && (
-                      <> — Stock de Seguridad: {consumoDetalle.reorder_point} {consumoDetalle.unidad}</>
+                      <> — Seguridad: {consumoDetalle.reorder_point} {consumoDetalle.unidad}</>
                     )}
                     {consumoDetalle.eoq != null && (
-                      <> — Stock Deseado: {consumoDetalle.eoq} {consumoDetalle.unidad}</>
+                      <> — Deseado: {consumoDetalle.eoq} {consumoDetalle.unidad}</>
                     )}
                   </p>
                 </div>
