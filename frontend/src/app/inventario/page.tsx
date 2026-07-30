@@ -858,8 +858,8 @@ function InventarioContent() {
                           const sortOrder: Record<string, number> = {};
                           for (const d of cafeAnalisisData) {
                             const n = d.nombre.toLowerCase();
-                            if (n.includes("grano") && n.includes("marr")) { displayNames[d.id] = "1KG MARRÓN"; sortOrder[d.id] = 1; }
-                            else if (n.includes("grano") && n.includes("rojo")) { displayNames[d.id] = "1KG ROJO"; sortOrder[d.id] = 2; }
+                            if (n.includes("grano") && n.includes("marr")) { displayNames[d.id] = "1kg MARRÓN"; sortOrder[d.id] = 1; }
+                            else if (n.includes("grano") && n.includes("rojo")) { displayNames[d.id] = "1kg ROJO"; sortOrder[d.id] = 2; }
                             else if (n.includes("200") && n.includes("marr")) { displayNames[d.id] = "200g MARRÓN"; sortOrder[d.id] = 3; }
                             else if (n.includes("200") && n.includes("rojo")) { displayNames[d.id] = "200g ROJO"; sortOrder[d.id] = 4; }
                             else if (n.includes("200") && n.includes("black")) { displayNames[d.id] = "200g BLACK"; sortOrder[d.id] = 5; }
