@@ -883,7 +883,7 @@ function InventarioContent() {
                         <tr className="border-b border-[#E8DFD3] text-[#6B5E52]">
                           <th className="text-left px-3 py-2 font-medium">Grupo</th>
                           <th className="text-right px-3 py-2 font-medium">Stock</th>
-                          <th className="text-right px-3 py-2 font-medium">Consumo/sem</th>
+                          <th className="text-right px-3 py-2 font-medium">Consumo</th>
                           <th className="text-right px-3 py-2 font-medium">Stk Deseado</th>
                           <th className="text-right px-3 py-2 font-medium">Pedir</th>
                           <th className="text-right px-3 py-2 font-medium">Tendencia</th>
@@ -910,6 +910,9 @@ function InventarioContent() {
                           return cafeAnalisisData
                           .sort((a, b) => (sortOrder[a.id] || 99) - (sortOrder[b.id] || 99))
                           .map((d) => {
+                            const isFrozen = (displayNames[d.id] || d.nombre).toLowerCase().includes("frozen");
+                            const consumoDisplay = isFrozen ? d.consumo_medio : d.consumo_medio * 4.33;
+                            const periodoLabel = isFrozen ? "/sem" : "/mes";
                             const pedir = d.par_level ? Math.max(0, d.par_level - d.stock) : 0;
                             return (
                               <tr key={d.id} className="border-b border-[#E8DFD3] hover:bg-[#F5F0E8]/50">
@@ -922,7 +925,7 @@ function InventarioContent() {
                                   {d.stock > 0 ? d.stock.toFixed(1) : "—"} {d.unidad}
                                 </td>
                                 <td className="text-right px-3 py-2">
-                                  {d.consumo_medio > 0 ? d.consumo_medio.toFixed(1) : "—"} {d.unidad}
+                                  {consumoDisplay > 0 ? consumoDisplay.toFixed(1) : "—"} {d.unidad}{periodoLabel}
                                 </td>
                                 <td className="text-right px-3 py-2">
                                   {d.par_level ? d.par_level.toFixed(1) : "—"} {d.unidad}
