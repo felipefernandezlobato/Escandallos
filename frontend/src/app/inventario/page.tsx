@@ -198,14 +198,6 @@ function InventarioContent() {
   const [newCoffeeName, setNewCoffeeName] = useState("");
   const [newCoffeeParent, setNewCoffeeParent] = useState<number | null>(null);
   const [savingCoffeeToggle, setSavingCoffeeToggle] = useState<number | null>(null);
-  const showCafeAnalisis = searchParams.get("cafe") === "analisis";
-  const setShowCafeAnalisis = useCallback((show: boolean) => {
-    if (show) {
-      router.push("/inventario?seccion=cafe&cafe=analisis");
-    } else {
-      router.push("/inventario?seccion=cafe");
-    }
-  }, [router]);
   const [cafeAnalisisData, setCafeAnalisisData] = useState<Array<{
     id: number; nombre: string;
     consumo_medio: number; unidad: string; tendencia: string;
@@ -213,6 +205,7 @@ function InventarioContent() {
     cycle_weeks: number | null; lead_weeks: number | null;
     stock: number;
   }>>([]);
+  const [cafeAnalisisLoading, setCafeAnalisisLoading] = useState(false);
 
   const fetchRegistrosHoy = () => {
     const hoy = new Date().toISOString().slice(0, 10);
@@ -299,6 +292,84 @@ function InventarioContent() {
       })
       .finally(() => setLoading(false));
   }, []);
+
+  // Auto-load café analysis when entering Cafe tab
+  useEffect(() => {
+    if (vista !== "cafe" || loading || ingredientes.length === 0) return;
+    const pids = Array.from(new Set(
+      ingredientes.filter((i) => i.grupo_ingrediente_id).map((i) => i.grupo_ingrediente_id!)
+    ));
+    if (pids.length === 0 || cafeAnalisisData.length > 0) return;
+    setCafeAnalisisLoading(true);
+    Promise.all([
+      Promise.all(
+        pids.map((pid) =>
+          apiFetch<{ consumo_medio: number; unidad: string; tendencia: string; safety_stock?: number | null; par_level?: number | null; cycle_weeks?: number | null; lead_weeks?: number | null }>(
+            `/api/inventario/consumo/${pid}?semanas=12`
+          ).then((d) => ({ id: pid, ...d })).catch(() => null)
+        )
+      ),
+      apiFetch<Array<{ ingrediente_id: number; cantidad: number; unidad: string }>>(
+        `/api/inventario/actual`
+      ).catch(() => [] as Array<{ ingrediente_id: number; cantidad: number; unidad: string }>),
+    ]).then(([results, allStock]) => {
+      const stockMap: Record<number, number> = {};
+      const ubicMap: Record<number, Record<string, number>> = {};
+      for (const item of allStock) {
+        stockMap[item.ingrediente_id] = item.cantidad;
+        if ((item as Record<string, unknown>).ubicaciones) {
+          ubicMap[item.ingrediente_id] = {};
+          for (const [loc, val] of Object.entries((item as Record<string, unknown>).ubicaciones as Record<string, { cantidad: number }>)) {
+            ubicMap[item.ingrediente_id][loc] = val.cantidad;
+          }
+        }
+      }
+      for (const pid of pids) {
+        if (stockMap[pid] !== undefined) continue;
+        const children = ingredientes.filter((i) => i.grupo_ingrediente_id === pid);
+        let total = 0;
+        const locTotals: Record<string, number> = {};
+        for (const child of children) {
+          total += stockMap[child.id] || 0;
+          if (ubicMap[child.id]) {
+            for (const [loc, qty] of Object.entries(ubicMap[child.id])) {
+              locTotals[loc] = (locTotals[loc] || 0) + qty;
+            }
+          }
+        }
+        stockMap[pid] = total;
+        if (Object.keys(locTotals).length > 0) ubicMap[pid] = locTotals;
+      }
+      const data: typeof cafeAnalisisData = [];
+      for (const r of results) {
+        if (!r) continue;
+        const parent = ingredientes.find((i) => i.id === r.id);
+        const nombre = parent?.nombre || `#${r.id}`;
+        const isFrozen = nombre.toLowerCase().includes("frozen") || nombre.toLowerCase().includes("tubo");
+        if (isFrozen && ubicMap[r.id]) {
+          for (const loc of ["BRU1", "BRU2"]) {
+            data.push({
+              id: r.id * 1000 + (loc === "BRU1" ? 1 : 2),
+              nombre: `Frozen ${loc}`,
+              consumo_medio: r.consumo_medio, unidad: r.unidad, tendencia: r.tendencia,
+              safety_stock: r.safety_stock ?? null, par_level: r.par_level ?? null,
+              cycle_weeks: r.cycle_weeks ?? null, lead_weeks: r.lead_weeks ?? null,
+              stock: ubicMap[r.id]?.[loc] || 0,
+            });
+          }
+        } else if (r.consumo_medio > 0 || (stockMap[r.id] || 0) > 0) {
+          data.push({
+            id: r.id, nombre,
+            consumo_medio: r.consumo_medio, unidad: r.unidad, tendencia: r.tendencia,
+            safety_stock: r.safety_stock ?? null, par_level: r.par_level ?? null,
+            cycle_weeks: r.cycle_weeks ?? null, lead_weeks: r.lead_weeks ?? null,
+            stock: stockMap[r.id] || 0,
+          });
+        }
+      }
+      setCafeAnalisisData(data);
+    }).finally(() => setCafeAnalisisLoading(false));
+  }, [vista, loading, ingredientes.length]);
 
   // Save draft to localStorage whenever stock changes (skip during initial load)
   const [draftReady, setDraftReady] = useState(false);
@@ -802,113 +873,16 @@ function InventarioContent() {
                     </button>
                   </div>
                 </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={async () => {
-                      if (showCafeAnalisis) {
-                        setShowCafeAnalisis(false);
-                        return;
-                      }
-                      const pids = Array.from(parentIds);
-                      const [results, allStock] = await Promise.all([
-                        Promise.all(
-                          pids.map((pid) =>
-                            apiFetch<{ consumo_medio: number; unidad: string; tendencia: string; safety_stock?: number | null; par_level?: number | null; cycle_weeks?: number | null; lead_weeks?: number | null }>(
-                              `/api/inventario/consumo/${pid}?semanas=12`
-                            ).then((d) => ({ id: pid, ...d })).catch(() => null)
-                          )
-                        ),
-                        apiFetch<Array<{ ingrediente_id: number; cantidad: number; unidad: string; ubicaciones?: Record<string, { cantidad: number; unidad: string }> }>>(
-                          `/api/inventario/actual`
-                        ).catch(() => [] as Array<{ ingrediente_id: number; cantidad: number; unidad: string }>),
-                      ]);
-                      const stockMap: Record<number, number> = {};
-                      const ubicMap: Record<number, Record<string, number>> = {};
-                      for (const item of allStock) {
-                        stockMap[item.ingrediente_id] = item.cantidad;
-                        if ((item as Record<string, unknown>).ubicaciones) {
-                          ubicMap[item.ingrediente_id] = {};
-                          for (const [loc, val] of Object.entries((item as Record<string, unknown>).ubicaciones as Record<string, { cantidad: number }>)) {
-                            ubicMap[item.ingrediente_id][loc] = val.cantidad;
-                          }
-                        }
-                      }
-                      // Aggregate children stock to parents
-                      for (const pid of pids) {
-                        if (stockMap[pid] !== undefined) continue;
-                        const children = ingredientes.filter((i) => i.grupo_ingrediente_id === pid);
-                        if (children.length === 0) continue;
-                        let total = 0;
-                        const locTotals: Record<string, number> = {};
-                        for (const child of children) {
-                          total += stockMap[child.id] || 0;
-                          if (ubicMap[child.id]) {
-                            for (const [loc, qty] of Object.entries(ubicMap[child.id])) {
-                              locTotals[loc] = (locTotals[loc] || 0) + qty;
-                            }
-                          }
-                        }
-                        stockMap[pid] = total;
-                        if (Object.keys(locTotals).length > 0) ubicMap[pid] = locTotals;
-                      }
-                      const data: typeof cafeAnalisisData = [];
-                      for (const r of results) {
-                        if (!r) continue;
-                        const parent = ingredientes.find((i) => i.id === r.id);
-                        const nombre = parent?.nombre || `#${r.id}`;
-                        const isFrozen = nombre.toLowerCase().includes("frozen") || nombre.toLowerCase().includes("tubo");
-                        if (isFrozen && ubicMap[r.id]) {
-                          for (const loc of ["BRU1", "BRU2"]) {
-                            data.push({
-                              id: r.id * 1000 + (loc === "BRU1" ? 1 : 2),
-                              nombre: `Frozen ${loc}`,
-                              consumo_medio: r.consumo_medio,
-                              unidad: r.unidad,
-                              tendencia: r.tendencia,
-                              safety_stock: r.safety_stock ?? null,
-                              par_level: r.par_level ?? null,
-                              cycle_weeks: r.cycle_weeks ?? null,
-                              lead_weeks: r.lead_weeks ?? null,
-                              stock: ubicMap[r.id]?.[loc] || 0,
-                            });
-                          }
-                        } else if (r.consumo_medio > 0 || (stockMap[r.id] || 0) > 0) {
-                          data.push({
-                            id: r.id,
-                            nombre,
-                            consumo_medio: r.consumo_medio,
-                            unidad: r.unidad,
-                            tendencia: r.tendencia,
-                            safety_stock: r.safety_stock ?? null,
-                            par_level: r.par_level ?? null,
-                            cycle_weeks: r.cycle_weeks ?? null,
-                            lead_weeks: r.lead_weeks ?? null,
-                            stock: stockMap[r.id] || 0,
-                          });
-                        }
-                      }
-                      setCafeAnalisisData(data);
-                      setShowCafeAnalisis(true);
-                    }}
-                    className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
-                      showCafeAnalisis
-                        ? "bg-[#8B1A2B] text-white"
-                        : "bg-white border border-[#8B1A2B] text-[#8B1A2B] hover:bg-[#F2E8EA]"
-                    }`}
-                  >
-                    Analisis Cafe
-                  </button>
-                  <button
-                    onClick={() => setShowGestionarCafes(true)}
-                    className="px-3 py-1.5 text-sm font-medium bg-white border border-[#D4C4A8] text-[#6B5E52] rounded-lg hover:bg-[#F5F0E8] transition-colors"
-                  >
-                    Gestionar Cafes
-                  </button>
-                </div>
+                <button
+                  onClick={() => setShowGestionarCafes(true)}
+                  className="px-3 py-1.5 text-sm font-medium bg-white border border-[#D4C4A8] text-[#6B5E52] rounded-lg hover:bg-[#F5F0E8] transition-colors"
+                >
+                  Gestionar Cafes
+                </button>
               </div>
 
               {/* Cafe Analysis Panel */}
-              {showCafeAnalisis && cafeAnalisisData.length > 0 && (
+              {cafeAnalisisData.length > 0 && (
                 <div className="bg-white border border-[#E8DFD3] rounded-lg overflow-hidden">
                   <div className="px-4 py-3 bg-[#F5F0E8] border-b border-[#E8DFD3]">
                     <h3 className="text-sm font-semibold text-[#8B1A2B] uppercase tracking-wider">
