@@ -21,6 +21,7 @@ from app.schemas import (
     StockHistorialItem,
 )
 from app.services.consumo import (
+    calcular_par_y_safety,
     consumo_medio_semanal,
     consumo_semanal,
     recomendacion_pedido,
@@ -413,6 +414,46 @@ def coste_semanal_proveedores(
             entry["proveedores"][prov] = round(total, 2)
         entry["total"] = round(sum(by_week[week].values()), 2)
         result.append(entry)
+    return result
+
+
+@router.get("/cafe-resumen")
+def cafe_resumen(
+    db: Session = Depends(get_db),
+    user=Depends(get_current_user),
+):
+    parents = (
+        db.query(Ingrediente)
+        .filter(
+            Ingrediente.id.in_(
+                db.query(Ingrediente.grupo_ingrediente_id)
+                .filter(Ingrediente.grupo_ingrediente_id.isnot(None))
+                .distinct()
+            )
+        )
+        .all()
+    )
+    result = []
+    for p in parents:
+        media = consumo_medio_semanal(p.id, db)
+        calc = calcular_par_y_safety(p.id, db)
+        stk = stock_actual(p.id, db)
+        stk_qty = stk["cantidad"] if stk else 0
+        stk_unit = stk["unidad"] if stk else p.unidad_compra
+        ubicaciones = stock_por_ubicacion(p.id, db)
+        hist = consumo_semanal(p.id, db)
+        trend = tendencia_consumo(hist)
+        result.append({
+            "id": p.id,
+            "nombre": p.nombre,
+            "consumo_medio": media,
+            "unidad": stk_unit,
+            "tendencia": trend,
+            "safety_stock": calc["safety_stock"],
+            "par_level": calc["par_level"],
+            "stock": round(stk_qty, 1),
+            "ubicaciones": ubicaciones if ubicaciones else None,
+        })
     return result
 
 

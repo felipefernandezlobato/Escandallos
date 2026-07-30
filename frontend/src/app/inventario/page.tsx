@@ -293,70 +293,33 @@ function InventarioContent() {
       .finally(() => setLoading(false));
   }, []);
 
-  // Auto-load café analysis when entering Cafe tab
+  // Auto-load café analysis when entering Cafe tab — single API call
   useEffect(() => {
     if (vista !== "cafe" || loading || ingredientes.length === 0) return;
-    const pids = Array.from(new Set(
-      ingredientes.filter((i) => i.grupo_ingrediente_id).map((i) => i.grupo_ingrediente_id!)
-    ));
-    if (pids.length === 0 || cafeAnalisisData.length > 0) return;
+    if (cafeAnalisisData.length > 0) return;
     setCafeAnalisisLoading(true);
-    Promise.all([
-      Promise.all(
-        pids.map((pid) =>
-          apiFetch<{ consumo_medio: number; unidad: string; tendencia: string; safety_stock?: number | null; par_level?: number | null; cycle_weeks?: number | null; lead_weeks?: number | null }>(
-            `/api/inventario/consumo/${pid}?semanas=12`
-          ).then((d) => ({ id: pid, ...d })).catch(() => null)
-        )
-      ),
-      apiFetch<Array<{ ingrediente_id: number; cantidad: number; unidad: string }>>(
-        `/api/inventario/actual`
-      ).catch(() => [] as Array<{ ingrediente_id: number; cantidad: number; unidad: string }>),
-    ]).then(([results, allStock]) => {
-      const stockMap: Record<number, number> = {};
-      const ubicMap: Record<number, Record<string, number>> = {};
-      for (const item of allStock) {
-        stockMap[item.ingrediente_id] = item.cantidad;
-        if ((item as Record<string, unknown>).ubicaciones) {
-          ubicMap[item.ingrediente_id] = {};
-          for (const [loc, val] of Object.entries((item as Record<string, unknown>).ubicaciones as Record<string, { cantidad: number }>)) {
-            ubicMap[item.ingrediente_id][loc] = val.cantidad;
+    apiFetch<Array<{
+      id: number; nombre: string; consumo_medio: number; unidad: string;
+      tendencia: string; safety_stock: number | null; par_level: number | null;
+      stock: number; ubicaciones?: Record<string, { cantidad: number }> | null;
+    }>>("/api/inventario/cafe-resumen")
+      .then((items) => {
+        const data: typeof cafeAnalisisData = [];
+        for (const r of items) {
+          if (r.consumo_medio > 0 || r.stock > 0) {
+            data.push({
+              id: r.id, nombre: r.nombre,
+              consumo_medio: r.consumo_medio, unidad: r.unidad, tendencia: r.tendencia,
+              safety_stock: r.safety_stock, par_level: r.par_level,
+              cycle_weeks: null, lead_weeks: null,
+              stock: r.stock,
+            });
           }
         }
-      }
-      for (const pid of pids) {
-        if (stockMap[pid] !== undefined) continue;
-        const children = ingredientes.filter((i) => i.grupo_ingrediente_id === pid);
-        let total = 0;
-        const locTotals: Record<string, number> = {};
-        for (const child of children) {
-          total += stockMap[child.id] || 0;
-          if (ubicMap[child.id]) {
-            for (const [loc, qty] of Object.entries(ubicMap[child.id])) {
-              locTotals[loc] = (locTotals[loc] || 0) + qty;
-            }
-          }
-        }
-        stockMap[pid] = total;
-        if (Object.keys(locTotals).length > 0) ubicMap[pid] = locTotals;
-      }
-      const data: typeof cafeAnalisisData = [];
-      for (const r of results) {
-        if (!r) continue;
-        const parent = ingredientes.find((i) => i.id === r.id);
-        const nombre = parent?.nombre || `#${r.id}`;
-        if (r.consumo_medio > 0 || (stockMap[r.id] || 0) > 0) {
-          data.push({
-            id: r.id, nombre,
-            consumo_medio: r.consumo_medio, unidad: r.unidad, tendencia: r.tendencia,
-            safety_stock: r.safety_stock ?? null, par_level: r.par_level ?? null,
-            cycle_weeks: r.cycle_weeks ?? null, lead_weeks: r.lead_weeks ?? null,
-            stock: stockMap[r.id] || 0,
-          });
-        }
-      }
-      setCafeAnalisisData(data);
-    }).finally(() => setCafeAnalisisLoading(false));
+        setCafeAnalisisData(data);
+      })
+      .catch(() => {})
+      .finally(() => setCafeAnalisisLoading(false));
   }, [vista, loading, ingredientes.length]);
 
   // Save draft to localStorage whenever stock changes (skip during initial load)
@@ -895,8 +858,8 @@ function InventarioContent() {
                           const sortOrder: Record<string, number> = {};
                           for (const d of cafeAnalisisData) {
                             const n = d.nombre.toLowerCase();
-                            if (n.includes("grano") && n.includes("marr")) { displayNames[d.id] = "Kilo MARRÓN"; sortOrder[d.id] = 1; }
-                            else if (n.includes("grano") && n.includes("rojo")) { displayNames[d.id] = "Kilo ROJO"; sortOrder[d.id] = 2; }
+                            if (n.includes("grano") && n.includes("marr")) { displayNames[d.id] = "1KG MARRÓN"; sortOrder[d.id] = 1; }
+                            else if (n.includes("grano") && n.includes("rojo")) { displayNames[d.id] = "1KG ROJO"; sortOrder[d.id] = 2; }
                             else if (n.includes("200") && n.includes("marr")) { displayNames[d.id] = "200g MARRÓN"; sortOrder[d.id] = 3; }
                             else if (n.includes("200") && n.includes("rojo")) { displayNames[d.id] = "200g ROJO"; sortOrder[d.id] = 4; }
                             else if (n.includes("200") && n.includes("black")) { displayNames[d.id] = "200g BLACK"; sortOrder[d.id] = 5; }
