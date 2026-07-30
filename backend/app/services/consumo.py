@@ -321,6 +321,16 @@ def calcular_par_y_safety(
     Returns dict with cycle_weeks, lead_weeks, safety_stock, par_level,
     or None values when insufficient data.
     """
+    ing = db.query(Ingrediente).get(ingrediente_id)
+    if ing and ing.par_level_override is not None:
+        media = consumo_medio_semanal(ingrediente_id, db)
+        return {
+            "cycle_weeks": 1.0,
+            "lead_weeks": None,
+            "safety_stock": 0,
+            "par_level": ing.par_level_override,
+        }
+
     media = consumo_medio_semanal(ingrediente_id, db)
     if media <= 0:
         return {"cycle_weeks": 1.0, "lead_weeks": None, "safety_stock": None, "par_level": None}
