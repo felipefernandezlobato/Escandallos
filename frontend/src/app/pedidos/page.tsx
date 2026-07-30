@@ -87,9 +87,20 @@ export default function PedidosPage() {
   };
 
   const ingredientesFiltrados = ingredientes
-    .filter((i) => !i.excluir_pedidos)
+    .filter((i) => !i.excluir_pedidos && i.activo !== false)
     .filter((i) => !busqueda || normalize(i.nombre).includes(normalize(busqueda)))
     .filter((i) => !filtroCategoria || String(i.categoria_id) === filtroCategoria);
+
+  // Parent-child grouping for cafe
+  const parentIds = new Set(
+    ingredientes.filter((i) => i.grupo_ingrediente_id).map((i) => i.grupo_ingrediente_id!)
+  );
+  const childrenByParent: Record<number, Ingrediente[]> = {};
+  for (const ing of ingredientesFiltrados.filter((i) => i.grupo_ingrediente_id && i.activo !== false)) {
+    const pid = ing.grupo_ingrediente_id!;
+    if (!childrenByParent[pid]) childrenByParent[pid] = [];
+    childrenByParent[pid].push(ing);
+  }
 
   const vistaCategories = categorias
     .filter((c) => {
@@ -105,6 +116,7 @@ export default function PedidosPage() {
       id: c.id,
       nombre: c.nombre,
       items: ingredientesFiltrados.filter((i) => {
+        if (vista === "cafe" && (i.grupo_ingrediente_id || parentIds.has(i.id))) return false;
         if (i.categoria_id === c.id) return true;
         if (vista === "cafe" && c.nombre === "Cafetería" && i.nombre.toLowerCase().includes("sibarist")) return true;
         return false;
@@ -321,6 +333,94 @@ export default function PedidosPage() {
           </div>
 
           <div className="space-y-6">
+            {/* Grouped coffee sections for Cafe vista */}
+            {vista === "cafe" && Object.keys(childrenByParent).length > 0 && (() => {
+              const allParents = Array.from(parentIds)
+                .map((pid) => ingredientes.find((i) => i.id === pid))
+                .filter(Boolean) as Ingrediente[];
+
+              const cafeSections: { title: string; keywords: string[] }[] = [
+                { title: "CAFÉS DE KILO", keywords: ["kilo", "grano"] },
+                { title: "CAFÉS DE 200G", keywords: ["200g"] },
+                { title: "CAFÉS DE 130G / COMPETITION", keywords: ["130g", "gold"] },
+                { title: "CÁPSULAS", keywords: ["cápsula", "capsula"] },
+                { title: "FROZEN TUBES", keywords: ["frozen", "tubo"] },
+              ];
+
+              const colorOrder = ["marrón", "marron", "rojo", "black", "negro", "gold", "oro", "dorado"];
+              const assigned = new Set<number>();
+
+              const renderItem = (ing: Ingrediente) => (
+                <div
+                  key={ing.id}
+                  className={`flex items-center gap-2 border rounded-lg px-3 py-2 ${
+                    cantidades[ing.id] && parseFloat(cantidades[ing.id]) > 0
+                      ? "bg-[#F5F0E8] border-[#8B1A2B]/30"
+                      : "bg-white border-[#E8DFD3]"
+                  }`}
+                >
+                  <div className="flex-1 min-w-0">
+                    <span className="text-sm truncate block">{ing.nombre}</span>
+                    <span className="text-[10px] text-[#6B5E52]/60">{mejorProveedor(ing)}</span>
+                  </div>
+                  <input
+                    type="text"
+                    inputMode="decimal"
+                    placeholder="0"
+                    value={cantidades[ing.id] || ""}
+                    onChange={(e) => {
+                      const v = e.target.value.replace(",", ".");
+                      if (v === "" || /^\d*\.?\d*$/.test(v))
+                        setCantidades((prev) => ({ ...prev, [ing.id]: v }));
+                    }}
+                    className="w-20 border border-[#D4C4A8] rounded px-2 py-1 text-sm text-right"
+                  />
+                  <span className="text-xs text-[#6B5E52] w-10">{unidadPedido(ing)}</span>
+                </div>
+              );
+
+              return cafeSections.map((section) => {
+                const sectionParents = allParents.filter((p) => {
+                  if (assigned.has(p.id)) return false;
+                  const n = p.nombre.toLowerCase();
+                  return section.keywords.some((kw) => n.includes(kw));
+                });
+                sectionParents.forEach((p) => assigned.add(p.id));
+                const parentsWithChildren = sectionParents
+                  .sort((a, b) => {
+                    const na = a.nombre.toLowerCase();
+                    const nb = b.nombre.toLowerCase();
+                    const ia = colorOrder.findIndex((c) => na.includes(c));
+                    const ib = colorOrder.findIndex((c) => nb.includes(c));
+                    if (ia !== -1 && ib !== -1) return ia - ib;
+                    if (ia !== -1) return -1;
+                    if (ib !== -1) return 1;
+                    return na.localeCompare(nb, "es");
+                  })
+                  .filter((p) => (childrenByParent[p.id] || []).length > 0);
+                if (parentsWithChildren.length === 0) return null;
+                return (
+                  <div key={section.title}>
+                    <h2 className="text-sm font-semibold text-[#8B1A2B] uppercase tracking-wider mb-2 border-b border-[#E8DFD3] pb-1">
+                      {section.title}
+                    </h2>
+                    {parentsWithChildren.map((parent, pi) => {
+                      const children = childrenByParent[parent.id] || [];
+                      return (
+                        <div key={parent.id}>
+                          {pi > 0 && <div className="border-t border-[#D4C4A8] my-2" />}
+                          <p className="text-xs text-[#6B5E52]/70 font-medium mb-1 mt-1">{parent.nombre}</p>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                            {children.map(renderItem)}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              });
+            })()}
+
             {porCategoria.map((grupo) => (
               <div key={grupo.id}>
                 <h3 className="text-sm font-semibold text-[#8B1A2B] uppercase tracking-wider mb-2 border-b border-[#E8DFD3] pb-1">
