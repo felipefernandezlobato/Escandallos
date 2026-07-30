@@ -293,10 +293,9 @@ function InventarioContent() {
       .finally(() => setLoading(false));
   }, []);
 
-  // Auto-load café analysis when entering Cafe tab — single API call
+  // Auto-load café analysis when entering Cafe tab or after saving inventory
   useEffect(() => {
     if (vista !== "cafe" || loading || ingredientes.length === 0) return;
-    if (cafeAnalisisData.length > 0) return;
     setCafeAnalisisLoading(true);
     apiFetch<Array<{
       id: number; nombre: string; consumo_medio: number; unidad: string;
@@ -320,7 +319,7 @@ function InventarioContent() {
       })
       .catch(() => {})
       .finally(() => setCafeAnalisisLoading(false));
-  }, [vista, loading, ingredientes.length]);
+  }, [vista, loading, ingredientes.length, lastSaved]);
 
   // Save draft to localStorage whenever stock changes (skip during initial load)
   const [draftReady, setDraftReady] = useState(false);
