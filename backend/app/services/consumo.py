@@ -177,7 +177,7 @@ def _stock_actual_leaf(ingrediente_id: int, db: Session) -> Optional[dict]:
     ultimo = (
         db.query(InventarioRegistro)
         .filter(InventarioRegistro.ingrediente_id == ingrediente_id)
-        .order_by(InventarioRegistro.fecha_registro.desc())
+        .order_by(InventarioRegistro.fecha_registro.desc(), InventarioRegistro.id.desc())
         .first()
     )
     if not ultimo:
