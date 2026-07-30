@@ -49,6 +49,7 @@ class Ingrediente(Base):
     excluir_pedidos: Mapped[bool] = mapped_column(Boolean, default=False, server_default=sa_text("false"))
     activo: Mapped[bool] = mapped_column(Boolean, default=True, server_default=sa_text("true"))
     grupo_ingrediente_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey("ingredientes.id"), nullable=True)
+    consumo_override_semanal: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
 
     categoria_rel: Mapped["Categoria"] = relationship(back_populates="ingredientes")
     hijos: Mapped[List["Ingrediente"]] = relationship(back_populates="grupo_padre", foreign_keys=[grupo_ingrediente_id])

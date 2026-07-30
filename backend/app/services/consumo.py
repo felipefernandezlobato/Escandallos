@@ -162,6 +162,9 @@ def consumo_semanal(ingrediente_id: int, db: Session, semanas: int = 12) -> list
 
 
 def consumo_medio_semanal(ingrediente_id: int, db: Session, semanas: int = 8) -> float:
+    ing = db.query(Ingrediente).get(ingrediente_id)
+    if ing and ing.consumo_override_semanal is not None:
+        return round(ing.consumo_override_semanal, 2)
     historial = consumo_semanal(ingrediente_id, db, semanas)
     if not historial:
         return 0.0
