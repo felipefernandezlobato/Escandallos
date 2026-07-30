@@ -345,19 +345,7 @@ function InventarioContent() {
         if (!r) continue;
         const parent = ingredientes.find((i) => i.id === r.id);
         const nombre = parent?.nombre || `#${r.id}`;
-        const isFrozen = nombre.toLowerCase().includes("frozen") || nombre.toLowerCase().includes("tubo");
-        if (isFrozen && ubicMap[r.id]) {
-          for (const loc of ["BRU1", "BRU2"]) {
-            data.push({
-              id: r.id * 1000 + (loc === "BRU1" ? 1 : 2),
-              nombre: `Frozen ${loc}`,
-              consumo_medio: r.consumo_medio, unidad: r.unidad, tendencia: r.tendencia,
-              safety_stock: r.safety_stock ?? null, par_level: r.par_level ?? null,
-              cycle_weeks: r.cycle_weeks ?? null, lead_weeks: r.lead_weeks ?? null,
-              stock: ubicMap[r.id]?.[loc] || 0,
-            });
-          }
-        } else if (r.consumo_medio > 0 || (stockMap[r.id] || 0) > 0) {
+        if (r.consumo_medio > 0 || (stockMap[r.id] || 0) > 0) {
           data.push({
             id: r.id, nombre,
             consumo_medio: r.consumo_medio, unidad: r.unidad, tendencia: r.tendencia,
@@ -914,8 +902,8 @@ function InventarioContent() {
                             else if (n.includes("200") && n.includes("black")) { displayNames[d.id] = "200g BLACK"; sortOrder[d.id] = 5; }
                             else if (n.includes("gold") || n.includes("130")) { displayNames[d.id] = "130g GOLD"; sortOrder[d.id] = 6; }
                             else if (n.includes("cápsula") || n.includes("capsula")) { displayNames[d.id] = "Cápsulas"; sortOrder[d.id] = 7; }
-                            else if (n === "frozen bru1") { displayNames[d.id] = "Frozen BRU1"; sortOrder[d.id] = 8; }
-                            else if (n === "frozen bru2") { displayNames[d.id] = "Frozen BRU2"; sortOrder[d.id] = 9; }
+                            else if (n.includes("frozen bru1") || n.includes("tubos frozen bru1")) { displayNames[d.id] = "Frozen BRU1"; sortOrder[d.id] = 8; }
+                            else if (n.includes("frozen bru2") || n.includes("tubos frozen bru2")) { displayNames[d.id] = "Frozen BRU2"; sortOrder[d.id] = 9; }
                             else if (n.includes("frozen") || n.includes("tubo")) { displayNames[d.id] = d.nombre; sortOrder[d.id] = 10; }
                             else { displayNames[d.id] = d.nombre; sortOrder[d.id] = 99; }
                           }
