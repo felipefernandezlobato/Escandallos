@@ -165,7 +165,11 @@ function InventarioContent() {
   } | null>(null);
   const [selectedIngId, setSelectedIngId] = useState<number | null>(null);
   const [idsConRegistros, setIdsConRegistros] = useState<number[]>([]);
-  const [vista, setVista] = useState<"cocina" | "cafe" | "bar">("cocina");
+  const urlVista = searchParams.get("seccion") as "cocina" | "cafe" | "bar" | null;
+  const vista = urlVista || "cocina";
+  const setVista = useCallback((v: "cocina" | "cafe" | "bar") => {
+    router.push(`/inventario?seccion=${v}`);
+  }, [router]);
   const [ultimoConteo, setUltimoConteo] = useState<Record<string, { fecha: string; unidad: string }>>({});
   const [recomendaciones, setRecomendaciones] = useState<RecomendacionItem[]>([]);
   const showRecomendaciones = urlView === "recomendaciones";
@@ -194,7 +198,14 @@ function InventarioContent() {
   const [newCoffeeName, setNewCoffeeName] = useState("");
   const [newCoffeeParent, setNewCoffeeParent] = useState<number | null>(null);
   const [savingCoffeeToggle, setSavingCoffeeToggle] = useState<number | null>(null);
-  const [showCafeAnalisis, setShowCafeAnalisis] = useState(false);
+  const showCafeAnalisis = searchParams.get("cafe") === "analisis";
+  const setShowCafeAnalisis = useCallback((show: boolean) => {
+    if (show) {
+      router.push("/inventario?seccion=cafe&cafe=analisis");
+    } else {
+      router.push("/inventario?seccion=cafe");
+    }
+  }, [router]);
   const [cafeAnalisisData, setCafeAnalisisData] = useState<Array<{
     id: number; nombre: string;
     consumo_medio: number; unidad: string; tendencia: string;
