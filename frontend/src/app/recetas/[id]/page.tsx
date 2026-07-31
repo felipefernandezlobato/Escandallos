@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/api";
 import { useToast } from "@/components/Toast";
@@ -378,36 +378,53 @@ export default function RecetaDetailPage() {
             </tr>
           </thead>
           <tbody>
-            {receta.lineas.map((l) => (
-              <tr key={l.id} className="border-b border-[#E8DFD3]/50">
-                <td className="px-4 py-2">
-                  {l.nombre_subreceta ? (
-                    <span>
-                      <span className="text-purple-600 text-xs mr-1">SUB</span>
-                      <Link href={`/recetas/${l.subreceta_id}`} className="text-[#8B1A2B] hover:underline">{l.nombre_subreceta}</Link>
-                    </span>
-                  ) : l.ingrediente_id ? (
-                    <Link href={`/ingredientes/${l.ingrediente_id}`} className="text-[#8B1A2B] hover:underline">{l.nombre_ingrediente}</Link>
-                  ) : (
-                    l.nombre_ingrediente
+            {receta.lineas.map((l) => {
+              const isLecheEntera = l.nombre_ingrediente && l.nombre_ingrediente.toLowerCase() === "leche entera";
+              const oatCost = isLecheEntera ? l.cantidad * 2.79 : 0;
+              return (
+                <React.Fragment key={l.id}>
+                  <tr className="border-b border-[#E8DFD3]/50">
+                    <td className="px-4 py-2">
+                      {l.nombre_subreceta ? (
+                        <span>
+                          <span className="text-purple-600 text-xs mr-1">SUB</span>
+                          <Link href={`/recetas/${l.subreceta_id}`} className="text-[#8B1A2B] hover:underline">{l.nombre_subreceta}</Link>
+                        </span>
+                      ) : l.ingrediente_id ? (
+                        <Link href={`/ingredientes/${l.ingrediente_id}`} className="text-[#8B1A2B] hover:underline">{l.nombre_ingrediente}</Link>
+                      ) : (
+                        l.nombre_ingrediente
+                      )}
+                    </td>
+                    <td className="px-4 py-2 text-right">
+                      {(l.unidad === "kg" || l.unidad === "litro") && l.cantidad < 1
+                        ? l.unidad === "kg" ? Math.round(l.cantidad * 1000) : Math.round(l.cantidad * 1000)
+                        : l.cantidad}
+                    </td>
+                    <td className="px-4 py-2">
+                      {(l.unidad === "kg" || l.unidad === "litro") && l.cantidad < 1
+                        ? l.unidad === "kg" ? "g" : "ml"
+                        : l.unidad}
+                    </td>
+                    <td className="px-4 py-2 text-right text-[#6B5E52]">
+                      {l.cantidad > 0 ? (l.coste_linea / l.cantidad * (l.unidad === "kg" ? 1 : l.unidad === "g" ? 1000 : l.unidad === "litro" ? 1 : 1)).toFixed(2) : "—"}
+                    </td>
+                    <td className="px-4 py-2 text-right font-medium">{l.coste_linea.toFixed(2)} CHF</td>
+                  </tr>
+                  {isLecheEntera && (
+                    <tr className="border-b border-[#E8DFD3]/50 bg-[#F0F4E8]/50">
+                      <td className="px-4 py-2 text-[#6B8E23] italic">↳ Leche de avena</td>
+                      <td className="px-4 py-2 text-right text-[#6B8E23]">
+                        {l.cantidad < 1 ? Math.round(l.cantidad * 1000) : l.cantidad}
+                      </td>
+                      <td className="px-4 py-2 text-[#6B8E23]">{l.cantidad < 1 ? "ml" : "litro"}</td>
+                      <td className="px-4 py-2 text-right text-[#6B8E23]">{(2.79).toFixed(2)}</td>
+                      <td className="px-4 py-2 text-right font-medium text-[#6B8E23]">{oatCost.toFixed(2)} CHF</td>
+                    </tr>
                   )}
-                </td>
-                <td className="px-4 py-2 text-right">
-                  {(l.unidad === "kg" || l.unidad === "litro") && l.cantidad < 1
-                    ? l.unidad === "kg" ? Math.round(l.cantidad * 1000) : Math.round(l.cantidad * 1000)
-                    : l.cantidad}
-                </td>
-                <td className="px-4 py-2">
-                  {(l.unidad === "kg" || l.unidad === "litro") && l.cantidad < 1
-                    ? l.unidad === "kg" ? "g" : "ml"
-                    : l.unidad}
-                </td>
-                <td className="px-4 py-2 text-right text-[#6B5E52]">
-                  {l.cantidad > 0 ? (l.coste_linea / l.cantidad * (l.unidad === "kg" ? 1 : l.unidad === "g" ? 1000 : l.unidad === "litro" ? 1 : 1)).toFixed(2) : "—"}
-                </td>
-                <td className="px-4 py-2 text-right font-medium">{l.coste_linea.toFixed(2)} CHF</td>
-              </tr>
-            ))}
+                </React.Fragment>
+              );
+            })}
           </tbody>
           <tfoot>
             <tr className="bg-[#F5F0E8] font-semibold">
