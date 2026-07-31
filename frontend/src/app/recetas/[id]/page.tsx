@@ -318,6 +318,46 @@ export default function RecetaDetailPage() {
         );
       })()}
 
+      {/* Oat milk variant — shown when recipe contains Leche entera */}
+      {(() => {
+        const lecheEnteraLine = receta.lineas.find(
+          (l) => l.nombre_ingrediente && l.nombre_ingrediente.toLowerCase() === "leche entera"
+        );
+        if (!lecheEnteraLine) return null;
+        const OAT_PRICE_PER_LITRO = 2.79;
+        const ENTERA_PRICE_PER_LITRO = 1.53;
+        const OAT_SURCHARGE = 0.50;
+        const milkQty = lecheEnteraLine.cantidad;
+        const costDiff = milkQty * (OAT_PRICE_PER_LITRO - ENTERA_PRICE_PER_LITRO);
+        const oatTotal = receta.coste_total + costDiff;
+        const oatPerPortion = oatTotal / receta.porciones_por_lote;
+        const oatPVP = receta.precio_venta ? receta.precio_venta + OAT_SURCHARGE : null;
+        return (
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div className="bg-[#F0F4E8] border border-[#6B8E23]/20 rounded-lg p-4">
+              <p className="text-xs text-[#6B8E23]">Coste total Avena</p>
+              <p className="text-xl font-bold">{oatTotal.toFixed(2)} CHF</p>
+            </div>
+            <div className="bg-[#F0F4E8] border border-[#6B8E23]/20 rounded-lg p-4">
+              <p className="text-xs text-[#6B8E23]">Coste/{receta.unidad_rendimiento || "ración"} Avena</p>
+              <p className="text-xl font-bold">{oatPerPortion.toFixed(2)} CHF</p>
+            </div>
+            <div className="bg-[#F0F4E8] border border-[#6B8E23]/20 rounded-lg p-4">
+              <p className="text-xs text-[#6B8E23]">Precio venta Avena</p>
+              <p className="text-xl font-bold">{oatPVP ? `${oatPVP.toFixed(2)} CHF` : "—"}</p>
+            </div>
+            <div className="bg-[#F0F4E8] border border-[#6B8E23]/20 rounded-lg p-4">
+              <p className="text-xs text-[#6B8E23]">Multiplicador Avena</p>
+              <p className="text-xl font-bold">
+                {oatPVP && oatPerPortion > 0
+                  ? `x${(oatPVP / oatPerPortion).toFixed(1)}`
+                  : "—"}
+              </p>
+            </div>
+          </div>
+        );
+      })()}
+
       {/* Info */}
       <div className="flex flex-wrap gap-4 text-sm text-[#6B5E52]">
         <span>Categoría: <strong className="text-[#1A1A1A]">{receta.categoria_nombre}</strong></span>
