@@ -1478,6 +1478,23 @@ function InventarioContent() {
                       if (!byDate[d]) byDate[d] = [];
                       byDate[d].push(r);
                     }
+                    // Sort each date's items by category then alphabetically
+                    const getCategory = (ingId: number) => {
+                      const ing = ingredientes.find((i) => i.id === ingId);
+                      if (!ing) return "";
+                      const parent = ing.grupo_ingrediente_id ? ingredientes.find((i) => i.id === ing.grupo_ingrediente_id) : null;
+                      if (parent) return parent.nombre;
+                      const cat = categorias.find((c) => c.id === ing.categoria_id);
+                      return cat?.nombre || "";
+                    };
+                    for (const d of Object.keys(byDate)) {
+                      byDate[d].sort((a, b) => {
+                        const catA = getCategory(a.ingrediente_id);
+                        const catB = getCategory(b.ingrediente_id);
+                        if (catA !== catB) return catA.localeCompare(catB, "es");
+                        return a.ingrediente_nombre.localeCompare(b.ingrediente_nombre, "es");
+                      });
+                    }
                     const sortedDates = Object.keys(byDate).sort((a, b) => b.localeCompare(a));
                     return sortedDates.map((d) => (
                       <tbody key={d}>
