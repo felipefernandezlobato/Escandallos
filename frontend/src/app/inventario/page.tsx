@@ -168,7 +168,9 @@ function InventarioContent() {
   const urlVista = searchParams.get("seccion") as "cocina" | "cafe" | "bar" | null;
   const vista = urlVista || "cocina";
   const setVista = useCallback((v: "cocina" | "cafe" | "bar") => {
-    router.push(`/inventario?seccion=${v}`);
+    const params = new URLSearchParams(window.location.search);
+    params.set("seccion", v);
+    router.push(`/inventario?${params.toString()}`);
   }, [router]);
   const [ultimoConteo, setUltimoConteo] = useState<Record<string, { fecha: string; unidad: string }>>({});
   const [recomendaciones, setRecomendaciones] = useState<RecomendacionItem[]>([]);
