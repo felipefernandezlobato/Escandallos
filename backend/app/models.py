@@ -51,6 +51,9 @@ class Ingrediente(Base):
     grupo_ingrediente_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey("ingredientes.id"), nullable=True)
     consumo_override_semanal: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     par_level_override: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    frozen_origen_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey("ingredientes.id"), nullable=True)
+    suplemento_frozen: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    coste_kg_frozen: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
 
     categoria_rel: Mapped["Categoria"] = relationship(back_populates="ingredientes")
     hijos: Mapped[List["Ingrediente"]] = relationship(back_populates="grupo_padre", foreign_keys=[grupo_ingrediente_id])

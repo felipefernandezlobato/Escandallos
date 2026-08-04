@@ -14,34 +14,6 @@ export interface MenuSection {
   items: MenuItem[];
 }
 
-export interface FrozenTube {
-  name: string;
-  costPerKgEur: number;
-  supplement: number;
-}
-
-export const FROZEN_TUBES: FrozenTube[] = [
-  { name: "DABOV COE Salvador", costPerKgEur: 92.85, supplement: 12 },
-  { name: "BD Tennessee (90+)", costPerKgEur: 91.00, supplement: 12 },
-  { name: "BD Meltic (89)", costPerKgEur: 89.10, supplement: 11 },
-  { name: "DABOV COE Ethiopia", costPerKgEur: 69.46, supplement: 8 },
-  { name: "DABOV Ethiopia Alo Mosto", costPerKgEur: 57.12, supplement: 6 },
-  { name: "BD Lalo (88)", costPerKgEur: 56.60, supplement: 6 },
-  { name: "DABOV Panama Lerida", costPerKgEur: 52.64, supplement: 5 },
-  { name: "BD Lazo Bloom (88)", costPerKgEur: 49.90, supplement: 5 },
-  { name: "BD Lord (87)", costPerKgEur: 49.40, supplement: 5 },
-  { name: "DABOV Colombia Banana", costPerKgEur: 46.41, supplement: 5 },
-  { name: "DABOV Ethiopia Tamiru Tadesse", costPerKgEur: 41.63, supplement: 4 },
-  { name: "DABOV Costa Rica La Ortiga", costPerKgEur: 37.25, supplement: 3 },
-  { name: "DABOV Ethiopia Karamo", costPerKgEur: 35.31, supplement: 2 },
-  { name: "DABOV Mexico La Perla", costPerKgEur: 31.92, supplement: 4 },
-];
-
-export const FROZEN_GRAMS_PER_TUBE = 19;
-export const FROZEN_EUR_CHF = 0.935;
-export const DOPPIO_PVP = 3.90;
-export const DOPPIO_COST = 0.41;
-
 export function getMultiColor(multi: number | null, section: string): string {
   if (multi === null) return "text-slate-400";
 
