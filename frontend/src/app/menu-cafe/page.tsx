@@ -92,12 +92,12 @@ function tendenciaDisplay(t: string) {
   return { symbol: "→", cls: "text-[#6B5E52]" };
 }
 
-/* ── Margin color ── */
+/* ── Multiplier color ── */
 
-function margenColor(m: number | null): string {
+function multiColor(m: number | null): string {
   if (m === null) return "text-[#6B5E52]";
-  if (m >= 65) return "text-green-600 font-medium";
-  if (m >= 50) return "text-orange-500 font-medium";
+  if (m >= 3) return "text-green-600 font-medium";
+  if (m >= 2) return "text-orange-500 font-medium";
   return "text-red-600 font-medium";
 }
 
@@ -267,9 +267,9 @@ export default function MenuCafePage() {
           value={`${resumen.valor_stock.toFixed(0)} CHF`}
         />
         <SummaryCard
-          label="Margen Medio"
-          value={`${resumen.margen_medio.toFixed(1)}%`}
-          valueColor={margenColor(resumen.margen_medio)}
+          label="Multi. Medio"
+          value={resumen.margen_medio > 0 ? `x${(100 / (100 - resumen.margen_medio)).toFixed(1)}` : "—"}
+          valueColor={multiColor(resumen.margen_medio > 0 ? 100 / (100 - resumen.margen_medio) : null)}
         />
         <SummaryCard
           label="Sin PVP"
@@ -298,7 +298,7 @@ export default function MenuCafePage() {
                         <th className="px-4 py-2 font-medium">Proveedor</th>
                         <th className="px-4 py-2 font-medium text-right">Coste</th>
                         <th className="px-4 py-2 font-medium text-right">PVP</th>
-                        <th className="px-4 py-2 font-medium text-right">Margen %</th>
+                        <th className="px-4 py-2 font-medium text-right">Multi.</th>
                         <th className="px-4 py-2 font-medium text-right">Stock</th>
                         <th className="px-4 py-2 font-medium text-right">Consumo/sem</th>
                         <th className="px-4 py-2 font-medium text-center">Tend.</th>
@@ -525,9 +525,9 @@ function ColorGroup({
               )}
             </td>
 
-            {/* Margen % */}
-            <td className={`px-4 py-1.5 text-right ${margenColor(item.margen)}`}>
-              {item.margen !== null ? `${item.margen.toFixed(1)}%` : "—"}
+            {/* Multiplicador */}
+            <td className={`px-4 py-1.5 text-right ${multiColor(item.pvp && item.coste > 0 ? item.pvp / item.coste : null)}`}>
+              {item.pvp && item.coste > 0 ? `x${(item.pvp / item.coste).toFixed(1)}` : "—"}
             </td>
 
             {/* Stock */}

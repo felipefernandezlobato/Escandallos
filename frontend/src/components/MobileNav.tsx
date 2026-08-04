@@ -4,13 +4,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const MOBILE_ITEMS = [
-  { href: "/", label: "Menú", icon: "📖" },
-  { href: "/menu-cafe", label: "Café", icon: "☕" },
-  { href: "/recetas", label: "Recetas", icon: "📋" },
-  { href: "/ingredientes", label: "Ingred.", icon: "🥫" },
-  { href: "/inventario", label: "Stock", icon: "📦" },
-  { href: "/pedidos", label: "Pedidos", icon: "🛒" },
-  { href: "/configuracion", label: "Config", icon: "⚙️" },
+  { href: "/", label: "Menu" },
+  { href: "/menu-cafe", label: "Cafe" },
+  { href: "/recetas", label: "Recetas" },
+  { href: "/ingredientes", label: "Ingred." },
+  { href: "/inventario", label: "Stock" },
+  { href: "/pedidos", label: "Pedidos" },
+  { href: "/configuracion", label: "Config" },
 ];
 
 export function MobileNav() {
@@ -33,7 +33,6 @@ export function MobileNav() {
                 : "text-[#6B5E52]"
             }`}
           >
-            <span className="text-lg">{item.icon}</span>
             {item.label}
           </Link>
         );
