@@ -111,7 +111,75 @@ After making changes:
 
 Render start command is `bash start.sh` (set in dashboard, NOT render.yaml). It auto-handles alembic migrations.
 
-## Backlog (not in v1)
+## Supply Chain
+
+- Per-supplier `lead_time_dias` and `ciclo_pedido_dias` in proveedores table
+- Par level formula: `media * (cycle + lead) + safety` with supplier-specific values
+- Supply chain stats shown on ingredient detail pages (Lead Time, Ciclo Pedido, Consumo/Ciclo)
+- Recommendation page fetches fresh data (no localStorage cache for calculated values)
+
+## Coffee Inventory System
+
+- **Parent-child ingredients:** `grupo_ingrediente_id` FK on ingredientes, `activo` flag for show/hide
+- **4 color labels** from Dabov catalog: MARRÓN (brown), ROJO (red), BLACK (exclusive), GOLD (competition)
+- **Formats:** 1kg beans, 200g retail, 130g competition, frozen tubes, capsules
+- **Multi-location:** `ubicacion` field on inventario_registros (BRU1/BRU2)
+- **Frozen tubes:** separate parents per location, `consumo_override_semanal` from Lightspeed POS, `par_level_override`. Pricing via `coste_kg_frozen`, `suplemento_frozen`, `frozen_origen_id` columns (NOT `precio_compra`)
+- **Café analysis table:** always visible in Cafe tab, single `/api/inventario/cafe-resumen` endpoint
+- **Gestionar Cafés:** modal to activate/deactivate coffees
+- Display order everywhere: MARRÓN → ROJO → BLACK → GOLD
+
+## Oat Milk Variant
+
+- Recipes with "Leche entera" auto-show a green "Avena" row with swapped cost + 0.50 CHF surcharge
+- Shows in both summary cards and ingredient table (↳ Leche de avena line)
+- No DB change needed — purely frontend display calculation
+
+## Consumption & Ordering
+
+- `consumo_semanal()` excludes "Pedido recibido" inventory records (they duplicate order data)
+- Received orders only used as consumption fallback when no inventory records exist
+- `ciclo_pedido_semanas()` auto-detects ordering frequency from order history (weekly/biweekly/monthly)
+- `calcular_par_y_safety()` uses auto-detected cycle + supplier lead time for par/safety calculation
+- Minimum safety stock = 2 days of consumption (prevents 0 when std_dev is 0)
+- Recommendations persist in localStorage (24h), accumulate across submissions, always validated against today's backend data
+- Sub-recipe costs displayed per kg/litro (not per g/ml) for readability
+
+## Inventory Page Navigation
+
+- **Never use `router.push()` for tab/vista switching** — causes Suspense freeze
+- All in-page state (tab, vista, showRecomendaciones) uses local `useState`
+- URL synced with `window.history.replaceState()` for deep linking
+- `useRouter` removed entirely from inventario page
+
+## Café Pivot Sorting
+
+- Sub-category order: 1kg → 200g → 130g → Coffee Retail Bags → Tubos Frozen → Frozen → Cápsulas
+- Within each size: sorted by color (MARRÓN → ROJO → GOLD → BLACK) via `grupo_ingrediente_id` with name fallback
+- Color sub-headers: "1kg · MARRÓN", "200g · ROJO", "130g · GOLD" etc.
+- Total rows (Café en grano, Retail color groups, Coffee Retail Bags) styled bold, sort LAST within their color group
+- `coffeeColorOrder`/`coffeeColorName` fall through to name-based detection when `grupo_ingrediente_id` not in COLOR_ORDER
+- Pivot auto-aggregates parent totals from children (`_child_ids` recursive for grandchildren)
+- Retail color groups (325-328) are children of Coffee Retail Bags (279)
+
+## Dabov Pricing
+
+- EUR→CHF multiplier: **1.0891** (includes shipping + import)
+- All 1kg, 200g, 130g bags and capsules have prices set
+- Frozen tubes: use `coste_kg_frozen` + `suplemento_frozen` + `frozen_origen_id`, NOT `precio_compra`
+- Pending: Frozen Nicaragua El Suspiro missing frozen pricing columns
+
+## Ingredient Detail Page
+
+- "Stock Actual" green box shows last inventory recording (quantity, unit, date)
+- Alongside Lead Time, Ciclo Pedido, Consumo/Ciclo in 4-column grid
+
+## Safety
+
+- When changing ingredient `unidad_uso`, recipe lines are auto-updated to prevent silent cost breakage
+- Never delete DB records without explicit user confirmation — list what will be lost, ask to confirm
+
+## Backlog
 
 - Price change impact simulator
 - Automated cloud backups (Google Drive/Dropbox)
@@ -120,4 +188,3 @@ Render start command is `bash start.sh` (set in dashboard, NOT render.yaml). It 
 - Recipe version history
 - Supplier comparison
 - In-app AI invoice processing (Claude API)
-- Multi-location support
