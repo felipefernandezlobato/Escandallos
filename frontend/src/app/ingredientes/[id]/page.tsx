@@ -398,32 +398,46 @@ export default function IngredienteDetailPage() {
           </div>
 
           {/* Supply Chain Stats */}
-          {(consumo.cycle_weeks != null || consumo.lead_weeks != null) && (
-            <div className="grid grid-cols-3 gap-3">
-              {consumo.lead_weeks != null && (
-                <div className="bg-[#F5F0E8] rounded-lg p-3 text-center">
-                  <p className="text-xs text-[#6B5E52] mb-1">Lead Time</p>
-                  <p className="text-lg font-bold text-[#3D2E22]">{Math.round(consumo.lead_weeks * 7)}d</p>
-                </div>
-              )}
-              {consumo.cycle_weeks != null && (
-                <div className="bg-[#F5F0E8] rounded-lg p-3 text-center">
-                  <p className="text-xs text-[#6B5E52] mb-1">Ciclo Pedido</p>
-                  <p className="text-lg font-bold text-[#3D2E22]">
-                    {consumo.cycle_weeks === 1 ? "semanal" : `${Math.round(consumo.cycle_weeks * 7)}d`}
-                  </p>
-                </div>
-              )}
-              {consumo.cycle_weeks != null && consumo.consumo_medio > 0 && (
-                <div className="bg-[#F5F0E8] rounded-lg p-3 text-center">
-                  <p className="text-xs text-[#6B5E52] mb-1">Consumo/Ciclo</p>
-                  <p className="text-lg font-bold text-[#3D2E22]">
-                    {Math.round(consumo.consumo_medio * consumo.cycle_weeks * 10) / 10} {consumo.unidad}
-                  </p>
-                </div>
-              )}
-            </div>
-          )}
+          {(() => {
+            const lastStock = consumo.stock_historial && consumo.stock_historial.length > 0
+              ? consumo.stock_historial[consumo.stock_historial.length - 1]
+              : null;
+            const hasStats = consumo.cycle_weeks != null || consumo.lead_weeks != null || lastStock;
+            if (!hasStats) return null;
+            return (
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {lastStock && (
+                  <div className="bg-[#E8F5E9] rounded-lg p-3 text-center">
+                    <p className="text-xs text-[#6B5E52] mb-1">Stock Actual</p>
+                    <p className="text-lg font-bold text-[#3D2E22]">{lastStock.cantidad} {lastStock.unidad}</p>
+                    <p className="text-[10px] text-[#6B5E52]">{lastStock.fecha}</p>
+                  </div>
+                )}
+                {consumo.lead_weeks != null && (
+                  <div className="bg-[#F5F0E8] rounded-lg p-3 text-center">
+                    <p className="text-xs text-[#6B5E52] mb-1">Lead Time</p>
+                    <p className="text-lg font-bold text-[#3D2E22]">{Math.round(consumo.lead_weeks * 7)}d</p>
+                  </div>
+                )}
+                {consumo.cycle_weeks != null && (
+                  <div className="bg-[#F5F0E8] rounded-lg p-3 text-center">
+                    <p className="text-xs text-[#6B5E52] mb-1">Ciclo Pedido</p>
+                    <p className="text-lg font-bold text-[#3D2E22]">
+                      {consumo.cycle_weeks === 1 ? "semanal" : `${Math.round(consumo.cycle_weeks * 7)}d`}
+                    </p>
+                  </div>
+                )}
+                {consumo.cycle_weeks != null && consumo.consumo_medio > 0 && (
+                  <div className="bg-[#F5F0E8] rounded-lg p-3 text-center">
+                    <p className="text-xs text-[#6B5E52] mb-1">Consumo/Ciclo</p>
+                    <p className="text-lg font-bold text-[#3D2E22]">
+                      {Math.round(consumo.consumo_medio * consumo.cycle_weeks * 10) / 10} {consumo.unidad}
+                    </p>
+                  </div>
+                )}
+              </div>
+            );
+          })()}
 
           {/* Stock Control Chart */}
           {consumo.stock_historial && consumo.stock_historial.length > 0 && (() => {
