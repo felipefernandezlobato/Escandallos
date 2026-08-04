@@ -14,6 +14,7 @@ interface LineaPedido {
   unidad: string;
   cantidad_recibida: number | null;
   precio_unitario: number | null;
+  precio_eur: number | null;
 }
 
 interface PedidoDetail {
@@ -135,6 +136,11 @@ export default function PedidoDetailPage() {
     const qty = l.cantidad_recibida ?? l.cantidad_pedida;
     return sum + qty * (l.precio_unitario || 0);
   }, 0);
+  const totalEur = pedido.lineas.reduce((sum, l) => {
+    if (!l.precio_eur) return sum;
+    const qty = l.cantidad_recibida ?? l.cantidad_pedida;
+    return sum + qty * l.precio_eur;
+  }, 0);
 
   return (
     <div className="space-y-6">
@@ -157,7 +163,7 @@ export default function PedidoDetailPage() {
             )}
             {totalEstimado > 0 && (
               <span className="text-sm font-medium">
-                Total: {totalEstimado.toFixed(2)} CHF
+                Total: {totalEstimado.toFixed(2)} CHF{totalEur > 0 ? ` (${totalEur.toFixed(2)}€)` : ""}
               </span>
             )}
           </div>
@@ -201,6 +207,9 @@ export default function PedidoDetailPage() {
               )}
               <th className="px-4 py-2 font-medium text-right">Unidad</th>
               <th className="px-4 py-2 font-medium text-right">Precio ud.</th>
+              {pedido.lineas.some((l: LineaPedido) => l.precio_eur) && (
+                <th className="px-4 py-2 font-medium text-right">€ origen</th>
+              )}
               <th className="px-4 py-2 font-medium text-right w-16"></th>
             </tr>
           </thead>
@@ -274,6 +283,11 @@ export default function PedidoDetailPage() {
                     "—"
                   )}
                 </td>
+                {pedido.lineas.some((ll: LineaPedido) => ll.precio_eur) && (
+                  <td className="px-4 py-2 text-right text-[#6B5E52]">
+                    {l.precio_eur ? `${l.precio_eur.toFixed(2)}€` : "—"}
+                  </td>
+                )}
                 <td className="px-4 py-2 text-right">
                   {editingLinea === l.id ? (
                     <div className="flex gap-1 justify-end">

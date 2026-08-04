@@ -54,6 +54,7 @@ def _linea_to_out(l: LineaPedido) -> dict:
         "cantidad_recibida": l.cantidad_recibida,
         "precio_unitario": l.precio_unitario,
         "ingrediente_nombre": l.ingrediente_rel.nombre if l.ingrediente_rel else "",
+        "precio_eur": getattr(l.ingrediente_rel, "precio_eur", None) if l.ingrediente_rel else None,
     }
 
 
