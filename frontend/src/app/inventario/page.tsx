@@ -1613,13 +1613,14 @@ function InventarioContent() {
                       grouped[g.name].items.push(ing);
                     }
                     const COLOR_ORDER: Record<number, number> = { 73: 0, 277: 1, 326: 0, 325: 1, 327: 3, 328: 2 };
+                    const COLOR_NAMES: Record<number, string> = { 73: "MARRÓN", 277: "ROJO", 326: "MARRÓN", 325: "ROJO", 327: "BLACK", 328: "GOLD" };
                     const coffeeSubOrder = (name: string): number => {
                       const n = name.toLowerCase();
-                      if (n.includes("café en grano")) return 0;
                       if (n.includes("1kg") || n.includes("1 kg")) return 10;
-                      if (n.includes("coffee retail")) return 20;
+                      if (n.includes("café en grano")) return 15;
                       if (n.includes("200g") || n.includes("200 g")) return 30;
                       if (n.includes("130g") || n.includes("130 g")) return 40;
+                      if (n.includes("coffee retail")) return 45;
                       if (n.includes("tubos frozen")) return 50;
                       if (n.startsWith("frozen") || n.includes("frozen")) return 60;
                       if (n.includes("cápsula") || n.includes("capsula")) return 70;
@@ -1631,6 +1632,17 @@ function InventarioContent() {
                         return COLOR_ORDER[fullIng.grupo_ingrediente_id] ?? 5;
                       }
                       return 5;
+                    };
+                    const coffeeColorName = (ingId: number): string => {
+                      const fullIng = ingredientes.find((i) => i.id === ingId);
+                      if (fullIng && fullIng.grupo_ingrediente_id) {
+                        return COLOR_NAMES[fullIng.grupo_ingrediente_id] ?? "";
+                      }
+                      return "";
+                    };
+                    const isCoffeeTotalRow = (name: string): boolean => {
+                      const n = name.toLowerCase();
+                      return n.includes("café en grano") || n.includes("coffee retail");
                     };
                     const sortItems = (items: typeof filtered, group: string) => {
                       const isCafe = vista === "cafe" && (group === "Café" || group.toLowerCase().includes("café"));
@@ -1647,13 +1659,14 @@ function InventarioContent() {
                     const sortedEntries = Object.entries(grouped)
                       .sort(([, a], [, b]) => a.orden - b.orden)
                       .map(([name, val]) => [name, sortItems(val.items, name)] as [string, typeof filtered]);
-                    const coffeeSubLabel = (name: string): string => {
+                    const coffeeSubLabel = (name: string, ingId: number): string => {
                       const n = name.toLowerCase();
-                      if (n.includes("café en grano")) return "Blend";
-                      if (n.includes("1kg") || n.includes("1 kg")) return "1kg";
-                      if (n.includes("coffee retail")) return "Retail";
-                      if (n.includes("200g") || n.includes("200 g")) return "200g";
-                      if (n.includes("130g") || n.includes("130 g")) return "130g";
+                      const color = coffeeColorName(ingId);
+                      if (n.includes("café en grano")) return n.includes("marrón") ? "= Total MARRÓN" : "= Total ROJO";
+                      if (n.includes("1kg") || n.includes("1 kg")) return color ? `1kg · ${color}` : "1kg";
+                      if (n.includes("coffee retail")) return "= Total Retail";
+                      if (n.includes("200g") || n.includes("200 g")) return color ? `200g · ${color}` : "200g";
+                      if (n.includes("130g") || n.includes("130 g")) return "130g · GOLD";
                       if (n.includes("tubos frozen")) return "Tubos Frozen";
                       if (n.startsWith("frozen") || n.includes("frozen")) return "Frozen";
                       if (n.includes("cápsula") || n.includes("capsula")) return "Cápsulas";
@@ -1672,9 +1685,10 @@ function InventarioContent() {
                           </tr>
                         )}
                         {items.map((ing) => {
-                          const subLabel = isCafeGroup ? coffeeSubLabel(ing.ingrediente_nombre) : "";
-                          const showSub = isCafeGroup && subLabel && subLabel !== lastSubLabel;
+                          const subLabel = isCafeGroup ? coffeeSubLabel(ing.ingrediente_nombre, ing.ingrediente_id) : "";
+                          const showSub = isCafeGroup && subLabel && subLabel !== lastSubLabel && !subLabel.startsWith("=");
                           if (subLabel) lastSubLabel = subLabel;
+                          const isTotal = isCafeGroup && isCoffeeTotalRow(ing.ingrediente_nombre);
                           return (
                           <React.Fragment key={ing.ingrediente_id}>
                             {showSub && (
@@ -1684,15 +1698,18 @@ function InventarioContent() {
                                 </td>
                               </tr>
                             )}
-                            <tr className="border-b border-[#E8DFD3]/50 hover:bg-[#F5F0E8]">
-                              <td className="py-1.5 pr-4 sticky left-0 bg-[#F5F0E8] z-10 font-medium">
-                                <Link href={`/ingredientes/${ing.ingrediente_id}`} className="text-[#8B1A2B] hover:underline">
-                                  {ing.ingrediente_nombre}
+                            <tr className={isTotal
+                              ? "border-t border-[#D4C4A8] bg-[#F0EBE3]"
+                              : "border-b border-[#E8DFD3]/50 hover:bg-[#F5F0E8]"
+                            }>
+                              <td className={`py-1.5 pr-4 sticky left-0 z-10 ${isTotal ? "bg-[#F0EBE3] font-bold text-[#3D2E22]" : "bg-[#F5F0E8] font-medium"}`}>
+                                <Link href={`/ingredientes/${ing.ingrediente_id}`} className={isTotal ? "text-[#3D2E22] hover:underline" : "text-[#8B1A2B] hover:underline"}>
+                                  {isTotal ? `= ${ing.ingrediente_nombre}` : ing.ingrediente_nombre}
                                 </Link>
                               </td>
-                              <td className="py-1.5 px-2 text-[#6B5E52] whitespace-nowrap">{ing.unidad}</td>
+                              <td className={`py-1.5 px-2 whitespace-nowrap ${isTotal ? "text-[#3D2E22] font-bold" : "text-[#6B5E52]"}`}>{ing.unidad}</td>
                               {pivot.fechas.map((f) => (
-                                <td key={f} className="py-1.5 px-2 text-center">
+                                <td key={f} className={`py-1.5 px-2 text-center ${isTotal ? "font-bold text-[#3D2E22]" : ""}`}>
                                   {ing.fechas[f] !== undefined ? ing.fechas[f] : ""}
                                 </td>
                               ))}
