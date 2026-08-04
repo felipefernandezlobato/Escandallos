@@ -37,7 +37,8 @@ def _convert_qty(qty: float, from_unit: str, to_unit: str) -> float:
 
 
 def _child_ids(ingrediente_id: int, db: Session) -> list[int]:
-    """Return list of child ingredient IDs if the ingredient is a parent (grupo).
+    """Return list of leaf ingredient IDs recursively.
+    If a child is itself a parent, returns its children instead (flattens the tree).
     Returns empty list if the ingredient has no children (is a leaf).
     """
     hijos = (
@@ -45,7 +46,16 @@ def _child_ids(ingrediente_id: int, db: Session) -> list[int]:
         .filter(Ingrediente.grupo_ingrediente_id == ingrediente_id)
         .all()
     )
-    return [h[0] for h in hijos]
+    if not hijos:
+        return []
+    result = []
+    for (h_id,) in hijos:
+        grandchildren = _child_ids(h_id, db)
+        if grandchildren:
+            result.extend(grandchildren)
+        else:
+            result.append(h_id)
+    return result
 
 
 def _consumo_semanal_leaf(ingrediente_id: int, db: Session, semanas: int = 12) -> list[dict]:

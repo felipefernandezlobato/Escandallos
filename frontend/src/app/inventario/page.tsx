@@ -1619,7 +1619,9 @@ function InventarioContent() {
                       if (n.includes("1kg") || n.includes("1 kg")) return 10;
                       if (n.includes("café en grano")) return 15;
                       if (n.includes("200g") || n.includes("200 g")) return 30;
+                      if (n.startsWith("retail ") && n.includes("200g")) return 35;
                       if (n.includes("130g") || n.includes("130 g")) return 40;
+                      if (n.startsWith("retail ") && !n.includes("200g")) return 42;
                       if (n.includes("coffee retail")) return 45;
                       if (n.includes("tubos frozen")) return 50;
                       if (n.startsWith("frozen") || n.includes("frozen")) return 60;
@@ -1652,7 +1654,7 @@ function InventarioContent() {
                     };
                     const isCoffeeTotalRow = (name: string): boolean => {
                       const n = name.toLowerCase();
-                      return n.includes("café en grano") || n.includes("coffee retail");
+                      return n.includes("café en grano") || n.includes("coffee retail") || n.startsWith("retail ");
                     };
                     const sortItems = (items: typeof filtered, group: string) => {
                       const isCafe = vista === "cafe" && (group === "Café" || group.toLowerCase().includes("café"));
@@ -1674,9 +1676,11 @@ function InventarioContent() {
                       const color = coffeeColorName(ingId, name);
                       if (n.includes("café en grano")) return n.includes("marrón") ? "= Total MARRÓN" : "= Total ROJO";
                       if (n.includes("1kg") || n.includes("1 kg")) return color ? `1kg · ${color}` : "1kg";
-                      if (n.includes("coffee retail")) return "= Total Retail";
+                      if (n.startsWith("retail ") && n.includes("200g")) return `= Total ${color || "200g"}`;
                       if (n.includes("200g") || n.includes("200 g")) return color ? `200g · ${color}` : "200g";
+                      if (n.startsWith("retail ") && !n.includes("200g")) return `= Total ${color || "GOLD"}`;
                       if (n.includes("130g") || n.includes("130 g")) return "130g · GOLD";
+                      if (n.includes("coffee retail")) return "= Total Retail";
                       if (n.includes("tubos frozen")) return "Tubos Frozen";
                       if (n.startsWith("frozen") || n.includes("frozen")) return "Frozen";
                       if (n.includes("cápsula") || n.includes("capsula")) return "Cápsulas";

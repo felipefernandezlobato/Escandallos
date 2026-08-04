@@ -238,6 +238,58 @@ def inventario_pivot(
 
     fechas_sorted = sorted(fechas_set, reverse=True)
 
+    # Add aggregated rows for parent ingredients that don't have their own records
+    parent_ings = (
+        db.query(Ingrediente)
+        .filter(
+            Ingrediente.id.in_(
+                db.query(Ingrediente.grupo_ingrediente_id)
+                .filter(Ingrediente.grupo_ingrediente_id.isnot(None))
+                .distinct()
+            )
+        )
+        .all()
+    )
+    for parent in parent_ings:
+        if parent.id in by_ing:
+            # Parent has own records — fill missing weeks from children
+            child_ids = [
+                c.id for c in db.query(Ingrediente).filter(
+                    Ingrediente.grupo_ingrediente_id == parent.id
+                ).all()
+            ]
+            for week in fechas_sorted:
+                if week not in by_ing[parent.id]["fechas"]:
+                    total = sum(
+                        by_ing[cid]["fechas"].get(week, 0)
+                        for cid in child_ids if cid in by_ing
+                    )
+                    if total > 0:
+                        by_ing[parent.id]["fechas"][week] = round(total, 2)
+        else:
+            # Parent has no records at all — build entirely from children
+            child_ids = [
+                c.id for c in db.query(Ingrediente).filter(
+                    Ingrediente.grupo_ingrediente_id == parent.id
+                ).all()
+            ]
+            fechas_data: dict[str, float] = {}
+            for week in fechas_sorted:
+                total = sum(
+                    by_ing[cid]["fechas"].get(week, 0)
+                    for cid in child_ids if cid in by_ing
+                )
+                if total > 0:
+                    fechas_data[week] = round(total, 2)
+            if fechas_data:
+                child_units = [by_ing[cid]["unidad"] for cid in child_ids if cid in by_ing]
+                by_ing[parent.id] = {
+                    "ingrediente_id": parent.id,
+                    "ingrediente_nombre": parent.nombre,
+                    "unidad": child_units[0] if child_units else parent.unidad_compra,
+                    "fechas": fechas_data,
+                }
+
     # Count distinct weeks ordered for sorting (frequency, not volume)
     order_counts: dict[int, int] = {}
     order_rows = (
