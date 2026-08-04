@@ -129,6 +129,19 @@ def actualizar_ingrediente(
     if precio_cambio:
         crear_historial_precio(db, ing.id, ing.precio_compra, updates["precio_compra"])
 
+    # If unidad_uso changes, auto-update recipe lines to match
+    new_unidad_uso = updates.get("unidad_uso")
+    if new_unidad_uso and new_unidad_uso != ing.unidad_uso:
+        from app.services.conversiones import son_compatibles
+        affected_lines = (
+            db.query(LineaReceta)
+            .filter(LineaReceta.ingrediente_id == ingrediente_id)
+            .all()
+        )
+        for linea in affected_lines:
+            if not son_compatibles(linea.unidad, new_unidad_uso):
+                linea.unidad = new_unidad_uso
+
     for key, val in updates.items():
         setattr(ing, key, val)
     ing.fecha_actualizacion = date.today()
