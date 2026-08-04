@@ -1626,18 +1626,28 @@ function InventarioContent() {
                       if (n.includes("cápsula") || n.includes("capsula")) return 70;
                       return 80;
                     };
-                    const coffeeColorOrder = (ingId: number): number => {
+                    const coffeeColorOrder = (ingId: number, name?: string): number => {
                       const fullIng = ingredientes.find((i) => i.id === ingId);
                       if (fullIng && fullIng.grupo_ingrediente_id) {
                         return COLOR_ORDER[fullIng.grupo_ingrediente_id] ?? 5;
                       }
+                      const n = (name || fullIng?.nombre || "").toLowerCase();
+                      if (n.includes("marrón")) return 0;
+                      if (n.includes("rojo")) return 1;
+                      if (n.includes("gold")) return 2;
+                      if (n.includes("black")) return 3;
                       return 5;
                     };
-                    const coffeeColorName = (ingId: number): string => {
+                    const coffeeColorName = (ingId: number, name?: string): string => {
                       const fullIng = ingredientes.find((i) => i.id === ingId);
                       if (fullIng && fullIng.grupo_ingrediente_id) {
                         return COLOR_NAMES[fullIng.grupo_ingrediente_id] ?? "";
                       }
+                      const n = (name || fullIng?.nombre || "").toLowerCase();
+                      if (n.includes("marrón")) return "MARRÓN";
+                      if (n.includes("rojo")) return "ROJO";
+                      if (n.includes("gold")) return "GOLD";
+                      if (n.includes("black")) return "BLACK";
                       return "";
                     };
                     const isCoffeeTotalRow = (name: string): boolean => {
@@ -1650,7 +1660,7 @@ function InventarioContent() {
                         if (isCafe) {
                           const subDiff = coffeeSubOrder(a.ingrediente_nombre) - coffeeSubOrder(b.ingrediente_nombre);
                           if (subDiff !== 0) return subDiff;
-                          const colorDiff = coffeeColorOrder(a.ingrediente_id) - coffeeColorOrder(b.ingrediente_id);
+                          const colorDiff = coffeeColorOrder(a.ingrediente_id, a.ingrediente_nombre) - coffeeColorOrder(b.ingrediente_id, b.ingrediente_nombre);
                           if (colorDiff !== 0) return colorDiff;
                         }
                         return a.ingrediente_nombre.localeCompare(b.ingrediente_nombre, "es");
@@ -1661,7 +1671,7 @@ function InventarioContent() {
                       .map(([name, val]) => [name, sortItems(val.items, name)] as [string, typeof filtered]);
                     const coffeeSubLabel = (name: string, ingId: number): string => {
                       const n = name.toLowerCase();
-                      const color = coffeeColorName(ingId);
+                      const color = coffeeColorName(ingId, name);
                       if (n.includes("café en grano")) return n.includes("marrón") ? "= Total MARRÓN" : "= Total ROJO";
                       if (n.includes("1kg") || n.includes("1 kg")) return color ? `1kg · ${color}` : "1kg";
                       if (n.includes("coffee retail")) return "= Total Retail";
