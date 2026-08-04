@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api";
-import { MENU, getMultiColor } from "@/lib/menu-data";
+import { MENU, getMultiColor, FROZEN_TUBES, FROZEN_GRAMS_PER_TUBE, FROZEN_EUR_CHF, DOPPIO_PVP, DOPPIO_COST } from "@/lib/menu-data";
 import type { Receta, Ingrediente } from "@/lib/types";
 import Link from "next/link";
 
@@ -152,6 +152,60 @@ export default function MenuPage() {
         </section>
         );
       })}
+
+      {/* Frozen Tubes Section */}
+      <section>
+        <h2 className="text-lg font-bold bg-[#3D2E22] text-white px-4 py-2 rounded-t-lg">
+          FROZEN TUBES
+        </h2>
+        <div className="bg-white border border-[#E8DFD3] rounded-b-lg overflow-hidden">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="bg-[#F5F0E8] text-left text-[#6B5E52] border-b border-[#E8DFD3]">
+                <th className="px-4 py-2 font-medium">Café</th>
+                <th className="px-4 py-2 font-medium text-right w-20">€/kg</th>
+                <th className="px-4 py-2 font-medium text-right w-20">CHF/tubo</th>
+                <th className="px-4 py-2 font-medium text-right w-20">Supl.</th>
+                <th className="px-4 py-2 font-medium text-right w-20">x Total</th>
+                <th className="px-4 py-2 font-medium text-right w-20">x Supl.</th>
+              </tr>
+            </thead>
+            <tbody>
+              {FROZEN_TUBES.map((tube) => {
+                const chfPerKg = tube.costPerKgEur * FROZEN_EUR_CHF;
+                const chfPerTube = chfPerKg * FROZEN_GRAMS_PER_TUBE / 1000;
+                const pvpTotal = DOPPIO_PVP + tube.supplement;
+                const multiTotal = chfPerTube > 0 ? pvpTotal / chfPerTube : null;
+                const extraCost = chfPerTube - DOPPIO_COST;
+                const multiSupl = extraCost > 0 && tube.supplement > 0 ? tube.supplement / extraCost : null;
+                return (
+                  <tr key={tube.name} className="border-b border-[#E8DFD3]/50 hover:bg-[#F5F0E8]/50">
+                    <td className="px-4 py-1.5">{tube.name}</td>
+                    <td className="px-4 py-1.5 text-right text-[#6B5E52]">{tube.costPerKgEur.toFixed(1)}</td>
+                    <td className="px-4 py-1.5 text-right">{chfPerTube.toFixed(2)}</td>
+                    <td className="px-4 py-1.5 text-right font-bold text-[#8B1A2B]">
+                      {tube.supplement > 0 ? `+${tube.supplement}` : "—"}
+                    </td>
+                    <td className={`px-4 py-1.5 text-right ${
+                      multiTotal && multiTotal >= 5 ? "text-green-600" : multiTotal && multiTotal >= 3 ? "text-[#6B5E52]" : "text-red-600"
+                    }`}>
+                      {multiTotal ? `x${multiTotal.toFixed(1)}` : "—"}
+                    </td>
+                    <td className={`px-4 py-1.5 text-right ${
+                      multiSupl && multiSupl >= 5 ? "text-green-600" : multiSupl && multiSupl >= 3 ? "text-[#6B5E52]" : "text-red-600"
+                    }`}>
+                      {multiSupl ? `x${multiSupl.toFixed(1)}` : "—"}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+          <div className="px-4 py-2 bg-[#F5F0E8] text-xs text-[#6B5E52]">
+            Base: Doppio {DOPPIO_PVP.toFixed(2)} CHF (coste {DOPPIO_COST.toFixed(2)} CHF) · {FROZEN_GRAMS_PER_TUBE}g/tubo · 1€ = {FROZEN_EUR_CHF} CHF
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
