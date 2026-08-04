@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useState, useCallback } from "react";
+import React, { Suspense, useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { apiFetch } from "@/lib/api";
@@ -1647,7 +1647,22 @@ function InventarioContent() {
                     const sortedEntries = Object.entries(grouped)
                       .sort(([, a], [, b]) => a.orden - b.orden)
                       .map(([name, val]) => [name, sortItems(val.items, name)] as [string, typeof filtered]);
-                    return sortedEntries.map(([group, items]) => (
+                    const coffeeSubLabel = (name: string): string => {
+                      const n = name.toLowerCase();
+                      if (n.includes("café en grano")) return "Blend";
+                      if (n.includes("1kg") || n.includes("1 kg")) return "1kg";
+                      if (n.includes("coffee retail")) return "Retail";
+                      if (n.includes("200g") || n.includes("200 g")) return "200g";
+                      if (n.includes("130g") || n.includes("130 g")) return "130g";
+                      if (n.includes("tubos frozen")) return "Tubos Frozen";
+                      if (n.startsWith("frozen") || n.includes("frozen")) return "Frozen";
+                      if (n.includes("cápsula") || n.includes("capsula")) return "Cápsulas";
+                      return "";
+                    };
+                    return sortedEntries.map(([group, items]) => {
+                      const isCafeGroup = vista === "cafe" && (group === "Café" || group.toLowerCase().includes("café"));
+                      let lastSubLabel = "";
+                      return (
                       <tbody key={group}>
                         {Object.keys(grouped).length > 1 && (
                           <tr className="bg-[#F5F0E8] border-t-2 border-[#D4C4A8]">
@@ -1656,23 +1671,38 @@ function InventarioContent() {
                             </td>
                           </tr>
                         )}
-                        {items.map((ing) => (
-                          <tr key={ing.ingrediente_id} className="border-b border-[#E8DFD3]/50 hover:bg-[#F5F0E8]">
-                            <td className="py-1.5 pr-4 sticky left-0 bg-[#F5F0E8] z-10 font-medium">
-                              <Link href={`/ingredientes/${ing.ingrediente_id}`} className="text-[#8B1A2B] hover:underline">
-                                {ing.ingrediente_nombre}
-                              </Link>
-                            </td>
-                            <td className="py-1.5 px-2 text-[#6B5E52] whitespace-nowrap">{ing.unidad}</td>
-                            {pivot.fechas.map((f) => (
-                              <td key={f} className="py-1.5 px-2 text-center">
-                                {ing.fechas[f] !== undefined ? ing.fechas[f] : ""}
+                        {items.map((ing) => {
+                          const subLabel = isCafeGroup ? coffeeSubLabel(ing.ingrediente_nombre) : "";
+                          const showSub = isCafeGroup && subLabel && subLabel !== lastSubLabel;
+                          if (subLabel) lastSubLabel = subLabel;
+                          return (
+                          <React.Fragment key={ing.ingrediente_id}>
+                            {showSub && (
+                              <tr className="border-t border-[#D4C4A8]">
+                                <td colSpan={pivot.fechas.length + 2} className="pt-2 pb-1 pr-4 sticky left-0 bg-[#F5F0E8] z-10 text-[10px] font-semibold text-[#6B5E52] uppercase tracking-widest">
+                                  {subLabel}
+                                </td>
+                              </tr>
+                            )}
+                            <tr className="border-b border-[#E8DFD3]/50 hover:bg-[#F5F0E8]">
+                              <td className="py-1.5 pr-4 sticky left-0 bg-[#F5F0E8] z-10 font-medium">
+                                <Link href={`/ingredientes/${ing.ingrediente_id}`} className="text-[#8B1A2B] hover:underline">
+                                  {ing.ingrediente_nombre}
+                                </Link>
                               </td>
-                            ))}
-                          </tr>
-                        ))}
+                              <td className="py-1.5 px-2 text-[#6B5E52] whitespace-nowrap">{ing.unidad}</td>
+                              {pivot.fechas.map((f) => (
+                                <td key={f} className="py-1.5 px-2 text-center">
+                                  {ing.fechas[f] !== undefined ? ing.fechas[f] : ""}
+                                </td>
+                              ))}
+                            </tr>
+                          </React.Fragment>
+                          );
+                        })}
                       </tbody>
-                    ));
+                      );
+                    })
                   })()}
                 </table>
               </div>
