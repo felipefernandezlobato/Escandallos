@@ -1615,9 +1615,31 @@ function InventarioContent() {
                       if (!grouped[g.name]) grouped[g.name] = { orden: g.orden, items: [] };
                       grouped[g.name].items.push(ing);
                     }
+                    const coffeeSubOrder = (name: string): number => {
+                      const n = name.toLowerCase();
+                      if (n.includes("café en grano")) return 0;
+                      if (n.includes("1kg") || n.includes("1 kg")) return 1;
+                      if (n.includes("200g") || n.includes("200 g")) return 2;
+                      if (n.includes("130g") || n.includes("130 g")) return 3;
+                      if (n.startsWith("frozen") || n.includes("frozen")) return 4;
+                      if (n.includes("cápsula") || n.includes("capsula")) return 5;
+                      if (n.includes("tubos frozen")) return 6;
+                      if (n.includes("coffee retail")) return 7;
+                      return 8;
+                    };
+                    const sortItems = (items: typeof filtered, group: string) => {
+                      const isCafe = vista === "cafe" && (group === "Café" || group.toLowerCase().includes("café"));
+                      return [...items].sort((a, b) => {
+                        if (isCafe) {
+                          const diff = coffeeSubOrder(a.ingrediente_nombre) - coffeeSubOrder(b.ingrediente_nombre);
+                          if (diff !== 0) return diff;
+                        }
+                        return a.ingrediente_nombre.localeCompare(b.ingrediente_nombre, "es");
+                      });
+                    };
                     const sortedEntries = Object.entries(grouped)
                       .sort(([, a], [, b]) => a.orden - b.orden)
-                      .map(([name, val]) => [name, val.items.sort((a, b) => a.ingrediente_nombre.localeCompare(b.ingrediente_nombre, "es"))] as [string, typeof filtered]);
+                      .map(([name, val]) => [name, sortItems(val.items, name)] as [string, typeof filtered]);
                     return sortedEntries.map(([group, items]) => (
                       <tbody key={group}>
                         {Object.keys(grouped).length > 1 && (
