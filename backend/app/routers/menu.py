@@ -123,6 +123,13 @@ def menu_frozen(
             item["multi_supplement"] = None
 
         item["coste_kg_frozen"] = coste_kg
+        # Stock data for the cafe catalog page
+        bru1_tubes = [t for t in tubes if "bru1" in t.nombre.lower()]
+        bru2_tubes = [t for t in tubes if "bru2" in t.nombre.lower()]
+        item["stock_bru1"] = sum(_latest_stock(t.id, db) for t in bru1_tubes)
+        item["stock_bru2"] = sum(_latest_stock(t.id, db) for t in bru2_tubes)
+        item["stock_bolsa"] = source_stock
+        item["disponible"] = visible
         result.append(item)
 
     # Sort by coste_kg_frozen DESC (most expensive first)

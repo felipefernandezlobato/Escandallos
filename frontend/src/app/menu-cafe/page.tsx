@@ -121,6 +121,7 @@ export default function MenuCafePage() {
 
   // Toggling activo state
   const [togglingActivo, setTogglingActivo] = useState<Set<number>>(new Set());
+  const [showInactive, setShowInactive] = useState(false);
 
   const fetchData = useCallback(() => {
     setLoading(true);
@@ -187,11 +188,12 @@ export default function MenuCafePage() {
 
   /* ── Filter items by supplier ── */
 
-  function filterBySupplier(items: CafeItem[]): CafeItem[] {
-    if (supplierFilter === "Todos") return items;
-    return items.filter(
-      (i) => i.proveedor.toLowerCase() === supplierFilter.toLowerCase()
-    );
+  function filterItems(items: CafeItem[]): CafeItem[] {
+    return items.filter((i) => {
+      if (!showInactive && !i.activo) return false;
+      if (supplierFilter !== "Todos" && i.proveedor.toLowerCase() !== supplierFilter.toLowerCase()) return false;
+      return true;
+    });
   }
 
   /* ── Group items by color ── */
@@ -225,20 +227,32 @@ export default function MenuCafePage() {
       {/* ── Header ── */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <h1 className="text-2xl font-bold">Menu Cafe</h1>
-        <div className="flex gap-1 bg-[#F5F0E8] rounded-lg p-1">
-          {SUPPLIER_FILTERS.map((f) => (
-            <button
-              key={f}
-              onClick={() => setSupplierFilter(f)}
-              className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-                supplierFilter === f
-                  ? "bg-[#8B1A2B] text-white"
-                  : "text-[#6B5E52] hover:bg-[#E8DFD3]"
-              }`}
-            >
-              {f}
-            </button>
-          ))}
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setShowInactive(!showInactive)}
+            className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors border ${
+              showInactive
+                ? "bg-[#8B1A2B] text-white border-[#8B1A2B]"
+                : "text-[#6B5E52] border-[#D4C4A8] hover:bg-[#F5F0E8]"
+            }`}
+          >
+            {showInactive ? "Ocultar inactivos" : "Mostrar inactivos"}
+          </button>
+          <div className="flex gap-1 bg-[#F5F0E8] rounded-lg p-1">
+            {SUPPLIER_FILTERS.map((f) => (
+              <button
+                key={f}
+                onClick={() => setSupplierFilter(f)}
+                className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                  supplierFilter === f
+                    ? "bg-[#8B1A2B] text-white"
+                    : "text-[#6B5E52] hover:bg-[#E8DFD3]"
+                }`}
+              >
+                {f}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -266,7 +280,7 @@ export default function MenuCafePage() {
 
       {/* ── Sections ── */}
       {secciones.map((seccion) => {
-        const filtered = filterBySupplier(seccion.items);
+        const filtered = filterItems(seccion.items);
         if (filtered.length === 0) return null;
         const groups = groupByColor(filtered);
 
