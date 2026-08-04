@@ -295,6 +295,7 @@ class LineaPedidoOut(BaseModel):
     cantidad_recibida: Optional[float] = None
     precio_unitario: Optional[float] = None
     ingrediente_nombre: str = ""
+    precio_eur: Optional[float] = None
 
     model_config = {"from_attributes": True}
 

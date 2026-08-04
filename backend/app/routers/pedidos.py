@@ -2,6 +2,7 @@ from datetime import date
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy import text
 from sqlalchemy.orm import Session, joinedload
 
 from app.auth import get_current_user
@@ -45,7 +46,15 @@ def _pedido_to_out(p: Pedido) -> dict:
     }
 
 
-def _linea_to_out(l: LineaPedido) -> dict:
+def _linea_to_out(l: LineaPedido, db: Session = None) -> dict:
+    precio_eur = None
+    if db and l.ingrediente_id:
+        row = db.execute(
+            text("SELECT precio_eur FROM ingredientes WHERE id = :id"),
+            {"id": l.ingrediente_id}
+        ).fetchone()
+        if row and row[0]:
+            precio_eur = row[0]
     return {
         "id": l.id,
         "ingrediente_id": l.ingrediente_id,
@@ -54,7 +63,7 @@ def _linea_to_out(l: LineaPedido) -> dict:
         "cantidad_recibida": l.cantidad_recibida,
         "precio_unitario": l.precio_unitario,
         "ingrediente_nombre": l.ingrediente_rel.nombre if l.ingrediente_rel else "",
-        "precio_eur": getattr(l.ingrediente_rel, "precio_eur", None) if l.ingrediente_rel else None,
+        "precio_eur": precio_eur,
     }
 
 
@@ -163,7 +172,7 @@ def obtener_pedido(
     if not p:
         raise HTTPException(404, "Pedido no encontrado")
     out = _pedido_to_out(p)
-    out["lineas"] = [_linea_to_out(l) for l in p.lineas]
+    out["lineas"] = [_linea_to_out(l, db) for l in p.lineas]
     return out
 
 
@@ -201,7 +210,7 @@ def crear_pedido(
         .first()
     )
     out = _pedido_to_out(p)
-    out["lineas"] = [_linea_to_out(l) for l in p.lineas]
+    out["lineas"] = [_linea_to_out(l, db) for l in p.lineas]
     return out
 
 
@@ -244,7 +253,7 @@ def actualizar_pedido(
         .first()
     )
     out = _pedido_to_out(p)
-    out["lineas"] = [_linea_to_out(l) for l in p.lineas]
+    out["lineas"] = [_linea_to_out(l, db) for l in p.lineas]
     return out
 
 
