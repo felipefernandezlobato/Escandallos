@@ -1619,12 +1619,12 @@ function InventarioContent() {
                       const n = name.toLowerCase();
                       if (n.includes("café en grano")) return 0;
                       if (n.includes("1kg") || n.includes("1 kg")) return 1;
-                      if (n.includes("200g") || n.includes("200 g")) return 2;
-                      if (n.includes("130g") || n.includes("130 g")) return 3;
-                      if (n.startsWith("frozen") || n.includes("frozen")) return 4;
-                      if (n.includes("cápsula") || n.includes("capsula")) return 5;
-                      if (n.includes("tubos frozen")) return 6;
-                      if (n.includes("coffee retail")) return 7;
+                      if (n.includes("coffee retail")) return 2;
+                      if (n.includes("200g") || n.includes("200 g")) return 3;
+                      if (n.includes("130g") || n.includes("130 g")) return 4;
+                      if (n.includes("tubos frozen")) return 5;
+                      if (n.startsWith("frozen") || n.includes("frozen")) return 6;
+                      if (n.includes("cápsula") || n.includes("capsula")) return 7;
                       return 8;
                     };
                     const sortItems = (items: typeof filtered, group: string) => {
