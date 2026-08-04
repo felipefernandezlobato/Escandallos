@@ -1617,7 +1617,7 @@ function InventarioContent() {
                     }
                     const sortedEntries = Object.entries(grouped)
                       .sort(([, a], [, b]) => a.orden - b.orden)
-                      .map(([name, val]) => [name, val.items] as [string, typeof filtered]);
+                      .map(([name, val]) => [name, val.items.sort((a, b) => a.ingrediente_nombre.localeCompare(b.ingrediente_nombre, "es"))] as [string, typeof filtered]);
                     return sortedEntries.map(([group, items]) => (
                       <tbody key={group}>
                         {Object.keys(grouped).length > 1 && (
