@@ -163,6 +163,7 @@ export default function MenuPage() {
             <thead>
               <tr className="bg-[#F5F0E8] text-left text-[#6B5E52] border-b border-[#E8DFD3]">
                 <th className="px-4 py-2 font-medium">Café</th>
+                <th className="px-4 py-2 font-medium text-right w-20">CHF/kg</th>
                 <th className="px-4 py-2 font-medium text-right w-20">CHF/tubo</th>
                 <th className="px-4 py-2 font-medium text-right w-20">Supl.</th>
                 <th className="px-4 py-2 font-medium text-right w-20">x Total</th>
@@ -177,6 +178,7 @@ export default function MenuPage() {
                         <Link href={`/ingredientes/${(tube as Record<string, unknown>).origen_id}`} className="text-[#8B1A2B] hover:underline">{tube.name}</Link>
                       ) : tube.name}
                     </td>
+                    <td className="px-4 py-1.5 text-right text-[#6B5E52]">{(tube as Record<string, unknown>).chf_per_kg ? ((tube as Record<string, unknown>).chf_per_kg as number).toFixed(1) : "—"}</td>
                     <td className="px-4 py-1.5 text-right">{tube.chf_per_tube.toFixed(2)}</td>
                     <td className="px-4 py-1.5 text-right font-bold text-[#8B1A2B]">
                       {tube.supplement > 0 ? `+${tube.supplement}` : "—"}

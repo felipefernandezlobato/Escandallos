@@ -128,11 +128,11 @@ def menu_frozen(
     # Sort by coste_kg_frozen DESC (most expensive first)
     result.sort(key=lambda x: -(x.get("coste_kg_frozen") or 0))
 
-    # Add constants and remove internal field
+    # Add constants and rename internal field
     for item in result:
         item["doppio_pvp"] = 3.90
         item["doppio_cost"] = 0.41
         item["grams_per_tube"] = 19
-        del item["coste_kg_frozen"]
+        item["chf_per_kg"] = round(item.pop("coste_kg_frozen"), 2)
 
     return result
