@@ -1630,8 +1630,8 @@ function InventarioContent() {
                     };
                     const coffeeColorOrder = (ingId: number, name?: string): number => {
                       const fullIng = ingredientes.find((i) => i.id === ingId);
-                      if (fullIng && fullIng.grupo_ingrediente_id) {
-                        return COLOR_ORDER[fullIng.grupo_ingrediente_id] ?? 5;
+                      if (fullIng && fullIng.grupo_ingrediente_id && COLOR_ORDER[fullIng.grupo_ingrediente_id] !== undefined) {
+                        return COLOR_ORDER[fullIng.grupo_ingrediente_id];
                       }
                       const n = (name || fullIng?.nombre || "").toLowerCase();
                       if (n.includes("marrón")) return 0;
@@ -1642,8 +1642,8 @@ function InventarioContent() {
                     };
                     const coffeeColorName = (ingId: number, name?: string): string => {
                       const fullIng = ingredientes.find((i) => i.id === ingId);
-                      if (fullIng && fullIng.grupo_ingrediente_id) {
-                        return COLOR_NAMES[fullIng.grupo_ingrediente_id] ?? "";
+                      if (fullIng && fullIng.grupo_ingrediente_id && COLOR_NAMES[fullIng.grupo_ingrediente_id]) {
+                        return COLOR_NAMES[fullIng.grupo_ingrediente_id];
                       }
                       const n = (name || fullIng?.nombre || "").toLowerCase();
                       if (n.includes("marrón")) return "MARRÓN";
