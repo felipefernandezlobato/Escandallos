@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api";
 import { MENU, getMultiColor, FROZEN_TUBES, FROZEN_GRAMS_PER_TUBE, FROZEN_EUR_CHF, DOPPIO_PVP, DOPPIO_COST } from "@/lib/menu-data";
 import type { Receta, Ingrediente } from "@/lib/types";
@@ -49,7 +49,8 @@ export default function MenuPage() {
           : { a: "Normal", b: "Iced", pvpA: "PVP", pvpB: "PVP Iced", xA: "x", xB: "x Iced" };
 
         return (
-        <section key={section.title}>
+        <React.Fragment key={section.title}>
+        <section>
           <h2 className="text-lg font-bold bg-[#8B1A2B] text-white px-4 py-2 rounded-t-lg">
             {section.title}
           </h2>
@@ -150,11 +151,7 @@ export default function MenuPage() {
             </table>
           </div>
         </section>
-        );
-      })}
-
-      {/* Frozen Tubes Section */}
-      <section>
+        {section.title === "COFFEE" && <section key="frozen-tubes">
         <h2 className="text-lg font-bold bg-[#3D2E22] text-white px-4 py-2 rounded-t-lg">
           FROZEN TUBES
         </h2>
@@ -163,7 +160,6 @@ export default function MenuPage() {
             <thead>
               <tr className="bg-[#F5F0E8] text-left text-[#6B5E52] border-b border-[#E8DFD3]">
                 <th className="px-4 py-2 font-medium">Café</th>
-                <th className="px-4 py-2 font-medium text-right w-20">€/kg</th>
                 <th className="px-4 py-2 font-medium text-right w-20">CHF/tubo</th>
                 <th className="px-4 py-2 font-medium text-right w-20">Supl.</th>
                 <th className="px-4 py-2 font-medium text-right w-20">x Total</th>
@@ -181,7 +177,6 @@ export default function MenuPage() {
                 return (
                   <tr key={tube.name} className="border-b border-[#E8DFD3]/50 hover:bg-[#F5F0E8]/50">
                     <td className="px-4 py-1.5">{tube.name}</td>
-                    <td className="px-4 py-1.5 text-right text-[#6B5E52]">{tube.costPerKgEur.toFixed(1)}</td>
                     <td className="px-4 py-1.5 text-right">{chfPerTube.toFixed(2)}</td>
                     <td className="px-4 py-1.5 text-right font-bold text-[#8B1A2B]">
                       {tube.supplement > 0 ? `+${tube.supplement}` : "—"}
@@ -202,10 +197,13 @@ export default function MenuPage() {
             </tbody>
           </table>
           <div className="px-4 py-2 bg-[#F5F0E8] text-xs text-[#6B5E52]">
-            Base: Doppio {DOPPIO_PVP.toFixed(2)} CHF (coste {DOPPIO_COST.toFixed(2)} CHF) · {FROZEN_GRAMS_PER_TUBE}g/tubo · 1€ = {FROZEN_EUR_CHF} CHF
+            Base: Doppio {DOPPIO_PVP.toFixed(2)} CHF (coste {DOPPIO_COST.toFixed(2)} CHF) · {FROZEN_GRAMS_PER_TUBE}g/tubo
           </div>
         </div>
-      </section>
+      </section>}
+        </React.Fragment>
+        );
+      })}
     </div>
   );
 }
