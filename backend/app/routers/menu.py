@@ -103,10 +103,12 @@ def menu_frozen(
         doppio_cost = 0.41
         base_price = 3.90
 
+        origen_id = representative.frozen_origen_id
         item = {
             "name": name,
             "chf_per_tube": round(chf_per_tube, 4),
             "supplement": supplement,
+            "origen_id": origen_id,
         }
 
         if chf_per_tube > 0:

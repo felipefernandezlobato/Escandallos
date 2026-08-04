@@ -172,7 +172,11 @@ export default function MenuPage() {
             <tbody>
               {frozenTubes.map((tube) => (
                   <tr key={tube.name} className="border-b border-[#E8DFD3]/50 hover:bg-[#F5F0E8]/50">
-                    <td className="px-4 py-1.5">{tube.name}</td>
+                    <td className="px-4 py-1.5">
+                      {(tube as Record<string, unknown>).origen_id ? (
+                        <Link href={`/ingredientes/${(tube as Record<string, unknown>).origen_id}`} className="text-[#8B1A2B] hover:underline">{tube.name}</Link>
+                      ) : tube.name}
+                    </td>
                     <td className="px-4 py-1.5 text-right">{tube.chf_per_tube.toFixed(2)}</td>
                     <td className="px-4 py-1.5 text-right font-bold text-[#8B1A2B]">
                       {tube.supplement > 0 ? `+${tube.supplement}` : "—"}
