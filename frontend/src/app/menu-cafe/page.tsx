@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { apiFetch } from "@/lib/api";
 import { useToast } from "@/components/Toast";
 import Link from "next/link";
@@ -278,138 +278,135 @@ export default function MenuCafePage() {
         />
       </div>
 
-      {/* ── Sections ── */}
-      {secciones.map((seccion) => {
+      {/* ── Sections with Frozen Tubes inserted between 130g and Cápsulas ── */}
+      {secciones.flatMap((seccion, idx) => {
+        const elements: React.ReactNode[] = [];
         const filtered = filterItems(seccion.items);
-        if (filtered.length === 0) return null;
-        const groups = groupByColor(filtered);
-
-        return (
-          <section key={seccion.nombre}>
-            <h2 className="text-lg font-bold bg-[#8B1A2B] text-white px-4 py-2 rounded-t-lg">
-              {seccion.nombre}
-            </h2>
-            <div className="bg-white border border-[#E8DFD3] rounded-b-lg overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm min-w-[800px]">
-                  <thead>
-                    <tr className="bg-[#F5F0E8] text-left text-[#6B5E52] border-b border-[#E8DFD3]">
-                      <th className="px-4 py-2 font-medium">Nombre</th>
-                      <th className="px-4 py-2 font-medium">Proveedor</th>
-                      <th className="px-4 py-2 font-medium text-right">Coste</th>
-                      <th className="px-4 py-2 font-medium text-right">PVP</th>
-                      <th className="px-4 py-2 font-medium text-right">Margen %</th>
-                      <th className="px-4 py-2 font-medium text-right">Stock</th>
-                      <th className="px-4 py-2 font-medium text-right">Consumo/sem</th>
-                      <th className="px-4 py-2 font-medium text-center">Tend.</th>
-                      <th className="px-4 py-2 font-medium text-center">Activo</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {groups.map((group) => (
-                      <ColorGroup
-                        key={group.color ?? "__null"}
-                        color={group.color}
-                        items={group.items}
-                        editingPvp={editingPvp}
-                        editPvpValue={editPvpValue}
-                        setEditingPvp={setEditingPvp}
-                        setEditPvpValue={setEditPvpValue}
-                        handlePvpSave={handlePvpSave}
-                        handleToggleActivo={handleToggleActivo}
-                        togglingActivo={togglingActivo}
-                      />
-                    ))}
-                  </tbody>
-                </table>
+        if (filtered.length > 0) {
+          const groups = groupByColor(filtered);
+          elements.push(
+            <section key={seccion.nombre}>
+              <h2 className="text-lg font-bold bg-[#8B1A2B] text-white px-4 py-2 rounded-t-lg">
+                {seccion.nombre}
+              </h2>
+              <div className="bg-white border border-[#E8DFD3] rounded-b-lg overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm min-w-[800px]">
+                    <thead>
+                      <tr className="bg-[#F5F0E8] text-left text-[#6B5E52] border-b border-[#E8DFD3]">
+                        <th className="px-4 py-2 font-medium">Nombre</th>
+                        <th className="px-4 py-2 font-medium">Proveedor</th>
+                        <th className="px-4 py-2 font-medium text-right">Coste</th>
+                        <th className="px-4 py-2 font-medium text-right">PVP</th>
+                        <th className="px-4 py-2 font-medium text-right">Margen %</th>
+                        <th className="px-4 py-2 font-medium text-right">Stock</th>
+                        <th className="px-4 py-2 font-medium text-right">Consumo/sem</th>
+                        <th className="px-4 py-2 font-medium text-center">Tend.</th>
+                        <th className="px-4 py-2 font-medium text-center">Activo</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {groups.map((group) => (
+                        <ColorGroup
+                          key={group.color ?? "__null"}
+                          color={group.color}
+                          items={group.items}
+                          editingPvp={editingPvp}
+                          editPvpValue={editPvpValue}
+                          setEditingPvp={setEditingPvp}
+                          setEditPvpValue={setEditPvpValue}
+                          handlePvpSave={handlePvpSave}
+                          handleToggleActivo={handleToggleActivo}
+                          togglingActivo={togglingActivo}
+                        />
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
-            </div>
-          </section>
-        );
+            </section>
+          );
+        }
+        // Insert frozen tubes after 130g section (or last section before Cápsulas)
+        const nextSeccion = secciones[idx + 1];
+        const isBefore130gOrCapsulas = seccion.nombre.includes("130") || (seccion.nombre.includes("200") && (!nextSeccion || nextSeccion.nombre.includes("Cáp")));
+        if (isBefore130gOrCapsulas && frozenTubes.length > 0) {
+          elements.push(<FrozenSection key="__frozen__" frozenTubes={frozenTubes} />);
+        }
+        return elements;
       })}
 
-      {/* ── Frozen Tubes ── */}
-      {frozenTubes.length > 0 && (
-        <section>
-          <h2 className="text-lg font-bold bg-[#3D2E22] text-white px-4 py-2 rounded-t-lg">
-            Frozen Tubes
-          </h2>
-          <div className="bg-white border border-[#E8DFD3] rounded-b-lg overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm min-w-[600px]">
-                <thead>
-                  <tr className="bg-[#F5F0E8] text-left text-[#6B5E52] border-b border-[#E8DFD3]">
-                    <th className="px-4 py-2 font-medium">Cafe</th>
-                    <th className="px-4 py-2 font-medium text-right">CHF/tubo</th>
-                    <th className="px-4 py-2 font-medium text-right">Suplemento</th>
-                    <th className="px-4 py-2 font-medium text-right">Stock BRU1</th>
-                    <th className="px-4 py-2 font-medium text-right">Stock BRU2</th>
-                    <th className="px-4 py-2 font-medium text-right">Stock Bolsa</th>
-                    <th className="px-4 py-2 font-medium text-center">Disponible</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {frozenTubes.map((tube) => (
-                    <tr
-                      key={tube.name}
-                      className="border-b border-[#E8DFD3]/50 hover:bg-[#F5F0E8]"
-                    >
-                      <td className="px-4 py-2">
-                        {tube.origen_id ? (
-                          <Link
-                            href={`/ingredientes/${tube.origen_id}`}
-                            className="text-[#8B1A2B] hover:underline"
-                          >
-                            {tube.name}
-                          </Link>
-                        ) : (
-                          tube.name
-                        )}
-                      </td>
-                      <td className="px-4 py-2 text-right">{tube.chf_per_tube.toFixed(2)}</td>
-                      <td className="px-4 py-2 text-right font-bold text-[#8B1A2B]">
-                        {tube.supplement > 0 ? `+${tube.supplement}` : "—"}
-                      </td>
-                      <td className="px-4 py-2 text-right">
-                        {tube.stock_bru1 !== undefined ? tube.stock_bru1 : "—"}
-                      </td>
-                      <td className="px-4 py-2 text-right">
-                        {tube.stock_bru2 !== undefined ? tube.stock_bru2 : "—"}
-                      </td>
-                      <td className="px-4 py-2 text-right">
-                        {tube.stock_bolsa !== undefined ? tube.stock_bolsa : "—"}
-                      </td>
-                      <td className="px-4 py-2 text-center">
-                        {tube.disponible !== undefined ? (
-                          <span
-                            className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${
-                              tube.disponible
-                                ? "bg-green-100 text-green-700"
-                                : "bg-red-100 text-red-700"
-                            }`}
-                          >
-                            {tube.disponible ? "Si" : "No"}
-                          </span>
-                        ) : (
-                          "—"
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            {frozenTubes[0] && (
-              <div className="px-4 py-2 bg-[#F5F0E8] text-xs text-[#6B5E52]">
-                Base: Doppio {frozenTubes[0].doppio_pvp.toFixed(2)} CHF (coste{" "}
-                {frozenTubes[0].doppio_cost.toFixed(2)} CHF) ·{" "}
-                {frozenTubes[0].grams_per_tube}g/tubo
-              </div>
-            )}
-          </div>
-        </section>
+      {/* Fallback: show frozen at end if no 130g/Cápsulas sections exist */}
+      {!secciones.some(s => s.nombre.includes("130")) && frozenTubes.length > 0 && (
+        <FrozenSection frozenTubes={frozenTubes} />
       )}
+
+      {/* ── (frozen rendered inline above) ── */}
     </div>
+  );
+}
+
+/* ── Frozen Section ── */
+
+function FrozenSection({ frozenTubes }: { frozenTubes: FrozenTube[] }) {
+  return (
+    <section>
+      <h2 className="text-lg font-bold bg-[#3D2E22] text-white px-4 py-2 rounded-t-lg">
+        Frozen Tubes
+      </h2>
+      <div className="bg-white border border-[#E8DFD3] rounded-b-lg overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm min-w-[600px]">
+            <thead>
+              <tr className="bg-[#F5F0E8] text-left text-[#6B5E52] border-b border-[#E8DFD3]">
+                <th className="px-4 py-2 font-medium">Cafe</th>
+                <th className="px-4 py-2 font-medium text-right">CHF/tubo</th>
+                <th className="px-4 py-2 font-medium text-right">Suplemento</th>
+                <th className="px-4 py-2 font-medium text-right">Stock BRU1</th>
+                <th className="px-4 py-2 font-medium text-right">Stock BRU2</th>
+                <th className="px-4 py-2 font-medium text-right">Stock Bolsa</th>
+                <th className="px-4 py-2 font-medium text-center">Disponible</th>
+              </tr>
+            </thead>
+            <tbody>
+              {frozenTubes.map((tube) => (
+                <tr key={tube.name} className="border-b border-[#E8DFD3]/50 hover:bg-[#F5F0E8]">
+                  <td className="px-4 py-2">
+                    {tube.origen_id ? (
+                      <Link href={`/ingredientes/${tube.origen_id}`} className="text-[#8B1A2B] hover:underline">
+                        {tube.name}
+                      </Link>
+                    ) : tube.name}
+                  </td>
+                  <td className="px-4 py-2 text-right">{tube.chf_per_tube.toFixed(2)}</td>
+                  <td className="px-4 py-2 text-right font-bold text-[#8B1A2B]">
+                    {tube.supplement > 0 ? `+${tube.supplement}` : "—"}
+                  </td>
+                  <td className="px-4 py-2 text-right">{tube.stock_bru1 ?? "—"}</td>
+                  <td className="px-4 py-2 text-right">{tube.stock_bru2 ?? "—"}</td>
+                  <td className="px-4 py-2 text-right">{tube.stock_bolsa ?? "—"}</td>
+                  <td className="px-4 py-2 text-center">
+                    {tube.disponible !== undefined ? (
+                      <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${
+                        tube.disponible ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+                      }`}>
+                        {tube.disponible ? "Si" : "No"}
+                      </span>
+                    ) : "—"}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {frozenTubes[0] && (
+          <div className="px-4 py-2 bg-[#F5F0E8] text-xs text-[#6B5E52]">
+            Base: Doppio {frozenTubes[0].doppio_pvp.toFixed(2)} CHF (coste{" "}
+            {frozenTubes[0].doppio_cost.toFixed(2)} CHF) · {frozenTubes[0].grams_per_tube}g/tubo
+          </div>
+        )}
+      </div>
+    </section>
   );
 }
 
