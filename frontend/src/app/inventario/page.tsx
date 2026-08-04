@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useState, useCallback } from "react";
 import Link from "next/link";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { apiFetch } from "@/lib/api";
 import { useToast } from "@/components/Toast";
 import type { Ingrediente, Categoria, RecomendacionItem } from "@/lib/types";
@@ -91,33 +91,33 @@ export default function InventarioPage() {
 
 function InventarioContent() {
   const toast = useToast();
-  const router = useRouter();
   const searchParams = useSearchParams();
 
-  const urlTab = searchParams.get("tab") as "registrar" | "historial" | "analisis" | null;
-  const urlSemana = searchParams.get("semana");
-  const urlView = searchParams.get("view");
-  const tab = urlTab || "registrar";
-  const urlSemanaVal = urlSemana || "";
+  // Read URL params only on initial mount for deep linking
+  const [tab, setTabState] = useState<"registrar" | "historial" | "analisis">(
+    (searchParams.get("tab") as "registrar" | "historial" | "analisis") || "registrar"
+  );
+  const [selectedSemana, setSelectedSemana] = useState(searchParams.get("semana") || "");
+
+  // Sync URL without triggering navigation (no re-render, no Suspense)
+  const syncUrl = useCallback((params: Record<string, string>) => {
+    const sp = new URLSearchParams();
+    for (const [k, v] of Object.entries(params)) {
+      if (v) sp.set(k, v);
+    }
+    const qs = sp.toString();
+    window.history.replaceState(null, "", `/inventario${qs ? `?${qs}` : ""}`);
+  }, []);
 
   const setTab = useCallback((newTab: "registrar" | "historial" | "analisis") => {
-    router.push(`/inventario?tab=${newTab}`);
-  }, [router]);
-
-  const [selectedSemana, setSelectedSemana] = useState(urlSemanaVal);
-
-  useEffect(() => {
-    setSelectedSemana(urlSemanaVal);
-  }, [urlSemanaVal]);
+    setTabState(newTab);
+    syncUrl({ tab: newTab });
+  }, [syncUrl]);
 
   const setHistorialFecha = useCallback((semana: string) => {
     setSelectedSemana(semana);
-    if (semana) {
-      router.push(`/inventario?tab=historial&semana=${semana}`);
-    } else {
-      router.push(`/inventario?tab=historial`);
-    }
-  }, [router]);
+    syncUrl({ tab: "historial", ...(semana ? { semana } : {}) });
+  }, [syncUrl]);
 
   const [ingredientes, setIngredientes] = useState<Ingrediente[]>([]);
   const [categorias, setCategorias] = useState<Categoria[]>([]);
@@ -165,23 +165,20 @@ function InventarioContent() {
   } | null>(null);
   const [selectedIngId, setSelectedIngId] = useState<number | null>(null);
   const [idsConRegistros, setIdsConRegistros] = useState<number[]>([]);
-  const urlVista = searchParams.get("seccion") as "cocina" | "cafe" | "bar" | null;
-  const vista = urlVista || "cocina";
+  const [vista, setVistaState] = useState<"cocina" | "cafe" | "bar">(
+    (searchParams.get("seccion") as "cocina" | "cafe" | "bar") || "cocina"
+  );
   const setVista = useCallback((v: "cocina" | "cafe" | "bar") => {
-    const params = new URLSearchParams(window.location.search);
-    params.set("seccion", v);
-    router.push(`/inventario?${params.toString()}`);
-  }, [router]);
+    setVistaState(v);
+    const sp = new URLSearchParams(window.location.search);
+    sp.set("seccion", v);
+    window.history.replaceState(null, "", `/inventario?${sp.toString()}`);
+  }, []);
   const [ultimoConteo, setUltimoConteo] = useState<Record<string, { fecha: string; unidad: string }>>({});
   const [recomendaciones, setRecomendaciones] = useState<RecomendacionItem[]>([]);
-  const showRecomendaciones = urlView === "recomendaciones";
-  const setShowRecomendaciones = useCallback((show: boolean) => {
-    if (show) {
-      router.push("/inventario?view=recomendaciones");
-    } else {
-      router.push("/inventario");
-    }
-  }, [router]);
+  const [showRecomendaciones, setShowRecomendaciones] = useState(
+    searchParams.get("view") === "recomendaciones"
+  );
   const [hasRecomendaciones, setHasRecomendaciones] = useState(false);
   const [cantidadesPedido, setCantidadesPedido] = useState<Record<number, string>>({});
   const [creatingOrder, setCreatingOrder] = useState(false);
