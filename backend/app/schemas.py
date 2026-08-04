@@ -73,6 +73,7 @@ class IngredienteOut(IngredienteBase):
     excluir_pedidos: bool = False
     activo: bool = True
     grupo_ingrediente_id: Optional[int] = None
+    precio_eur: Optional[float] = None
 
     model_config = {"from_attributes": True}
 

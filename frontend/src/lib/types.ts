@@ -26,6 +26,7 @@ export interface Ingrediente {
   excluir_pedidos?: boolean;
   activo?: boolean;
   grupo_ingrediente_id?: number | null;
+  precio_eur?: number | null;
 }
 
 export interface LineaReceta {

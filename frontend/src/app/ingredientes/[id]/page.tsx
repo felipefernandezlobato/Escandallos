@@ -124,8 +124,15 @@ export default function IngredienteDetailPage() {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        {ingrediente.precio_eur != null && ingrediente.precio_eur > 0 && (
+          <div className="bg-white border border-[#E8DFD3] rounded-lg p-4">
+            <p className="text-xs text-[#6B5E52]">Precio origen</p>
+            <p className="text-xl font-bold">{ingrediente.precio_eur.toFixed(2)} €</p>
+            <p className="text-xs text-[#6B5E52]">sin envío ni import</p>
+          </div>
+        )}
         <div className="bg-white border border-[#E8DFD3] rounded-lg p-4">
-          <p className="text-xs text-[#6B5E52]">Precio compra</p>
+          <p className="text-xs text-[#6B5E52]">{ingrediente.precio_eur ? "Coste con import" : "Precio compra"}</p>
           {editingPrice ? (
             <div className="flex items-center gap-1 mt-1">
               <input
