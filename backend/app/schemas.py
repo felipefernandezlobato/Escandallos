@@ -61,6 +61,7 @@ class IngredienteUpdate(BaseModel):
     notas: Optional[str] = None
     grupo_ingrediente_id: Optional[int] = None
     activo: Optional[bool] = None
+    precio_venta: Optional[float] = None
 
 
 class IngredienteOut(IngredienteBase):
@@ -74,6 +75,7 @@ class IngredienteOut(IngredienteBase):
     activo: bool = True
     grupo_ingrediente_id: Optional[int] = None
     precio_eur: Optional[float] = None
+    precio_venta: Optional[float] = None
 
     model_config = {"from_attributes": True}
 

@@ -121,13 +121,17 @@ Render start command is `bash start.sh` (set in dashboard, NOT render.yaml). It 
 ## Coffee Inventory System
 
 - **Parent-child ingredients:** `grupo_ingrediente_id` FK on ingredientes, `activo` flag for show/hide
-- **4 color labels** from Dabov catalog: MARRÓN (brown), ROJO (red), BLACK (exclusive), GOLD (competition)
-- **Formats:** 1kg beans, 200g retail, 130g competition, frozen tubes, capsules
+- **4 color labels** (internal classification, all suppliers): MARRÓN (brown), ROJO (red), BLACK (exclusive), GOLD (competition)
+- **Multi-supplier:** DABOV and BD (Brewing Dealers). Naming: "size SUPPLIER name" (e.g., "1kg DABOV Brazil By Dabov", "200g BD Lord")
+- **Formats:** 1kg beans, 200g retail, 100g/130g competition, frozen tubes, capsules
 - **Multi-location:** `ubicacion` field on inventario_registros (BRU1/BRU2)
-- **Frozen tubes:** separate parents per location, `consumo_override_semanal` from Lightspeed POS, `par_level_override`. Pricing via `coste_kg_frozen`, `suplemento_frozen`, `frozen_origen_id` columns (NOT `precio_compra`)
+- **Frozen tubes:** separate parents per location, `consumo_override_semanal` from Lightspeed POS, `par_level_override` (10/200g flavor, 6/130g flavor)
+- **Frozen tube pricing:** `coste_kg_frozen` (CHF/kg), `suplemento_frozen` (+X CHF), `frozen_origen_id` (FK to source bag)
+- **Dynamic frozen menu:** `/api/menu/frozen` returns visible tubes based on tube stock + bag stock + pending orders. No hardcoded data.
 - **Café analysis table:** always visible in Cafe tab, single `/api/inventario/cafe-resumen` endpoint
 - **Gestionar Cafés:** modal to activate/deactivate coffees
 - Display order everywhere: MARRÓN → ROJO → BLACK → GOLD
+- 100g/130g bags → always GOLD parent regardless of color classification
 
 ## Oat Milk Variant
 

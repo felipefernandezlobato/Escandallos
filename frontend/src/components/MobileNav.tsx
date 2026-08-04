@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 
 const MOBILE_ITEMS = [
   { href: "/", label: "Menú", icon: "📖" },
+  { href: "/menu-cafe", label: "Café", icon: "☕" },
   { href: "/recetas", label: "Recetas", icon: "📋" },
   { href: "/ingredientes", label: "Ingred.", icon: "🥫" },
   { href: "/inventario", label: "Stock", icon: "📦" },
