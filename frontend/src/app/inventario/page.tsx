@@ -1616,12 +1616,12 @@ function InventarioContent() {
                     const COLOR_NAMES: Record<number, string> = { 73: "MARRÓN", 277: "ROJO", 326: "MARRÓN", 325: "ROJO", 327: "BLACK", 328: "GOLD" };
                     const coffeeSubOrder = (name: string): number => {
                       const n = name.toLowerCase();
+                      if (n.includes("café en grano")) return 10;
                       if (n.includes("1kg") || n.includes("1 kg")) return 10;
-                      if (n.includes("café en grano")) return 15;
+                      if (n.startsWith("retail ") && n.includes("200g")) return 30;
                       if (n.includes("200g") || n.includes("200 g")) return 30;
-                      if (n.startsWith("retail ") && n.includes("200g")) return 35;
+                      if (n.startsWith("retail ") && !n.includes("200g")) return 40;
                       if (n.includes("130g") || n.includes("130 g")) return 40;
-                      if (n.startsWith("retail ") && !n.includes("200g")) return 42;
                       if (n.includes("coffee retail")) return 45;
                       if (n.includes("tubos frozen")) return 50;
                       if (n.startsWith("frozen") || n.includes("frozen")) return 60;
@@ -1664,6 +1664,9 @@ function InventarioContent() {
                           if (subDiff !== 0) return subDiff;
                           const colorDiff = coffeeColorOrder(a.ingrediente_id, a.ingrediente_nombre) - coffeeColorOrder(b.ingrediente_id, b.ingrediente_nombre);
                           if (colorDiff !== 0) return colorDiff;
+                          const aTotal = isCoffeeTotalRow(a.ingrediente_nombre) ? 1 : 0;
+                          const bTotal = isCoffeeTotalRow(b.ingrediente_nombre) ? 1 : 0;
+                          if (aTotal !== bTotal) return aTotal - bTotal;
                         }
                         return a.ingrediente_nombre.localeCompare(b.ingrediente_nombre, "es");
                       });
