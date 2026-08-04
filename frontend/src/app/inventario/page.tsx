@@ -1505,7 +1505,21 @@ function InventarioContent() {
                             </td>
                           </tr>
                         )}
-                        {byDate[d].map((r) => (
+                        {byDate[d].flatMap((r, idx) => {
+                          const cat = getCategory(r.ingrediente_id);
+                          const prevCat = idx > 0 ? getCategory(byDate[d][idx - 1].ingrediente_id) : "";
+                          const showHeader = cat !== prevCat && cat !== "";
+                          const rows = [];
+                          if (showHeader) {
+                            rows.push(
+                              <tr key={`hdr-${r.id}`} className="bg-[#F5F0E8]/70">
+                                <td colSpan={4} className="px-4 py-1 text-xs font-medium text-[#6B5E52]/80 uppercase tracking-wider">
+                                  {cat}
+                                </td>
+                              </tr>
+                            );
+                          }
+                          rows.push(
                           <tr key={r.id} className="border-b border-[#E8DFD3]/50 hover:bg-[#F5F0E8]">
                             <td className="px-4 py-2">
                               <Link href={`/ingredientes/${r.ingrediente_id}`} className="text-[#8B1A2B] hover:underline">
@@ -1556,7 +1570,9 @@ function InventarioContent() {
                               )}
                             </td>
                           </tr>
-                        ))}
+                          );
+                          return rows;
+                        })}
                       </tbody>
                     ));
                   })()}
