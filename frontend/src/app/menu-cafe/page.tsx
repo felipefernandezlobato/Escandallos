@@ -153,7 +153,7 @@ export default function MenuCafePage() {
     try {
       await apiFetch(`/api/cafe/catalogo/${id}/pvp`, {
         method: "PUT",
-        body: JSON.stringify({ pvp: val }),
+        body: JSON.stringify({ precio_venta: val }),
       });
       toast("PVP actualizado");
       fetchData();
