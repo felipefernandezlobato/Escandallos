@@ -1589,7 +1589,7 @@ function InventarioContent() {
                 <table className="text-sm border-collapse">
                   <thead>
                     <tr className="border-b border-[#E8DFD3] text-left text-[#6B5E52]">
-                      <th className="pb-2 pr-4 font-medium sticky left-0 bg-[#F5F0E8] z-10 min-w-[180px]">Ingrediente</th>
+                      <th className="pb-2 pr-4 font-medium sticky left-0 bg-[#F5F0E8] z-10 min-w-[260px]">Ingrediente</th>
                       <th className="pb-2 px-2 font-medium whitespace-nowrap">Ud</th>
                       {pivot.fechas.map((f) => (
                         <th key={f} className="pb-2 px-2 font-medium text-center whitespace-nowrap">
@@ -1615,24 +1615,34 @@ function InventarioContent() {
                       if (!grouped[g.name]) grouped[g.name] = { orden: g.orden, items: [] };
                       grouped[g.name].items.push(ing);
                     }
+                    const COLOR_ORDER: Record<number, number> = { 73: 0, 277: 1, 326: 0, 325: 1, 327: 3, 328: 2 };
                     const coffeeSubOrder = (name: string): number => {
                       const n = name.toLowerCase();
                       if (n.includes("café en grano")) return 0;
-                      if (n.includes("1kg") || n.includes("1 kg")) return 1;
-                      if (n.includes("coffee retail")) return 2;
-                      if (n.includes("200g") || n.includes("200 g")) return 3;
-                      if (n.includes("130g") || n.includes("130 g")) return 4;
-                      if (n.includes("tubos frozen")) return 5;
-                      if (n.startsWith("frozen") || n.includes("frozen")) return 6;
-                      if (n.includes("cápsula") || n.includes("capsula")) return 7;
-                      return 8;
+                      if (n.includes("1kg") || n.includes("1 kg")) return 10;
+                      if (n.includes("coffee retail")) return 20;
+                      if (n.includes("200g") || n.includes("200 g")) return 30;
+                      if (n.includes("130g") || n.includes("130 g")) return 40;
+                      if (n.includes("tubos frozen")) return 50;
+                      if (n.startsWith("frozen") || n.includes("frozen")) return 60;
+                      if (n.includes("cápsula") || n.includes("capsula")) return 70;
+                      return 80;
+                    };
+                    const coffeeColorOrder = (ingId: number): number => {
+                      const fullIng = ingredientes.find((i) => i.id === ingId);
+                      if (fullIng && fullIng.grupo_ingrediente_id) {
+                        return COLOR_ORDER[fullIng.grupo_ingrediente_id] ?? 5;
+                      }
+                      return 5;
                     };
                     const sortItems = (items: typeof filtered, group: string) => {
                       const isCafe = vista === "cafe" && (group === "Café" || group.toLowerCase().includes("café"));
                       return [...items].sort((a, b) => {
                         if (isCafe) {
-                          const diff = coffeeSubOrder(a.ingrediente_nombre) - coffeeSubOrder(b.ingrediente_nombre);
-                          if (diff !== 0) return diff;
+                          const subDiff = coffeeSubOrder(a.ingrediente_nombre) - coffeeSubOrder(b.ingrediente_nombre);
+                          if (subDiff !== 0) return subDiff;
+                          const colorDiff = coffeeColorOrder(a.ingrediente_id) - coffeeColorOrder(b.ingrediente_id);
+                          if (colorDiff !== 0) return colorDiff;
                         }
                         return a.ingrediente_nombre.localeCompare(b.ingrediente_nombre, "es");
                       });
