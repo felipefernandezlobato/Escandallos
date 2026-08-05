@@ -222,6 +222,7 @@ def inventario_pivot(
 
     fechas_set: set[str] = set()
     by_ing: dict[int, dict] = {}
+    latest_date_per_ing_week: dict[tuple[int, str], date] = {}
     for r in registros:
         week = to_week_key(r.fecha_registro)
         fechas_set.add(week)
@@ -233,8 +234,14 @@ def inventario_pivot(
                 "unidad": r.unidad,
                 "fechas": {},
             }
-        if week not in by_ing[r.ingrediente_id]["fechas"]:
-            by_ing[r.ingrediente_id]["fechas"][week] = round(r.cantidad, 2)
+        key = (r.ingrediente_id, week)
+        if key not in latest_date_per_ing_week:
+            latest_date_per_ing_week[key] = r.fecha_registro
+        latest = latest_date_per_ing_week[key]
+        if r.fecha_registro == latest:
+            by_ing[r.ingrediente_id]["fechas"][week] = round(
+                by_ing[r.ingrediente_id]["fechas"].get(week, 0) + r.cantidad, 2
+            )
 
     fechas_sorted = sorted(fechas_set, reverse=True)
 

@@ -81,11 +81,29 @@ def _consumo_semanal_leaf(ingrediente_id: int, db: Session, semanas: int = 12) -
         .all()
     )
     # Exclude "Pedido recibido" records — they duplicate order data and inflate consumption
-    inventarios = [r for r in all_inventarios if not (r.notas and "recibido" in r.notas.lower())]
+    filtered = [r for r in all_inventarios if not (r.notas and "recibido" in r.notas.lower())]
     if all_inventarios:
         target_unit = all_inventarios[-1].unidad
     else:
         target_unit = ing.unidad_compra if ing else "unidad"
+
+    # Aggregate same-day records (BRU1 + BRU2 entries) into single data points
+    from collections import OrderedDict
+    day_sums: OrderedDict[date, float] = OrderedDict()
+    day_units: dict[date, str] = {}
+    for r in filtered:
+        day_sums[r.fecha_registro] = day_sums.get(r.fecha_registro, 0) + r.cantidad
+        if r.fecha_registro not in day_units:
+            day_units[r.fecha_registro] = r.unidad
+
+    class _AggRecord:
+        def __init__(self, fecha, cantidad, unidad):
+            self.fecha_registro = fecha
+            self.cantidad = cantidad
+            self.unidad = unidad
+            self.notas = None
+
+    inventarios = [_AggRecord(f, q, day_units[f]) for f, q in day_sums.items()]
 
     pedidos_recibidos = (
         db.query(LineaPedido.cantidad_recibida, LineaPedido.unidad, Pedido.fecha_recepcion)
@@ -183,17 +201,26 @@ def consumo_medio_semanal(ingrediente_id: int, db: Session, semanas: int = 8) ->
 
 
 def _stock_actual_leaf(ingrediente_id: int, db: Session) -> Optional[dict]:
-    """Get latest stock for a single (leaf) ingredient."""
+    """Get latest stock for a single (leaf) ingredient.
+    Sums all records from the latest date (BRU1 + BRU2 entries)."""
     ultimo = (
         db.query(InventarioRegistro)
         .filter(InventarioRegistro.ingrediente_id == ingrediente_id)
-        .order_by(InventarioRegistro.fecha_registro.desc(), InventarioRegistro.id.desc())
+        .order_by(InventarioRegistro.fecha_registro.desc())
         .first()
     )
     if not ultimo:
         return None
+    registros_dia = (
+        db.query(InventarioRegistro)
+        .filter(
+            InventarioRegistro.ingrediente_id == ingrediente_id,
+            InventarioRegistro.fecha_registro == ultimo.fecha_registro,
+        )
+        .all()
+    )
     return {
-        "cantidad": ultimo.cantidad,
+        "cantidad": sum(r.cantidad for r in registros_dia),
         "unidad": ultimo.unidad,
         "fecha": ultimo.fecha_registro,
     }
