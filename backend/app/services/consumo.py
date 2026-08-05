@@ -226,12 +226,18 @@ def _stock_actual_leaf(ingrediente_id: int, db: Session) -> Optional[dict]:
     }
 
 
+CAFE_CATEGORIA_ID = 5
+
 def stock_actual(ingrediente_id: int, db: Session) -> Optional[dict]:
     """Get latest stock. If parent, sum latest stock of all children.
-    Children not counted on the most recent date are assumed to be 0."""
+    For café (categoria_id=5): children not counted on the most recent date = 0.
+    For other categories: use each child's last known stock."""
     children = _child_ids(ingrediente_id, db)
     if not children:
         return _stock_actual_leaf(ingrediente_id, db)
+
+    ing = db.query(Ingrediente).get(ingrediente_id)
+    zero_if_uncounted = ing and ing.categoria_id == CAFE_CATEGORIA_ID
 
     child_stocks = []
     latest_fecha = None
@@ -247,12 +253,14 @@ def stock_actual(ingrediente_id: int, db: Session) -> Optional[dict]:
     total = 0.0
     unidad = None
     for stk in child_stocks:
-        if stk and stk["fecha"] == latest_fecha:
-            total += stk["cantidad"]
+        if stk:
             if unidad is None:
                 unidad = stk["unidad"]
-        elif stk and unidad is None:
-            unidad = stk["unidad"]
+            if zero_if_uncounted:
+                if stk["fecha"] == latest_fecha:
+                    total += stk["cantidad"]
+            else:
+                total += stk["cantidad"]
 
     if unidad is None:
         return None

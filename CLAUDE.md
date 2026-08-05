@@ -139,6 +139,14 @@ Render start command is `bash start.sh` (set in dashboard, NOT render.yaml). It 
 - Shows in both summary cards and ingredient table (↳ Leche de avena line)
 - No DB change needed — purely frontend display calculation
 
+## Inventory Stock Rules
+
+- Nelson enters stock for **BRU1 and BRU2 separately** on the same day — always **sum** same-day records per ingredient
+- If an ingredient was **not counted** in the latest inventory session, assume its stock is **0** — never carry forward old values from previous weeks
+- Within a parent group, only children counted on the most recent date contribute to the total
+- **This rule only applies to café (categoria_id=5).** Kitchen/bar/other categories keep each child's last known stock even if not counted recently
+- These rules apply to: `stock_actual`, pivot aggregation, and consumption calculations
+
 ## Consumption & Ordering
 
 - `consumo_semanal()` excludes "Pedido recibido" inventory records (they duplicate order data)
