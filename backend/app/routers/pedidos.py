@@ -17,6 +17,7 @@ from app.services.conversiones import to_week_key
 from app.services.consumo import recomendacion_pedido
 from app.services.costes import crear_historial_precio
 from app.schemas import (
+    LineaPedidoCreate,
     LineaPedidoOut,
     LineaPedidoUpdate,
     PedidoCreate,
@@ -293,6 +294,61 @@ def actualizar_linea_pedido(
         "precio_unitario": linea.precio_unitario,
         "ingrediente_nombre": ing.nombre if ing else "",
     }
+
+
+@router.post("/{pedido_id}/lineas")
+def agregar_linea_pedido(
+    pedido_id: int,
+    data: LineaPedidoCreate,
+    db: Session = Depends(get_db),
+    user=Depends(get_current_user),
+):
+    p = db.get(Pedido, pedido_id)
+    if not p:
+        raise HTTPException(404, "Pedido no encontrado")
+    if p.estado == "recibido":
+        raise HTTPException(400, "No se puede modificar un pedido recibido")
+
+    linea = LineaPedido(pedido_id=pedido_id, **data.model_dump())
+    db.add(linea)
+    db.commit()
+
+    ing = db.get(Ingrediente, linea.ingrediente_id)
+    return {
+        "id": linea.id,
+        "ingrediente_id": linea.ingrediente_id,
+        "cantidad_pedida": linea.cantidad_pedida,
+        "unidad": linea.unidad,
+        "cantidad_recibida": linea.cantidad_recibida,
+        "precio_unitario": linea.precio_unitario,
+        "ingrediente_nombre": ing.nombre if ing else "",
+    }
+
+
+@router.delete("/{pedido_id}/lineas/{linea_id}")
+def eliminar_linea_pedido(
+    pedido_id: int,
+    linea_id: int,
+    db: Session = Depends(get_db),
+    user=Depends(get_current_user),
+):
+    p = db.get(Pedido, pedido_id)
+    if not p:
+        raise HTTPException(404, "Pedido no encontrado")
+    if p.estado == "recibido":
+        raise HTTPException(400, "No se puede modificar un pedido recibido")
+
+    linea = (
+        db.query(LineaPedido)
+        .filter(LineaPedido.id == linea_id, LineaPedido.pedido_id == pedido_id)
+        .first()
+    )
+    if not linea:
+        raise HTTPException(404, "Linea no encontrada")
+
+    db.delete(linea)
+    db.commit()
+    return {"ok": True}
 
 
 @router.delete("/{pedido_id}")

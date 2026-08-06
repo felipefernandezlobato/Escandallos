@@ -150,24 +150,52 @@ export default function PedidosPage() {
       porProv[l.proveedor].push(l);
     }
 
+    const enviadosPorProv: Record<string, Pedido> = {};
+    for (const p of pedidos) {
+      if (p.estado === "enviado") {
+        enviadosPorProv[p.proveedor] = p;
+      }
+    }
+
     setCreando(true);
     try {
       let creados = 0;
+      let agregados = 0;
       for (const [prov, items] of Object.entries(porProv)) {
-        await apiFetch("/api/pedidos", {
-          method: "POST",
-          body: JSON.stringify({
-            proveedor: prov,
-            lineas: items.map((l) => ({
-              ingrediente_id: l.ingrediente_id,
-              cantidad_pedida: l.cantidad_pedida,
-              unidad: l.unidad,
-            })),
-          }),
-        });
-        creados++;
+        const existente = enviadosPorProv[prov];
+        if (existente && confirm(
+          `Ya tienes un pedido enviado para ${prov} (${existente.num_lineas} items, ${existente.fecha}). ¿Agregar a ese pedido?`
+        )) {
+          for (const item of items) {
+            await apiFetch(`/api/pedidos/${existente.id}/lineas`, {
+              method: "POST",
+              body: JSON.stringify({
+                ingrediente_id: item.ingrediente_id,
+                cantidad_pedida: item.cantidad_pedida,
+                unidad: item.unidad,
+              }),
+            });
+          }
+          agregados += items.length;
+        } else {
+          await apiFetch("/api/pedidos", {
+            method: "POST",
+            body: JSON.stringify({
+              proveedor: prov,
+              lineas: items.map((l) => ({
+                ingrediente_id: l.ingrediente_id,
+                cantidad_pedida: l.cantidad_pedida,
+                unidad: l.unidad,
+              })),
+            }),
+          });
+          creados++;
+        }
       }
-      toast(`${creados} pedido${creados > 1 ? "s" : ""} creado${creados > 1 ? "s" : ""} como borrador`, "success");
+      const msgs: string[] = [];
+      if (creados > 0) msgs.push(`${creados} pedido${creados > 1 ? "s" : ""} creado${creados > 1 ? "s" : ""}`);
+      if (agregados > 0) msgs.push(`${agregados} linea${agregados > 1 ? "s" : ""} agregada${agregados > 1 ? "s" : ""} a pedido existente`);
+      toast(msgs.join(", "), "success");
       setShowCrear(false);
       fetchData();
     } catch (err) {

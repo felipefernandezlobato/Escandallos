@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { apiFetch } from "@/lib/api";
 import { useToast } from "@/components/Toast";
+import type { Ingrediente } from "@/lib/types";
 
 interface LineaPedido {
   id: number;
@@ -41,6 +42,13 @@ export default function PedidoDetailPage() {
   }>({ cantidad_pedida: "", cantidad_recibida: "", precio_unitario: "" });
   const [editingNotas, setEditingNotas] = useState(false);
   const [notasValue, setNotasValue] = useState("");
+
+  // Add lines state
+  const [showAgregar, setShowAgregar] = useState(false);
+  const [ingredientes, setIngredientes] = useState<Ingrediente[]>([]);
+  const [busqueda, setBusqueda] = useState("");
+  const [nuevasLineas, setNuevasLineas] = useState<Record<number, string>>({});
+  const [agregando, setAgregando] = useState(false);
 
   const fetchPedido = () => {
     apiFetch<PedidoDetail>(`/api/pedidos/${params.id}`)
@@ -106,6 +114,19 @@ export default function PedidoDetailPage() {
     }
   };
 
+  const handleDeleteLinea = async (lineaId: number, nombre: string) => {
+    if (!confirm(`Eliminar "${nombre}" del pedido?`)) return;
+    try {
+      await apiFetch(`/api/pedidos/${params.id}/lineas/${lineaId}`, {
+        method: "DELETE",
+      });
+      toast("Linea eliminada", "success");
+      fetchPedido();
+    } catch (err) {
+      toast("Error: " + (err as Error).message, "error");
+    }
+  };
+
   const handleSaveNotas = async () => {
     try {
       await apiFetch(`/api/pedidos/${params.id}`, {
@@ -120,8 +141,64 @@ export default function PedidoDetailPage() {
     }
   };
 
+  const openAgregar = () => {
+    if (ingredientes.length === 0) {
+      apiFetch<Ingrediente[]>("/api/ingredientes").then(setIngredientes);
+    }
+    setShowAgregar(true);
+    setNuevasLineas({});
+    setBusqueda("");
+  };
+
+  const normalize = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+
+  const ingredientesFiltrados = ingredientes
+    .filter((i) => i.activo !== false && !i.excluir_pedidos)
+    .filter((i) => {
+      if (!pedido) return true;
+      return !pedido.lineas.some((l) => l.ingrediente_id === i.id);
+    })
+    .filter((i) => !busqueda || normalize(i.nombre).includes(normalize(busqueda)));
+
+  const nuevasCount = Object.values(nuevasLineas).filter((v) => v && parseFloat(v) > 0).length;
+
+  const handleAgregarLineas = async () => {
+    if (!pedido) return;
+    const items = Object.entries(nuevasLineas)
+      .filter(([, v]) => v && parseFloat(v) > 0)
+      .map(([idStr, v]) => {
+        const ing = ingredientes.find((i) => i.id === Number(idStr))!;
+        return {
+          ingrediente_id: ing.id,
+          cantidad_pedida: parseFloat(v),
+          unidad: ing.unidad_compra,
+        };
+      });
+
+    if (items.length === 0) return;
+
+    setAgregando(true);
+    try {
+      for (const item of items) {
+        await apiFetch(`/api/pedidos/${params.id}/lineas`, {
+          method: "POST",
+          body: JSON.stringify(item),
+        });
+      }
+      toast(`${items.length} linea${items.length > 1 ? "s" : ""} agregada${items.length > 1 ? "s" : ""}`, "success");
+      setShowAgregar(false);
+      fetchPedido();
+    } catch (err) {
+      toast("Error: " + (err as Error).message, "error");
+    } finally {
+      setAgregando(false);
+    }
+  };
+
   if (loading) return <p className="text-[#6B5E52] py-10 text-center">Cargando...</p>;
   if (!pedido) return <p className="text-[#6B5E52] py-10 text-center">Pedido no encontrado</p>;
+
+  const editable = pedido.estado !== "recibido";
 
   const estadoColor = (estado: string) => {
     switch (estado) {
@@ -193,8 +270,79 @@ export default function PedidoDetailPage() {
               Recibir Pedido
             </Link>
           )}
+          {editable && !showAgregar && (
+            <button
+              onClick={openAgregar}
+              className="border border-[#8B1A2B] text-[#8B1A2B] px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#F5F0E8] transition-colors"
+            >
+              + Agregar lineas
+            </button>
+          )}
         </div>
       </div>
+
+      {/* Add lines form */}
+      {showAgregar && (
+        <div className="bg-white border border-[#8B1A2B]/20 rounded-lg p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-semibold text-[#8B1A2B]">
+              Agregar ingredientes — {nuevasCount} seleccionados
+            </h3>
+            <button
+              onClick={() => setShowAgregar(false)}
+              className="text-sm text-[#6B5E52] hover:text-[#8B1A2B]"
+            >
+              Cancelar
+            </button>
+          </div>
+          <input
+            type="text"
+            value={busqueda}
+            onChange={(e) => setBusqueda(e.target.value)}
+            placeholder="Buscar ingrediente..."
+            className="w-full border border-[#D4C4A8] rounded-lg px-3 py-2 text-sm"
+          />
+          <div className="max-h-64 overflow-y-auto space-y-1">
+            {ingredientesFiltrados.slice(0, 50).map((ing) => (
+              <div
+                key={ing.id}
+                className={`flex items-center gap-2 rounded px-3 py-1.5 ${
+                  nuevasLineas[ing.id] && parseFloat(nuevasLineas[ing.id]) > 0
+                    ? "bg-[#F5F0E8] border border-[#8B1A2B]/20"
+                    : "hover:bg-[#F5F0E8]/50"
+                }`}
+              >
+                <span className="flex-1 text-sm truncate">{ing.nombre}</span>
+                <input
+                  type="text"
+                  inputMode="decimal"
+                  placeholder="0"
+                  value={nuevasLineas[ing.id] || ""}
+                  onChange={(e) => {
+                    const v = e.target.value.replace(",", ".");
+                    if (v === "" || /^\d*\.?\d*$/.test(v))
+                      setNuevasLineas((prev) => ({ ...prev, [ing.id]: v }));
+                  }}
+                  className="w-16 border border-[#D4C4A8] rounded px-2 py-0.5 text-sm text-right"
+                />
+                <span className="text-xs text-[#6B5E52] w-12">{ing.unidad_compra}</span>
+              </div>
+            ))}
+            {ingredientesFiltrados.length === 0 && (
+              <p className="text-sm text-[#6B5E52] text-center py-4">No se encontraron ingredientes</p>
+            )}
+          </div>
+          {nuevasCount > 0 && (
+            <button
+              onClick={handleAgregarLineas}
+              disabled={agregando}
+              className="w-full bg-[#8B1A2B] text-white px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-[#6D1422] transition-colors disabled:opacity-50"
+            >
+              {agregando ? "Agregando..." : `Agregar ${nuevasCount} linea${nuevasCount > 1 ? "s" : ""}`}
+            </button>
+          )}
+        </div>
+      )}
 
       <div className="bg-white border border-[#E8DFD3] rounded-lg overflow-x-auto">
         <table className="w-full text-sm min-w-[500px]">
@@ -208,9 +356,9 @@ export default function PedidoDetailPage() {
               <th className="px-4 py-2 font-medium text-right">Unidad</th>
               <th className="px-4 py-2 font-medium text-right">Precio ud.</th>
               {pedido.lineas.some((l: LineaPedido) => l.precio_eur) && (
-                <th className="px-4 py-2 font-medium text-right">€ origen</th>
+                <th className="px-4 py-2 font-medium text-right">EUR origen</th>
               )}
-              <th className="px-4 py-2 font-medium text-right w-16"></th>
+              <th className="px-4 py-2 font-medium text-right w-24"></th>
             </tr>
           </thead>
           <tbody>
@@ -305,13 +453,24 @@ export default function PedidoDetailPage() {
                       </button>
                     </div>
                   ) : (
-                    <button
-                      onClick={() => handleEditLinea(l)}
-                      className="text-xs text-[#6B5E52] hover:text-[#8B1A2B]"
-                      title="Editar linea"
-                    >
-                      Editar
-                    </button>
+                    <div className="flex gap-2 justify-end">
+                      <button
+                        onClick={() => handleEditLinea(l)}
+                        className="text-xs text-[#6B5E52] hover:text-[#8B1A2B]"
+                        title="Editar linea"
+                      >
+                        Editar
+                      </button>
+                      {editable && (
+                        <button
+                          onClick={() => handleDeleteLinea(l.id, l.ingrediente_nombre)}
+                          className="text-xs text-red-400 hover:text-red-600"
+                          title="Eliminar linea"
+                        >
+                          X
+                        </button>
+                      )}
+                    </div>
                   )}
                 </td>
               </tr>
