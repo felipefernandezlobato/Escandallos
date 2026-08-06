@@ -355,6 +355,7 @@ export default function PedidoDetailPage() {
               )}
               <th className="px-4 py-2 font-medium text-right">Unidad</th>
               <th className="px-4 py-2 font-medium text-right">Precio ud.</th>
+              <th className="px-4 py-2 font-medium text-right">Total</th>
               {pedido.lineas.some((l: LineaPedido) => l.precio_eur) && (
                 <th className="px-4 py-2 font-medium text-right">EUR origen</th>
               )}
@@ -430,6 +431,11 @@ export default function PedidoDetailPage() {
                   ) : (
                     "—"
                   )}
+                </td>
+                <td className="px-4 py-2 text-right font-medium">
+                  {l.precio_unitario != null
+                    ? ((l.cantidad_recibida ?? l.cantidad_pedida) * l.precio_unitario).toFixed(2)
+                    : "—"}
                 </td>
                 {pedido.lineas.some((ll: LineaPedido) => ll.precio_eur) && (
                   <td className="px-4 py-2 text-right text-[#6B5E52]">

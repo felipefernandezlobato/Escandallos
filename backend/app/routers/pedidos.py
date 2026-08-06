@@ -196,7 +196,7 @@ def crear_pedido(
         if precio is None:
             ing = db.get(Ingrediente, linea_data.ingrediente_id)
             if ing and ing.precio_compra:
-                precio = ing.precio_compra
+                precio = round(ing.precio_compra / (ing.cantidad_compra or 1), 2)
         linea = LineaPedido(
             pedido_id=pedido.id,
             ingrediente_id=linea_data.ingrediente_id,
@@ -318,7 +318,7 @@ def agregar_linea_pedido(
     if linea_data.get("precio_unitario") is None:
         ing = db.get(Ingrediente, linea_data["ingrediente_id"])
         if ing and ing.precio_compra:
-            linea_data["precio_unitario"] = ing.precio_compra
+            linea_data["precio_unitario"] = round(ing.precio_compra / (ing.cantidad_compra or 1), 2)
     linea = LineaPedido(pedido_id=pedido_id, **linea_data)
     db.add(linea)
     db.commit()
