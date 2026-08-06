@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 
 from app.auth import get_current_user
 from app.database import get_db
-from app.models import Categoria, Ingrediente
+from app.models import Categoria, Ingrediente, PrecioProveedor, Proveedor
 from app.services.costes import crear_historial_precio
 from app.schemas import (
     ImportarConfirmItem,
@@ -116,6 +116,40 @@ def confirmar_importacion(data: ImportarConfirmRequest, db: Session = Depends(ge
             ing.proveedor = data.proveedor
             ing.fecha_actualizacion = date.today()
             actualizados += 1
+
+    # Upsert into precios_proveedor so comparison data stays current
+    prov = db.query(Proveedor).filter(Proveedor.nombre == data.proveedor).first()
+    if not prov:
+        prov = Proveedor(nombre=data.proveedor)
+        db.add(prov)
+        db.flush()
+
+    for item in data.items:
+        ing_id = item.ingrediente_id
+        if not ing_id:
+            continue
+        precio_por_unidad = item.precio_compra / item.cantidad_compra if item.cantidad_compra > 0 else item.precio_compra
+        existing = (
+            db.query(PrecioProveedor)
+            .filter(PrecioProveedor.ingrediente_id == ing_id, PrecioProveedor.proveedor_id == prov.id)
+            .first()
+        )
+        if existing:
+            existing.precio = item.precio_compra
+            existing.cantidad = item.cantidad_compra
+            existing.precio_por_unidad = precio_por_unidad
+            existing.unidad = item.unidad_compra
+            existing.fecha = date.today()
+        else:
+            db.add(PrecioProveedor(
+                ingrediente_id=ing_id,
+                proveedor_id=prov.id,
+                precio=item.precio_compra,
+                unidad=item.unidad_compra,
+                cantidad=item.cantidad_compra,
+                precio_por_unidad=precio_por_unidad,
+                fecha=date.today(),
+            ))
 
     db.commit()
     return {"actualizados": actualizados, "creados": creados}

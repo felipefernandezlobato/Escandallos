@@ -277,6 +277,39 @@ export default function IngredienteDetailPage() {
               })()}
             </tbody>
           </table>
+          {(() => {
+            if (preciosProveedores.length < 2) return null;
+            const cheapest = preciosProveedores.reduce((a, b) => a.precio_por_unidad < b.precio_por_unidad ? a : b);
+            if (cheapest.proveedor === ingrediente.proveedor) return null;
+            return (
+              <div className="px-4 py-3 bg-green-50 border-t border-green-200 flex items-center justify-between">
+                <span className="text-sm text-green-800">
+                  {cheapest.proveedor} es mas barato ({cheapest.precio_por_unidad.toFixed(2)} CHF/u vs actual)
+                </span>
+                <button
+                  onClick={() => {
+                    apiFetch(`/api/ingredientes/auto-switch-cheapest`, {
+                      method: "POST",
+                      body: JSON.stringify({ ingrediente_ids: [ingrediente.id] }),
+                    })
+                      .then(async (res: any) => {
+                        if (res.total > 0) {
+                          toast(`Cambiado a ${cheapest.proveedor}`);
+                          const updated = await apiFetch<Ingrediente>(`/api/ingredientes/${id}`);
+                          setIngrediente(updated);
+                          const hist = await apiFetch<HistorialPrecio[]>(`/api/ingredientes/${id}/historial`);
+                          setHistorial(hist);
+                        }
+                      })
+                      .catch(() => toast("Error al cambiar proveedor", "error"));
+                  }}
+                  className="px-3 py-1.5 bg-green-600 text-white text-sm rounded hover:bg-green-700 transition-colors"
+                >
+                  Usar mas barato
+                </button>
+              </div>
+            );
+          })()}
         )}
       </div>
 

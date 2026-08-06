@@ -2,6 +2,7 @@ from datetime import date
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
+from pydantic import BaseModel
 from sqlalchemy.orm import Session, joinedload
 
 from app.auth import get_current_user
@@ -208,6 +209,59 @@ def eliminar_historial_precio(ingrediente_id: int, historial_id: int, db: Sessio
     db.delete(entry)
     db.commit()
     return {"ok": True}
+
+
+class AutoSwitchRequest(BaseModel):
+    ingrediente_ids: Optional[list[int]] = None
+
+
+@router.post("/auto-switch-cheapest")
+def auto_switch_cheapest(
+    data: Optional[AutoSwitchRequest] = None,
+    db: Session = Depends(get_db),
+    user=Depends(get_current_user),
+):
+    q = db.query(Ingrediente).filter(Ingrediente.activo == True)
+    if data and data.ingrediente_ids:
+        q = q.filter(Ingrediente.id.in_(data.ingrediente_ids))
+    ingredientes = q.all()
+
+    cambios = []
+    for ing in ingredientes:
+        cheapest = (
+            db.query(PrecioProveedor)
+            .options(joinedload(PrecioProveedor.proveedor_rel))
+            .filter(PrecioProveedor.ingrediente_id == ing.id)
+            .order_by(PrecioProveedor.precio_por_unidad)
+            .first()
+        )
+        if not cheapest:
+            continue
+
+        nuevo_precio = round(cheapest.precio_por_unidad * (ing.cantidad_compra or 1), 4)
+        nuevo_proveedor = cheapest.proveedor_rel.nombre
+
+        if nuevo_proveedor == ing.proveedor and abs(nuevo_precio - (ing.precio_compra or 0)) < 0.01:
+            continue
+
+        cambios.append({
+            "ingrediente_id": ing.id,
+            "ingrediente": ing.nombre,
+            "proveedor_anterior": ing.proveedor,
+            "proveedor_nuevo": nuevo_proveedor,
+            "precio_anterior": ing.precio_compra,
+            "precio_nuevo": nuevo_precio,
+        })
+
+        if ing.precio_compra and ing.precio_compra != nuevo_precio:
+            crear_historial_precio(db, ing.id, ing.precio_compra, nuevo_precio)
+
+        ing.precio_compra = nuevo_precio
+        ing.proveedor = nuevo_proveedor
+        ing.fecha_actualizacion = date.today()
+
+    db.commit()
+    return {"cambios": cambios, "total": len(cambios)}
 
 
 @router.get("/{ingrediente_id}/recetas", response_model=list[RecetaOut])
