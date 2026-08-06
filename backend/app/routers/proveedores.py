@@ -100,9 +100,18 @@ def comparar_precios(ingrediente_id: int, db: Session = Depends(get_db), user=De
         db.query(PrecioProveedor)
         .options(joinedload(PrecioProveedor.proveedor_rel))
         .filter(PrecioProveedor.ingrediente_id == ingrediente_id)
-        .order_by(PrecioProveedor.precio_por_unidad)
+        .order_by(PrecioProveedor.fecha.desc())
         .all()
     )
+    # Keep only the latest entry per supplier
+    seen: set[int] = set()
+    latest: list[PrecioProveedor] = []
+    for p in precios:
+        if p.proveedor_id not in seen:
+            seen.add(p.proveedor_id)
+            latest.append(p)
+    latest.sort(key=lambda p: p.precio_por_unidad)
+
     return {
         "ingrediente": {"id": ing.id, "nombre": ing.nombre, "precio_actual": ing.precio_compra},
         "precios": [
@@ -116,7 +125,7 @@ def comparar_precios(ingrediente_id: int, db: Session = Depends(get_db), user=De
                 "fecha": str(p.fecha),
                 "notas": p.notas,
             }
-            for p in precios
+            for p in latest
         ],
     }
 

@@ -66,11 +66,17 @@ def listar_ingredientes(
     all_precios = (
         db.query(PrecioProveedor)
         .options(joinedload(PrecioProveedor.proveedor_rel))
+        .order_by(PrecioProveedor.fecha.desc())
         .all()
     )
+    # Keep only latest price per supplier per ingredient
     precios_por_ing: dict[int, dict[str, float]] = {}
+    seen_keys: set[tuple[int, int]] = set()
     for pp in all_precios:
-        precios_por_ing.setdefault(pp.ingrediente_id, {})[pp.proveedor_rel.nombre] = pp.precio_por_unidad
+        key = (pp.ingrediente_id, pp.proveedor_id)
+        if key not in seen_keys:
+            seen_keys.add(key)
+            precios_por_ing.setdefault(pp.ingrediente_id, {})[pp.proveedor_rel.nombre] = pp.precio_por_unidad
 
     result = []
     for ing in ingredientes:
@@ -228,15 +234,22 @@ def auto_switch_cheapest(
 
     cambios = []
     for ing in ingredientes:
-        cheapest = (
+        all_pp = (
             db.query(PrecioProveedor)
             .options(joinedload(PrecioProveedor.proveedor_rel))
             .filter(PrecioProveedor.ingrediente_id == ing.id)
-            .order_by(PrecioProveedor.precio_por_unidad)
-            .first()
+            .order_by(PrecioProveedor.fecha.desc())
+            .all()
         )
-        if not cheapest:
+        seen_provs: set[int] = set()
+        latest_per_prov: list[PrecioProveedor] = []
+        for pp in all_pp:
+            if pp.proveedor_id not in seen_provs:
+                seen_provs.add(pp.proveedor_id)
+                latest_per_prov.append(pp)
+        if not latest_per_prov:
             continue
+        cheapest = min(latest_per_prov, key=lambda p: p.precio_por_unidad)
 
         nuevo_precio = round(cheapest.precio_por_unidad * (ing.cantidad_compra or 1), 4)
         nuevo_proveedor = cheapest.proveedor_rel.nombre

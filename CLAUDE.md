@@ -24,6 +24,17 @@ This is an internal tool for a coffee shop that serves brunch and drinks. The te
 - The app matches imported items to existing ingredients, shows a preview, and the user confirms
 - This leverages the user's existing Claude subscription at zero extra cost
 
+### Invoice Price Updates (when user sends invoices/albaranes to Claude)
+1. **Identify the supplier** from the invoice header FIRST (Transgourmet=Prodega, Josef Pfaff=Pfaff, Dabov, BD, etc.)
+2. **Only update `precios_proveedor` for THAT supplier** — never touch other suppliers' entries
+3. **Recalculate `ingredientes.precio_compra`** = cheapest `precio_por_unidad` across all suppliers in `precios_proveedor`
+4. **Update `ingredientes.proveedor`** = name of cheapest supplier
+5. **Always create `historial_precios`** when `precio_compra` changes
+6. **Show summary to user before applying** — user wants to review changes first
+7. Items with different products per supplier (e.g., Huevo: Prodega=Import 90er, Pfaff=Freiland 30er) are NOT comparable — keep separate
+8. Pfaff invoices show prices **exkl. MWST** (add 2.6% for inkl.). Prodega/Transgourmet albaranes show both columns — use **inkl. MWST**
+9. Update ALL items on the invoice, not just ones with big changes — every price gets updated in `precios_proveedor` with today's date
+
 ### Data
 - No authentication or user roles — small team, everyone has full access
 - **Production:** Neon PostgreSQL (free tier, EU Frankfurt) — persists across Render sleep/wake
@@ -185,6 +196,22 @@ Render start command is `bash start.sh` (set in dashboard, NOT render.yaml). It 
 
 - "Stock Actual" green box shows last inventory recording (quantity, unit, date)
 - Alongside Lead Time, Ciclo Pedido, Consumo/Ciclo in 4-column grid
+
+## Menu Cafe Page (/menu-cafe)
+
+- Dedicated retail coffee catalog page — separate from the inventory cafe tab
+- `precio_venta` column on ingredientes for retail selling prices
+- `GET /api/cafe/catalogo` — all coffee products grouped by format with cost, PVP, multiplier, stock, consumption
+- `PUT /api/cafe/catalogo/{id}/pvp` — inline PVP editing
+- Sections: 1kg → 200g → 130g → Frozen Tubes → Capsulas, with color sub-headers
+- Supplier filter (Todos/Dabov/BD), inactive items hidden by default with toggle
+- Shows multiplier (x2.4) not margin %. Color: green >=3x, orange 2-3x, red <2x
+- Frozen tubes show stock BRU1/BRU2/bolsa and disponible badge
+
+## UI Rules
+
+- **No emojis** anywhere in the app — not in nav, headers, buttons, badges, or text
+- Navigation uses text labels only (no emoji icons)
 
 ## Safety
 
