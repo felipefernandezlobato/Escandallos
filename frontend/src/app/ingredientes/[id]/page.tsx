@@ -13,6 +13,7 @@ interface PrecioProveedor {
   cantidad: number;
   unidad: string;
   precio_por_unidad: number;
+  fecha?: string;
 }
 
 interface ComparacionProveedores {
@@ -243,6 +244,7 @@ export default function IngredienteDetailPage() {
         {preciosProveedores.length === 0 ? (
           <p className="text-sm text-[#6B5E52]/70 px-4 pb-4">Sin precios de proveedores registrados</p>
         ) : (
+          <>
           <table className="w-full text-sm">
             <thead>
               <tr className="bg-[#F5F0E8] text-left text-[#6B5E52] border-b border-[#E8DFD3]">
@@ -260,7 +262,12 @@ export default function IngredienteDetailPage() {
                   return (
                     <tr key={p.proveedor} className="border-b border-[#E8DFD3]/50">
                       <td className={`px-4 py-2 ${isCheapest ? "text-green-600 font-medium" : ""}`}>
-                        {p.proveedor}
+                        <div>{p.proveedor}</div>
+                        {p.fecha && (
+                          <div className="text-[10px] text-[#6B5E52]/50 font-normal">
+                            Ult. {p.fecha}
+                          </div>
+                        )}
                       </td>
                       <td className={`px-4 py-2 text-right ${isCheapest ? "text-green-600 font-medium" : ""}`}>
                         {p.precio.toFixed(2)} CHF
@@ -310,6 +317,7 @@ export default function IngredienteDetailPage() {
               </div>
             );
           })()}
+          </>
         )}
       </div>
 
