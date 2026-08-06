@@ -220,6 +220,8 @@ def inventario_pivot(
     ing_ids = {r.ingrediente_id for r in registros}
     ings = {i.id: i for i in db.query(Ingrediente).filter(Ingrediente.id.in_(ing_ids)).all()}
 
+    cafe_ids = {i.id for i in db.query(Ingrediente.id).filter(Ingrediente.categoria_id == 5).all()}
+
     fechas_set: set[str] = set()
     by_ing: dict[int, dict] = {}
     latest_date_per_ing_week: dict[tuple[int, str], date] = {}
@@ -239,9 +241,12 @@ def inventario_pivot(
             latest_date_per_ing_week[key] = r.fecha_registro
         latest = latest_date_per_ing_week[key]
         if r.fecha_registro == latest:
-            by_ing[r.ingrediente_id]["fechas"][week] = round(
-                by_ing[r.ingrediente_id]["fechas"].get(week, 0) + r.cantidad, 2
-            )
+            if r.ingrediente_id in cafe_ids:
+                by_ing[r.ingrediente_id]["fechas"][week] = round(
+                    by_ing[r.ingrediente_id]["fechas"].get(week, 0) + r.cantidad, 2
+                )
+            else:
+                by_ing[r.ingrediente_id]["fechas"][week] = round(r.cantidad, 2)
 
     fechas_sorted = sorted(fechas_set, reverse=True)
 
@@ -562,10 +567,14 @@ def obtener_consumo(
         display_unit = ing.unidad_compra
         if all_registros:
             display_unit = all_registros[-1].unidad
+        is_cafe = ing.categoria_id == 5
         by_date: dict[str, float] = {}
         for r in all_registros:
             key = str(r.fecha_registro)
-            by_date[key] = by_date.get(key, 0) + r.cantidad
+            if is_cafe:
+                by_date[key] = by_date.get(key, 0) + r.cantidad
+            else:
+                by_date[key] = r.cantidad
         stock_points = [
             StockHistorialItem(fecha=f, cantidad=round(q, 2), unidad=display_unit)
             for f, q in sorted(by_date.items())

@@ -202,25 +202,35 @@ def consumo_medio_semanal(ingrediente_id: int, db: Session, semanas: int = 8) ->
 
 def _stock_actual_leaf(ingrediente_id: int, db: Session) -> Optional[dict]:
     """Get latest stock for a single (leaf) ingredient.
-    Sums all records from the latest date (BRU1 + BRU2 entries)."""
+    Café (cat 5): sums all same-day records (BRU1 + BRU2).
+    Other: takes the last record of the latest day (correction overwrites)."""
     ultimo = (
         db.query(InventarioRegistro)
         .filter(InventarioRegistro.ingrediente_id == ingrediente_id)
-        .order_by(InventarioRegistro.fecha_registro.desc())
+        .order_by(InventarioRegistro.fecha_registro.desc(), InventarioRegistro.id.desc())
         .first()
     )
     if not ultimo:
         return None
-    registros_dia = (
-        db.query(InventarioRegistro)
-        .filter(
-            InventarioRegistro.ingrediente_id == ingrediente_id,
-            InventarioRegistro.fecha_registro == ultimo.fecha_registro,
+
+    ing = db.query(Ingrediente).get(ingrediente_id)
+    is_cafe = ing and ing.categoria_id == CAFE_CATEGORIA_ID
+
+    if is_cafe:
+        registros_dia = (
+            db.query(InventarioRegistro)
+            .filter(
+                InventarioRegistro.ingrediente_id == ingrediente_id,
+                InventarioRegistro.fecha_registro == ultimo.fecha_registro,
+            )
+            .all()
         )
-        .all()
-    )
+        cantidad = sum(r.cantidad for r in registros_dia)
+    else:
+        cantidad = ultimo.cantidad
+
     return {
-        "cantidad": sum(r.cantidad for r in registros_dia),
+        "cantidad": cantidad,
         "unidad": ultimo.unidad,
         "fecha": ultimo.fecha_registro,
     }

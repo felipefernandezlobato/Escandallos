@@ -152,11 +152,17 @@ Render start command is `bash start.sh` (set in dashboard, NOT render.yaml). It 
 
 ## Inventory Stock Rules
 
-- Nelson enters stock for **BRU1 and BRU2 separately** on the same day — always **sum** same-day records per ingredient
-- If an ingredient was **not counted** in the latest inventory session, assume its stock is **0** — never carry forward old values from previous weeks
-- Within a parent group, only children counted on the most recent date contribute to the total
-- **This rule only applies to café (categoria_id=5).** Kitchen/bar/other categories keep each child's last known stock even if not counted recently
-- These rules apply to: `stock_actual`, pivot aggregation, and consumption calculations
+### Café (categoria_id=5) — BRU1 + BRU2
+- BRU1 and BRU2 are **two physical locations**. Nelson counts stock at each location separately
+- **Everything** in café is counted at both locations: 1kg bags, 200g bags, 130g bags, frozen tubes, capsules
+- **Always sum** same-day records per ingredient (BRU1 count + BRU2 count = total stock)
+- If a café ingredient was **not counted** in the latest session, assume stock is **0** — never carry forward old values
+- Within a parent group (e.g., "Café en grano ROJO"), only children counted on the most recent date contribute to the total
+
+### Kitchen / Bar / Other categories
+- **Single location** — no BRU1/BRU2 concept, one count per item
+- Keep each ingredient's **last known stock** even if not counted recently — do NOT assume 0
+- Same-day summing is technically applied but harmless (only one record per day per item)
 
 ## Consumption & Ordering
 
