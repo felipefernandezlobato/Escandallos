@@ -69,6 +69,13 @@ Two types of categories, both user-customizable:
 
 Ingredients define a purchase unit and a usage unit. The system converts between them automatically.
 
+### Descriptive Units
+- Items tracked by count use descriptive units: `unidad (350g)`, `unidad (340g)`, `unidad (100g)`, etc.
+- The weight in parentheses is informational — the system treats `unidad (Xg)` as a plain string, matching compra↔uso by exact string equality
+- Both `unidad_compra` and `unidad_uso` must use the same descriptive string
+- Inventory records and recipe lines must also use the matching string
+- The inventory page displays the unit from the **last inventory record**, not from `ingrediente.unidad_uso`
+
 ## Key Constraints
 
 - Must be 100% free to host and run (no paid APIs, no paid databases, no paid hosting)
@@ -161,8 +168,8 @@ Render start command is `bash start.sh` (set in dashboard, NOT render.yaml). It 
 
 ### Kitchen / Bar / Other categories
 - **Single location** — no BRU1/BRU2 concept, one count per item
+- If multiple records on the same day, take the **last one** (latest ID) — it's a correction, not a second location
 - Keep each ingredient's **last known stock** even if not counted recently — do NOT assume 0
-- Same-day summing is technically applied but harmless (only one record per day per item)
 
 ## Consumption & Ordering
 
@@ -224,6 +231,19 @@ Render start command is `bash start.sh` (set in dashboard, NOT render.yaml). It 
 - When changing ingredient `unidad_uso`, recipe lines are auto-updated to prevent silent cost breakage
 - Never delete DB records without explicit user confirmation — list what will be lost, ask to confirm
 
+## Auto-Switch Cheapest Supplier
+
+- `POST /api/ingredientes/auto-switch-cheapest` — finds cheapest supplier per ingredient from `precios_proveedor`, updates `precio_compra` and `proveedor`, creates `historial_precios`
+- Accepts optional `{ ingrediente_ids: [int] }` — if empty, processes all active ingredients
+- Frontend: "Usar mas barato" button on ingredient detail page when a cheaper supplier exists
+- Invoice import (`/api/importar/confirm`) now auto-upserts into `precios_proveedor` so comparison data stays current
+
+## Sub-Recipes
+
+- **Patatas a lo pobre** (ID:168): sub-recipe yielding in kg. 230g raw patata → 0.2 kg cooked. Used in Secreto and Tortilla (0.2 kg each). Cost per kg = ingredient cost / yield.
+- Sub-recipe cost formula: `coste_total / porciones_por_lote` gives cost per unit of `unidad_rendimiento`. Parent recipes multiply by their quantity in that unit.
+- **Rúcola tostada** = same as "Rúcula Mix" (colloquial name)
+
 ## Backlog
 
 - Price change impact simulator
@@ -231,5 +251,4 @@ Render start command is `bash start.sh` (set in dashboard, NOT render.yaml). It 
 - Dish photos on recipes
 - Printable recipe cards (PDF)
 - Recipe version history
-- Supplier comparison
 - In-app AI invoice processing (Claude API)
