@@ -562,9 +562,13 @@ def obtener_consumo(
         display_unit = ing.unidad_compra
         if all_registros:
             display_unit = all_registros[-1].unidad
+        by_date: dict[str, float] = {}
+        for r in all_registros:
+            key = str(r.fecha_registro)
+            by_date[key] = by_date.get(key, 0) + r.cantidad
         stock_points = [
-            StockHistorialItem(fecha=str(r.fecha_registro), cantidad=r.cantidad, unidad=r.unidad)
-            for r in all_registros
+            StockHistorialItem(fecha=f, cantidad=round(q, 2), unidad=display_unit)
+            for f, q in sorted(by_date.items())
         ]
 
     calc = calcular_par_y_safety(ingrediente_id, db)
