@@ -264,8 +264,8 @@ export default function IngredienteDetailPage() {
                       <td className={`px-4 py-2 ${isCheapest ? "text-green-600 font-medium" : ""}`}>
                         <div>{p.proveedor}</div>
                         {p.fecha && (
-                          <div className="text-[10px] text-[#6B5E52]/50 font-normal">
-                            Ult. {p.fecha}
+                          <div className="text-xs text-[#6B5E52]/60 font-normal">
+                            Ult. {new Date(p.fecha).toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit", year: "numeric" })}
                           </div>
                         )}
                       </td>
