@@ -192,12 +192,17 @@ def crear_pedido(
     db.flush()
 
     for linea_data in data.lineas:
+        precio = linea_data.precio_unitario
+        if precio is None:
+            ing = db.get(Ingrediente, linea_data.ingrediente_id)
+            if ing and ing.precio_compra:
+                precio = ing.precio_compra
         linea = LineaPedido(
             pedido_id=pedido.id,
             ingrediente_id=linea_data.ingrediente_id,
             cantidad_pedida=linea_data.cantidad_pedida,
             unidad=linea_data.unidad,
-            precio_unitario=linea_data.precio_unitario,
+            precio_unitario=precio,
         )
         db.add(linea)
     db.commit()
@@ -309,7 +314,12 @@ def agregar_linea_pedido(
     if p.estado == "recibido":
         raise HTTPException(400, "No se puede modificar un pedido recibido")
 
-    linea = LineaPedido(pedido_id=pedido_id, **data.model_dump())
+    linea_data = data.model_dump()
+    if linea_data.get("precio_unitario") is None:
+        ing = db.get(Ingrediente, linea_data["ingrediente_id"])
+        if ing and ing.precio_compra:
+            linea_data["precio_unitario"] = ing.precio_compra
+    linea = LineaPedido(pedido_id=pedido_id, **linea_data)
     db.add(linea)
     db.commit()
 
