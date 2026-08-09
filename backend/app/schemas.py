@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import date, datetime
 from typing import Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 
 # --- Categorias ---
@@ -389,3 +389,98 @@ class ConsumoOut(BaseModel):
     lead_weeks: Optional[float] = None
     historial: list[ConsumoSemanalItem] = []
     stock_historial: list[StockHistorialItem] = []
+
+
+# --- Mermas ---
+
+MOTIVOS_MERMA = ["caducado", "roto", "error_cocina", "error_sala", "otro"]
+
+
+class MermaRegistroCreate(BaseModel):
+    ingrediente_id: Optional[int] = None
+    receta_id: Optional[int] = None
+    nombre_libre: Optional[str] = None
+    cantidad: float = Field(gt=0)
+    unidad: str
+    motivo: str = Field(pattern="^(caducado|roto|error_cocina|error_sala|otro)$")
+    notas: Optional[str] = None
+    fecha: Optional[str] = None
+    ubicacion: Optional[str] = None
+
+    @model_validator(mode="after")
+    def validate_item_and_notas(self):
+        if not self.ingrediente_id and not self.receta_id and not self.nombre_libre:
+            raise ValueError("Debe indicar ingrediente, receta, o nombre libre")
+        if self.motivo == "otro" and not self.notas:
+            raise ValueError("Notas obligatorias cuando el motivo es 'Otro'")
+        return self
+
+
+class MermaRegistroUpdate(BaseModel):
+    cantidad: Optional[float] = None
+    unidad: Optional[str] = None
+    motivo: Optional[str] = None
+    notas: Optional[str] = None
+    ubicacion: Optional[str] = None
+
+
+class MermaRegistroOut(BaseModel):
+    id: int
+    ingrediente_id: Optional[int] = None
+    receta_id: Optional[int] = None
+    nombre_libre: Optional[str] = None
+    cantidad: float
+    unidad: str
+    motivo: str
+    notas: Optional[str] = None
+    fecha: date
+    ubicacion: Optional[str] = None
+    coste_unitario: float
+    coste_total: float
+    ingrediente_nombre: Optional[str] = None
+    receta_nombre: Optional[str] = None
+    categoria_nombre: Optional[str] = None
+
+    model_config = {"from_attributes": True}
+
+
+class MermaResumenOut(BaseModel):
+    total_eventos: int
+    coste_total: float
+    periodo: str
+    coste_periodo_anterior: Optional[float] = None
+    cambio_porcentaje: Optional[float] = None
+
+
+class MermaPorTiempoItem(BaseModel):
+    periodo: str
+    eventos: int
+    coste: float
+
+
+class MermaPorCategoriaItem(BaseModel):
+    categoria: str
+    eventos: int
+    coste: float
+
+
+class MermaPorMotivoItem(BaseModel):
+    motivo: str
+    eventos: int
+    coste: float
+
+
+class MermaTopItem(BaseModel):
+    nombre: str
+    eventos: int
+    cantidad_total: float
+    unidad: str
+    coste_total: float
+
+
+class MermaAnalisisOut(BaseModel):
+    resumen: MermaResumenOut
+    por_tiempo: list[MermaPorTiempoItem]
+    por_categoria: list[MermaPorCategoriaItem]
+    por_motivo: list[MermaPorMotivoItem]
+    top_items: list[MermaTopItem]

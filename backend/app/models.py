@@ -201,3 +201,23 @@ class LineaPedido(Base):
 
     pedido_rel: Mapped["Pedido"] = relationship(back_populates="lineas")
     ingrediente_rel: Mapped["Ingrediente"] = relationship()
+
+
+class MermaRegistro(Base):
+    __tablename__ = "merma_registros"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    ingrediente_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey("ingredientes.id"), nullable=True)
+    receta_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey("recetas.id"), nullable=True)
+    nombre_libre: Mapped[Optional[str]] = mapped_column(String(200), nullable=True)
+    cantidad: Mapped[float] = mapped_column(Float, nullable=False)
+    unidad: Mapped[str] = mapped_column(String(20), nullable=False)
+    motivo: Mapped[str] = mapped_column(String(20), nullable=False)
+    notas: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    fecha: Mapped[date] = mapped_column(Date, default=func.current_date())
+    ubicacion: Mapped[Optional[str]] = mapped_column(String(10), nullable=True)
+    coste_unitario: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
+    coste_total: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
+
+    ingrediente_rel: Mapped[Optional["Ingrediente"]] = relationship()
+    receta_rel: Mapped[Optional["Receta"]] = relationship()

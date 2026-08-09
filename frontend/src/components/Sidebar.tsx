@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { href: "/recetas", label: "Recetas" },
   { href: "/ingredientes", label: "Ingredientes" },
   { href: "/inventario", label: "Inventario" },
+  { href: "/mermas", label: "Mermas" },
   { href: "/pedidos", label: "Pedidos" },
   { href: "/configuracion", label: "Configuración" },
 ];

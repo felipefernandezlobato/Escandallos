@@ -180,6 +180,58 @@ export interface ConsumoSemanal {
   unidad: string;
 }
 
+// --- Mermas ---
+
+export type MotivoMerma = "caducado" | "roto" | "error_cocina" | "error_sala" | "otro";
+
+export const MOTIVOS_MERMA: { value: MotivoMerma; label: string }[] = [
+  { value: "caducado", label: "Caducado" },
+  { value: "roto", label: "Roto" },
+  { value: "error_cocina", label: "Error cocina" },
+  { value: "error_sala", label: "Error sala" },
+  { value: "otro", label: "Otro" },
+];
+
+export interface MermaRegistro {
+  id: number;
+  ingrediente_id: number | null;
+  receta_id: number | null;
+  nombre_libre: string | null;
+  cantidad: number;
+  unidad: string;
+  motivo: MotivoMerma;
+  notas: string | null;
+  fecha: string;
+  ubicacion: string | null;
+  coste_unitario: number;
+  coste_total: number;
+  ingrediente_nombre: string | null;
+  receta_nombre: string | null;
+  categoria_nombre: string | null;
+}
+
+export interface MermaResumen {
+  total_eventos: number;
+  coste_total: number;
+  periodo: string;
+  coste_periodo_anterior: number | null;
+  cambio_porcentaje: number | null;
+}
+
+export interface MermaAnalisis {
+  resumen: MermaResumen;
+  por_tiempo: Array<{ periodo: string; eventos: number; coste: number }>;
+  por_categoria: Array<{ categoria: string; eventos: number; coste: number }>;
+  por_motivo: Array<{ motivo: string; eventos: number; coste: number }>;
+  top_items: Array<{
+    nombre: string;
+    eventos: number;
+    cantidad_total: number;
+    unidad: string;
+    coste_total: number;
+  }>;
+}
+
 export interface ConsumoData {
   ingrediente_id: number;
   ingrediente_nombre: string;

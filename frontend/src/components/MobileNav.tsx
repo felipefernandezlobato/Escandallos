@@ -9,6 +9,7 @@ const MOBILE_ITEMS = [
   { href: "/recetas", label: "Recetas" },
   { href: "/ingredientes", label: "Ingred." },
   { href: "/inventario", label: "Stock" },
+  { href: "/mermas", label: "Mermas" },
   { href: "/pedidos", label: "Pedidos" },
   { href: "/configuracion", label: "Config" },
 ];

@@ -14,7 +14,7 @@ from app.auth import (
     verify_password,
 )
 from app.database import get_db, SessionLocal
-from app.routers import categorias, ingredientes, recetas, importar, dashboard, backup, proveedores, inventario, pedidos, menu, cafe
+from app.routers import categorias, ingredientes, recetas, importar, dashboard, backup, proveedores, inventario, pedidos, menu, cafe, mermas
 from app.models import Categoria
 
 # Tables are managed by alembic migrations (start.sh).
@@ -65,6 +65,7 @@ app.include_router(inventario.router)
 app.include_router(pedidos.router)
 app.include_router(menu.router)
 app.include_router(cafe.router)
+app.include_router(mermas.router)
 
 
 @app.get("/api/health")
