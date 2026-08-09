@@ -221,6 +221,32 @@ Render start command is `bash start.sh` (set in dashboard, NOT render.yaml). It 
 - Shows multiplier (x2.4) not margin %. Color: green >=3x, orange 2-3x, red <2x
 - Frozen tubes show stock BRU1/BRU2/bolsa and disponible badge
 
+## Mermas (Waste Tracking) Page (/mermas)
+
+- Dedicated waste tracking page with two tabs: **Registrar** and **Analisis**
+- **Registrar tab**: form to log waste for ingredients (DB FK), recipes (DB FK), or free text (broken plates, glasses, etc.)
+- 5 motivos: `caducado` (expired/dry/not consumed), `roto` (broken/cracked/dropped), `error_cocina` (burned/wrong prep), `error_sala` (wrong order/spill), `otro` (requires notas)
+- Location tracking: BRU1/BRU2
+- Cost snapshotted at creation time: ingredients use `coste_por_unidad_uso()`, recipes use `coste_por_racion()`, free text items default to 0 (can be set manually in DB)
+- **Analisis tab**: summary cards (total events, cost, % change vs previous period), bar chart by time (dia/semana/mes), horizontal bars by category and motivo, top 10 table
+- DB table: `merma_registros` with `ingrediente_id` (FK nullable), `receta_id` (FK nullable), `nombre_libre` (nullable), `cantidad`, `unidad`, `motivo`, `notas`, `fecha`, `ubicacion`, `coste_unitario`, `coste_total`
+- API: `POST/GET/PUT/DELETE /api/mermas`, `GET /api/mermas/analisis`
+- Analytics aggregation done in Python (not SQL) for SQLite/PostgreSQL compatibility
+- 257 historical records imported (April-August 2026)
+
+### Glassware Costs (free text items)
+| Item | Cost (CHF) |
+|------|-----------|
+| Freddo glass | 3.50 |
+| Wine Glass | 5.95 |
+| Copa Martini | 2.95 |
+| Cappuccino Cup | 13.00 |
+| Espresso Cup / Taza de espresso | 11.00 |
+| Cortado Glass | 5.00 |
+| Origami Ceramic | 30.00 |
+| Water Glass | 2.00 |
+| Small water glass / Water Glass Small | 0.50 |
+
 ## UI Rules
 
 - **No emojis** anywhere in the app — not in nav, headers, buttons, badges, or text
