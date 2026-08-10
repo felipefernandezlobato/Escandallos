@@ -6,7 +6,6 @@ import { apiFetch } from "@/lib/api";
 import { useToast } from "@/components/Toast";
 import type {
   Ingrediente,
-  MermaAnalisis,
   MermaRegistro,
   MotivoMerma,
   Receta,
@@ -59,10 +58,24 @@ function MermasContent() {
     fecha: new Date().toISOString().slice(0, 10),
   });
 
-  // Analytics
-  const [analisis, setAnalisis] = useState<MermaAnalisis | null>(null);
+  // Analytics — client-side filtering
+  const [allAnalisisRecords, setAllAnalisisRecords] = useState<MermaRegistro[]>([]);
   const [periodo, setPeriodo] = useState<Periodo>("semana");
   const [loadingAnalisis, setLoadingAnalisis] = useState(false);
+  const [fechaDesde, setFechaDesde] = useState(() => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-01`;
+  });
+  const [fechaHasta, setFechaHasta] = useState(() => new Date().toISOString().slice(0, 10));
+  const [activePreset, setActivePreset] = useState<string>("mes");
+  const [filterTiempo, setFilterTiempo] = useState<string | null>(null);
+  const [filterCategoria, setFilterCategoria] = useState<string | null>(null);
+  const [filterMotivo, setFilterMotivo] = useState<string | null>(null);
+  const [showAllTopItems, setShowAllTopItems] = useState(false);
+  const [showAllRecords, setShowAllRecords] = useState(false);
+  const [recordsLimit, setRecordsLimit] = useState(50);
+  const [sortCol, setSortCol] = useState<string>("fecha");
+  const [sortAsc, setSortAsc] = useState(false);
 
   // URL sync
   const syncUrl = (t: Tab) => {
@@ -91,10 +104,10 @@ function MermasContent() {
     fetchRegistros();
   }, []);
 
-  // Fetch analytics when tab switches
+  // Fetch analytics records when tab switches or date range changes
   useEffect(() => {
-    if (tab === "analisis") fetchAnalisis();
-  }, [tab, periodo]);
+    if (tab === "analisis") fetchAnalisisRecords();
+  }, [tab, fechaDesde, fechaHasta]);
 
   const fetchRegistros = async () => {
     try {
@@ -108,19 +121,179 @@ function MermasContent() {
     }
   };
 
-  const fetchAnalisis = async () => {
+  const fetchAnalisisRecords = async () => {
     setLoadingAnalisis(true);
     try {
-      const data = await apiFetch<MermaAnalisis>(
-        `/api/mermas/analisis?periodo=${periodo}`
+      const params = new URLSearchParams();
+      if (fechaDesde) params.set("fecha_desde", fechaDesde);
+      if (fechaHasta) params.set("fecha_hasta", fechaHasta);
+      params.set("limit", "2000");
+      const res = await apiFetch<{ total: number; registros: MermaRegistro[] }>(
+        `/api/mermas?${params}`
       );
-      setAnalisis(data);
+      setAllAnalisisRecords(res.registros);
+      setFilterTiempo(null);
+      setFilterCategoria(null);
+      setFilterMotivo(null);
+      setRecordsLimit(50);
     } catch {
       // silent
     } finally {
       setLoadingAnalisis(false);
     }
   };
+
+  // Date range presets
+  const applyPreset = (preset: string) => {
+    const today = new Date();
+    const y = today.getFullYear();
+    const m = today.getMonth();
+    const d = today.getDate();
+    const dow = today.getDay() === 0 ? 7 : today.getDay();
+    let desde = "";
+    let hasta = today.toISOString().slice(0, 10);
+
+    if (preset === "semana") {
+      const mon = new Date(today);
+      mon.setDate(d - dow + 1);
+      desde = mon.toISOString().slice(0, 10);
+    } else if (preset === "mes") {
+      desde = `${y}-${String(m + 1).padStart(2, "0")}-01`;
+    } else if (preset === "ultimo_mes") {
+      const pm = m === 0 ? 11 : m - 1;
+      const py = m === 0 ? y - 1 : y;
+      desde = `${py}-${String(pm + 1).padStart(2, "0")}-01`;
+      const lastDay = new Date(y, m, 0).getDate();
+      hasta = `${py}-${String(pm + 1).padStart(2, "0")}-${String(lastDay).padStart(2, "0")}`;
+    } else if (preset === "trimestre") {
+      const three = new Date(today);
+      three.setMonth(m - 3);
+      desde = three.toISOString().slice(0, 10);
+    } else if (preset === "todo") {
+      desde = "2020-01-01";
+    }
+
+    setActivePreset(preset);
+    setFechaDesde(desde);
+    setFechaHasta(hasta);
+  };
+
+  // Client-side filtering and aggregation
+  const getItemName = (r: MermaRegistro) =>
+    r.ingrediente_nombre || r.receta_nombre || r.nombre_libre || "?";
+
+  const getItemCategory = (r: MermaRegistro) => r.categoria_nombre || "Otro";
+
+  const getTimeKey = (fecha: string) => {
+    const d = new Date(fecha);
+    if (periodo === "dia") return fecha;
+    if (periodo === "semana") {
+      const jan1 = new Date(d.getFullYear(), 0, 1);
+      const days = Math.floor((d.getTime() - jan1.getTime()) / 86400000);
+      const week = Math.ceil((days + jan1.getDay() + 1) / 7);
+      return `${d.getFullYear()}-W${String(week).padStart(2, "0")}`;
+    }
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+  };
+
+  const filteredRecords = allAnalisisRecords.filter((r) => {
+    if (filterTiempo && getTimeKey(r.fecha) !== filterTiempo) return false;
+    if (filterCategoria && getItemCategory(r) !== filterCategoria) return false;
+    if (filterMotivo && r.motivo !== filterMotivo) return false;
+    return true;
+  });
+
+  const hasFilters = filterTiempo || filterCategoria || filterMotivo;
+
+  // Aggregations from filtered records
+  const totalEventos = filteredRecords.length;
+  const totalCoste = filteredRecords.reduce((s, r) => s + r.coste_total, 0);
+
+  // Time chart — always from allAnalisisRecords (not filtered by time)
+  const timeChartRecords = allAnalisisRecords.filter((r) => {
+    if (filterCategoria && getItemCategory(r) !== filterCategoria) return false;
+    if (filterMotivo && r.motivo !== filterMotivo) return false;
+    return true;
+  });
+  const timeMap = new Map<string, { eventos: number; coste: number }>();
+  timeChartRecords.forEach((r) => {
+    const key = getTimeKey(r.fecha);
+    const cur = timeMap.get(key) || { eventos: 0, coste: 0 };
+    cur.eventos++;
+    cur.coste += r.coste_total;
+    timeMap.set(key, cur);
+  });
+  const porTiempo = Array.from(timeMap.entries())
+    .map(([k, v]) => ({ periodo: k, ...v }))
+    .sort((a, b) => a.periodo.localeCompare(b.periodo));
+
+  // Category chart — from records not filtered by category
+  const catChartRecords = allAnalisisRecords.filter((r) => {
+    if (filterTiempo && getTimeKey(r.fecha) !== filterTiempo) return false;
+    if (filterMotivo && r.motivo !== filterMotivo) return false;
+    return true;
+  });
+  const catMap = new Map<string, { eventos: number; coste: number }>();
+  catChartRecords.forEach((r) => {
+    const cat = getItemCategory(r);
+    const cur = catMap.get(cat) || { eventos: 0, coste: 0 };
+    cur.eventos++;
+    cur.coste += r.coste_total;
+    catMap.set(cat, cur);
+  });
+  const porCategoria = Array.from(catMap.entries())
+    .map(([k, v]) => ({ categoria: k, ...v }))
+    .sort((a, b) => b.coste - a.coste);
+
+  // Motivo chart — from records not filtered by motivo
+  const motChartRecords = allAnalisisRecords.filter((r) => {
+    if (filterTiempo && getTimeKey(r.fecha) !== filterTiempo) return false;
+    if (filterCategoria && getItemCategory(r) !== filterCategoria) return false;
+    return true;
+  });
+  const motMap = new Map<string, { eventos: number; coste: number }>();
+  motChartRecords.forEach((r) => {
+    const cur = motMap.get(r.motivo) || { eventos: 0, coste: 0 };
+    cur.eventos++;
+    cur.coste += r.coste_total;
+    motMap.set(r.motivo, cur);
+  });
+  const porMotivo = Array.from(motMap.entries())
+    .map(([k, v]) => ({ motivo: k, ...v }))
+    .sort((a, b) => b.coste - a.coste);
+
+  // Top items from filtered records
+  const itemMap = new Map<string, { eventos: number; cantidad: number; unidad: string; coste: number }>();
+  filteredRecords.forEach((r) => {
+    const name = getItemName(r);
+    const cur = itemMap.get(name) || { eventos: 0, cantidad: 0, unidad: r.unidad, coste: 0 };
+    cur.eventos++;
+    cur.cantidad += r.cantidad;
+    cur.coste += r.coste_total;
+    itemMap.set(name, cur);
+  });
+  const topItems = Array.from(itemMap.entries())
+    .map(([k, v]) => ({ nombre: k, ...v }))
+    .sort((a, b) => b.coste - a.coste);
+
+  // Sorted records for the list
+  const sortedRecords = [...filteredRecords].sort((a, b) => {
+    let cmp = 0;
+    if (sortCol === "fecha") cmp = a.fecha.localeCompare(b.fecha);
+    else if (sortCol === "item") cmp = getItemName(a).localeCompare(getItemName(b));
+    else if (sortCol === "cantidad") cmp = a.cantidad - b.cantidad;
+    else if (sortCol === "coste") cmp = a.coste_total - b.coste_total;
+    else if (sortCol === "motivo") cmp = a.motivo.localeCompare(b.motivo);
+    return sortAsc ? cmp : -cmp;
+  });
+
+  const toggleSort = (col: string) => {
+    if (sortCol === col) setSortAsc(!sortAsc);
+    else { setSortCol(col); setSortAsc(col !== "fecha"); }
+  };
+
+  const sortIcon = (col: string) =>
+    sortCol === col ? (sortAsc ? " ↑" : " ↓") : "";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -545,7 +718,48 @@ function MermasContent() {
       {/* ===== TAB: ANALISIS ===== */}
       {tab === "analisis" && (
         <div className="space-y-6">
-          {/* Period selector */}
+          {/* Date range presets + custom */}
+          <div className="bg-white border border-[#E8DFD3] rounded-lg p-4 space-y-3">
+            <div className="flex flex-wrap gap-2">
+              {[
+                { key: "semana", label: "Esta semana" },
+                { key: "mes", label: "Este mes" },
+                { key: "ultimo_mes", label: "Ultimo mes" },
+                { key: "trimestre", label: "Ultimo trimestre" },
+                { key: "todo", label: "Todo" },
+              ].map((p) => (
+                <button
+                  key={p.key}
+                  onClick={() => applyPreset(p.key)}
+                  className={`px-3 py-1.5 rounded text-sm transition-colors ${
+                    activePreset === p.key
+                      ? "bg-[#8B1A2B] text-white"
+                      : "bg-white border border-[#D4C4A8] text-[#6B5E52] hover:bg-[#F5F0E8]"
+                  }`}
+                >
+                  {p.label}
+                </button>
+              ))}
+            </div>
+            <div className="flex items-center gap-3 flex-wrap">
+              <label className="text-xs text-[#6B5E52]">Desde</label>
+              <input
+                type="date"
+                value={fechaDesde}
+                onChange={(e) => { setFechaDesde(e.target.value); setActivePreset(""); }}
+                className="border border-[#D4C4A8] rounded px-3 py-1.5 text-sm"
+              />
+              <label className="text-xs text-[#6B5E52]">Hasta</label>
+              <input
+                type="date"
+                value={fechaHasta}
+                onChange={(e) => { setFechaHasta(e.target.value); setActivePreset(""); }}
+                className="border border-[#D4C4A8] rounded px-3 py-1.5 text-sm"
+              />
+            </div>
+          </div>
+
+          {/* Period grouping toggle */}
           <div className="flex gap-2">
             {(["dia", "semana", "mes"] as Periodo[]).map((p) => (
               <button
@@ -562,179 +776,217 @@ function MermasContent() {
             ))}
           </div>
 
+          {/* Active filter chips */}
+          {hasFilters && (
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-xs text-[#6B5E52]">Filtros:</span>
+              {filterTiempo && (
+                <button
+                  onClick={() => setFilterTiempo(null)}
+                  className="inline-flex items-center gap-1 px-2 py-1 bg-[#8B1A2B]/10 text-[#8B1A2B] rounded text-xs"
+                >
+                  {periodo === "dia" ? "Dia" : periodo === "semana" ? "Semana" : "Mes"}: {filterTiempo.replace(/^\d{4}-/, "")}
+                  <span className="ml-1">&#10005;</span>
+                </button>
+              )}
+              {filterCategoria && (
+                <button
+                  onClick={() => setFilterCategoria(null)}
+                  className="inline-flex items-center gap-1 px-2 py-1 bg-[#8B1A2B]/10 text-[#8B1A2B] rounded text-xs"
+                >
+                  Categoria: {filterCategoria}
+                  <span className="ml-1">&#10005;</span>
+                </button>
+              )}
+              {filterMotivo && (
+                <button
+                  onClick={() => setFilterMotivo(null)}
+                  className="inline-flex items-center gap-1 px-2 py-1 bg-[#8B1A2B]/10 text-[#8B1A2B] rounded text-xs"
+                >
+                  Motivo: {MOTIVO_LABELS[filterMotivo] || filterMotivo}
+                  <span className="ml-1">&#10005;</span>
+                </button>
+              )}
+              <button
+                onClick={() => { setFilterTiempo(null); setFilterCategoria(null); setFilterMotivo(null); }}
+                className="text-xs text-[#6B5E52] hover:text-[#8B1A2B] underline"
+              >
+                Limpiar todos
+              </button>
+            </div>
+          )}
+
           {loadingAnalisis ? (
             <div className="text-[#6B5E52] py-10 text-center">Cargando analisis...</div>
-          ) : !analisis ? (
-            <div className="text-[#6B5E52] py-10 text-center">Sin datos</div>
+          ) : allAnalisisRecords.length === 0 ? (
+            <div className="text-[#6B5E52] py-10 text-center">Sin datos en este periodo</div>
           ) : (
             <>
               {/* Summary cards */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="bg-white border border-[#E8DFD3] rounded-lg p-4">
                   <p className="text-xs uppercase text-[#6B5E52] mb-1">Total Mermas</p>
-                  <p className="text-2xl font-bold text-[#8B1A2B]">
-                    {analisis.resumen.total_eventos}
-                  </p>
+                  <p className="text-2xl font-bold text-[#8B1A2B]">{totalEventos}</p>
                   <p className="text-xs text-[#6B5E52]">eventos</p>
                 </div>
                 <div className="bg-white border border-[#E8DFD3] rounded-lg p-4">
                   <p className="text-xs uppercase text-[#6B5E52] mb-1">Coste Total</p>
-                  <p className="text-2xl font-bold text-[#8B1A2B]">
-                    {analisis.resumen.coste_total.toFixed(2)}
-                  </p>
+                  <p className="text-2xl font-bold text-[#8B1A2B]">{totalCoste.toFixed(2)}</p>
                   <p className="text-xs text-[#6B5E52]">CHF</p>
                 </div>
                 <div className="bg-white border border-[#E8DFD3] rounded-lg p-4">
-                  <p className="text-xs uppercase text-[#6B5E52] mb-1">vs Periodo Anterior</p>
-                  {analisis.resumen.cambio_porcentaje != null ? (
-                    <p
-                      className={`text-2xl font-bold ${
-                        analisis.resumen.cambio_porcentaje <= 0
-                          ? "text-green-600"
-                          : "text-red-600"
-                      }`}
-                    >
-                      {analisis.resumen.cambio_porcentaje > 0 ? "+" : ""}
-                      {analisis.resumen.cambio_porcentaje}%
-                    </p>
-                  ) : (
-                    <p className="text-2xl font-bold text-[#6B5E52]">--</p>
-                  )}
-                  <p className="text-xs text-[#6B5E52]">
-                    {analisis.resumen.coste_periodo_anterior != null
-                      ? `Anterior: ${analisis.resumen.coste_periodo_anterior.toFixed(2)} CHF`
-                      : "Sin datos previos"}
-                  </p>
+                  <p className="text-xs uppercase text-[#6B5E52] mb-1">Total Registros</p>
+                  <p className="text-2xl font-bold text-[#8B1A2B]">{allAnalisisRecords.length}</p>
+                  <p className="text-xs text-[#6B5E52]">en periodo{hasFilters ? ` (${filteredRecords.length} filtrados)` : ""}</p>
                 </div>
               </div>
 
-              {/* Waste over time bar chart */}
-              {analisis.por_tiempo.length > 0 && (
+              {/* Waste over time bar chart — clickable */}
+              {porTiempo.length > 0 && (
                 <div className="bg-white border border-[#E8DFD3] rounded-lg p-4">
                   <h3 className="text-sm font-semibold text-[#8B1A2B] uppercase tracking-wider mb-3">
                     Mermas por {periodo === "dia" ? "dia" : periodo === "semana" ? "semana" : "mes"}
                   </h3>
-                  {(() => {
-                    const data = analisis.por_tiempo;
-                    const maxCoste = Math.max(...data.map((d) => d.coste), 1);
-                    return (
-                      <div>
-                        <div className="flex items-end gap-1" style={{ height: 160 }}>
-                          {data.map((d, i) => {
-                            const barH = Math.max((d.coste / maxCoste) * 140, 4);
-                            return (
+                  <div>
+                    <div className="flex items-end gap-1" style={{ height: 160 }}>
+                      {(() => {
+                        const maxCoste = Math.max(...porTiempo.map((d) => d.coste), 1);
+                        return porTiempo.map((d, i) => {
+                          const barH = Math.max((d.coste / maxCoste) * 140, 4);
+                          const isActive = filterTiempo === d.periodo;
+                          return (
+                            <div
+                              key={i}
+                              className="flex-1 flex flex-col items-center justify-end cursor-pointer"
+                              title={`${d.periodo}: ${d.coste.toFixed(2)} CHF (${d.eventos} eventos)`}
+                              onClick={() => setFilterTiempo(isActive ? null : d.periodo)}
+                            >
+                              <span className="text-[8px] text-[#6B5E52] mb-0.5 leading-none">
+                                {d.coste.toFixed(0)}
+                              </span>
                               <div
-                                key={i}
-                                className="flex-1 flex flex-col items-center justify-end"
-                                title={`${d.periodo}: ${d.coste.toFixed(2)} CHF (${d.eventos} eventos)`}
-                              >
-                                <span className="text-[8px] text-[#6B5E52] mb-0.5 leading-none">
-                                  {d.coste.toFixed(0)}
-                                </span>
-                                <div
-                                  className="w-full bg-[#8B1A2B] opacity-70 rounded-t"
-                                  style={{ height: barH }}
-                                />
-                              </div>
-                            );
-                          })}
-                        </div>
-                        <div className="flex gap-1 text-[8px] text-[#6B5E52] mt-1">
-                          {data.map((d, i) => (
-                            <div key={i} className="flex-1 text-center truncate">
-                              {d.periodo.replace(/^\d{4}-/, "")}
+                                className={`w-full rounded-t transition-opacity ${isActive ? "bg-[#8B1A2B]" : "bg-[#8B1A2B]"}`}
+                                style={{ height: barH, opacity: isActive ? 1 : filterTiempo ? 0.3 : 0.7 }}
+                              />
                             </div>
-                          ))}
+                          );
+                        });
+                      })()}
+                    </div>
+                    <div className="flex gap-1 text-[8px] text-[#6B5E52] mt-1">
+                      {porTiempo.map((d, i) => (
+                        <div key={i} className="flex-1 text-center truncate">
+                          {d.periodo.replace(/^\d{4}-/, "")}
                         </div>
-                      </div>
-                    );
-                  })()}
+                      ))}
+                    </div>
+                  </div>
                 </div>
               )}
 
-              {/* By category — horizontal bars */}
-              {analisis.por_categoria.length > 0 && (
+              {/* By category — clickable horizontal bars */}
+              {porCategoria.length > 0 && (
                 <div className="bg-white border border-[#E8DFD3] rounded-lg p-4">
                   <h3 className="text-sm font-semibold text-[#8B1A2B] uppercase tracking-wider mb-3">
                     Por Categoria
                   </h3>
                   <div className="space-y-2">
                     {(() => {
-                      const maxCoste = Math.max(
-                        ...analisis.por_categoria.map((c) => c.coste),
-                        1
-                      );
-                      return analisis.por_categoria.map((c, i) => (
-                        <div key={i} className="flex items-center gap-2">
-                          <span className="text-sm text-[#6B5E52] w-24 text-right truncate">
-                            {c.categoria}
-                          </span>
-                          <div className="flex-1 bg-[#F5F0E8] rounded h-5 overflow-hidden">
-                            <div
-                              className="bg-[#8B1A2B] h-full rounded opacity-70"
-                              style={{
-                                width: `${Math.max((c.coste / maxCoste) * 100, 2)}%`,
-                              }}
-                            />
+                      const maxCoste = Math.max(...porCategoria.map((c) => c.coste), 1);
+                      return porCategoria.map((c, i) => {
+                        const isActive = filterCategoria === c.categoria;
+                        return (
+                          <div
+                            key={i}
+                            className="flex items-center gap-2 cursor-pointer"
+                            onClick={() => setFilterCategoria(isActive ? null : c.categoria)}
+                            style={{ opacity: isActive ? 1 : filterCategoria ? 0.4 : 1 }}
+                          >
+                            <span className="text-sm text-[#6B5E52] w-24 text-right truncate">
+                              {c.categoria}
+                            </span>
+                            <div className="flex-1 bg-[#F5F0E8] rounded h-5 overflow-hidden">
+                              <div
+                                className="bg-[#8B1A2B] h-full rounded"
+                                style={{
+                                  width: `${Math.max((c.coste / maxCoste) * 100, 2)}%`,
+                                  opacity: isActive ? 1 : 0.7,
+                                }}
+                              />
+                            </div>
+                            <span className="text-xs text-[#6B5E52] w-20 text-right">
+                              {c.coste.toFixed(2)} CHF
+                            </span>
+                            <span className="text-xs text-[#6B5E52] w-8 text-right">
+                              ({c.eventos})
+                            </span>
                           </div>
-                          <span className="text-xs text-[#6B5E52] w-20 text-right">
-                            {c.coste.toFixed(2)} CHF
-                          </span>
-                          <span className="text-xs text-[#6B5E52] w-8 text-right">
-                            ({c.eventos})
-                          </span>
-                        </div>
-                      ));
+                        );
+                      });
                     })()}
                   </div>
                 </div>
               )}
 
-              {/* By motivo */}
-              {analisis.por_motivo.length > 0 && (
+              {/* By motivo — clickable */}
+              {porMotivo.length > 0 && (
                 <div className="bg-white border border-[#E8DFD3] rounded-lg p-4">
                   <h3 className="text-sm font-semibold text-[#8B1A2B] uppercase tracking-wider mb-3">
                     Por Motivo
                   </h3>
                   <div className="space-y-2">
                     {(() => {
-                      const maxCoste = Math.max(
-                        ...analisis.por_motivo.map((m) => m.coste),
-                        1
-                      );
-                      return analisis.por_motivo.map((m, i) => (
-                        <div key={i} className="flex items-center gap-2">
-                          <span className="text-sm text-[#6B5E52] w-24 text-right truncate">
-                            {MOTIVO_LABELS[m.motivo] || m.motivo}
-                          </span>
-                          <div className="flex-1 bg-[#F5F0E8] rounded h-5 overflow-hidden">
-                            <div
-                              className="bg-[#8B1A2B] h-full rounded opacity-70"
-                              style={{
-                                width: `${Math.max((m.coste / maxCoste) * 100, 2)}%`,
-                              }}
-                            />
+                      const maxCoste = Math.max(...porMotivo.map((m) => m.coste), 1);
+                      return porMotivo.map((m, i) => {
+                        const isActive = filterMotivo === m.motivo;
+                        return (
+                          <div
+                            key={i}
+                            className="flex items-center gap-2 cursor-pointer"
+                            onClick={() => setFilterMotivo(isActive ? null : m.motivo)}
+                            style={{ opacity: isActive ? 1 : filterMotivo ? 0.4 : 1 }}
+                          >
+                            <span className="text-sm text-[#6B5E52] w-24 text-right truncate">
+                              {MOTIVO_LABELS[m.motivo] || m.motivo}
+                            </span>
+                            <div className="flex-1 bg-[#F5F0E8] rounded h-5 overflow-hidden">
+                              <div
+                                className="bg-[#8B1A2B] h-full rounded"
+                                style={{
+                                  width: `${Math.max((m.coste / maxCoste) * 100, 2)}%`,
+                                  opacity: isActive ? 1 : 0.7,
+                                }}
+                              />
+                            </div>
+                            <span className="text-xs text-[#6B5E52] w-20 text-right">
+                              {m.coste.toFixed(2)} CHF
+                            </span>
+                            <span className="text-xs text-[#6B5E52] w-8 text-right">
+                              ({m.eventos})
+                            </span>
                           </div>
-                          <span className="text-xs text-[#6B5E52] w-20 text-right">
-                            {m.coste.toFixed(2)} CHF
-                          </span>
-                          <span className="text-xs text-[#6B5E52] w-8 text-right">
-                            ({m.eventos})
-                          </span>
-                        </div>
-                      ));
+                        );
+                      });
                     })()}
                   </div>
                 </div>
               )}
 
-              {/* Top 10 items */}
-              {analisis.top_items.length > 0 && (
+              {/* Top items — expandable */}
+              {topItems.length > 0 && (
                 <div className="bg-white border border-[#E8DFD3] rounded-lg">
-                  <div className="px-4 py-3 bg-[#F5F0E8] border-b border-[#E8DFD3]">
+                  <div className="px-4 py-3 bg-[#F5F0E8] border-b border-[#E8DFD3] flex items-center justify-between">
                     <h3 className="text-sm font-semibold text-[#8B1A2B] uppercase tracking-wider">
-                      Top Items con mas Merma
+                      Items con mas Merma ({topItems.length})
                     </h3>
+                    {topItems.length > 10 && (
+                      <button
+                        onClick={() => setShowAllTopItems(!showAllTopItems)}
+                        className="text-xs text-[#6B5E52] hover:text-[#8B1A2B] underline"
+                      >
+                        {showAllTopItems ? "Ver menos" : "Ver todos"}
+                      </button>
+                    )}
                   </div>
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">
@@ -748,7 +1000,7 @@ function MermasContent() {
                         </tr>
                       </thead>
                       <tbody>
-                        {analisis.top_items.map((item, i) => (
+                        {(showAllTopItems ? topItems : topItems.slice(0, 10)).map((item, i) => (
                           <tr
                             key={i}
                             className="border-b border-[#E8DFD3]/50 hover:bg-[#F5F0E8]"
@@ -757,10 +1009,10 @@ function MermasContent() {
                             <td className="px-4 py-2">{item.nombre}</td>
                             <td className="px-4 py-2 text-right">{item.eventos}</td>
                             <td className="px-4 py-2 text-right whitespace-nowrap">
-                              {item.cantidad_total} {item.unidad}
+                              {item.cantidad.toFixed(2)} {item.unidad}
                             </td>
                             <td className="px-4 py-2 text-right whitespace-nowrap font-medium">
-                              {item.coste_total.toFixed(2)} CHF
+                              {item.coste.toFixed(2)} CHF
                             </td>
                           </tr>
                         ))}
@@ -769,6 +1021,86 @@ function MermasContent() {
                   </div>
                 </div>
               )}
+
+              {/* Full records list */}
+              <div className="bg-white border border-[#E8DFD3] rounded-lg">
+                <div className="px-4 py-3 bg-[#F5F0E8] border-b border-[#E8DFD3] flex items-center justify-between">
+                  <h3 className="text-sm font-semibold text-[#8B1A2B] uppercase tracking-wider">
+                    Todos los registros ({filteredRecords.length})
+                  </h3>
+                  {!showAllRecords && filteredRecords.length > 0 && (
+                    <button
+                      onClick={() => setShowAllRecords(true)}
+                      className="text-xs text-[#6B5E52] hover:text-[#8B1A2B] underline"
+                    >
+                      Expandir
+                    </button>
+                  )}
+                  {showAllRecords && (
+                    <button
+                      onClick={() => { setShowAllRecords(false); setRecordsLimit(50); }}
+                      className="text-xs text-[#6B5E52] hover:text-[#8B1A2B] underline"
+                    >
+                      Colapsar
+                    </button>
+                  )}
+                </div>
+                {showAllRecords && (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-[#E8DFD3] text-left text-[#6B5E52]">
+                          <th className="px-4 py-2 font-medium cursor-pointer hover:text-[#8B1A2B]" onClick={() => toggleSort("fecha")}>
+                            Fecha{sortIcon("fecha")}
+                          </th>
+                          <th className="px-4 py-2 font-medium cursor-pointer hover:text-[#8B1A2B]" onClick={() => toggleSort("item")}>
+                            Item{sortIcon("item")}
+                          </th>
+                          <th className="px-4 py-2 font-medium cursor-pointer hover:text-[#8B1A2B]" onClick={() => toggleSort("cantidad")}>
+                            Cantidad{sortIcon("cantidad")}
+                          </th>
+                          <th className="px-4 py-2 font-medium cursor-pointer hover:text-[#8B1A2B]" onClick={() => toggleSort("motivo")}>
+                            Motivo{sortIcon("motivo")}
+                          </th>
+                          <th className="px-4 py-2 font-medium">Ubicacion</th>
+                          <th className="px-4 py-2 font-medium text-right cursor-pointer hover:text-[#8B1A2B]" onClick={() => toggleSort("coste")}>
+                            Coste{sortIcon("coste")}
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {sortedRecords.slice(0, recordsLimit).map((r) => (
+                          <tr key={r.id} className="border-b border-[#E8DFD3]/50 hover:bg-[#F5F0E8]">
+                            <td className="px-4 py-2 whitespace-nowrap">{r.fecha}</td>
+                            <td className="px-4 py-2">
+                              {getItemName(r)}
+                              {r.categoria_nombre && (
+                                <span className="text-xs text-[#6B5E52] ml-1">({r.categoria_nombre})</span>
+                              )}
+                            </td>
+                            <td className="px-4 py-2 whitespace-nowrap">{r.cantidad} {r.unidad}</td>
+                            <td className="px-4 py-2">{MOTIVO_LABELS[r.motivo] || r.motivo}</td>
+                            <td className="px-4 py-2">{r.ubicacion || "-"}</td>
+                            <td className="px-4 py-2 text-right whitespace-nowrap">
+                              {r.coste_total > 0 ? `${r.coste_total.toFixed(2)} CHF` : "-"}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                    {recordsLimit < sortedRecords.length && (
+                      <div className="px-4 py-3 text-center">
+                        <button
+                          onClick={() => setRecordsLimit((l) => l + 50)}
+                          className="text-sm text-[#6B5E52] hover:text-[#8B1A2B] underline"
+                        >
+                          Ver mas ({sortedRecords.length - recordsLimit} restantes)
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
             </>
           )}
         </div>
