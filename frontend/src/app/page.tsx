@@ -13,12 +13,12 @@ export default function MenuPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Load recetas + ingredientes first (fast), frozen in background
     Promise.all([
       apiFetch<Receta[]>("/api/recetas"),
       apiFetch<Ingrediente[]>("/api/ingredientes"),
-      apiFetch<Array<{name: string; chf_per_tube: number; supplement: number; multi_total: number; multi_supplement: number; doppio_pvp: number; doppio_cost: number; grams_per_tube: number}>>("/api/menu/frozen").catch(() => []),
     ])
-      .then(([recetas, ingredientes, frozen]) => {
+      .then(([recetas, ingredientes]) => {
         const rMap: Record<string, { coste: number; id: number; pvp: number | null }> = {};
         for (const r of recetas) {
           rMap[r.nombre] = { coste: r.coste_por_porcion, id: r.id, pvp: r.precio_venta };
@@ -29,9 +29,14 @@ export default function MenuPage() {
           iMap[i.nombre] = i.precio_compra;
         }
         setIngredientMap(iMap);
-        setFrozenTubes(frozen);
+        setLoading(false);
       })
-      .finally(() => setLoading(false));
+      .catch(() => setLoading(false));
+
+    // Frozen tubes load independently — page renders without waiting
+    apiFetch<Array<{name: string; chf_per_tube: number; supplement: number; multi_total: number; multi_supplement: number; doppio_pvp: number; doppio_cost: number; grams_per_tube: number}>>("/api/menu/frozen")
+      .then(setFrozenTubes)
+      .catch(() => {});
   }, []);
 
   if (loading) {

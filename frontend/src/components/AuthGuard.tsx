@@ -15,8 +15,15 @@ function isTokenValid(token: string): boolean {
   }
 }
 
+function getInitialAuth(): boolean | null {
+  if (typeof window === "undefined") return null;
+  const token = localStorage.getItem("bru_token");
+  if (token && isTokenValid(token)) return true;
+  return null;
+}
+
 export function AuthGuard({ children }: { children: React.ReactNode }) {
-  const [authed, setAuthed] = useState<boolean | null>(null);
+  const [authed, setAuthed] = useState<boolean | null>(getInitialAuth);
   const pathname = usePathname();
   const router = useRouter();
   const serverChecked = useRef(false);
