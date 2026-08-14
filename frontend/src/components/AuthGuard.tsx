@@ -1,14 +1,25 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+function isTokenValid(token: string): boolean {
+  try {
+    const payloadB64 = token.split(".")[0];
+    const payload = JSON.parse(atob(payloadB64.replace(/-/g, "+").replace(/_/g, "/")));
+    return (payload.exp || 0) > Date.now() / 1000;
+  } catch {
+    return false;
+  }
+}
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
   const [authed, setAuthed] = useState<boolean | null>(null);
   const pathname = usePathname();
   const router = useRouter();
+  const serverChecked = useRef(false);
 
   useEffect(() => {
     if (pathname === "/login") {
@@ -16,24 +27,29 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
       return;
     }
     const token = localStorage.getItem("bru_token");
-    if (!token) {
+    if (!token || !isTokenValid(token)) {
+      localStorage.removeItem("bru_token");
       router.replace("/login");
       return;
     }
-    fetch(`${API_BASE}/api/auth/check`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => {
-        if (res.ok) setAuthed(true);
-        else {
-          localStorage.removeItem("bru_token");
-          router.replace("/login");
-        }
+
+    // Token is locally valid — render immediately
+    setAuthed(true);
+
+    // Verify with server once per session (background, non-blocking)
+    if (!serverChecked.current) {
+      serverChecked.current = true;
+      fetch(`${API_BASE}/api/auth/check`, {
+        headers: { Authorization: `Bearer ${token}` },
       })
-      .catch(() => {
-        localStorage.removeItem("bru_token");
-        router.replace("/login");
-      });
+        .then((res) => {
+          if (!res.ok) {
+            localStorage.removeItem("bru_token");
+            router.replace("/login");
+          }
+        })
+        .catch(() => {});
+    }
   }, [pathname, router]);
 
   if (authed === null) {
