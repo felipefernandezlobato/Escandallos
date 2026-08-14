@@ -21,6 +21,17 @@ interface ComparacionProveedores {
   precios: PrecioProveedor[];
 }
 
+interface FrozenTubeCompare {
+  name: string;
+  stock_bru1: number;
+  stock_bru2: number;
+  stock_bolsa_bru1: number;
+  stock_bolsa_bru2: number;
+  origen_id?: number;
+}
+
+const FROZEN_PARENT_IDS = [289, 290];
+
 export default function IngredienteDetailPage() {
   const toast = useToast();
   const params = useParams<{ id: string }>();
@@ -49,22 +60,30 @@ export default function IngredienteDetailPage() {
   const [editingField, setEditingField] = useState<string | null>(null);
   const [editValue, setEditValue] = useState("");
   const [chartRange, setChartRange] = useState<"3m" | "all">("3m");
+  const [frozenTubes, setFrozenTubes] = useState<FrozenTubeCompare[]>([]);
+
+  const isFrozenParent = FROZEN_PARENT_IDS.includes(Number(id));
 
   useEffect(() => {
     setLoading(true);
-    Promise.all([
+    const fetches: Promise<any>[] = [
       apiFetch<Ingrediente>(`/api/ingredientes/${id}`),
       apiFetch<HistorialPrecio[]>(`/api/ingredientes/${id}/historial`),
       apiFetch<Receta[]>(`/api/ingredientes/${id}/recetas`),
       apiFetch<ComparacionProveedores>(`/api/proveedores/comparar/${id}`).catch(() => ({ ingrediente: { id: 0, nombre: "", precio_actual: 0 }, precios: [] })),
       apiFetch<typeof consumo>(`/api/inventario/consumo/${id}?semanas=52`).catch(() => null),
-    ])
-      .then(([ing, hist, rec, comp, cons]) => {
+    ];
+    if (FROZEN_PARENT_IDS.includes(Number(id))) {
+      fetches.push(apiFetch<FrozenTubeCompare[]>(`/api/menu/frozen`).catch(() => []));
+    }
+    Promise.all(fetches)
+      .then(([ing, hist, rec, comp, cons, frozen]) => {
         setIngrediente(ing);
         setHistorial(hist);
         setRecetas(rec);
         setPreciosProveedores(comp.precios);
         setConsumo(cons as typeof consumo);
+        if (frozen) setFrozenTubes(frozen);
       })
       .catch(() => setNotFound(true))
       .finally(() => setLoading(false));
@@ -122,6 +141,57 @@ export default function IngredienteDetailPage() {
           <h1 className="text-2xl font-bold mt-1">{ingrediente.nombre}</h1>
         </div>
       </div>
+
+      {/* Frozen Comparison Table */}
+      {isFrozenParent && frozenTubes.length > 0 && (
+        <div className="bg-white border border-[#E8DFD3] rounded-lg overflow-hidden">
+          <h2 className="text-lg font-semibold px-4 pt-4 pb-2">Stock Frozen Tubes</h2>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-[#F5F0E8] text-left text-[#6B5E52] border-b border-[#E8DFD3]">
+                  <th className="px-4 py-2 font-medium">Cafe</th>
+                  <th className="px-4 py-2 font-medium text-right" colSpan={2}>Tubos</th>
+                  <th className="px-4 py-2 font-medium text-right" colSpan={2}>Bolsas</th>
+                </tr>
+                <tr className="bg-[#F5F0E8]/60 text-left text-[#6B5E52] border-b border-[#E8DFD3] text-xs">
+                  <th className="px-4 py-1"></th>
+                  <th className="px-4 py-1 text-right font-medium">BRU1</th>
+                  <th className="px-4 py-1 text-right font-medium">BRU2</th>
+                  <th className="px-4 py-1 text-right font-medium">BRU1</th>
+                  <th className="px-4 py-1 text-right font-medium">BRU2</th>
+                </tr>
+              </thead>
+              <tbody>
+                {frozenTubes.map((tube) => (
+                  <tr key={tube.name} className="border-b border-[#E8DFD3]/50 hover:bg-[#F5F0E8]/50">
+                    <td className="px-4 py-2">
+                      {tube.origen_id ? (
+                        <Link href={`/ingredientes/${tube.origen_id}`} className="text-[#8B1A2B] hover:underline">
+                          {tube.name}
+                        </Link>
+                      ) : tube.name}
+                    </td>
+                    <td className="px-4 py-2 text-right font-mono">{tube.stock_bru1}</td>
+                    <td className="px-4 py-2 text-right font-mono">{tube.stock_bru2}</td>
+                    <td className="px-4 py-2 text-right font-mono text-[#6B5E52]">{tube.stock_bolsa_bru1}</td>
+                    <td className="px-4 py-2 text-right font-mono text-[#6B5E52]">{tube.stock_bolsa_bru2}</td>
+                  </tr>
+                ))}
+              </tbody>
+              <tfoot>
+                <tr className="bg-[#F5F0E8] font-semibold border-t border-[#E8DFD3]">
+                  <td className="px-4 py-2">Total</td>
+                  <td className="px-4 py-2 text-right font-mono">{frozenTubes.reduce((s, t) => s + t.stock_bru1, 0)}</td>
+                  <td className="px-4 py-2 text-right font-mono">{frozenTubes.reduce((s, t) => s + t.stock_bru2, 0)}</td>
+                  <td className="px-4 py-2 text-right font-mono text-[#6B5E52]">{frozenTubes.reduce((s, t) => s + t.stock_bolsa_bru1, 0)}</td>
+                  <td className="px-4 py-2 text-right font-mono text-[#6B5E52]">{frozenTubes.reduce((s, t) => s + t.stock_bolsa_bru2, 0)}</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      )}
 
       {/* Summary Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">

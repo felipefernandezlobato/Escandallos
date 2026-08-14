@@ -24,6 +24,30 @@ def _coffee_name(nombre: str) -> str:
     return name.strip()
 
 
+def _latest_stock_by_location(ingrediente_id: int, db: Session) -> dict[str, float]:
+    """Return stock split by location for the latest inventory date."""
+    max_fecha = (
+        db.query(func.max(InventarioRegistro.fecha_registro))
+        .filter(InventarioRegistro.ingrediente_id == ingrediente_id)
+        .scalar()
+    )
+    if max_fecha is None:
+        return {}
+    rows = (
+        db.query(InventarioRegistro.ubicacion, InventarioRegistro.cantidad)
+        .filter(
+            InventarioRegistro.ingrediente_id == ingrediente_id,
+            InventarioRegistro.fecha_registro == max_fecha,
+        )
+        .all()
+    )
+    result: dict[str, float] = {}
+    for loc, qty in rows:
+        key = loc or "SIN"
+        result[key] = result.get(key, 0) + qty
+    return result
+
+
 def _latest_stock(ingrediente_id: int, db: Session) -> float:
     """Return the sum of quantities from the latest inventory date for an ingredient."""
     max_fecha = (
@@ -129,6 +153,12 @@ def menu_frozen(
         item["stock_bru1"] = sum(_latest_stock(t.id, db) for t in bru1_tubes)
         item["stock_bru2"] = sum(_latest_stock(t.id, db) for t in bru2_tubes)
         item["stock_bolsa"] = source_stock
+        bolsa_by_loc: dict[str, float] = {}
+        for sid in source_ids:
+            for loc, qty in _latest_stock_by_location(sid, db).items():
+                bolsa_by_loc[loc] = bolsa_by_loc.get(loc, 0) + qty
+        item["stock_bolsa_bru1"] = bolsa_by_loc.get("BRU1", 0)
+        item["stock_bolsa_bru2"] = bolsa_by_loc.get("BRU2", 0)
         item["disponible"] = visible
         result.append(item)
 
