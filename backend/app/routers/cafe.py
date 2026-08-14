@@ -7,8 +7,8 @@ from sqlalchemy.orm import Session
 
 from app.auth import get_current_user
 from app.database import get_db
-from app.models import Ingrediente, Categoria
-from app.services.consumo import consumo_medio_semanal, consumo_semanal, stock_actual, tendencia_consumo
+from app.models import Ingrediente, Categoria, InventarioRegistro
+from app.services.consumo import consumo_medio_batch
 
 router = APIRouter(prefix="/api/cafe", tags=["cafe"])
 
@@ -111,16 +111,44 @@ def catalogo_cafe(
         .all()
     )
 
+    # Batch: find all IDs that have children (parents) in one query
+    parent_ids_rows = (
+        db.query(Ingrediente.grupo_ingrediente_id)
+        .filter(
+            Ingrediente.grupo_ingrediente_id.isnot(None),
+            Ingrediente.categoria_id.in_(cafe_cat_ids),
+        )
+        .distinct()
+        .all()
+    )
+    parent_ids = {row[0] for row in parent_ids_rows}
+
     # Filter: keep leaf items, exclude parents/aggregators
     items = []
     for ing in all_cafe:
-        # Skip parent/aggregator names
         if _is_parent_name(ing.nombre):
             continue
-        # Skip items that have children (they are virtual totals)
-        if _has_children(ing.id, db):
+        if ing.id in parent_ids:
             continue
         items.append(ing)
+
+    # Batch: load all inventory records and orders for all items at once
+    item_ids = [ing.id for ing in items]
+    all_inv_records = (
+        db.query(InventarioRegistro)
+        .filter(InventarioRegistro.ingrediente_id.in_(item_ids))
+        .order_by(InventarioRegistro.fecha_registro.desc(), InventarioRegistro.id.desc())
+        .all()
+    ) if item_ids else []
+
+    # Group inventory by ingredient_id
+    inv_by_ing: dict[int, list] = {}
+    for r in all_inv_records:
+        inv_by_ing.setdefault(r.ingrediente_id, []).append(r)
+
+    # Batch-compute consumption for all active items (3 queries total, not 3×N)
+    active_ids = [ing.id for ing in items if ing.activo and _detect_format(ing.nombre) is not None]
+    consumo_batch = consumo_medio_batch(active_ids, db, semanas=8) if active_ids else {}
 
     # Build catalog items grouped by format
     format_sections: dict[str, list[dict]] = {}
@@ -133,21 +161,25 @@ def catalogo_cafe(
     for ing in items:
         fmt = _detect_format(ing.nombre)
         if fmt is None:
-            continue  # Skip frozen items
+            continue
 
         total_skus += 1
         if ing.activo:
             skus_activos += 1
 
-        # Stock
-        stk = stock_actual(ing.id, db)
-        stock_qty = stk["cantidad"] if stk else 0.0
-        stock_unit = stk["unidad"] if stk else ing.unidad_compra
+        # Stock — use pre-loaded inventory records
+        inv_records = inv_by_ing.get(ing.id, [])
+        stock_qty = 0.0
+        stock_unit = ing.unidad_compra
+        if inv_records:
+            latest_date = inv_records[0].fecha_registro
+            stock_unit = inv_records[0].unidad
+            stock_qty = sum(r.cantidad for r in inv_records if r.fecha_registro == latest_date)
 
-        # Consumo
-        historial = consumo_semanal(ing.id, db, semanas=8)
-        consumo_medio = consumo_medio_semanal(ing.id, db, semanas=8)
-        tendencia = tendencia_consumo(historial)
+        # Consumo — from batch result
+        cd = consumo_batch.get(ing.id, {"consumo_medio": 0.0, "tendencia": "estable"})
+        consumo_medio = cd["consumo_medio"]
+        tendencia = cd["tendencia"]
 
         # Valor stock
         if ing.activo and stock_qty > 0:
@@ -232,10 +264,26 @@ def update_pvp(
     db.commit()
     db.refresh(ing)
 
-    # Return updated item info
-    stk = stock_actual(ing.id, db)
-    stock_qty = stk["cantidad"] if stk else 0.0
-    stock_unit = stk["unidad"] if stk else ing.unidad_compra
+    # Return updated item info — inline stock lookup (single leaf item)
+    ultimo = (
+        db.query(InventarioRegistro)
+        .filter(InventarioRegistro.ingrediente_id == ingrediente_id)
+        .order_by(InventarioRegistro.fecha_registro.desc(), InventarioRegistro.id.desc())
+        .first()
+    )
+    stock_qty = 0.0
+    stock_unit = ing.unidad_compra
+    if ultimo:
+        stock_unit = ultimo.unidad
+        same_day = (
+            db.query(InventarioRegistro)
+            .filter(
+                InventarioRegistro.ingrediente_id == ingrediente_id,
+                InventarioRegistro.fecha_registro == ultimo.fecha_registro,
+            )
+            .all()
+        )
+        stock_qty = sum(r.cantidad for r in same_day)
 
     pvp = ing.precio_venta
     coste = ing.precio_compra

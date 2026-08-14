@@ -1,6 +1,7 @@
 import math
+from collections import OrderedDict
 from datetime import date, timedelta
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 from sqlalchemy import distinct, func
 from sqlalchemy.orm import Session
@@ -502,3 +503,149 @@ def recomendacion_pedido(
         })
 
     return resultado
+
+
+def consumo_medio_batch(
+    ingrediente_ids: List[int], db: Session, semanas: int = 8
+) -> Dict[int, dict]:
+    """Batch-compute weekly consumption mean and trend for many leaf ingredients.
+
+    Returns {ingrediente_id: {"consumo_medio": float, "tendencia": str}}.
+    Uses 3 bulk queries instead of 3×N individual ones.
+    """
+    if not ingrediente_ids:
+        return {}
+
+    most_recent = (
+        db.query(func.max(Pedido.fecha_recepcion))
+        .filter(Pedido.estado == "recibido")
+        .scalar()
+    )
+    if not most_recent:
+        return {iid: {"consumo_medio": 0.0, "tendencia": "estable"} for iid in ingrediente_ids}
+
+    inicio = most_recent - timedelta(weeks=semanas)
+
+    # Bulk load inventory records
+    all_inv = (
+        db.query(InventarioRegistro)
+        .filter(
+            InventarioRegistro.ingrediente_id.in_(ingrediente_ids),
+            InventarioRegistro.fecha_registro >= inicio,
+        )
+        .order_by(InventarioRegistro.fecha_registro)
+        .all()
+    )
+    inv_by_id: Dict[int, list] = {iid: [] for iid in ingrediente_ids}
+    for r in all_inv:
+        inv_by_id.setdefault(r.ingrediente_id, []).append(r)
+
+    # Bulk load received orders
+    all_orders = (
+        db.query(
+            LineaPedido.ingrediente_id,
+            LineaPedido.cantidad_recibida,
+            LineaPedido.unidad,
+            Pedido.fecha_recepcion,
+        )
+        .join(Pedido)
+        .filter(
+            LineaPedido.ingrediente_id.in_(ingrediente_ids),
+            Pedido.estado == "recibido",
+            Pedido.fecha_recepcion >= inicio,
+            LineaPedido.cantidad_recibida.isnot(None),
+        )
+        .all()
+    )
+    orders_by_id: Dict[int, list] = {iid: [] for iid in ingrediente_ids}
+    for ing_id, qty, unit, fecha in all_orders:
+        orders_by_id.setdefault(ing_id, []).append((qty, unit, fecha))
+
+    # Bulk load ingredients for unit info
+    ings = db.query(Ingrediente).filter(Ingrediente.id.in_(ingrediente_ids)).all()
+    ing_map = {i.id: i for i in ings}
+
+    result: Dict[int, dict] = {}
+    for iid in ingrediente_ids:
+        ing = ing_map.get(iid)
+        if ing and ing.consumo_override_semanal is not None:
+            result[iid] = {
+                "consumo_medio": round(ing.consumo_override_semanal, 2),
+                "tendencia": "estable",
+            }
+            continue
+
+        raw_inv = inv_by_id.get(iid, [])
+        filtered = [r for r in raw_inv if not (r.notas and "recibido" in r.notas.lower())]
+        target_unit = raw_inv[-1].unidad if raw_inv else (ing.unidad_compra if ing else "unidad")
+
+        # Aggregate same-day records
+        day_sums: OrderedDict[date, float] = OrderedDict()
+        day_units: dict[date, str] = {}
+        for r in filtered:
+            day_sums[r.fecha_registro] = day_sums.get(r.fecha_registro, 0) + r.cantidad
+            if r.fecha_registro not in day_units:
+                day_units[r.fecha_registro] = r.unidad
+
+        inventarios = [
+            type("R", (), {"fecha_registro": f, "cantidad": q, "unidad": day_units[f]})
+            for f, q in day_sums.items()
+        ]
+
+        pedidos = orders_by_id.get(iid, [])
+        semana_data: dict[str, float] = {}
+
+        if inventarios and len(inventarios) >= 2:
+            pass
+        else:
+            for qty, order_unit, fecha in pedidos:
+                if qty and fecha:
+                    iso = fecha.isocalendar()
+                    key = f"w{iso[1]}.{str(iso[0])[2:]}"
+                    converted = _convert_qty(qty, order_unit or target_unit, target_unit)
+                    semana_data[key] = semana_data.get(key, 0) + converted
+
+        if inventarios and len(inventarios) >= 2:
+            for i in range(1, len(inventarios)):
+                prev = inventarios[i - 1]
+                curr = inventarios[i]
+                if not _units_compatible(prev.unidad, curr.unidad):
+                    continue
+                prev_qty = _convert_qty(prev.cantidad, prev.unidad, target_unit)
+                curr_qty = _convert_qty(curr.cantidad, curr.unidad, target_unit)
+                days_gap = (curr.fecha_registro - prev.fecha_registro).days
+                weeks_spanned = max(1, round(days_gap / 7))
+
+                received_between = 0
+                for qty_r, unit_r, fecha_r in pedidos:
+                    if qty_r and fecha_r and prev.fecha_registro < fecha_r <= curr.fecha_registro:
+                        received_between += _convert_qty(qty_r, unit_r or target_unit, target_unit)
+
+                consumo = prev_qty + received_between - curr_qty
+                if consumo > 0:
+                    weekly = round(consumo / weeks_spanned, 2)
+                    d = prev.fecha_registro
+                    for w in range(weeks_spanned):
+                        week_date = d + timedelta(weeks=w + 1)
+                        if week_date > curr.fecha_registro:
+                            week_date = curr.fecha_registro
+                        iso = week_date.isocalendar()
+                        key = f"w{iso[1]}.{str(iso[0])[2:]}"
+                        semana_data[key] = semana_data.get(key, 0) + weekly
+
+        historial = [
+            {"semana": key, "cantidad": round(semana_data[key], 2)}
+            for key in sorted(semana_data.keys())
+        ]
+
+        if historial:
+            consumo_medio = round(sum(h["cantidad"] for h in historial) / len(historial), 2)
+        else:
+            consumo_medio = 0.0
+
+        result[iid] = {
+            "consumo_medio": consumo_medio,
+            "tendencia": tendencia_consumo(historial),
+        }
+
+    return result
