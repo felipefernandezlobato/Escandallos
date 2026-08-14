@@ -130,69 +130,58 @@ export default function IngredienteDetailPage() {
   if (loading) return <p className="text-[#6B5E52] py-10 text-center">Cargando...</p>;
   if (notFound || !ingrediente) return <p className="text-red-500 py-10 text-center">Ingrediente no encontrado</p>;
 
-  return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <button onClick={() => router.back()} className="text-sm text-[#8B1A2B] hover:underline">
-            &larr; Volver
-          </button>
-          <h1 className="text-2xl font-bold mt-1">{ingrediente.nombre}</h1>
-        </div>
+  const frozenTableSection = isFrozenParent && frozenTubes.length > 0 ? (
+    <div className="bg-white border border-[#E8DFD3] rounded-lg overflow-hidden">
+      <h2 className="text-lg font-semibold px-4 pt-4 pb-2">Stock Frozen Tubes</h2>
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="bg-[#F5F0E8] text-left text-[#6B5E52] border-b border-[#E8DFD3]">
+              <th className="px-4 py-2 font-medium">Cafe</th>
+              <th className="px-4 py-2 font-medium text-right" colSpan={2}>Tubos</th>
+              <th className="px-4 py-2 font-medium text-right" colSpan={2}>Bolsas</th>
+            </tr>
+            <tr className="bg-[#F5F0E8]/60 text-left text-[#6B5E52] border-b border-[#E8DFD3] text-xs">
+              <th className="px-4 py-1"></th>
+              <th className="px-4 py-1 text-right font-medium">BRU1</th>
+              <th className="px-4 py-1 text-right font-medium">BRU2</th>
+              <th className="px-4 py-1 text-right font-medium">BRU1</th>
+              <th className="px-4 py-1 text-right font-medium">BRU2</th>
+            </tr>
+          </thead>
+          <tbody>
+            {frozenTubes.map((tube) => (
+              <tr key={tube.name} className="border-b border-[#E8DFD3]/50 hover:bg-[#F5F0E8]/50">
+                <td className="px-4 py-2">
+                  {tube.origen_id ? (
+                    <Link href={`/ingredientes/${tube.origen_id}`} className="text-[#8B1A2B] hover:underline">
+                      {tube.name}
+                    </Link>
+                  ) : tube.name}
+                </td>
+                <td className="px-4 py-2 text-right font-mono">{tube.stock_bru1}</td>
+                <td className="px-4 py-2 text-right font-mono">{tube.stock_bru2}</td>
+                <td className="px-4 py-2 text-right font-mono text-[#6B5E52]">{tube.stock_bolsa_bru1}</td>
+                <td className="px-4 py-2 text-right font-mono text-[#6B5E52]">{tube.stock_bolsa_bru2}</td>
+              </tr>
+            ))}
+          </tbody>
+          <tfoot>
+            <tr className="bg-[#F5F0E8] font-semibold border-t border-[#E8DFD3]">
+              <td className="px-4 py-2">Total</td>
+              <td className="px-4 py-2 text-right font-mono">{frozenTubes.reduce((s, t) => s + t.stock_bru1, 0)}</td>
+              <td className="px-4 py-2 text-right font-mono">{frozenTubes.reduce((s, t) => s + t.stock_bru2, 0)}</td>
+              <td className="px-4 py-2 text-right font-mono text-[#6B5E52]">{frozenTubes.reduce((s, t) => s + t.stock_bolsa_bru1, 0)}</td>
+              <td className="px-4 py-2 text-right font-mono text-[#6B5E52]">{frozenTubes.reduce((s, t) => s + t.stock_bolsa_bru2, 0)}</td>
+            </tr>
+          </tfoot>
+        </table>
       </div>
+    </div>
+  ) : null;
 
-      {/* Frozen Comparison Table */}
-      {isFrozenParent && frozenTubes.length > 0 && (
-        <div className="bg-white border border-[#E8DFD3] rounded-lg overflow-hidden">
-          <h2 className="text-lg font-semibold px-4 pt-4 pb-2">Stock Frozen Tubes</h2>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="bg-[#F5F0E8] text-left text-[#6B5E52] border-b border-[#E8DFD3]">
-                  <th className="px-4 py-2 font-medium">Cafe</th>
-                  <th className="px-4 py-2 font-medium text-right" colSpan={2}>Tubos</th>
-                  <th className="px-4 py-2 font-medium text-right" colSpan={2}>Bolsas</th>
-                </tr>
-                <tr className="bg-[#F5F0E8]/60 text-left text-[#6B5E52] border-b border-[#E8DFD3] text-xs">
-                  <th className="px-4 py-1"></th>
-                  <th className="px-4 py-1 text-right font-medium">BRU1</th>
-                  <th className="px-4 py-1 text-right font-medium">BRU2</th>
-                  <th className="px-4 py-1 text-right font-medium">BRU1</th>
-                  <th className="px-4 py-1 text-right font-medium">BRU2</th>
-                </tr>
-              </thead>
-              <tbody>
-                {frozenTubes.map((tube) => (
-                  <tr key={tube.name} className="border-b border-[#E8DFD3]/50 hover:bg-[#F5F0E8]/50">
-                    <td className="px-4 py-2">
-                      {tube.origen_id ? (
-                        <Link href={`/ingredientes/${tube.origen_id}`} className="text-[#8B1A2B] hover:underline">
-                          {tube.name}
-                        </Link>
-                      ) : tube.name}
-                    </td>
-                    <td className="px-4 py-2 text-right font-mono">{tube.stock_bru1}</td>
-                    <td className="px-4 py-2 text-right font-mono">{tube.stock_bru2}</td>
-                    <td className="px-4 py-2 text-right font-mono text-[#6B5E52]">{tube.stock_bolsa_bru1}</td>
-                    <td className="px-4 py-2 text-right font-mono text-[#6B5E52]">{tube.stock_bolsa_bru2}</td>
-                  </tr>
-                ))}
-              </tbody>
-              <tfoot>
-                <tr className="bg-[#F5F0E8] font-semibold border-t border-[#E8DFD3]">
-                  <td className="px-4 py-2">Total</td>
-                  <td className="px-4 py-2 text-right font-mono">{frozenTubes.reduce((s, t) => s + t.stock_bru1, 0)}</td>
-                  <td className="px-4 py-2 text-right font-mono">{frozenTubes.reduce((s, t) => s + t.stock_bru2, 0)}</td>
-                  <td className="px-4 py-2 text-right font-mono text-[#6B5E52]">{frozenTubes.reduce((s, t) => s + t.stock_bolsa_bru1, 0)}</td>
-                  <td className="px-4 py-2 text-right font-mono text-[#6B5E52]">{frozenTubes.reduce((s, t) => s + t.stock_bolsa_bru2, 0)}</td>
-                </tr>
-              </tfoot>
-            </table>
-          </div>
-        </div>
-      )}
-
+  const detailSections = (
+    <>
       {/* Summary Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {ingrediente.precio_eur != null && ingrediente.precio_eur > 0 && (
@@ -458,6 +447,25 @@ export default function IngredienteDetailPage() {
           </table>
         )}
       </div>
+    </>
+  );
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <button onClick={() => router.back()} className="text-sm text-[#8B1A2B] hover:underline">
+            &larr; Volver
+          </button>
+          <h1 className="text-2xl font-bold mt-1">{ingrediente.nombre}</h1>
+        </div>
+      </div>
+
+      {/* Frozen: table + chart first. Normal: details sections first */}
+      {isFrozenParent && frozenTableSection}
+
+      {!isFrozenParent && detailSections}
 
       {/* Consumo y Stock */}
       {consumo && (consumo.historial.length > 0 || (consumo.stock_historial && consumo.stock_historial.length > 0)) && (() => {
@@ -706,6 +714,9 @@ export default function IngredienteDetailPage() {
           </table>
         )}
       </div>
+
+      {/* Frozen parents: detail sections at the bottom */}
+      {isFrozenParent && detailSections}
     </div>
   );
 }
