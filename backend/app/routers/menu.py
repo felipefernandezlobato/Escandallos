@@ -24,63 +24,73 @@ def _coffee_name(nombre: str) -> str:
     return name.strip()
 
 
-def _latest_stock_by_location(ingrediente_id: int, db: Session) -> dict[str, float]:
-    """Return stock split by location for the latest inventory date."""
-    max_fecha = (
-        db.query(func.max(InventarioRegistro.fecha_registro))
-        .filter(InventarioRegistro.ingrediente_id == ingrediente_id)
-        .scalar()
-    )
-    if max_fecha is None:
+def _batch_latest_stocks(ingredient_ids: list[int], db: Session) -> dict[int, dict]:
+    """Batch-load latest stock for many ingredients.
+    Returns {id: {"total": float, "by_location": {loc: qty}}}.
+    """
+    if not ingredient_ids:
         return {}
-    rows = (
-        db.query(InventarioRegistro.ubicacion, InventarioRegistro.cantidad)
-        .filter(
-            InventarioRegistro.ingrediente_id == ingrediente_id,
-            InventarioRegistro.fecha_registro == max_fecha,
+
+    # Get max date per ingredient in one query
+    max_dates = (
+        db.query(
+            InventarioRegistro.ingrediente_id,
+            func.max(InventarioRegistro.fecha_registro).label("max_fecha"),
         )
+        .filter(InventarioRegistro.ingrediente_id.in_(ingredient_ids))
+        .group_by(InventarioRegistro.ingrediente_id)
         .all()
     )
-    result: dict[str, float] = {}
-    for loc, qty in rows:
+    date_map = {row[0]: row[1] for row in max_dates}
+
+    if not date_map:
+        return {iid: {"total": 0.0, "by_location": {}} for iid in ingredient_ids}
+
+    # Build filter conditions for each ingredient's latest date
+    from sqlalchemy import and_, or_, tuple_
+    conditions = [
+        and_(
+            InventarioRegistro.ingrediente_id == iid,
+            InventarioRegistro.fecha_registro == fecha,
+        )
+        for iid, fecha in date_map.items()
+    ]
+
+    rows = (
+        db.query(
+            InventarioRegistro.ingrediente_id,
+            InventarioRegistro.ubicacion,
+            InventarioRegistro.cantidad,
+        )
+        .filter(or_(*conditions))
+        .all()
+    ) if conditions else []
+
+    result: dict[int, dict] = {iid: {"total": 0.0, "by_location": {}} for iid in ingredient_ids}
+    for iid, loc, qty in rows:
+        result[iid]["total"] += qty
         key = loc or "SIN"
-        result[key] = result.get(key, 0) + qty
+        result[iid]["by_location"][key] = result[iid]["by_location"].get(key, 0) + qty
+
     return result
 
 
-def _latest_stock(ingrediente_id: int, db: Session) -> float:
-    """Return the sum of quantities from the latest inventory date for an ingredient."""
-    max_fecha = (
-        db.query(func.max(InventarioRegistro.fecha_registro))
-        .filter(InventarioRegistro.ingrediente_id == ingrediente_id)
-        .scalar()
-    )
-    if max_fecha is None:
-        return 0.0
+def _batch_has_pending_orders(ingredient_ids: list[int], db: Session) -> set[int]:
+    """Batch-check which ingredients have pending order lines."""
+    if not ingredient_ids:
+        return set()
+
     rows = (
-        db.query(InventarioRegistro.cantidad)
-        .filter(
-            InventarioRegistro.ingrediente_id == ingrediente_id,
-            InventarioRegistro.fecha_registro == max_fecha,
-        )
-        .all()
-    )
-    return sum(r[0] for r in rows)
-
-
-def _has_pending_order(ingrediente_id: int, db: Session) -> bool:
-    """Check if there is a pending order line for the given ingredient."""
-    count = (
-        db.query(LineaPedido.id)
+        db.query(LineaPedido.ingrediente_id)
         .join(Pedido, LineaPedido.pedido_id == Pedido.id)
         .filter(
-            LineaPedido.ingrediente_id == ingrediente_id,
+            LineaPedido.ingrediente_id.in_(ingredient_ids),
             Pedido.estado.in_(["borrador", "enviado"]),
         )
-        .limit(1)
-        .count()
+        .distinct()
+        .all()
     )
-    return count > 0
+    return {r[0] for r in rows}
 
 
 @router.get("/frozen")
@@ -101,23 +111,27 @@ def menu_frozen(
         name = _coffee_name(tube.nombre)
         groups[name].append(tube)
 
+    # Collect all IDs we need stock for (tubes + source bags)
+    all_tube_ids = [t.id for t in frozen_tubes]
+    all_source_ids = list({t.frozen_origen_id for t in frozen_tubes if t.frozen_origen_id is not None})
+    all_ids = list(set(all_tube_ids + all_source_ids))
+
+    # Batch-load all stocks and pending orders
+    stocks = _batch_latest_stocks(all_ids, db)
+    pending_ids = _batch_has_pending_orders(all_source_ids, db)
+
     result = []
     for name, tubes in groups.items():
-        # Use the first tube's values (they should be the same across Bru1/Bru2)
         representative = tubes[0]
         coste_kg = representative.coste_kg_frozen or 0.0
         supplement = representative.suplemento_frozen or 0.0
 
-        # Check visibility:
-        # a) Sum stock of all frozen tube variants
-        tube_stock = sum(_latest_stock(t.id, db) for t in tubes)
+        tube_stock = sum(stocks.get(t.id, {}).get("total", 0.0) for t in tubes)
 
-        # b) Check source bag stock via frozen_origen_id
         source_ids = {t.frozen_origen_id for t in tubes if t.frozen_origen_id is not None}
-        source_stock = sum(_latest_stock(sid, db) for sid in source_ids)
+        source_stock = sum(stocks.get(sid, {}).get("total", 0.0) for sid in source_ids)
 
-        # c) Check pending orders for source bag ingredients
-        has_pending = any(_has_pending_order(sid, db) for sid in source_ids)
+        has_pending = bool(source_ids & pending_ids)
 
         visible = tube_stock > 0 or source_stock > 0 or has_pending
         if not visible:
@@ -147,25 +161,24 @@ def menu_frozen(
             item["multi_supplement"] = None
 
         item["coste_kg_frozen"] = coste_kg
-        # Stock data for the cafe catalog page
+
         bru1_tubes = [t for t in tubes if "bru1" in t.nombre.lower()]
         bru2_tubes = [t for t in tubes if "bru2" in t.nombre.lower()]
-        item["stock_bru1"] = sum(_latest_stock(t.id, db) for t in bru1_tubes)
-        item["stock_bru2"] = sum(_latest_stock(t.id, db) for t in bru2_tubes)
+        item["stock_bru1"] = sum(stocks.get(t.id, {}).get("total", 0.0) for t in bru1_tubes)
+        item["stock_bru2"] = sum(stocks.get(t.id, {}).get("total", 0.0) for t in bru2_tubes)
         item["stock_bolsa"] = source_stock
+
         bolsa_by_loc: dict[str, float] = {}
         for sid in source_ids:
-            for loc, qty in _latest_stock_by_location(sid, db).items():
+            for loc, qty in stocks.get(sid, {}).get("by_location", {}).items():
                 bolsa_by_loc[loc] = bolsa_by_loc.get(loc, 0) + qty
         item["stock_bolsa_bru1"] = bolsa_by_loc.get("BRU1", 0)
         item["stock_bolsa_bru2"] = bolsa_by_loc.get("BRU2", 0)
         item["disponible"] = visible
         result.append(item)
 
-    # Sort by coste_kg_frozen DESC (most expensive first)
     result.sort(key=lambda x: -(x.get("coste_kg_frozen") or 0))
 
-    # Add constants and rename internal field
     for item in result:
         item["doppio_pvp"] = 3.90
         item["doppio_cost"] = 0.41
