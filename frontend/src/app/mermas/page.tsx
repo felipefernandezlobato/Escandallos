@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { apiFetch } from "@/lib/api";
 import { useToast } from "@/components/Toast";
@@ -26,6 +26,25 @@ type Tab = "registrar" | "analisis";
 type TipoItem = "ingrediente" | "receta" | "otro";
 type Periodo = "dia" | "semana" | "mes";
 
+interface BatchItem {
+  key: number;
+  tipo: TipoItem;
+  ingrediente_id: number | null;
+  receta_id: number | null;
+  nombre: string;
+  cantidad: string;
+  unidad: string;
+  motivo: MotivoMerma;
+  notas: string;
+}
+
+interface SearchResult {
+  tipo: TipoItem;
+  id: number;
+  nombre: string;
+  unidad: string;
+}
+
 function MermasContent() {
   const toast = useToast();
   const searchParams = useSearchParams();
@@ -41,22 +60,21 @@ function MermasContent() {
   const [registros, setRegistros] = useState<MermaRegistro[]>([]);
   const [totalRegistros, setTotalRegistros] = useState(0);
 
-  // Form
-  const [tipoItem, setTipoItem] = useState<TipoItem>("ingrediente");
+  // Batch header
+  const [batchFecha, setBatchFecha] = useState(new Date().toISOString().slice(0, 10));
+  const [batchUbicacion, setBatchUbicacion] = useState("");
+
+  // Unified search
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [highlightIndex, setHighlightIndex] = useState(-1);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Batch list
+  const [batchItems, setBatchItems] = useState<BatchItem[]>([]);
+  const [nextKey, setNextKey] = useState(1);
   const [saving, setSaving] = useState(false);
-  const [buscarIng, setBuscarIng] = useState("");
-  const [buscarRec, setBuscarRec] = useState("");
-  const [form, setForm] = useState({
-    ingrediente_id: null as number | null,
-    receta_id: null as number | null,
-    nombre_libre: "",
-    cantidad: "",
-    unidad: "unidad",
-    motivo: "caducado" as MotivoMerma,
-    notas: "",
-    ubicacion: "",
-    fecha: new Date().toISOString().slice(0, 10),
-  });
 
   // Analytics — client-side filtering
   const [allAnalisisRecords, setAllAnalisisRecords] = useState<MermaRegistro[]>([]);
@@ -109,6 +127,22 @@ function MermasContent() {
     if (tab === "analisis") fetchAnalisisRecords();
   }, [tab, fechaDesde, fechaHasta]);
 
+  // Click outside to close dropdown
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node) &&
+        searchInputRef.current &&
+        !searchInputRef.current.contains(e.target as Node)
+      ) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const fetchRegistros = async () => {
     try {
       const res = await apiFetch<{ total: number; registros: MermaRegistro[] }>(
@@ -143,7 +177,199 @@ function MermasContent() {
     }
   };
 
-  // Date range presets
+  // ── Search ──
+
+  const normalize = (s: string) =>
+    s
+      .normalize("NFD")
+      .replace(/[̀-ͯ]/g, "")
+      .toLowerCase();
+
+  const searchResults = useMemo((): SearchResult[] => {
+    const q = searchQuery.trim();
+    if (q.length === 0) return [];
+    const nq = normalize(q);
+
+    const ingResults: SearchResult[] = ingredientes
+      .filter((i) => normalize(i.nombre).includes(nq))
+      .map((i) => ({
+        tipo: "ingrediente" as TipoItem,
+        id: i.id,
+        nombre: i.nombre,
+        unidad: i.unidad_uso || "unidad",
+      }));
+
+    const recResults: SearchResult[] = recetas
+      .filter((r) => normalize(r.nombre).includes(nq))
+      .map((r) => ({
+        tipo: "receta" as TipoItem,
+        id: r.id,
+        nombre: r.nombre,
+        unidad: "unidad",
+      }));
+
+    return [...ingResults, ...recResults].slice(0, 15);
+  }, [searchQuery, ingredientes, recetas]);
+
+  // ── Batch operations ──
+
+  const addToBatch = (result: SearchResult) => {
+    const item: BatchItem = {
+      key: nextKey,
+      tipo: result.tipo,
+      ingrediente_id: result.tipo === "ingrediente" ? result.id : null,
+      receta_id: result.tipo === "receta" ? result.id : null,
+      nombre: result.nombre,
+      cantidad: "1",
+      unidad: result.unidad,
+      motivo: "caducado",
+      notas: "",
+    };
+    setNextKey((k) => k + 1);
+    setBatchItems((prev) => [...prev, item]);
+    setSearchQuery("");
+    setShowDropdown(false);
+    setHighlightIndex(-1);
+    setTimeout(() => searchInputRef.current?.focus(), 0);
+  };
+
+  const addFreeText = () => {
+    const name = searchQuery.trim();
+    if (!name) return;
+    const item: BatchItem = {
+      key: nextKey,
+      tipo: "otro",
+      ingrediente_id: null,
+      receta_id: null,
+      nombre: name,
+      cantidad: "1",
+      unidad: "unidad",
+      motivo: "caducado",
+      notas: "",
+    };
+    setNextKey((k) => k + 1);
+    setBatchItems((prev) => [...prev, item]);
+    setSearchQuery("");
+    setShowDropdown(false);
+    setHighlightIndex(-1);
+    setTimeout(() => searchInputRef.current?.focus(), 0);
+  };
+
+  const removeFromBatch = (key: number) => {
+    setBatchItems((prev) => prev.filter((item) => item.key !== key));
+  };
+
+  const updateBatchItem = (key: number, field: keyof BatchItem, value: string) => {
+    setBatchItems((prev) =>
+      prev.map((item) =>
+        item.key === key ? { ...item, [field]: value } : item
+      )
+    );
+  };
+
+  // ── Save all ──
+
+  const handleSaveAll = async () => {
+    if (batchItems.length === 0) {
+      toast("Agrega al menos un item", "error");
+      return;
+    }
+
+    for (const item of batchItems) {
+      const cantidad = parseFloat(item.cantidad.replace(",", "."));
+      if (isNaN(cantidad) || cantidad <= 0) {
+        toast(`"${item.nombre}": cantidad debe ser mayor a 0`, "error");
+        return;
+      }
+      if (item.motivo === "otro" && !item.notas.trim()) {
+        toast(`"${item.nombre}": notas obligatorias cuando motivo es Otro`, "error");
+        return;
+      }
+    }
+
+    setSaving(true);
+    let successCount = 0;
+    let errorCount = 0;
+
+    for (const item of batchItems) {
+      const cantidad = parseFloat(item.cantidad.replace(",", "."));
+      const body: Record<string, unknown> = {
+        cantidad,
+        unidad: item.unidad,
+        motivo: item.motivo,
+        notas: item.notas || null,
+        ubicacion: batchUbicacion || null,
+        fecha: batchFecha,
+      };
+
+      if (item.tipo === "ingrediente") body.ingrediente_id = item.ingrediente_id;
+      else if (item.tipo === "receta") body.receta_id = item.receta_id;
+      else body.nombre_libre = item.nombre;
+
+      try {
+        await apiFetch("/api/mermas", {
+          method: "POST",
+          body: JSON.stringify(body),
+        });
+        successCount++;
+      } catch (err) {
+        errorCount++;
+        toast(`Error en "${item.nombre}": ${(err as Error).message}`, "error");
+      }
+    }
+
+    if (successCount > 0) {
+      toast(`${successCount} merma${successCount > 1 ? "s" : ""} registrada${successCount > 1 ? "s" : ""}`);
+      setBatchItems([]);
+      fetchRegistros();
+    }
+    if (errorCount > 0 && successCount > 0) {
+      toast(`${errorCount} error${errorCount > 1 ? "es" : ""} al guardar`, "error");
+    }
+
+    setSaving(false);
+  };
+
+  const handleDelete = async (id: number) => {
+    if (!confirm("¿Eliminar este registro de merma?")) return;
+    try {
+      await apiFetch(`/api/mermas/${id}`, { method: "DELETE" });
+      toast("Registro eliminado");
+      fetchRegistros();
+    } catch (err) {
+      toast("Error: " + (err as Error).message, "error");
+    }
+  };
+
+  // ── Search keyboard navigation ──
+
+  const totalDropdownItems = searchResults.length + (searchQuery.trim() ? 1 : 0);
+
+  const handleSearchKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setHighlightIndex((i) => Math.min(i + 1, totalDropdownItems - 1));
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setHighlightIndex((i) => Math.max(i - 1, -1));
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      if (highlightIndex >= 0 && highlightIndex < searchResults.length) {
+        addToBatch(searchResults[highlightIndex]);
+      } else if (highlightIndex === searchResults.length && searchQuery.trim()) {
+        addFreeText();
+      } else if (searchResults.length === 1) {
+        addToBatch(searchResults[0]);
+      } else if (searchResults.length === 0 && searchQuery.trim()) {
+        addFreeText();
+      }
+    } else if (e.key === "Escape") {
+      setShowDropdown(false);
+    }
+  };
+
+  // ── Analytics computations (unchanged) ──
+
   const applyPreset = (preset: string) => {
     const today = new Date();
     const y = today.getFullYear();
@@ -178,7 +404,6 @@ function MermasContent() {
     setFechaHasta(hasta);
   };
 
-  // Client-side filtering and aggregation
   const getItemName = (r: MermaRegistro) =>
     r.ingrediente_nombre || r.receta_nombre || r.nombre_libre || "?";
 
@@ -205,11 +430,9 @@ function MermasContent() {
 
   const hasFilters = filterTiempo || filterCategoria || filterMotivo;
 
-  // Aggregations from filtered records
   const totalEventos = filteredRecords.length;
   const totalCoste = filteredRecords.reduce((s, r) => s + r.coste_total, 0);
 
-  // Time chart — always from allAnalisisRecords (not filtered by time)
   const timeChartRecords = allAnalisisRecords.filter((r) => {
     if (filterCategoria && getItemCategory(r) !== filterCategoria) return false;
     if (filterMotivo && r.motivo !== filterMotivo) return false;
@@ -227,7 +450,6 @@ function MermasContent() {
     .map(([k, v]) => ({ periodo: k, ...v }))
     .sort((a, b) => a.periodo.localeCompare(b.periodo));
 
-  // Category chart — from records not filtered by category
   const catChartRecords = allAnalisisRecords.filter((r) => {
     if (filterTiempo && getTimeKey(r.fecha) !== filterTiempo) return false;
     if (filterMotivo && r.motivo !== filterMotivo) return false;
@@ -245,7 +467,6 @@ function MermasContent() {
     .map(([k, v]) => ({ categoria: k, ...v }))
     .sort((a, b) => b.coste - a.coste);
 
-  // Motivo chart — from records not filtered by motivo
   const motChartRecords = allAnalisisRecords.filter((r) => {
     if (filterTiempo && getTimeKey(r.fecha) !== filterTiempo) return false;
     if (filterCategoria && getItemCategory(r) !== filterCategoria) return false;
@@ -262,7 +483,6 @@ function MermasContent() {
     .map(([k, v]) => ({ motivo: k, ...v }))
     .sort((a, b) => b.coste - a.coste);
 
-  // Top items from filtered records
   const itemMap = new Map<string, { eventos: number; cantidad: number; unidad: string; coste: number }>();
   filteredRecords.forEach((r) => {
     const name = getItemName(r);
@@ -276,7 +496,6 @@ function MermasContent() {
     .map(([k, v]) => ({ nombre: k, ...v }))
     .sort((a, b) => b.coste - a.coste);
 
-  // Sorted records for the list
   const sortedRecords = [...filteredRecords].sort((a, b) => {
     let cmp = 0;
     if (sortCol === "fecha") cmp = a.fecha.localeCompare(b.fecha);
@@ -294,106 +513,6 @@ function MermasContent() {
 
   const sortIcon = (col: string) =>
     sortCol === col ? (sortAsc ? " ↑" : " ↓") : "";
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const cantidad = parseFloat(form.cantidad.replace(",", "."));
-    if (isNaN(cantidad) || cantidad <= 0) {
-      toast("Cantidad debe ser mayor a 0", "error");
-      return;
-    }
-    if (tipoItem === "ingrediente" && !form.ingrediente_id) {
-      toast("Selecciona un ingrediente", "error");
-      return;
-    }
-    if (tipoItem === "receta" && !form.receta_id) {
-      toast("Selecciona una receta", "error");
-      return;
-    }
-    if (tipoItem === "otro" && !form.nombre_libre.trim()) {
-      toast("Escribe un nombre", "error");
-      return;
-    }
-    if (form.motivo === "otro" && !form.notas.trim()) {
-      toast("Notas obligatorias cuando el motivo es Otro", "error");
-      return;
-    }
-
-    setSaving(true);
-    try {
-      const body: Record<string, unknown> = {
-        cantidad,
-        unidad: form.unidad,
-        motivo: form.motivo,
-        notas: form.notas || null,
-        ubicacion: form.ubicacion || null,
-        fecha: form.fecha,
-      };
-      if (tipoItem === "ingrediente") body.ingrediente_id = form.ingrediente_id;
-      else if (tipoItem === "receta") body.receta_id = form.receta_id;
-      else body.nombre_libre = form.nombre_libre;
-
-      await apiFetch("/api/mermas", {
-        method: "POST",
-        body: JSON.stringify(body),
-      });
-      toast("Merma registrada");
-      setForm({
-        ingrediente_id: null,
-        receta_id: null,
-        nombre_libre: "",
-        cantidad: "",
-        unidad: "unidad",
-        motivo: "caducado",
-        notas: "",
-        ubicacion: form.ubicacion,
-        fecha: form.fecha,
-      });
-      setBuscarIng("");
-      setBuscarRec("");
-      fetchRegistros();
-    } catch (err) {
-      toast("Error: " + (err as Error).message, "error");
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const handleDelete = async (id: number) => {
-    if (!confirm("¿Eliminar este registro de merma?")) return;
-    try {
-      await apiFetch(`/api/mermas/${id}`, { method: "DELETE" });
-      toast("Registro eliminado");
-      fetchRegistros();
-    } catch (err) {
-      toast("Error: " + (err as Error).message, "error");
-    }
-  };
-
-  // Filter ingredients/recipes for search
-  const normalize = (s: string) =>
-    s
-      .normalize("NFD")
-      .replace(/[̀-ͯ]/g, "")
-      .toLowerCase();
-
-  const ingFiltrados = buscarIng
-    ? ingredientes.filter((i) => normalize(i.nombre).includes(normalize(buscarIng)))
-    : ingredientes;
-
-  const recFiltrados = buscarRec
-    ? recetas.filter((r) => normalize(r.nombre).includes(normalize(buscarRec)))
-    : recetas;
-
-  // Auto-fill unit when ingredient selected
-  const onSelectIngrediente = (id: number) => {
-    const ing = ingredientes.find((i) => i.id === id);
-    setForm((f) => ({
-      ...f,
-      ingrediente_id: id,
-      unidad: ing?.unidad_uso || "unidad",
-    }));
-  };
 
   if (loading) {
     return (
@@ -431,211 +550,206 @@ function MermasContent() {
       {/* ===== TAB: REGISTRAR ===== */}
       {tab === "registrar" && (
         <div className="space-y-6">
-          {/* Form */}
+          {/* Batch header: fecha + ubicacion */}
+          <div className="bg-white border border-[#E8DFD3] rounded-lg p-4">
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs text-[#6B5E52] mb-1">Fecha</label>
+                <input
+                  type="date"
+                  value={batchFecha}
+                  onChange={(e) => setBatchFecha(e.target.value)}
+                  className="border border-[#D4C4A8] rounded px-3 py-2 text-sm w-full"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-[#6B5E52] mb-1">Ubicacion</label>
+                <select
+                  value={batchUbicacion}
+                  onChange={(e) => setBatchUbicacion(e.target.value)}
+                  className="border border-[#D4C4A8] rounded px-3 py-2 text-sm w-full"
+                >
+                  <option value="">--</option>
+                  <option value="BRU1">BRU1</option>
+                  <option value="BRU2">BRU2</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* Search + batch card */}
           <div className="bg-white border border-[#E8DFD3] rounded-lg">
             <div className="px-4 py-3 bg-[#F5F0E8] border-b border-[#E8DFD3]">
-              <h2 className="font-semibold text-[#8B1A2B]">Registrar Merma</h2>
+              <h2 className="font-semibold text-[#8B1A2B]">Registrar Mermas</h2>
             </div>
-            <form onSubmit={handleSubmit} className="p-4 space-y-4">
-              {/* Tipo selector */}
-              <div>
-                <label className="block text-xs text-[#6B5E52] mb-1">Tipo de item</label>
-                <div className="flex gap-2">
-                  {(["ingrediente", "receta", "otro"] as TipoItem[]).map((t) => (
-                    <button
-                      key={t}
-                      type="button"
-                      onClick={() => {
-                        setTipoItem(t);
-                        setForm((f) => ({
-                          ...f,
-                          ingrediente_id: null,
-                          receta_id: null,
-                          nombre_libre: "",
-                          unidad: t === "ingrediente" ? "g" : "unidad",
-                        }));
-                        setBuscarIng("");
-                        setBuscarRec("");
-                      }}
-                      className={`px-3 py-1.5 rounded text-sm transition-colors ${
-                        tipoItem === t
-                          ? "bg-[#8B1A2B] text-white"
-                          : "bg-white border border-[#D4C4A8] text-[#6B5E52] hover:bg-[#F5F0E8]"
-                      }`}
+            <div className="p-4 space-y-4">
+              {/* Unified search input */}
+              <div className="relative">
+                <label className="block text-xs text-[#6B5E52] mb-1">
+                  Buscar ingrediente o receta
+                </label>
+                <input
+                  ref={searchInputRef}
+                  type="text"
+                  placeholder="Escribe para buscar..."
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setShowDropdown(true);
+                    setHighlightIndex(-1);
+                  }}
+                  onFocus={() => {
+                    if (searchQuery.trim().length > 0) setShowDropdown(true);
+                  }}
+                  onKeyDown={handleSearchKeyDown}
+                  className="border border-[#D4C4A8] rounded px-3 py-2 text-sm w-full"
+                />
+
+                {/* Dropdown */}
+                {showDropdown && searchQuery.trim().length > 0 && (
+                  <div
+                    ref={dropdownRef}
+                    className="absolute z-20 left-0 right-0 mt-1 bg-white border border-[#D4C4A8] rounded-lg shadow-lg max-h-60 overflow-y-auto"
+                  >
+                    {searchResults.length === 0 && (
+                      <div className="px-3 py-2 text-sm text-[#6B5E52]">
+                        Sin resultados
+                      </div>
+                    )}
+                    {searchResults.map((result, idx) => (
+                      <button
+                        key={`${result.tipo}-${result.id}`}
+                        type="button"
+                        onClick={() => addToBatch(result)}
+                        className={`w-full text-left px-3 py-2 text-sm hover:bg-[#F5F0E8] ${
+                          highlightIndex === idx ? "bg-[#F5F0E8]" : ""
+                        }`}
+                      >
+                        {result.nombre}
+                        <span className="ml-2 text-xs text-[#6B5E52]">
+                          ({result.tipo === "ingrediente" ? "Ingrediente" : "Receta"})
+                        </span>
+                      </button>
+                    ))}
+                    {searchQuery.trim() && (
+                      <button
+                        type="button"
+                        onClick={addFreeText}
+                        className={`w-full text-left px-3 py-2 text-sm border-t border-[#E8DFD3] hover:bg-[#F5F0E8] text-[#6B5E52] ${
+                          highlightIndex === searchResults.length ? "bg-[#F5F0E8]" : ""
+                        }`}
+                      >
+                        Agregar como otro: &quot;{searchQuery.trim()}&quot;
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Batch list */}
+              {batchItems.length > 0 && (
+                <div className="space-y-2">
+                  <div className="text-xs text-[#6B5E52] font-medium">
+                    {batchItems.length} item{batchItems.length > 1 ? "s" : ""} en lote
+                  </div>
+                  {batchItems.map((item) => (
+                    <div
+                      key={item.key}
+                      className="border border-[#E8DFD3] rounded-lg p-3 space-y-2"
                     >
-                      {t === "ingrediente"
-                        ? "Ingrediente"
-                        : t === "receta"
-                        ? "Receta"
-                        : "Otro"}
-                    </button>
+                      {/* Name + remove */}
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium text-[#3D2E22]">
+                          {item.nombre}
+                          <span className="ml-1 text-xs text-[#6B5E52]">
+                            ({item.tipo === "ingrediente"
+                              ? "Ingrediente"
+                              : item.tipo === "receta"
+                              ? "Receta"
+                              : "Otro"})
+                          </span>
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => removeFromBatch(item.key)}
+                          className="text-red-500 hover:text-red-700 text-xs"
+                        >
+                          Quitar
+                        </button>
+                      </div>
+                      {/* Cantidad, Unidad, Motivo */}
+                      <div className="grid grid-cols-3 gap-2">
+                        <div>
+                          <label className="block text-[10px] text-[#6B5E52]">Cantidad</label>
+                          <input
+                            type="text"
+                            inputMode="decimal"
+                            value={item.cantidad}
+                            onChange={(e) =>
+                              updateBatchItem(item.key, "cantidad", e.target.value.replace(",", "."))
+                            }
+                            className="border border-[#D4C4A8] rounded px-2 py-1.5 text-sm w-full"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] text-[#6B5E52]">Unidad</label>
+                          <select
+                            value={item.unidad}
+                            onChange={(e) => updateBatchItem(item.key, "unidad", e.target.value)}
+                            className="border border-[#D4C4A8] rounded px-2 py-1.5 text-sm w-full"
+                          >
+                            {UNIDADES.map((u) => (
+                              <option key={u} value={u}>{u}</option>
+                            ))}
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-[10px] text-[#6B5E52]">Motivo</label>
+                          <select
+                            value={item.motivo}
+                            onChange={(e) =>
+                              updateBatchItem(item.key, "motivo", e.target.value)
+                            }
+                            className="border border-[#D4C4A8] rounded px-2 py-1.5 text-sm w-full"
+                          >
+                            {MOTIVOS_MERMA.map((m) => (
+                              <option key={m.value} value={m.value}>{m.label}</option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+                      {/* Notas */}
+                      <div>
+                        <label className="block text-[10px] text-[#6B5E52]">
+                          Notas{item.motivo === "otro" ? " (obligatorio)" : ""}
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="Detalles..."
+                          value={item.notas}
+                          onChange={(e) => updateBatchItem(item.key, "notas", e.target.value)}
+                          className="border border-[#D4C4A8] rounded px-2 py-1.5 text-sm w-full"
+                        />
+                      </div>
+                    </div>
                   ))}
                 </div>
-              </div>
-
-              {/* Item selector */}
-              {tipoItem === "ingrediente" && (
-                <div>
-                  <label className="block text-xs text-[#6B5E52] mb-1">Ingrediente</label>
-                  <input
-                    type="text"
-                    placeholder="Buscar ingrediente..."
-                    value={buscarIng}
-                    onChange={(e) => setBuscarIng(e.target.value)}
-                    className="border border-[#D4C4A8] rounded px-3 py-2 text-sm w-full mb-1"
-                  />
-                  <select
-                    value={form.ingrediente_id ?? ""}
-                    onChange={(e) => onSelectIngrediente(parseInt(e.target.value))}
-                    className="border border-[#D4C4A8] rounded px-3 py-2 text-sm w-full"
-                    size={Math.min(ingFiltrados.length, 6)}
-                  >
-                    {ingFiltrados.map((ing) => (
-                      <option key={ing.id} value={ing.id}>
-                        {ing.nombre} ({ing.unidad_uso})
-                      </option>
-                    ))}
-                  </select>
-                </div>
               )}
 
-              {tipoItem === "receta" && (
-                <div>
-                  <label className="block text-xs text-[#6B5E52] mb-1">Receta</label>
-                  <input
-                    type="text"
-                    placeholder="Buscar receta..."
-                    value={buscarRec}
-                    onChange={(e) => setBuscarRec(e.target.value)}
-                    className="border border-[#D4C4A8] rounded px-3 py-2 text-sm w-full mb-1"
-                  />
-                  <select
-                    value={form.receta_id ?? ""}
-                    onChange={(e) =>
-                      setForm((f) => ({ ...f, receta_id: parseInt(e.target.value) }))
-                    }
-                    className="border border-[#D4C4A8] rounded px-3 py-2 text-sm w-full"
-                    size={Math.min(recFiltrados.length, 6)}
-                  >
-                    {recFiltrados.map((r) => (
-                      <option key={r.id} value={r.id}>
-                        {r.nombre}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+              {/* Save all */}
+              {batchItems.length > 0 && (
+                <button
+                  type="button"
+                  onClick={handleSaveAll}
+                  disabled={saving}
+                  className="w-full bg-[#8B1A2B] text-white px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-[#6B1420] transition-colors disabled:opacity-50"
+                >
+                  {saving
+                    ? "Guardando..."
+                    : `Guardar todo (${batchItems.length})`}
+                </button>
               )}
-
-              {tipoItem === "otro" && (
-                <div>
-                  <label className="block text-xs text-[#6B5E52] mb-1">Nombre</label>
-                  <input
-                    type="text"
-                    placeholder="Ej: Plato roto, vaso..."
-                    value={form.nombre_libre}
-                    onChange={(e) =>
-                      setForm((f) => ({ ...f, nombre_libre: e.target.value }))
-                    }
-                    className="border border-[#D4C4A8] rounded px-3 py-2 text-sm w-full"
-                  />
-                </div>
-              )}
-
-              {/* Cantidad + Unidad + Motivo row */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <div>
-                  <label className="block text-xs text-[#6B5E52] mb-1">Cantidad</label>
-                  <input
-                    type="text"
-                    inputMode="decimal"
-                    placeholder="0"
-                    value={form.cantidad}
-                    onChange={(e) =>
-                      setForm((f) => ({
-                        ...f,
-                        cantidad: e.target.value.replace(",", "."),
-                      }))
-                    }
-                    className="border border-[#D4C4A8] rounded px-3 py-2 text-sm w-full"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs text-[#6B5E52] mb-1">Unidad</label>
-                  <select
-                    value={form.unidad}
-                    onChange={(e) => setForm((f) => ({ ...f, unidad: e.target.value }))}
-                    className="border border-[#D4C4A8] rounded px-3 py-2 text-sm w-full"
-                  >
-                    {UNIDADES.map((u) => (
-                      <option key={u} value={u}>
-                        {u}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-xs text-[#6B5E52] mb-1">Motivo</label>
-                  <select
-                    value={form.motivo}
-                    onChange={(e) =>
-                      setForm((f) => ({ ...f, motivo: e.target.value as MotivoMerma }))
-                    }
-                    className="border border-[#D4C4A8] rounded px-3 py-2 text-sm w-full"
-                  >
-                    {MOTIVOS_MERMA.map((m) => (
-                      <option key={m.value} value={m.value}>
-                        {m.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-xs text-[#6B5E52] mb-1">Ubicacion</label>
-                  <select
-                    value={form.ubicacion}
-                    onChange={(e) => setForm((f) => ({ ...f, ubicacion: e.target.value }))}
-                    className="border border-[#D4C4A8] rounded px-3 py-2 text-sm w-full"
-                  >
-                    <option value="">--</option>
-                    <option value="BRU1">BRU1</option>
-                    <option value="BRU2">BRU2</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* Fecha + Notas */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs text-[#6B5E52] mb-1">Fecha</label>
-                  <input
-                    type="date"
-                    value={form.fecha}
-                    onChange={(e) => setForm((f) => ({ ...f, fecha: e.target.value }))}
-                    className="border border-[#D4C4A8] rounded px-3 py-2 text-sm w-full"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs text-[#6B5E52] mb-1">
-                    Notas{form.motivo === "otro" ? " (obligatorio)" : ""}
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Detalles adicionales..."
-                    value={form.notas}
-                    onChange={(e) => setForm((f) => ({ ...f, notas: e.target.value }))}
-                    className="border border-[#D4C4A8] rounded px-3 py-2 text-sm w-full"
-                  />
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                disabled={saving}
-                className="bg-[#8B1A2B] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#6B1420] transition-colors disabled:opacity-50"
-              >
-                {saving ? "Guardando..." : "Registrar Merma"}
-              </button>
-            </form>
+            </div>
           </div>
 
           {/* Recent entries table */}
