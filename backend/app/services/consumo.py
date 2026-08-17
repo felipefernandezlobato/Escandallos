@@ -201,9 +201,22 @@ def consumo_medio_semanal(ingrediente_id: int, db: Session, semanas: int = 8) ->
     return round(total / len(historial), 2)
 
 
+def _day_total(records: list) -> float:
+    """Sum quantities across distinct ubicaciones for same-day records of one
+    ingredient. Records must be pre-sorted by id ascending. Two records at the
+    SAME ubicacion on the same day are a correction (latest wins, not summed);
+    two records at DIFFERENT ubicaciones (e.g. BRU1 + BRU2) are genuinely
+    additive."""
+    by_loc: dict = {}
+    for r in records:
+        by_loc[r.ubicacion] = r.cantidad
+    return sum(by_loc.values())
+
+
 def _stock_actual_leaf(ingrediente_id: int, db: Session) -> Optional[dict]:
     """Get latest stock for a single (leaf) ingredient.
-    Café (cat 5): sums all same-day records (BRU1 + BRU2).
+    Café (cat 5): sums same-day records per distinct ubicacion (BRU1 + BRU2),
+    with same-ubicacion same-day duplicates treated as a correction.
     Other: takes the last record of the latest day (correction overwrites)."""
     ultimo = (
         db.query(InventarioRegistro)
@@ -224,9 +237,10 @@ def _stock_actual_leaf(ingrediente_id: int, db: Session) -> Optional[dict]:
                 InventarioRegistro.ingrediente_id == ingrediente_id,
                 InventarioRegistro.fecha_registro == ultimo.fecha_registro,
             )
+            .order_by(InventarioRegistro.id.asc())
             .all()
         )
-        cantidad = sum(r.cantidad for r in registros_dia)
+        cantidad = _day_total(registros_dia)
     else:
         cantidad = ultimo.cantidad
 
@@ -330,17 +344,20 @@ def stock_historial_serie(ingrediente_id: int, db: Session) -> list[dict]:
     series = []
     for d in dates:
         for cid, regs in per_child.items():
-            day_total = None
             day_date = None
+            day_records: list = []
             while idx[cid] < len(regs) and regs[idx[cid]].fecha_registro <= d:
                 r = regs[idx[cid]]
-                if day_date is None or r.fecha_registro != day_date or not sum_same_day:
-                    day_total = r.cantidad
+                if day_date is None or r.fecha_registro != day_date:
                     day_date = r.fecha_registro
+                    day_records = [r]
+                elif sum_same_day:
+                    day_records.append(r)
                 else:
-                    day_total += r.cantidad
+                    day_records = [r]
                 idx[cid] += 1
             if day_date is not None:
+                day_total = _day_total(day_records) if sum_same_day else day_records[-1].cantidad
                 last_val[cid] = (day_total, day_date)
         total = 0.0
         for val in last_val.values():
