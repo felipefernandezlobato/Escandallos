@@ -580,6 +580,20 @@ def obtener_consumo(
             for f, q in sorted(by_date.items())
         ]
 
+    current = stock_actual(ingrediente_id, db)
+    if current:
+        current_key = str(current["fecha"])
+        if stock_points and stock_points[-1].fecha == current_key:
+            stock_points[-1] = StockHistorialItem(
+                fecha=current_key, cantidad=current["cantidad"], unidad=current["unidad"]
+            )
+        elif not stock_points or current_key > stock_points[-1].fecha:
+            stock_points.append(
+                StockHistorialItem(
+                    fecha=current_key, cantidad=current["cantidad"], unidad=current["unidad"]
+                )
+            )
+
     calc = calcular_par_y_safety(ingrediente_id, db)
     rop = calc["safety_stock"]
     eoq = calc["par_level"]

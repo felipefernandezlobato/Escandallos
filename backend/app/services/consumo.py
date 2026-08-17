@@ -242,13 +242,22 @@ CAFE_CATEGORIA_ID = 5
 def stock_actual(ingrediente_id: int, db: Session) -> Optional[dict]:
     """Get latest stock. If parent, sum latest stock of all children.
     For café (categoria_id=5): children not counted on the most recent date = 0.
+    Exception: frozen tube flavors (frozen_origen_id set) are tracked independently
+    per flavor, not in a single synchronized counting session, so each keeps its
+    own last known stock regardless of date.
     For other categories: use each child's last known stock."""
     children = _child_ids(ingrediente_id, db)
     if not children:
         return _stock_actual_leaf(ingrediente_id, db)
 
     ing = db.query(Ingrediente).get(ingrediente_id)
-    zero_if_uncounted = ing and ing.categoria_id == CAFE_CATEGORIA_ID
+    is_frozen_group = (
+        db.query(Ingrediente.id)
+        .filter(Ingrediente.id.in_(children), Ingrediente.frozen_origen_id.isnot(None))
+        .first()
+        is not None
+    )
+    zero_if_uncounted = ing and ing.categoria_id == CAFE_CATEGORIA_ID and not is_frozen_group
 
     child_stocks = []
     latest_fecha = None
