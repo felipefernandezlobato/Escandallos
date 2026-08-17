@@ -63,11 +63,18 @@ def _batch_latest_stocks(ingredient_ids: list[int], db: Session) -> dict[int, di
             InventarioRegistro.cantidad,
         )
         .filter(or_(*conditions))
+        .order_by(InventarioRegistro.id.asc())
         .all()
     ) if conditions else []
 
-    result: dict[int, dict] = {iid: {"total": 0.0, "by_location": {}} for iid in ingredient_ids}
+    # A same-day, same-location duplicate is a correction (latest wins), not
+    # additive — only genuinely different ubicaciones (BRU1 + BRU2) should sum.
+    latest_by_loc: dict[tuple, float] = {}
     for iid, loc, qty in rows:
+        latest_by_loc[(iid, loc)] = qty
+
+    result: dict[int, dict] = {iid: {"total": 0.0, "by_location": {}} for iid in ingredient_ids}
+    for (iid, loc), qty in latest_by_loc.items():
         result[iid]["total"] += qty
         key = loc or "SIN"
         result[iid]["by_location"][key] = result[iid]["by_location"].get(key, 0) + qty
