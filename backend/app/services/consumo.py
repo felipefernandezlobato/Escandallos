@@ -292,6 +292,68 @@ def stock_actual(ingrediente_id: int, db: Session) -> Optional[dict]:
     }
 
 
+def stock_historial_serie(ingrediente_id: int, db: Session) -> list[dict]:
+    """Full stock-over-time series for charts, using the same semantics as
+    stock_actual() at every historical date: each child's last known quantity
+    as of that date, carried forward, zeroed out on café sync-count dates it
+    wasn't part of (except frozen tube groups — see stock_actual)."""
+    children = _child_ids(ingrediente_id, db)
+    ing = db.query(Ingrediente).get(ingrediente_id)
+    target_ids = children or [ingrediente_id]
+
+    is_frozen_group = bool(children) and (
+        db.query(Ingrediente.id)
+        .filter(Ingrediente.id.in_(children), Ingrediente.frozen_origen_id.isnot(None))
+        .first()
+        is not None
+    )
+    zero_if_uncounted = bool(children) and ing.categoria_id == CAFE_CATEGORIA_ID and not is_frozen_group
+
+    all_registros = (
+        db.query(InventarioRegistro)
+        .filter(InventarioRegistro.ingrediente_id.in_(target_ids))
+        .order_by(InventarioRegistro.fecha_registro.asc(), InventarioRegistro.id.asc())
+        .all()
+    )
+    if not all_registros:
+        return []
+
+    per_child: dict[int, list] = {}
+    for r in all_registros:
+        per_child.setdefault(r.ingrediente_id, []).append(r)
+
+    sum_same_day = ing.categoria_id == CAFE_CATEGORIA_ID
+    dates = sorted({r.fecha_registro for r in all_registros})
+    idx = {cid: 0 for cid in per_child}
+    last_val: dict[int, tuple] = {cid: None for cid in per_child}
+    unidad = all_registros[-1].unidad
+    series = []
+    for d in dates:
+        for cid, regs in per_child.items():
+            day_total = None
+            day_date = None
+            while idx[cid] < len(regs) and regs[idx[cid]].fecha_registro <= d:
+                r = regs[idx[cid]]
+                if day_date is None or r.fecha_registro != day_date or not sum_same_day:
+                    day_total = r.cantidad
+                    day_date = r.fecha_registro
+                else:
+                    day_total += r.cantidad
+                idx[cid] += 1
+            if day_date is not None:
+                last_val[cid] = (day_total, day_date)
+        total = 0.0
+        for val in last_val.values():
+            if val is None:
+                continue
+            cantidad, fecha = val
+            if zero_if_uncounted and fecha != d:
+                continue
+            total += cantidad
+        series.append({"fecha": str(d), "cantidad": round(total, 2), "unidad": unidad})
+    return series
+
+
 def stock_por_ubicacion(ingrediente_id: int, db: Session) -> dict:
     """Return stock breakdown by location for items with ubicacion data.
 

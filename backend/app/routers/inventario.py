@@ -536,63 +536,14 @@ def obtener_consumo(
     media = consumo_medio_semanal(ingrediente_id, db)
     trend = tendencia_consumo(historial)
 
-    from app.services.consumo import calcular_par_y_safety, _child_ids
+    from app.services.consumo import calcular_par_y_safety, stock_historial_serie
 
-    child_ids = _child_ids(ingrediente_id, db)
-    if child_ids:
-        # Parent: aggregate stock history from all children by date
-        all_registros = (
-            db.query(InventarioRegistro)
-            .filter(InventarioRegistro.ingrediente_id.in_(child_ids))
-            .order_by(InventarioRegistro.fecha_registro.asc())
-            .all()
-        )
-        by_date: dict[str, float] = {}
-        display_unit = ing.unidad_compra
-        for r in all_registros:
-            key = str(r.fecha_registro)
-            by_date[key] = by_date.get(key, 0) + r.cantidad
-            display_unit = r.unidad
-        stock_points: list[StockHistorialItem] = [
-            StockHistorialItem(fecha=f, cantidad=round(q, 2), unidad=display_unit)
-            for f, q in sorted(by_date.items())
-        ]
-    else:
-        all_registros = (
-            db.query(InventarioRegistro)
-            .filter(InventarioRegistro.ingrediente_id == ingrediente_id)
-            .order_by(InventarioRegistro.fecha_registro.asc())
-            .all()
-        )
-        display_unit = ing.unidad_compra
-        if all_registros:
-            display_unit = all_registros[-1].unidad
-        is_cafe = ing.categoria_id == 5
-        by_date: dict[str, float] = {}
-        for r in all_registros:
-            key = str(r.fecha_registro)
-            if is_cafe:
-                by_date[key] = by_date.get(key, 0) + r.cantidad
-            else:
-                by_date[key] = r.cantidad
-        stock_points = [
-            StockHistorialItem(fecha=f, cantidad=round(q, 2), unidad=display_unit)
-            for f, q in sorted(by_date.items())
-        ]
-
-    current = stock_actual(ingrediente_id, db)
-    if current:
-        current_key = str(current["fecha"])
-        if stock_points and stock_points[-1].fecha == current_key:
-            stock_points[-1] = StockHistorialItem(
-                fecha=current_key, cantidad=current["cantidad"], unidad=current["unidad"]
-            )
-        elif not stock_points or current_key > stock_points[-1].fecha:
-            stock_points.append(
-                StockHistorialItem(
-                    fecha=current_key, cantidad=current["cantidad"], unidad=current["unidad"]
-                )
-            )
+    serie = stock_historial_serie(ingrediente_id, db)
+    display_unit = serie[-1]["unidad"] if serie else ing.unidad_compra
+    stock_points = [
+        StockHistorialItem(fecha=p["fecha"], cantidad=p["cantidad"], unidad=p["unidad"])
+        for p in serie
+    ]
 
     calc = calcular_par_y_safety(ingrediente_id, db)
     rop = calc["safety_stock"]
