@@ -35,9 +35,11 @@ export interface LineaReceta {
   subreceta_id: number | null;
   cantidad: number;
   unidad: string;
+  cantidad_bru2: number | null;
   nombre_ingrediente: string | null;
   nombre_subreceta: string | null;
   coste_linea: number;
+  coste_linea_bru2: number;
 }
 
 export interface LineaRecetaInput {
@@ -45,6 +47,7 @@ export interface LineaRecetaInput {
   subreceta_id?: number | null;
   cantidad: number;
   unidad: string;
+  cantidad_bru2?: number | null;
 }
 
 export interface Receta {
@@ -60,6 +63,8 @@ export interface Receta {
   descripcion: string | null;
   coste_total: number;
   coste_por_porcion: number;
+  coste_total_bru2: number;
+  coste_por_porcion_bru2: number;
   margen_real: number | null;
   categoria_nombre: string;
   fecha_creacion: string | null;

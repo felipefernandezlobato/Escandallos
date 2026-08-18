@@ -99,6 +99,7 @@ class LineaRecetaBase(BaseModel):
     subreceta_id: Optional[int] = None
     cantidad: float
     unidad: str
+    cantidad_bru2: Optional[float] = None
 
 
 class LineaRecetaCreate(LineaRecetaBase):
@@ -110,6 +111,7 @@ class LineaRecetaOut(LineaRecetaBase):
     nombre_ingrediente: Optional[str] = None
     nombre_subreceta: Optional[str] = None
     coste_linea: float = 0.0
+    coste_linea_bru2: float = 0.0
 
     model_config = {"from_attributes": True}
 
@@ -149,6 +151,8 @@ class RecetaOut(RecetaBase):
     id: int
     coste_total: float = 0.0
     coste_por_porcion: float = 0.0
+    coste_total_bru2: float = 0.0
+    coste_por_porcion_bru2: float = 0.0
     margen_real: Optional[float] = None
     categoria_nombre: str = ""
     fecha_creacion: Optional[datetime] = None

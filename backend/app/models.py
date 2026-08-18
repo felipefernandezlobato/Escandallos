@@ -106,6 +106,7 @@ class LineaReceta(Base):
     subreceta_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey("recetas.id"), nullable=True)
     cantidad: Mapped[float] = mapped_column(Float, nullable=False)
     unidad: Mapped[str] = mapped_column(String(20), nullable=False)
+    cantidad_bru2: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
 
     receta_rel: Mapped["Receta"] = relationship(
         back_populates="lineas", foreign_keys=[receta_id]

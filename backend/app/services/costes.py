@@ -32,15 +32,22 @@ def coste_por_unidad_uso(ingrediente: Ingrediente) -> float:
 
 
 def coste_linea(
-    linea: LineaReceta, db: Session, visited: Optional[Set[int]] = None
+    linea: LineaReceta,
+    db: Session,
+    visited: Optional[Set[int]] = None,
+    ubicacion: str = "bru1",
 ) -> float:
     if visited is None:
         visited = set()
 
+    cantidad_linea = linea.cantidad
+    if ubicacion == "bru2" and linea.cantidad_bru2 is not None:
+        cantidad_linea = linea.cantidad_bru2
+
     if linea.ingrediente_id is not None:
         ingrediente = linea.ingrediente_rel
         cpu = coste_por_unidad_uso(ingrediente)
-        cantidad_convertida = convertir(linea.cantidad, linea.unidad, ingrediente.unidad_uso)
+        cantidad_convertida = convertir(cantidad_linea, linea.unidad, ingrediente.unidad_uso)
         return cpu * cantidad_convertida
 
     if linea.subreceta_id is not None:
@@ -48,14 +55,14 @@ def coste_linea(
         if sub.id in visited:
             return 0.0
         porciones = sub.porciones_por_lote if sub.porciones_por_lote > 0 else 1
-        coste_por_porcion = coste_total_receta(sub, db, visited) / porciones
+        coste_por_porcion = coste_total_receta(sub, db, visited, ubicacion) / porciones
         # Convert quantity to the sub-recipe's yield unit so that
         # e.g. 70 g of a sub-recipe yielding 8.947 kg becomes 0.070 kg.
-        cantidad = linea.cantidad
+        cantidad = cantidad_linea
         if sub.unidad_rendimiento and linea.unidad != sub.unidad_rendimiento:
             try:
                 cantidad = convertir(
-                    linea.cantidad, linea.unidad, sub.unidad_rendimiento
+                    cantidad_linea, linea.unidad, sub.unidad_rendimiento
                 )
             except ValueError:
                 pass  # incompatible units — fall back to raw quantity
@@ -65,19 +72,22 @@ def coste_linea(
 
 
 def coste_total_receta(
-    receta: Receta, db: Session, visited: Optional[Set[int]] = None
+    receta: Receta,
+    db: Session,
+    visited: Optional[Set[int]] = None,
+    ubicacion: str = "bru1",
 ) -> float:
     if visited is None:
         visited = set()
     visited = visited | {receta.id}
     total = 0.0
     for linea in receta.lineas:
-        total += coste_linea(linea, db, visited)
+        total += coste_linea(linea, db, visited, ubicacion)
     return total
 
 
-def coste_por_racion(receta: Receta, db: Session) -> float:
-    total = coste_total_receta(receta, db)
+def coste_por_racion(receta: Receta, db: Session, ubicacion: str = "bru1") -> float:
+    total = coste_total_receta(receta, db, ubicacion=ubicacion)
     if receta.porciones_por_lote <= 0:
         return total
     return total / receta.porciones_por_lote

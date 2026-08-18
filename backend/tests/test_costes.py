@@ -110,6 +110,45 @@ def test_coste_total_receta(db, datos_base):
     assert total == pytest.approx(1.3941, abs=0.01)
 
 
+def test_coste_total_receta_bru2_override(db, datos_base):
+    receta = Receta(
+        nombre="Tostada de fresas",
+        categoria_id=datos_base["cat_rec"].id,
+        porciones_por_lote=2,
+        precio_venta=8.50,
+    )
+    db.add(receta)
+    db.flush()
+
+    linea_fresas = LineaReceta(
+        receta_id=receta.id,
+        ingrediente_id=datos_base["fresas"].id,
+        cantidad=150,
+        unidad="g",
+        cantidad_bru2=75,  # half quantity at Bru2
+    )
+    linea_huevos = LineaReceta(
+        receta_id=receta.id,
+        ingrediente_id=datos_base["huevos"].id,
+        cantidad=2,
+        unidad="unidad",
+        cantidad_bru2=0,  # excluded entirely at Bru2
+    )
+    db.add_all([linea_fresas, linea_huevos])
+    db.flush()
+
+    receta.lineas = [linea_fresas, linea_huevos]
+    linea_fresas.ingrediente_rel = datos_base["fresas"]
+    linea_huevos.ingrediente_rel = datos_base["huevos"]
+
+    total_bru1 = coste_total_receta(receta, db)
+    total_bru2 = coste_total_receta(receta, db, ubicacion="bru2")
+    # bru1: fresas 0.005294*150 + huevos 0.30*2 = 1.3941
+    # bru2: fresas 0.005294*75 + huevos 0 = 0.3971
+    assert total_bru1 == pytest.approx(1.3941, abs=0.01)
+    assert total_bru2 == pytest.approx(0.3971, abs=0.01)
+
+
 def test_coste_por_racion_ok(db, datos_base):
     receta = Receta(
         nombre="Tostada de fresas",

@@ -72,6 +72,7 @@ export default function RecetaDetailPage() {
         subreceta_id: l.subreceta_id,
         cantidad: l.cantidad,
         unidad: l.unidad,
+        cantidad_bru2: l.cantidad_bru2,
       })),
     });
     setEditing(true);
@@ -110,6 +111,7 @@ export default function RecetaDetailPage() {
           subreceta_id: tipo === "subreceta" ? (subrecetas[0]?.id || null) : null,
           cantidad: 1,
           unidad: "g",
+          cantidad_bru2: null,
         },
       ],
     });
@@ -163,7 +165,7 @@ export default function RecetaDetailPage() {
               <input type="number" step="any" value={editForm.precio_venta ?? ""} onChange={(e) => setEditForm({ ...editForm, precio_venta: e.target.value ? parseFloat(e.target.value) : null })} className="w-full border border-[#D4C4A8] rounded px-3 py-2 text-sm" />
             </div>
             <div>
-              <label className="block text-xs text-[#6B5E52] mb-1">Precio venta Bru2 (CHF)</label>
+              <label className="block text-xs text-[#6B5E52] mb-1">Precio venta BRU2 (CHF)</label>
               <input type="number" step="any" value={editForm.precio_venta_bru2 ?? ""} onChange={(e) => setEditForm({ ...editForm, precio_venta_bru2: e.target.value ? parseFloat(e.target.value) : null })} className="w-full border border-[#D4C4A8] rounded px-3 py-2 text-sm" />
             </div>
             <div className="flex items-center gap-2 pt-5">
@@ -208,6 +210,7 @@ export default function RecetaDetailPage() {
             <p className="text-sm text-[#6B5E52]/70">Añade ingredientes a la receta</p>
           ) : (
             <div className="space-y-2">
+              <p className="text-xs text-[#8B1A2B]/70">La casilla en burdeos es la cantidad en BRU2 (vacío = igual que BRU1, 0 = no se usa en BRU2)</p>
               {editForm.lineas.map((linea, i) => (
                 <div key={i} className="flex flex-wrap items-center gap-2 p-2 bg-[#F5F0E8] rounded">
                   {linea.subreceta_id ? (
@@ -223,6 +226,15 @@ export default function RecetaDetailPage() {
                   <select value={linea.unidad} onChange={(e) => updateLinea(i, "unidad", e.target.value)} className="border border-[#D4C4A8] rounded px-2 py-1 text-sm">
                     {UNIDADES.map((u) => <option key={u} value={u}>{u}</option>)}
                   </select>
+                  <input
+                    type="number"
+                    step="any"
+                    placeholder="= BRU1"
+                    title="Cantidad en BRU2 (vacío = igual que BRU1, 0 = no se usa en BRU2)"
+                    value={linea.cantidad_bru2 ?? ""}
+                    onChange={(e) => updateLinea(i, "cantidad_bru2", e.target.value === "" ? null : parseFloat(e.target.value) || 0)}
+                    className="w-20 border border-[#8B1A2B]/30 rounded px-2 py-1 text-sm text-[#8B1A2B]"
+                  />
                   <button onClick={() => removeLinea(i)} className="text-red-500 text-sm hover:text-red-700">×</button>
                 </div>
               ))}
@@ -280,34 +292,35 @@ export default function RecetaDetailPage() {
         </div>
       </div>
 
-      {/* Bru2 cost row — only shown when recipe has excluded ingredients */}
+      {/* BRU2 cost row — shown when the recipe has excluded ingredients (legacy name-match) or per-line BRU2 overrides */}
       {(() => {
         const BRU2_EXCLUDE_ING = ["brotes de cebolla", "chilli flakes", "mohn", "rúcola"];
         const BRU2_EXCLUDE_SUB = ["rúcola tostada"];
         const excludedCost = receta.lineas.reduce((sum, l) => {
+          if (l.cantidad_bru2 !== null) return sum; // already reflected in coste_total_bru2
           if (l.nombre_ingrediente && BRU2_EXCLUDE_ING.includes(l.nombre_ingrediente.toLowerCase())) return sum + l.coste_linea;
           if (l.nombre_subreceta && BRU2_EXCLUDE_SUB.includes(l.nombre_subreceta.toLowerCase())) return sum + l.coste_linea;
           return sum;
         }, 0);
-        if (excludedCost <= 0) return null;
-        const bru2Total = receta.coste_total - excludedCost;
+        const bru2Total = receta.coste_total_bru2 - excludedCost;
+        if (receta.coste_total - bru2Total <= 0.0001) return null;
         const bru2PerPortion = bru2Total / receta.porciones_por_lote;
         return (
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <div className="bg-[#F2E8EA] border border-[#8B1A2B]/20 rounded-lg p-4">
-              <p className="text-xs text-[#8B1A2B]">Coste total Bru2</p>
+              <p className="text-xs text-[#8B1A2B]">Coste total BRU2</p>
               <p className="text-xl font-bold">{bru2Total.toFixed(2)} CHF</p>
             </div>
             <div className="bg-[#F2E8EA] border border-[#8B1A2B]/20 rounded-lg p-4">
-              <p className="text-xs text-[#8B1A2B]">Coste/{receta.unidad_rendimiento || "ración"} Bru2</p>
+              <p className="text-xs text-[#8B1A2B]">Coste/{receta.unidad_rendimiento || "ración"} BRU2</p>
               <p className="text-xl font-bold">{bru2PerPortion.toFixed(2)} CHF</p>
             </div>
             <div className="bg-[#F2E8EA] border border-[#8B1A2B]/20 rounded-lg p-4">
-              <p className="text-xs text-[#8B1A2B]">Precio venta Bru2</p>
+              <p className="text-xs text-[#8B1A2B]">Precio venta BRU2</p>
               <p className="text-xl font-bold">{receta.precio_venta_bru2 ? `${receta.precio_venta_bru2.toFixed(2)} CHF` : "—"}</p>
             </div>
             <div className="bg-[#F2E8EA] border border-[#8B1A2B]/20 rounded-lg p-4">
-              <p className="text-xs text-[#8B1A2B]">Multiplicador Bru2</p>
+              <p className="text-xs text-[#8B1A2B]">Multiplicador BRU2</p>
               <p className="text-xl font-bold">
                 {receta.precio_venta_bru2 && bru2PerPortion > 0
                   ? `x${(receta.precio_venta_bru2 / bru2PerPortion).toFixed(1)}`
@@ -411,6 +424,27 @@ export default function RecetaDetailPage() {
                     </td>
                     <td className="px-4 py-2 text-right font-medium">{l.coste_linea.toFixed(2)} CHF</td>
                   </tr>
+                  {l.cantidad_bru2 !== null && l.cantidad_bru2 !== l.cantidad && (
+                    <tr className="border-b border-[#E8DFD3]/50 bg-[#F2E8EA]/50">
+                      <td className="px-4 py-2 text-[#8B1A2B] italic">↳ BRU2</td>
+                      <td className="px-4 py-2 text-right text-[#8B1A2B]">
+                        {l.cantidad_bru2 === 0
+                          ? "No se usa"
+                          : (l.unidad === "kg" || l.unidad === "litro") && l.cantidad_bru2 < 1
+                          ? Math.round(l.cantidad_bru2 * 1000)
+                          : l.cantidad_bru2}
+                      </td>
+                      <td className="px-4 py-2 text-[#8B1A2B]">
+                        {l.cantidad_bru2 === 0
+                          ? ""
+                          : (l.unidad === "kg" || l.unidad === "litro") && l.cantidad_bru2 < 1
+                          ? l.unidad === "kg" ? "g" : "ml"
+                          : l.unidad}
+                      </td>
+                      <td className="px-4 py-2"></td>
+                      <td className="px-4 py-2 text-right font-medium text-[#8B1A2B]">{l.coste_linea_bru2.toFixed(2)} CHF</td>
+                    </tr>
+                  )}
                   {isLecheEntera && (
                     <tr className="border-b border-[#E8DFD3]/50 bg-[#F0F4E8]/50">
                       <td className="px-4 py-2 text-[#6B8E23] italic">↳ Leche de avena</td>

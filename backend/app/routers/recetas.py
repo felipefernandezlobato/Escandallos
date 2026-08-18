@@ -28,14 +28,20 @@ def _receta_to_out(r: Receta, db: Session) -> dict:
         ct = coste_total_receta(r, db)
         cpp = coste_por_racion(r, db)
         mr = margen_real(r, db)
+        ct_bru2 = coste_total_receta(r, db, ubicacion="bru2")
+        cpp_bru2 = coste_por_racion(r, db, ubicacion="bru2")
     except (ValueError, ZeroDivisionError):
         ct = 0.0
         cpp = 0.0
         mr = None
+        ct_bru2 = 0.0
+        cpp_bru2 = 0.0
     return {
         **{c.key: getattr(r, c.key) for c in Receta.__table__.columns},
         "coste_total": round(ct, 4),
         "coste_por_porcion": round(cpp, 4),
+        "coste_total_bru2": round(ct_bru2, 4),
+        "coste_por_porcion_bru2": round(cpp_bru2, 4),
         "margen_real": round(mr, 2) if mr is not None else None,
         "categoria_nombre": r.categoria_rel.nombre if r.categoria_rel else "",
     }
@@ -43,8 +49,10 @@ def _receta_to_out(r: Receta, db: Session) -> dict:
 
 def _linea_to_out(linea: LineaReceta, db: Session) -> dict:
     cl = 0.0
+    cl_bru2 = 0.0
     try:
         cl = coste_linea(linea, db)
+        cl_bru2 = coste_linea(linea, db, ubicacion="bru2")
     except (ValueError, ZeroDivisionError):
         pass
     return {
@@ -53,9 +61,11 @@ def _linea_to_out(linea: LineaReceta, db: Session) -> dict:
         "subreceta_id": linea.subreceta_id,
         "cantidad": linea.cantidad,
         "unidad": linea.unidad,
+        "cantidad_bru2": linea.cantidad_bru2,
         "nombre_ingrediente": linea.ingrediente_rel.nombre if linea.ingrediente_rel else None,
         "nombre_subreceta": linea.subreceta_rel.nombre if linea.subreceta_rel else None,
         "coste_linea": round(cl, 4),
+        "coste_linea_bru2": round(cl_bru2, 4),
     }
 
 
@@ -125,6 +135,7 @@ def crear_receta(data: RecetaCreate, db: Session = Depends(get_db), user=Depends
             subreceta_id=linea_data.subreceta_id,
             cantidad=linea_data.cantidad,
             unidad=linea_data.unidad,
+            cantidad_bru2=linea_data.cantidad_bru2,
         )
         db.add(linea)
 
