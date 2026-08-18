@@ -21,6 +21,7 @@ from app.services.costes import (
     coste_total_receta,
     crear_historial_precio,
     margen_real,
+    precio_unitario_compra,
     recetas_afectadas_por_ingrediente,
 )
 
@@ -131,10 +132,13 @@ def actualizar_ingrediente(
         raise HTTPException(404, "Ingrediente no encontrado")
 
     updates = data.model_dump(exclude_unset=True)
-    precio_cambio = "precio_compra" in updates and updates["precio_compra"] != ing.precio_compra
-
-    if precio_cambio:
-        crear_historial_precio(db, ing.id, ing.precio_compra, updates["precio_compra"])
+    if "precio_compra" in updates or "cantidad_compra" in updates:
+        nuevo_precio_compra = updates.get("precio_compra", ing.precio_compra)
+        nueva_cantidad_compra = updates.get("cantidad_compra", ing.cantidad_compra)
+        precio_unitario_anterior = precio_unitario_compra(ing.precio_compra, ing.cantidad_compra)
+        precio_unitario_nuevo = precio_unitario_compra(nuevo_precio_compra, nueva_cantidad_compra)
+        if abs(precio_unitario_anterior - precio_unitario_nuevo) > 0.0001:
+            crear_historial_precio(db, ing.id, precio_unitario_anterior, precio_unitario_nuevo)
 
     # If unidad_uso changes, auto-update recipe lines to match
     new_unidad_uso = updates.get("unidad_uso")

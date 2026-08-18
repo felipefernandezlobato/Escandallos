@@ -34,6 +34,8 @@ This is an internal tool for a coffee shop that serves brunch and drinks. The te
 7. Items with different products per supplier (e.g., Huevo: Prodega=Import 90er, Pfaff=Freiland 30er) are NOT comparable — keep separate
 8. Pfaff invoices show prices **exkl. MWST** (add 2.6% for inkl.). Prodega/Transgourmet albaranes show both columns — use **inkl. MWST**
 9. Update ALL items on the invoice, not just ones with big changes — every price gets updated in `precios_proveedor` with today's date
+10. **Never compare raw invoice-line prices before/after — always compare per-unit price** (`precio_compra / cantidad_compra`, matching `precios_proveedor.precio_por_unidad`). If a supplier changes pack size (e.g. was sold individually, now sold in a box of 6), the raw price will jump ~6x even though the true per-unit cost is unchanged — this previously created a false "+500%" spike for Romer's Huusbrot. Before recording a price change, always ask: *did cantidad_compra/pack size change too?* If so, normalize both sides to per-unit before deciding it's a real change. The in-app import/edit endpoints already do this automatically (`precio_unitario_compra()` in `backend/app/services/costes.py`) — but when editing prices via direct SQL, do this normalization by hand too
+11. Keep `ingredientes.precio_compra`/`cantidad_compra` on the same basis as `precios_proveedor` for that supplier (e.g. both "4.57 CHF per 1 unidad", not one normalized and the other a raw box total) — a mismatch between the two tables is itself a sign something went wrong
 
 ### Data
 - No authentication or user roles — small team, everyone has full access
@@ -119,6 +121,8 @@ Two options:
 
 ## Deploy Checklist
 
+**Never ask for confirmation before deploying.** User only checks production, never local dev — after any code change, immediately commit, push, and trigger both deploys without asking.
+
 After making changes:
 1. `git push` — triggers Vercel auto-deploy for frontend
 1b. Trigger Vercel deploy (if needed): `curl -s "https://api.vercel.com/v1/integrations/deploy/prj_VpRYLvM9NtDVZY2xJf0Ehc53fREb/iLu6M7L1mE"`
@@ -162,9 +166,11 @@ Render start command is `bash start.sh` (set in dashboard, NOT render.yaml). It 
 ### Café (categoria_id=5) — BRU1 + BRU2
 - BRU1 and BRU2 are **two physical locations**. Nelson counts stock at each location separately
 - **Everything** in café is counted at both locations: 1kg bags, 200g bags, 130g bags, frozen tubes, capsules
-- **Always sum** same-day records per ingredient (BRU1 count + BRU2 count = total stock)
+- **Sum only distinct ubicaciones** on the same day (BRU1 count + BRU2 count = total). Two records at the **same** ubicacion on the same day are a correction (latest one wins) — do NOT sum them, or same-day transfer/adjustment notes double-count stock
 - If a café ingredient was **not counted** in the latest session, assume stock is **0** — never carry forward old values
 - Within a parent group (e.g., "Café en grano ROJO"), only children counted on the most recent date contribute to the total
+- **Exception — frozen tube flavors:** each flavor (`frozen_origen_id` set) is counted/updated independently on its own schedule, not in one synchronized BRU1+BRU2 session like whole-bean coffee. For these, skip the "zero if not counted today" rule — carry forward each flavor's own last known stock regardless of date, same as Kitchen/Bar below
+- This exact stock logic is duplicated in **three places** that must be kept in sync: `_stock_actual_leaf`/`_day_total` and `stock_historial_serie` in `consumo.py`, and `_batch_latest_stocks` in `menu.py` (feeds `/api/menu/frozen`). A fix in one needs to be checked/applied in the other two
 
 ### Kitchen / Bar / Other categories
 - **Single location** — no BRU1/BRU2 concept, one count per item

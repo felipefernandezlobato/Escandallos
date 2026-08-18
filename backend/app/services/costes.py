@@ -17,6 +17,18 @@ def crear_historial_precio(db: Session, ingrediente_id: int, precio_anterior: fl
     ))
 
 
+def precio_unitario_compra(precio_compra: float, cantidad_compra: float) -> float:
+    """Price per single purchase unit (precio_compra / cantidad_compra).
+
+    Historial de precios must always compare on this normalized basis —
+    comparing raw precio_compra values is wrong whenever cantidad_compra
+    also changes (e.g. a supplier switches from selling individually to
+    selling in a box of 6), since that makes an unchanged per-unit cost
+    look like a multi-hundred-percent price jump.
+    """
+    return precio_compra / cantidad_compra if cantidad_compra else precio_compra
+
+
 def coste_por_unidad_uso(ingrediente: Ingrediente) -> float:
     cantidad_uso = cantidad_en_unidades_uso(
         ingrediente.cantidad_compra,

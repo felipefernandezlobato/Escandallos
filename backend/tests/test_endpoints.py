@@ -273,6 +273,45 @@ def test_actualizar_precio_crea_historial(client, seed_data):
     assert entry["precio_nuevo"] == 6.00
 
 
+def test_cambio_cantidad_compra_no_crea_historial_falso(client, seed_data):
+    """PUT switching to a bigger pack at proportionally higher price (same
+    per-unit cost) must NOT log a price-history entry — regression test for
+    the "Romer's Huusbrot" bug where buying a box of 6 at 6x the price
+    looked like a +500% spike even though the per-unit cost was unchanged.
+    """
+    ing_id = seed_data["fresas"].id  # cantidad_compra=1, precio_compra=4.50
+
+    r = client.put(
+        f"/api/ingredientes/{ing_id}",
+        json={"precio_compra": 27.00, "cantidad_compra": 6},  # 4.50/unit, unchanged
+    )
+    assert r.status_code == 200
+
+    r = client.get(f"/api/ingredientes/{ing_id}/historial")
+    assert r.status_code == 200
+    assert r.json() == []
+
+
+def test_cambio_cantidad_compra_con_precio_real_crea_historial_normalizado(client, seed_data):
+    """PUT switching pack size AND actually changing the per-unit price →
+    historial should record the normalized per-unit prices, not the raw
+    purchase-line totals."""
+    ing_id = seed_data["fresas"].id  # cantidad_compra=1, precio_compra=4.50
+
+    r = client.put(
+        f"/api/ingredientes/{ing_id}",
+        json={"precio_compra": 30.00, "cantidad_compra": 6},  # 5.00/unit, a real increase
+    )
+    assert r.status_code == 200
+
+    r = client.get(f"/api/ingredientes/{ing_id}/historial")
+    assert r.status_code == 200
+    historial = r.json()
+    assert len(historial) == 1
+    assert historial[0]["precio_anterior"] == pytest.approx(4.50)
+    assert historial[0]["precio_nuevo"] == pytest.approx(5.00)
+
+
 def test_eliminar_ingrediente(client, seed_data, test_db):
     """DELETE /api/ingredientes/{id} → 200 (ingredient not used in recipes)."""
     # Create an ingredient that is NOT used in any recipe

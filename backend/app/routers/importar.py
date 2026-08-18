@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 from app.auth import get_current_user
 from app.database import get_db
 from app.models import Categoria, Ingrediente, PrecioProveedor, Proveedor
-from app.services.costes import crear_historial_precio
+from app.services.costes import crear_historial_precio, precio_unitario_compra
 from app.schemas import (
     ImportarConfirmItem,
     ImportarConfirmRequest,
@@ -109,8 +109,10 @@ def confirmar_importacion(data: ImportarConfirmRequest, db: Session = Depends(ge
             ing = db.get(Ingrediente, item.ingrediente_id)
             if not ing:
                 continue
-            if ing.precio_compra != item.precio_compra:
-                crear_historial_precio(db, ing.id, ing.precio_compra, item.precio_compra)
+            precio_unitario_anterior = precio_unitario_compra(ing.precio_compra, ing.cantidad_compra)
+            precio_unitario_nuevo = precio_unitario_compra(item.precio_compra, item.cantidad_compra)
+            if abs(precio_unitario_anterior - precio_unitario_nuevo) > 0.0001:
+                crear_historial_precio(db, ing.id, precio_unitario_anterior, precio_unitario_nuevo)
             ing.precio_compra = item.precio_compra
             ing.cantidad_compra = item.cantidad_compra
             ing.proveedor = data.proveedor
