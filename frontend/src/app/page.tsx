@@ -7,7 +7,7 @@ import type { Receta, Ingrediente } from "@/lib/types";
 import Link from "next/link";
 
 export default function MenuPage() {
-  const [recipeMap, setRecipeMap] = useState<Record<string, { coste: number; id: number; pvp: number | null }>>({});
+  const [recipeMap, setRecipeMap] = useState<Record<string, { coste: number; id: number; pvp: number | null; costeBru2: number; pvpBru2: number | null }>>({});
   const [ingredientMap, setIngredientMap] = useState<Record<string, number>>({});
   const [frozenTubes, setFrozenTubes] = useState<Array<{name: string; chf_per_tube: number; supplement: number; multi_total: number; multi_supplement: number; doppio_pvp: number; doppio_cost: number; grams_per_tube: number}>>([]);
   const [loading, setLoading] = useState(true);
@@ -19,9 +19,9 @@ export default function MenuPage() {
       apiFetch<Ingrediente[]>("/api/ingredientes"),
     ])
       .then(([recetas, ingredientes]) => {
-        const rMap: Record<string, { coste: number; id: number; pvp: number | null }> = {};
+        const rMap: Record<string, { coste: number; id: number; pvp: number | null; costeBru2: number; pvpBru2: number | null }> = {};
         for (const r of recetas) {
-          rMap[r.nombre] = { coste: r.coste_por_porcion, id: r.id, pvp: r.precio_venta };
+          rMap[r.nombre] = { coste: r.coste_por_porcion, id: r.id, pvp: r.precio_venta, costeBru2: r.coste_por_porcion_bru2, pvpBru2: r.precio_venta_bru2 };
         }
         setRecipeMap(rMap);
         const iMap: Record<string, number> = {};
@@ -50,10 +50,13 @@ export default function MenuPage() {
       {MENU.map((section) => {
         const isWine = section.title === "WINE";
         const isDual = section.title === "COFFEE" || section.title === "NOT COFFEE";
-        const hasDualColumns = isWine || isDual;
+        const isBru = section.title === "SANDWICHES" || section.title === "BOWLS";
+        const hasDualColumns = isWine || isDual || isBru;
 
         const dualLabels = isWine
           ? { a: "Copa", b: "Botella", pvpA: "PVP Copa", pvpB: "PVP Bot.", xA: "x Copa", xB: "x Bot." }
+          : isBru
+          ? { a: "BRU1", b: "BRU2", pvpA: "PVP BRU1", pvpB: "PVP BRU2", xA: "x BRU1", xB: "x BRU2" }
           : { a: "Normal", b: "Iced", pvpA: "PVP", pvpB: "PVP Iced", xA: "x", xB: "x Iced" };
 
         return (
@@ -97,11 +100,11 @@ export default function MenuPage() {
                   const multiColor = (m: number | null) => getMultiColor(m, section.title);
 
                   if (hasDualColumns) {
-                    const secondRecipeName = isWine ? item.recipeNameBottle : item.recipeNameIced;
+                    const secondRecipeName = isBru ? undefined : isWine ? item.recipeNameBottle : item.recipeNameIced;
                     const secondPvpHardcoded = isWine ? item.pvpBottle : item.pvpIced;
                     const secondRecipe = secondRecipeName ? recipeMap[secondRecipeName] : undefined;
-                    const secondPvp = secondRecipe?.pvp ?? secondPvpHardcoded;
-                    const costeSecond = secondRecipe?.coste;
+                    const secondPvp = isBru ? recipe?.pvpBru2 : (secondRecipe?.pvp ?? secondPvpHardcoded);
+                    const costeSecond = isBru ? recipe?.costeBru2 : secondRecipe?.coste;
                     const multiSecond = costeSecond !== undefined && secondPvp && costeSecond > 0 ? secondPvp / costeSecond : null;
 
                     return (
@@ -112,7 +115,7 @@ export default function MenuPage() {
                           ) : secondRecipe?.id ? (
                             <Link href={`/recetas/${secondRecipe.id}`} className="text-[#8B1A2B] hover:underline">{item.name}</Link>
                           ) : item.name}
-                          {!isWine && recipeId && secondRecipe?.id && (
+                          {!isWine && !isBru && recipeId && secondRecipe?.id && (
                             <>
                               <span className="text-[#6B5E52]/50"> / </span>
                               <Link href={`/recetas/${secondRecipe.id}`} className="text-[#8B1A2B] hover:underline">{secondRecipeName}</Link>

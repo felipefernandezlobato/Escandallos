@@ -292,17 +292,9 @@ export default function RecetaDetailPage() {
         </div>
       </div>
 
-      {/* BRU2 cost row — shown when the recipe has excluded ingredients (legacy name-match) or per-line BRU2 overrides */}
+      {/* BRU2 cost row — shown when Bru2 cost differs from Bru1 (per-line overrides or ingredient exclusions, computed backend-side) */}
       {(() => {
-        const BRU2_EXCLUDE_ING = ["brotes de cebolla", "chilli flakes", "mohn", "rúcola"];
-        const BRU2_EXCLUDE_SUB = ["rúcola tostada"];
-        const excludedCost = receta.lineas.reduce((sum, l) => {
-          if (l.cantidad_bru2 !== null) return sum; // already reflected in coste_total_bru2
-          if (l.nombre_ingrediente && BRU2_EXCLUDE_ING.includes(l.nombre_ingrediente.toLowerCase())) return sum + l.coste_linea;
-          if (l.nombre_subreceta && BRU2_EXCLUDE_SUB.includes(l.nombre_subreceta.toLowerCase())) return sum + l.coste_linea;
-          return sum;
-        }, 0);
-        const bru2Total = receta.coste_total_bru2 - excludedCost;
+        const bru2Total = receta.coste_total_bru2;
         if (receta.coste_total - bru2Total <= 0.0001) return null;
         const bru2PerPortion = bru2Total / receta.porciones_por_lote;
         return (

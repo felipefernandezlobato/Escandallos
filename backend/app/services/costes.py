@@ -31,6 +31,13 @@ def coste_por_unidad_uso(ingrediente: Ingrediente) -> float:
     return (ingrediente.precio_compra / cantidad_uso) / factor_merma
 
 
+# Ingredients/sub-recipes traditionally left out of the Bru2 preparation
+# (garnish not stocked at that location). Used as a fallback only when a
+# line has no explicit cantidad_bru2 override.
+_BRU2_EXCLUDE_ING = {"brotes de cebolla", "chilli flakes", "mohn", "rúcola"}
+_BRU2_EXCLUDE_SUB = {"rúcola tostada"}
+
+
 def coste_linea(
     linea: LineaReceta,
     db: Session,
@@ -41,8 +48,13 @@ def coste_linea(
         visited = set()
 
     cantidad_linea = linea.cantidad
-    if ubicacion == "bru2" and linea.cantidad_bru2 is not None:
-        cantidad_linea = linea.cantidad_bru2
+    if ubicacion == "bru2":
+        if linea.cantidad_bru2 is not None:
+            cantidad_linea = linea.cantidad_bru2
+        elif linea.ingrediente_id is not None and linea.ingrediente_rel.nombre.lower() in _BRU2_EXCLUDE_ING:
+            cantidad_linea = 0
+        elif linea.subreceta_id is not None and linea.subreceta_rel.nombre.lower() in _BRU2_EXCLUDE_SUB:
+            cantidad_linea = 0
 
     if linea.ingrediente_id is not None:
         ingrediente = linea.ingrediente_rel
