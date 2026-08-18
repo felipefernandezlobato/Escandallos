@@ -329,7 +329,7 @@ export default function RecetaDetailPage() {
           (l) => l.nombre_ingrediente && l.nombre_ingrediente.toLowerCase() === "leche entera"
         );
         if (!lecheEnteraLine) return null;
-        const OAT_PRICE_PER_LITRO = 2.79;
+        const OAT_PRICE_PER_LITRO = 1.85;
         const ENTERA_PRICE_PER_LITRO = 1.53;
         const OAT_SURCHARGE = 0.50;
         const milkQty = lecheEnteraLine.cantidad;
@@ -385,7 +385,7 @@ export default function RecetaDetailPage() {
           <tbody>
             {receta.lineas.map((l) => {
               const isLecheEntera = l.nombre_ingrediente && l.nombre_ingrediente.toLowerCase() === "leche entera";
-              const oatCost = isLecheEntera ? l.cantidad * 2.79 : 0;
+              const oatCost = isLecheEntera ? l.cantidad * 1.85 : 0;
               return (
                 <React.Fragment key={l.id}>
                   <tr className="border-b border-[#E8DFD3]/50">
@@ -444,7 +444,7 @@ export default function RecetaDetailPage() {
                         {l.cantidad < 1 ? Math.round(l.cantidad * 1000) : l.cantidad}
                       </td>
                       <td className="px-4 py-2 text-[#6B8E23]">{l.cantidad < 1 ? "ml" : "litro"}</td>
-                      <td className="px-4 py-2 text-right text-[#6B8E23]">{(2.79).toFixed(2)}</td>
+                      <td className="px-4 py-2 text-right text-[#6B8E23]">{(1.85).toFixed(2)}</td>
                       <td className="px-4 py-2 text-right font-medium text-[#6B8E23]">{oatCost.toFixed(2)} CHF</td>
                     </tr>
                   )}
