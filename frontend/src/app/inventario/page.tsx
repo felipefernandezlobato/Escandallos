@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { apiFetch } from "@/lib/api";
 import { useToast } from "@/components/Toast";
+import { weekKeyToLabel } from "@/lib/format";
 import type { Ingrediente, Categoria, RecomendacionItem } from "@/lib/types";
 
 interface StockEntry {
@@ -1435,7 +1436,7 @@ function InventarioContent() {
             >
               <option value="">Selecciona una semana...</option>
               {semanas.map((s) => (
-                <option key={s} value={s}>Semana {s}</option>
+                <option key={s} value={s}>Semana {weekKeyToLabel(s)}</option>
               ))}
             </select>
             {activeSemana && (
@@ -1454,7 +1455,7 @@ function InventarioContent() {
             <div className="bg-white border border-[#E8DFD3] rounded-lg overflow-hidden">
               <div className="px-4 py-3 bg-[#F5F0E8] border-b border-[#E8DFD3]">
                 <h3 className="font-semibold text-[#8B1A2B]">
-                  Semana {activeSemana} ({historial.registros.length} registros)
+                  Semana {weekKeyToLabel(activeSemana)} ({historial.registros.length} registros)
                 </h3>
               </div>
               <div className="overflow-x-auto">
@@ -1590,7 +1591,7 @@ function InventarioContent() {
                       <th className="pb-2 px-2 font-medium whitespace-nowrap">Ud</th>
                       {pivot.fechas.map((f) => (
                         <th key={f} className="pb-2 px-2 font-medium text-center whitespace-nowrap">
-                          {f}
+                          {weekKeyToLabel(f)}
                         </th>
                       ))}
                     </tr>
