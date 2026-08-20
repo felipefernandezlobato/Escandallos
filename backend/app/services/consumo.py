@@ -201,6 +201,12 @@ def consumo_medio_semanal(ingrediente_id: int, db: Session, semanas: int = 8) ->
     return round(total / len(historial), 2)
 
 
+def _es_pedido_recibido(registro) -> bool:
+    """A "Pedido recibido" insert is tagged only via a free-text notas marker
+    (no dedicated column) — see recibir_pedido() in routers/pedidos.py."""
+    return bool(registro.notas and "recibido" in registro.notas.lower())
+
+
 def _day_total(records: list) -> float:
     """Sum quantities across distinct ubicaciones for same-day records of one
     ingredient. Records must be pre-sorted by id ascending. Two records at the
@@ -217,7 +223,14 @@ def _stock_actual_leaf(ingrediente_id: int, db: Session) -> Optional[dict]:
     """Get latest stock for a single (leaf) ingredient.
     Café (cat 5): sums same-day records per distinct ubicacion (BRU1 + BRU2),
     with same-ubicacion same-day duplicates treated as a correction.
-    Other: takes the last record of the latest day (correction overwrites)."""
+    Other: takes the last record of the latest day (correction overwrites).
+
+    Also returns `fecha_conteo`: the date of the latest MANUAL count record,
+    excluding "Pedido recibido" inserts. stock_actual() uses this (instead of
+    the raw latest date) to decide whether this leaf was part of the group's
+    latest counting session — receiving an order for one flavor must not
+    fake a new session that zeroes out siblings that weren't in that delivery.
+    """
     ultimo = (
         db.query(InventarioRegistro)
         .filter(InventarioRegistro.ingrediente_id == ingrediente_id)
@@ -229,6 +242,7 @@ def _stock_actual_leaf(ingrediente_id: int, db: Session) -> Optional[dict]:
 
     ing = db.query(Ingrediente).get(ingrediente_id)
     is_cafe = ing and ing.categoria_id == CAFE_CATEGORIA_ID
+    es_recibido = _es_pedido_recibido(ultimo)
 
     if is_cafe:
         registros_dia = (
@@ -244,10 +258,24 @@ def _stock_actual_leaf(ingrediente_id: int, db: Session) -> Optional[dict]:
     else:
         cantidad = ultimo.cantidad
 
+    fecha_conteo = ultimo.fecha_registro
+    if es_recibido:
+        historial = (
+            db.query(InventarioRegistro)
+            .filter(InventarioRegistro.ingrediente_id == ingrediente_id)
+            .order_by(InventarioRegistro.fecha_registro.desc(), InventarioRegistro.id.desc())
+            .all()
+        )
+        conteo = next((r for r in historial if not _es_pedido_recibido(r)), None)
+        fecha_conteo = conteo.fecha_registro if conteo else None
+
     return {
         "cantidad": cantidad,
         "unidad": ultimo.unidad,
+        "ubicacion": ultimo.ubicacion,
         "fecha": ultimo.fecha_registro,
+        "fecha_conteo": fecha_conteo,
+        "es_recibido": es_recibido,
     }
 
 
@@ -257,7 +285,9 @@ def stock_actual(ingrediente_id: int, db: Session) -> Optional[dict]:
     """Get latest stock. If parent, sum latest stock of all children.
     For café (categoria_id=5), including frozen tube flavor groups: a flavor
     left blank on count day is 0, not carried forward — only children counted
-    on the most recent date contribute to the total.
+    (by a manual count) on the most recent count session contribute to the
+    total. "Pedido recibido" inserts never define that session themselves —
+    a flavor bumped by a received order always contributes its current value.
     For other categories: use each child's last known stock."""
     children = _child_ids(ingrediente_id, db)
     if not children:
@@ -268,11 +298,17 @@ def stock_actual(ingrediente_id: int, db: Session) -> Optional[dict]:
 
     child_stocks = []
     latest_fecha = None
+    latest_fecha_conteo = None
     for child_id in children:
         stk = _stock_actual_leaf(child_id, db)
         child_stocks.append(stk)
-        if stk and (latest_fecha is None or stk["fecha"] > latest_fecha):
-            latest_fecha = stk["fecha"]
+        if stk:
+            if latest_fecha is None or stk["fecha"] > latest_fecha:
+                latest_fecha = stk["fecha"]
+            if stk["fecha_conteo"] and (
+                latest_fecha_conteo is None or stk["fecha_conteo"] > latest_fecha_conteo
+            ):
+                latest_fecha_conteo = stk["fecha_conteo"]
 
     if latest_fecha is None:
         return None
@@ -284,7 +320,7 @@ def stock_actual(ingrediente_id: int, db: Session) -> Optional[dict]:
             if unidad is None:
                 unidad = stk["unidad"]
             if zero_if_uncounted:
-                if stk["fecha"] == latest_fecha:
+                if stk["es_recibido"] or stk["fecha_conteo"] == latest_fecha_conteo:
                     total += stk["cantidad"]
             else:
                 total += stk["cantidad"]
@@ -299,11 +335,44 @@ def stock_actual(ingrediente_id: int, db: Session) -> Optional[dict]:
     }
 
 
+def stock_base_recepcion_pedido(ingrediente_id: int, db: Session) -> dict:
+    """Effective current stock for a single leaf ingredient, used as the
+    baseline when adding stock from a received order (recibir_pedido). For
+    café items in a synchronized counting group, applies the same
+    "zero if not counted in the group's latest session" rule as stock_actual()
+    — so a flavor that was blank (0) in the last count doesn't inherit a
+    stale pre-zero quantity just because its own last raw record predates
+    that session. Falls back to the leaf's raw last known value otherwise."""
+    leaf = _stock_actual_leaf(ingrediente_id, db)
+    if not leaf:
+        return {"cantidad": 0.0, "unidad": None, "ubicacion": None}
+
+    ing = db.query(Ingrediente).get(ingrediente_id)
+    if not (ing and ing.categoria_id == CAFE_CATEGORIA_ID and ing.grupo_ingrediente_id):
+        return leaf
+    if leaf["es_recibido"]:
+        return leaf
+
+    latest_fecha_conteo = None
+    for sib_id in _child_ids(ing.grupo_ingrediente_id, db):
+        sib = _stock_actual_leaf(sib_id, db)
+        if sib and sib["fecha_conteo"] and (
+            latest_fecha_conteo is None or sib["fecha_conteo"] > latest_fecha_conteo
+        ):
+            latest_fecha_conteo = sib["fecha_conteo"]
+
+    if latest_fecha_conteo is not None and leaf["fecha_conteo"] != latest_fecha_conteo:
+        return {"cantidad": 0.0, "unidad": leaf["unidad"], "ubicacion": leaf["ubicacion"]}
+    return leaf
+
+
 def stock_historial_serie(ingrediente_id: int, db: Session) -> list[dict]:
     """Full stock-over-time series for charts, using the same semantics as
     stock_actual() at every historical date: each child's last known quantity
     as of that date, carried forward, zeroed out on café sync-count dates it
-    wasn't part of."""
+    wasn't part of. "Pedido recibido" inserts never define a sync-count date
+    themselves — they only bump their own leaf's running total (mirrors the
+    fecha_conteo/es_recibido logic in _stock_actual_leaf/stock_actual)."""
     children = _child_ids(ingrediente_id, db)
     ing = db.query(Ingrediente).get(ingrediente_id)
     target_ids = children or [ingrediente_id]
@@ -326,7 +395,8 @@ def stock_historial_serie(ingrediente_id: int, db: Session) -> list[dict]:
     sum_same_day = ing.categoria_id == CAFE_CATEGORIA_ID
     dates = sorted({r.fecha_registro for r in all_registros})
     idx = {cid: 0 for cid in per_child}
-    last_val: dict[int, tuple] = {cid: None for cid in per_child}
+    last_val: dict[int, tuple] = {cid: None for cid in per_child}  # (cantidad, fecha, es_recibido)
+    last_conteo_fecha: dict[int, object] = {cid: None for cid in per_child}
     unidad = all_registros[-1].unidad
     series = []
     for d in dates:
@@ -345,13 +415,19 @@ def stock_historial_serie(ingrediente_id: int, db: Session) -> list[dict]:
                 idx[cid] += 1
             if day_date is not None:
                 day_total = _day_total(day_records) if sum_same_day else day_records[-1].cantidad
-                last_val[cid] = (day_total, day_date)
+                es_recibido = all(_es_pedido_recibido(r) for r in day_records)
+                last_val[cid] = (day_total, day_date, es_recibido)
+                if not es_recibido:
+                    last_conteo_fecha[cid] = day_date
+        latest_fecha_conteo = max(
+            (f for f in last_conteo_fecha.values() if f is not None), default=None
+        )
         total = 0.0
-        for val in last_val.values():
+        for cid, val in last_val.items():
             if val is None:
                 continue
-            cantidad, fecha = val
-            if zero_if_uncounted and fecha != d:
+            cantidad, fecha, es_recibido = val
+            if zero_if_uncounted and not es_recibido and last_conteo_fecha[cid] != latest_fecha_conteo:
                 continue
             total += cantidad
         series.append({"fecha": str(d), "cantidad": round(total, 2), "unidad": unidad})

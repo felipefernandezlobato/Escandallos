@@ -3,7 +3,7 @@ from collections import defaultdict
 from typing import Optional
 
 from fastapi import APIRouter, Depends
-from sqlalchemy import func
+from sqlalchemy import and_, func, or_
 from sqlalchemy.orm import Session
 
 from app.auth import get_current_user
@@ -31,10 +31,14 @@ def _batch_latest_stocks(
     Returns {id: {"total": float, "by_location": {loc: qty}}}.
 
     group_of (optional {ingrediente_id: parent_group_id}): when given, an
-    ingredient's stock is zeroed if its own latest recorded date doesn't match
-    the most recent date recorded across all ingredients sharing its group —
-    a flavor left blank on count day is 0, not carried forward, matching the
-    café "zero if not counted in the latest session" rule.
+    ingredient's stock is zeroed if its own latest MANUAL COUNT date doesn't
+    match the most recent count date recorded across all ingredients sharing
+    its group — a flavor left blank on count day is 0, not carried forward,
+    matching the café "zero if not counted in the latest session" rule.
+    "Pedido recibido" inserts (see recibir_pedido() in routers/pedidos.py,
+    tagged only via a free-text notas marker) never define that session
+    themselves — a flavor bumped by a received order always contributes its
+    current value, even if no sibling was counted that same day.
     """
     if not ingredient_ids:
         return {}
@@ -54,9 +58,28 @@ def _batch_latest_stocks(
     if not date_map:
         return {iid: {"total": 0.0, "by_location": {}} for iid in ingredient_ids}
 
+    # Same as max_dates but excluding "Pedido recibido" inserts — this is the
+    # date that actually defines a synchronized counting session.
+    conteo_dates = (
+        db.query(
+            InventarioRegistro.ingrediente_id,
+            func.max(InventarioRegistro.fecha_registro).label("max_fecha"),
+        )
+        .filter(
+            InventarioRegistro.ingrediente_id.in_(ingredient_ids),
+            or_(
+                InventarioRegistro.notas.is_(None),
+                ~InventarioRegistro.notas.ilike("%recibido%"),
+            ),
+        )
+        .group_by(InventarioRegistro.ingrediente_id)
+        .all()
+    )
+    conteo_date_map = {row[0]: row[1] for row in conteo_dates}
+
     group_max_date: dict[int, object] = {}
     if group_of:
-        for iid, fecha in date_map.items():
+        for iid, fecha in conteo_date_map.items():
             gid = group_of.get(iid)
             if gid is None:
                 continue
@@ -64,7 +87,6 @@ def _batch_latest_stocks(
                 group_max_date[gid] = fecha
 
     # Build filter conditions for each ingredient's latest date
-    from sqlalchemy import and_, or_, tuple_
     conditions = [
         and_(
             InventarioRegistro.ingrediente_id == iid,
@@ -94,7 +116,12 @@ def _batch_latest_stocks(
     for (iid, loc), qty in latest_by_loc.items():
         if group_of:
             gid = group_of.get(iid)
-            if gid is not None and date_map.get(iid) != group_max_date.get(gid):
+            # If this ingredient's own latest record IS a "Pedido recibido"
+            # insert (i.e. no manual count shares that exact date), always
+            # include it — only a stale manual count that missed the group's
+            # latest session gets zeroed.
+            es_recibido = date_map.get(iid) != conteo_date_map.get(iid)
+            if gid is not None and not es_recibido and conteo_date_map.get(iid) != group_max_date.get(gid):
                 continue
         result[iid]["total"] += qty
         key = loc or "SIN"

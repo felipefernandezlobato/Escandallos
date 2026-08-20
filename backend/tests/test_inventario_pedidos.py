@@ -3,6 +3,7 @@ Tests de endpoints de inventario y pedidos.
 """
 
 import os
+from datetime import date
 
 os.environ.setdefault(
     "AUTH_PASSWORD_HASH",
@@ -424,6 +425,181 @@ class TestPedidoRecibir:
             "lineas": [{"linea_id": lid, "cantidad_recibida": 5}]
         })
         assert resp.status_code == 400
+
+
+class TestPedidoRecibirCafeFrozen:
+    """Receiving an order for one frozen-tube flavor must not zero out its
+    siblings that weren't part of the delivery (the bug reported 2026-08-20)."""
+
+    @pytest.fixture
+    def frozen(self, test_db):
+        cafe_cat = Categoria(id=5, nombre="Café", tipo="ingrediente")
+        test_db.add(cafe_cat)
+        test_db.flush()
+
+        parent = Ingrediente(
+            nombre="Tubos Frozen Bru1", categoria_id=5,
+            unidad_compra="unidad", cantidad_compra=1, precio_compra=0,
+            unidad_uso="unidad", merma_porcentaje=0.0,
+        )
+        test_db.add(parent)
+        test_db.flush()
+
+        karamo = Ingrediente(
+            nombre="Frozen Karamo Bru1", categoria_id=5,
+            unidad_compra="unidad", cantidad_compra=1, precio_compra=3.0,
+            unidad_uso="unidad", merma_porcentaje=0.0,
+            grupo_ingrediente_id=parent.id,
+        )
+        perla = Ingrediente(
+            nombre="Frozen Perla Bru1", categoria_id=5,
+            unidad_compra="unidad", cantidad_compra=1, precio_compra=3.0,
+            unidad_uso="unidad", merma_porcentaje=0.0,
+            grupo_ingrediente_id=parent.id,
+        )
+        test_db.add_all([karamo, perla])
+        test_db.flush()
+
+        # Both flavors counted together in the last real counting session.
+        test_db.add_all([
+            InventarioRegistro(
+                ingrediente_id=karamo.id, cantidad=5, unidad="unidad",
+                fecha_registro=date(2026, 1, 1), ubicacion="BRU1",
+            ),
+            InventarioRegistro(
+                ingrediente_id=perla.id, cantidad=3, unidad="unidad",
+                fecha_registro=date(2026, 1, 1), ubicacion="BRU1",
+            ),
+        ])
+        test_db.flush()
+        return {"parent": parent, "karamo": karamo, "perla": perla}
+
+    def test_recibir_no_zera_hermanos(self, client, test_db, frozen):
+        from app.services.consumo import stock_actual, stock_base_recepcion_pedido
+
+        create = client.post("/api/pedidos", json={
+            "proveedor": "Dabov",
+            "lineas": [
+                {"ingrediente_id": frozen["karamo"].id, "cantidad_pedida": 10, "unidad": "unidad"},
+            ],
+        })
+        pid = create.json()["id"]
+        lid = create.json()["lineas"][0]["id"]
+        client.post(f"/api/pedidos/{pid}/enviar")
+
+        resp = client.post(f"/api/pedidos/{pid}/recibir", json={
+            "lineas": [{"linea_id": lid, "cantidad_recibida": 10}],
+        })
+        assert resp.status_code == 200
+
+        # Karamo: last real count (5) + received (10) = 15.
+        karamo_stock = stock_actual(frozen["karamo"].id, test_db)
+        assert karamo_stock["cantidad"] == 15
+
+        # Perla was untouched by the order — must still show its last real
+        # count (3), not be zeroed just because Karamo got a delivery today.
+        perla_stock = stock_actual(frozen["perla"].id, test_db)
+        assert perla_stock["cantidad"] == 3
+
+        # The parent group total must reflect both, not just the delivery.
+        group_stock = stock_actual(frozen["parent"].id, test_db)
+        assert group_stock["cantidad"] == 18
+
+    def test_recibir_usa_ultimo_conteo_como_base_si_sabor_no_estaba_en_sesion(
+        self, client, test_db, frozen
+    ):
+        """If a flavor already missed the latest counting session (so its true
+        current stock is 0 per the zero-if-uncounted rule), a later delivery
+        must add on top of 0, not on top of its stale pre-session quantity."""
+        from app.services.consumo import stock_actual
+
+        # A newer session recounts only Perla — Karamo is now "missed" and
+        # should read as 0 going forward.
+        test_db.add(InventarioRegistro(
+            ingrediente_id=frozen["perla"].id, cantidad=4, unidad="unidad",
+            fecha_registro=date(2026, 1, 8), ubicacion="BRU1",
+        ))
+        test_db.flush()
+
+        create = client.post("/api/pedidos", json={
+            "proveedor": "Dabov",
+            "lineas": [
+                {"ingrediente_id": frozen["karamo"].id, "cantidad_pedida": 6, "unidad": "unidad"},
+            ],
+        })
+        pid = create.json()["id"]
+        lid = create.json()["lineas"][0]["id"]
+        client.post(f"/api/pedidos/{pid}/enviar")
+        client.post(f"/api/pedidos/{pid}/recibir", json={
+            "lineas": [{"linea_id": lid, "cantidad_recibida": 6}],
+        })
+
+        # 0 (missed session) + 6 received = 6, not 5 (stale) + 6 = 11.
+        karamo_stock = stock_actual(frozen["karamo"].id, test_db)
+        assert karamo_stock["cantidad"] == 6
+
+    def test_recibir_mismo_dia_que_conteo_no_duplica(self, client, test_db, frozen):
+        """A manual count and an order delivery landing on the same calendar
+        date must not be double-counted as if "Pedido recibido" (ubicacion
+        unset) were a third distinct location alongside BRU1/BRU2."""
+        from app.services.consumo import stock_actual
+
+        # Today's manual count for Karamo at BRU1.
+        client.post("/api/inventario", json={
+            "registros": [
+                {
+                    "ingrediente_id": frozen["karamo"].id, "cantidad": 7,
+                    "unidad": "unidad", "ubicacion": "BRU1",
+                },
+            ]
+        })
+
+        create = client.post("/api/pedidos", json={
+            "proveedor": "Dabov",
+            "lineas": [
+                {"ingrediente_id": frozen["karamo"].id, "cantidad_pedida": 10, "unidad": "unidad"},
+            ],
+        })
+        pid = create.json()["id"]
+        lid = create.json()["lineas"][0]["id"]
+        client.post(f"/api/pedidos/{pid}/enviar")
+        client.post(f"/api/pedidos/{pid}/recibir", json={
+            "lineas": [{"linea_id": lid, "cantidad_recibida": 10}],
+        })
+
+        # 7 (today's count) + 10 received = 17, not 7 + 17 = 24 from treating
+        # the order-received row as an extra "None" location.
+        karamo_stock = stock_actual(frozen["karamo"].id, test_db)
+        assert karamo_stock["cantidad"] == 17
+
+    def test_batch_latest_stocks_no_zera_hermanos(self, client, test_db, frozen):
+        """Same rule, verified against menu.py's independent implementation
+        (_batch_latest_stocks feeds /api/menu/frozen) — the duplicated stock
+        logic must be fixed in all 3 places, not just consumo.py."""
+        from app.routers.menu import _batch_latest_stocks
+
+        create = client.post("/api/pedidos", json={
+            "proveedor": "Dabov",
+            "lineas": [
+                {"ingrediente_id": frozen["karamo"].id, "cantidad_pedida": 10, "unidad": "unidad"},
+            ],
+        })
+        pid = create.json()["id"]
+        lid = create.json()["lineas"][0]["id"]
+        client.post(f"/api/pedidos/{pid}/enviar")
+        client.post(f"/api/pedidos/{pid}/recibir", json={
+            "lineas": [{"linea_id": lid, "cantidad_recibida": 10}],
+        })
+
+        group_of = {
+            frozen["karamo"].id: frozen["parent"].id,
+            frozen["perla"].id: frozen["parent"].id,
+        }
+        stocks = _batch_latest_stocks(
+            [frozen["karamo"].id, frozen["perla"].id], test_db, group_of=group_of
+        )
+        assert stocks[frozen["karamo"].id]["total"] == 15
+        assert stocks[frozen["perla"].id]["total"] == 3
 
 
 class TestInventarioActualizar:

@@ -14,7 +14,7 @@ from app.models import (
     Pedido,
 )
 from app.services.conversiones import to_week_key
-from app.services.consumo import recomendacion_pedido
+from app.services.consumo import recomendacion_pedido, stock_base_recepcion_pedido
 from app.services.costes import crear_historial_precio
 from app.schemas import (
     LineaPedidoCreate,
@@ -425,21 +425,21 @@ def recibir_pedido(
     for linea in p.lineas:
         if not linea.cantidad_recibida or linea.cantidad_recibida <= 0:
             continue
-        ultimo = (
-            db.query(InventarioRegistro)
-            .filter(InventarioRegistro.ingrediente_id == linea.ingrediente_id)
-            .order_by(InventarioRegistro.fecha_registro.desc())
-            .first()
-        )
-        stock_actual = ultimo.cantidad if ultimo else 0
+        base = stock_base_recepcion_pedido(linea.ingrediente_id, db)
+        stock_actual = base["cantidad"] if base else 0
         nueva_cantidad = stock_actual + linea.cantidad_recibida
-        unidad = ultimo.unidad if ultimo else linea.unidad
+        unidad = (base and base.get("unidad")) or linea.unidad
+        # Inherit the leaf's last known ubicacion (instead of leaving it
+        # unset) so a manual count and a same-day delivery aren't summed as
+        # if they were two different locations in _day_total()/_batch_latest_stocks.
+        ubicacion = base and base.get("ubicacion")
         db.add(InventarioRegistro(
             ingrediente_id=linea.ingrediente_id,
             cantidad=nueva_cantidad,
             unidad=unidad,
             fecha_registro=date.today(),
             notas=f"Pedido #{p.id} recibido",
+            ubicacion=ubicacion,
         ))
 
     db.commit()
