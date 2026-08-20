@@ -53,6 +53,7 @@ export default function PedidosPage() {
   const [busqueda, setBusqueda] = useState("");
   const [filtroCategoria, setFiltroCategoria] = useState("");
   const [vista, setVista] = useState<"cocina" | "cafe" | "bar">("cocina");
+  const [pivotVista, setPivotVista] = useState<"cocina" | "cafe" | "bar">("cocina");
 
   useEffect(() => {
     fetchData();
@@ -102,6 +103,15 @@ export default function PedidosPage() {
     if (!childrenByParent[pid]) childrenByParent[pid] = [];
     childrenByParent[pid].push(ing);
   }
+
+  const matchesPivotVista = (ingredienteId: number, ingredienteNombre: string): boolean => {
+    if (ingredienteNombre.toLowerCase().includes("sibarist")) return pivotVista === "cafe";
+    const fullIng = ingredientes.find((i) => i.id === ingredienteId);
+    if (!fullIng) return false;
+    const cat = categorias.find((c) => c.id === fullIng.categoria_id);
+    if (!cat) return false;
+    return cat.seccion === pivotVista;
+  };
 
   const vistaCategories = categorias
     .filter((c) => {
@@ -288,6 +298,15 @@ export default function PedidosPage() {
             onClick={() => {
               setTab("pivot");
               if (!pivot) apiFetch<PivotData>("/api/pedidos/pivot").then(setPivot);
+              if (ingredientes.length === 0) {
+                Promise.all([
+                  apiFetch<Ingrediente[]>("/api/ingredientes"),
+                  apiFetch<Categoria[]>("/api/categorias?tipo=ingrediente"),
+                ]).then(([ings, cats]) => {
+                  setIngredientes(ings);
+                  setCategorias(cats);
+                });
+              }
             }}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
               tab === "pivot"
@@ -741,6 +760,21 @@ export default function PedidosPage() {
         </div>
       ) : (
         <div className="space-y-4">
+          <div className="flex gap-2">
+            {(["cocina", "cafe", "bar"] as const).map((v) => (
+              <button
+                key={v}
+                onClick={() => setPivotVista(v)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  pivotVista === v
+                    ? "bg-[#8B1A2B] text-white"
+                    : "bg-white border border-[#D4C4A8] text-[#6B5E52] hover:bg-[#F5F0E8]"
+                }`}
+              >
+                {v === "cocina" ? "Cocina" : v === "cafe" ? "Cafe" : "Bar"}
+              </button>
+            ))}
+          </div>
           {!pivot || pivot.ingredientes.length === 0 ? (
             <p className="text-[#6B5E52] text-center py-10">
               No hay pedidos recibidos todavia.
@@ -767,7 +801,9 @@ export default function PedidosPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {pivot.ingredientes.map((ing) => (
+                  {pivot.ingredientes
+                    .filter((ing) => matchesPivotVista(ing.ingrediente_id, ing.ingrediente_nombre))
+                    .map((ing) => (
                     <tr
                       key={ing.ingrediente_id}
                       className="border-b border-[#E8DFD3]/50 hover:bg-[#F5F0E8]"
