@@ -255,23 +255,16 @@ CAFE_CATEGORIA_ID = 5
 
 def stock_actual(ingrediente_id: int, db: Session) -> Optional[dict]:
     """Get latest stock. If parent, sum latest stock of all children.
-    For café (categoria_id=5): children not counted on the most recent date = 0.
-    Exception: frozen tube flavors (frozen_origen_id set) are tracked independently
-    per flavor, not in a single synchronized counting session, so each keeps its
-    own last known stock regardless of date.
+    For café (categoria_id=5), including frozen tube flavor groups: a flavor
+    left blank on count day is 0, not carried forward — only children counted
+    on the most recent date contribute to the total.
     For other categories: use each child's last known stock."""
     children = _child_ids(ingrediente_id, db)
     if not children:
         return _stock_actual_leaf(ingrediente_id, db)
 
     ing = db.query(Ingrediente).get(ingrediente_id)
-    is_frozen_group = (
-        db.query(Ingrediente.id)
-        .filter(Ingrediente.id.in_(children), Ingrediente.frozen_origen_id.isnot(None))
-        .first()
-        is not None
-    )
-    zero_if_uncounted = ing and ing.categoria_id == CAFE_CATEGORIA_ID and not is_frozen_group
+    zero_if_uncounted = ing and ing.categoria_id == CAFE_CATEGORIA_ID
 
     child_stocks = []
     latest_fecha = None
@@ -310,18 +303,12 @@ def stock_historial_serie(ingrediente_id: int, db: Session) -> list[dict]:
     """Full stock-over-time series for charts, using the same semantics as
     stock_actual() at every historical date: each child's last known quantity
     as of that date, carried forward, zeroed out on café sync-count dates it
-    wasn't part of (except frozen tube groups — see stock_actual)."""
+    wasn't part of."""
     children = _child_ids(ingrediente_id, db)
     ing = db.query(Ingrediente).get(ingrediente_id)
     target_ids = children or [ingrediente_id]
 
-    is_frozen_group = bool(children) and (
-        db.query(Ingrediente.id)
-        .filter(Ingrediente.id.in_(children), Ingrediente.frozen_origen_id.isnot(None))
-        .first()
-        is not None
-    )
-    zero_if_uncounted = bool(children) and ing.categoria_id == CAFE_CATEGORIA_ID and not is_frozen_group
+    zero_if_uncounted = bool(children) and ing.categoria_id == CAFE_CATEGORIA_ID
 
     all_registros = (
         db.query(InventarioRegistro)

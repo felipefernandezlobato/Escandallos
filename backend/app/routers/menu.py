@@ -24,9 +24,17 @@ def _coffee_name(nombre: str) -> str:
     return name.strip()
 
 
-def _batch_latest_stocks(ingredient_ids: list[int], db: Session) -> dict[int, dict]:
+def _batch_latest_stocks(
+    ingredient_ids: list[int], db: Session, group_of: Optional[dict[int, int]] = None
+) -> dict[int, dict]:
     """Batch-load latest stock for many ingredients.
     Returns {id: {"total": float, "by_location": {loc: qty}}}.
+
+    group_of (optional {ingrediente_id: parent_group_id}): when given, an
+    ingredient's stock is zeroed if its own latest recorded date doesn't match
+    the most recent date recorded across all ingredients sharing its group —
+    a flavor left blank on count day is 0, not carried forward, matching the
+    café "zero if not counted in the latest session" rule.
     """
     if not ingredient_ids:
         return {}
@@ -45,6 +53,15 @@ def _batch_latest_stocks(ingredient_ids: list[int], db: Session) -> dict[int, di
 
     if not date_map:
         return {iid: {"total": 0.0, "by_location": {}} for iid in ingredient_ids}
+
+    group_max_date: dict[int, object] = {}
+    if group_of:
+        for iid, fecha in date_map.items():
+            gid = group_of.get(iid)
+            if gid is None:
+                continue
+            if gid not in group_max_date or fecha > group_max_date[gid]:
+                group_max_date[gid] = fecha
 
     # Build filter conditions for each ingredient's latest date
     from sqlalchemy import and_, or_, tuple_
@@ -75,6 +92,10 @@ def _batch_latest_stocks(ingredient_ids: list[int], db: Session) -> dict[int, di
 
     result: dict[int, dict] = {iid: {"total": 0.0, "by_location": {}} for iid in ingredient_ids}
     for (iid, loc), qty in latest_by_loc.items():
+        if group_of:
+            gid = group_of.get(iid)
+            if gid is not None and date_map.get(iid) != group_max_date.get(gid):
+                continue
         result[iid]["total"] += qty
         key = loc or "SIN"
         result[iid]["by_location"][key] = result[iid]["by_location"].get(key, 0) + qty
@@ -123,8 +144,18 @@ def menu_frozen(
     all_source_ids = list({t.frozen_origen_id for t in frozen_tubes if t.frozen_origen_id is not None})
     all_ids = list(set(all_tube_ids + all_source_ids))
 
+    # Group each id by its real parent (Tubos Frozen Bru1/Bru2 for tubes, its
+    # own retail-color group for source bags) so a flavor left blank on count
+    # day reads as 0 instead of carrying forward a stale count.
+    group_rows = (
+        db.query(Ingrediente.id, Ingrediente.grupo_ingrediente_id)
+        .filter(Ingrediente.id.in_(all_ids))
+        .all()
+    )
+    group_of = {iid: gid for iid, gid in group_rows if gid is not None}
+
     # Batch-load all stocks and pending orders
-    stocks = _batch_latest_stocks(all_ids, db)
+    stocks = _batch_latest_stocks(all_ids, db, group_of=group_of)
     pending_ids = _batch_has_pending_orders(all_source_ids, db)
 
     result = []
