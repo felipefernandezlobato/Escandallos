@@ -72,7 +72,7 @@ export default function PedidoDetailPage() {
   };
 
   const handleEliminar = async () => {
-    if (!confirm("Eliminar este pedido?")) return;
+    if (!confirm(`Eliminar el pedido completo (${pedido?.lineas.length ?? 0} lineas)? Esta accion no se puede deshacer.`)) return;
     try {
       await apiFetch(`/api/pedidos/${params.id}`, { method: "DELETE" });
       toast("Pedido eliminado", "success");
@@ -247,20 +247,12 @@ export default function PedidoDetailPage() {
         </div>
         <div className="flex gap-2 flex-wrap">
           {pedido.estado === "borrador" && (
-            <>
-              <button
-                onClick={handleEnviar}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
-              >
-                Marcar como Enviado
-              </button>
-              <button
-                onClick={handleEliminar}
-                className="border border-red-300 text-red-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-50 transition-colors"
-              >
-                Eliminar
-              </button>
-            </>
+            <button
+              onClick={handleEnviar}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+            >
+              Marcar como Enviado
+            </button>
           )}
           {pedido.estado === "enviado" && (
             <Link
@@ -269,6 +261,14 @@ export default function PedidoDetailPage() {
             >
               Recibir Pedido
             </Link>
+          )}
+          {pedido.estado !== "recibido" && (
+            <button
+              onClick={handleEliminar}
+              className="border border-red-300 text-red-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-50 transition-colors"
+            >
+              Eliminar
+            </button>
           )}
           {editable && !showAgregar && (
             <button
