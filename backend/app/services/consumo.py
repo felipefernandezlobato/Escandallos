@@ -614,9 +614,15 @@ def historial_frozen_por_ubicacion(ubicacion: str, db: Session) -> dict:
 
     Each date column is every day with a movement (count, order, or waste)
     for ANY flavor at this location — not weekly-sampled like the /inventario
-    historial tab. Each cell carries the flavor's running counted stock as of
-    that date (last known count, carried forward), plus any pedido/merma
-    events that landed on that exact date for tooltip display.
+    historial tab. A flavor that wasn't part of the location's most recent
+    synchronized counting session shows 0 for that date rather than its
+    stale prior value — same "zero if not counted in the latest session"
+    rule stock_actual()/stock_historial_serie() already apply for café (see
+    CLAUDE.md "Inventory Stock Rules"), just kept per-flavor here instead of
+    summed into one total. Receiving an order is exempt from this — a
+    delivery always shows the flavor's own bumped total, matching
+    stock_actual()'s es_recibido carve-out (a delivery for one flavor must
+    not make it look "missed" just because it wasn't part of a manual count).
     """
     parent_id = FROZEN_TUBE_PARENT_BY_UBICACION.get(ubicacion)
     tubo_ids_set = set(_child_ids(parent_id, db)) if parent_id else set()
@@ -647,7 +653,9 @@ def historial_frozen_por_ubicacion(ubicacion: str, db: Session) -> dict:
     per_child_days: dict[int, dict] = {}
     for r in registros:
         # Later id on the same day overwrites — same-day correction, not a
-        # second event (mirrors _day_total's same-ubicacion-same-day rule).
+        # second event. Each of these ingredients is already single-location
+        # by construction (see docstring), so unlike _day_total elsewhere,
+        # same-day records are never summed across ubicaciones here.
         per_child_days.setdefault(r.ingrediente_id, {})[r.fecha_registro] = r
 
     mermas_by_child_day: dict[tuple, list] = {}
@@ -659,29 +667,59 @@ def historial_frozen_por_ubicacion(ubicacion: str, db: Session) -> dict:
         | {d for (_cid, d) in mermas_by_child_day}
     )
 
-    sabores = []
-    for tid in tubo_ids:
-        days = per_child_days.get(tid, {})
-        has_merma = any(cid == tid for cid, _d in mermas_by_child_day)
-        if not days and not has_merma:
-            continue
-        valores = {}
-        last_qty = None
-        last_unidad = None
-        for d in fechas:
-            if d in days:
-                last_qty = days[d].cantidad
-                last_unidad = days[d].unidad
+    # Walk dates chronologically, tracking each flavor's last known value and
+    # last REAL (non-pedido) count date, to determine the location's latest
+    # synchronized counting session at each point in time — mirrors
+    # stock_historial_serie()'s per-child bookkeeping, kept unsummed.
+    last_val: dict[int, tuple] = {}  # tid -> (cantidad, es_recibido)
+    last_conteo_fecha: dict[int, object] = {}
+    per_child_valores: dict[int, dict] = {tid: {} for tid in tubo_ids}
+    for d in fechas:
+        for tid in tubo_ids:
+            r = per_child_days.get(tid, {}).get(d)
+            if r is None:
+                continue
+            es_recibido = _es_pedido_recibido(r)
+            last_val[tid] = (r.cantidad, es_recibido)
+            if not es_recibido:
+                last_conteo_fecha[tid] = d
+
+        latest_fecha_conteo = max(
+            (f for f in last_conteo_fecha.values() if f is not None), default=None
+        )
+
+        for tid in tubo_ids:
+            val = last_val.get(tid)
+            if val is None:
+                cantidad = None  # never counted yet at this location
+            else:
+                cantidad_val, es_recibido = val
+                if es_recibido or last_conteo_fecha.get(tid) == latest_fecha_conteo:
+                    cantidad = cantidad_val
+                else:
+                    cantidad = 0.0  # not part of the latest session
+
             eventos = []
-            if d in days and _es_pedido_recibido(days[d]):
-                eventos.append({"tipo": "pedido", "detalle": days[d].notas, "cantidad": None})
+            r = per_child_days.get(tid, {}).get(d)
+            if r is not None and _es_pedido_recibido(r):
+                eventos.append({"tipo": "pedido", "detalle": r.notas, "cantidad": None})
             for m in mermas_by_child_day.get((tid, d), []):
                 eventos.append({"tipo": "merma", "detalle": m.notas or m.motivo, "cantidad": -m.cantidad})
-            valores[str(d)] = {"cantidad": last_qty, "eventos": eventos}
+
+            per_child_valores[tid][str(d)] = {"cantidad": cantidad, "eventos": eventos}
+
+    sabores = []
+    for tid in tubo_ids:
+        valores = per_child_valores[tid]
+        has_data = any(v["cantidad"] is not None or v["eventos"] for v in valores.values())
+        if not has_data:
+            continue
+        days = per_child_days.get(tid, {})
+        unidad = days[max(days)].unidad if days else None
         sabores.append({
             "ingrediente_id": tid,
             "nombre": nombres[tid],
-            "unidad": last_unidad,
+            "unidad": unidad,
             "valores": valores,
         })
 

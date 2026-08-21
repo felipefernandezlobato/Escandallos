@@ -848,9 +848,10 @@ class TestHistorialFrozen:
         assert {s["nombre"] for s in bru2["sabores"]} == {"Frozen Perla Bru2"}
         assert bru2["sabores"][0]["valores"]["2026-08-03"]["cantidad"] == 4
 
-    def test_carry_forward_en_dia_de_otro_sabor(self, client, test_db, tubos):
-        """A date column introduced by one flavor's count must carry forward
-        the other flavor's last known quantity, not show it as missing."""
+    def test_cero_si_no_forma_parte_de_la_ultima_sesion(self, client, test_db, tubos):
+        """Flavors at a location are counted together in one synchronized
+        session (per CLAUDE.md). A flavor left out of the most recent
+        session shows 0 for that date, not its stale prior value."""
         test_db.add_all([
             InventarioRegistro(
                 ingrediente_id=tubos["karamo_bru1"].id, cantidad=12, unidad="unidad",
@@ -866,10 +867,54 @@ class TestHistorialFrozen:
         data = client.get(f"/api/ingredientes/{tubos['karamo_bru1'].id}/historial-frozen?ubicacion=BRU1").json()
         assert data["fechas"] == ["2026-08-01", "2026-08-03"]
         sabores = {s["nombre"]: s for s in data["sabores"]}
-        # Karamo wasn't recounted on 08-03, but its last known value carries forward.
-        assert sabores["Frozen Karamo Bru1"]["valores"]["2026-08-03"]["cantidad"] == 12
+        # On 08-01, Karamo IS the latest session — shows its real count.
+        assert sabores["Frozen Karamo Bru1"]["valores"]["2026-08-01"]["cantidad"] == 12
+        # By 08-03, Perla's count makes that the latest session — Karamo
+        # wasn't part of it, so it reads 0, not the stale 12.
+        assert sabores["Frozen Karamo Bru1"]["valores"]["2026-08-03"]["cantidad"] == 0
         # Perla had no count before 08-01 — no data yet for that date.
         assert sabores["Frozen Perla Bru1"]["valores"]["2026-08-01"]["cantidad"] is None
+        assert sabores["Frozen Perla Bru1"]["valores"]["2026-08-03"]["cantidad"] == 6
+
+    def test_pedido_exento_del_cero_aunque_no_sea_la_ultima_sesion(self, client, test_db, tubos):
+        """A delivery for a flavor left out of the latest counting session
+        must still show its own bumped total, not get zeroed — mirrors the
+        es_recibido carve-out in stock_actual() (TestPedidoRecibirCafeFrozen)."""
+        test_db.add(InventarioRegistro(
+            ingrediente_id=tubos["karamo_bru1"].id, cantidad=5, unidad="unidad",
+            fecha_registro=date(2026, 8, 1),
+        ))
+        test_db.flush()
+
+        create = client.post("/api/pedidos", json={
+            "proveedor": "Dabov",
+            "lineas": [
+                {"ingrediente_id": tubos["karamo_bru1"].id, "cantidad_pedida": 10, "unidad": "unidad"},
+            ],
+        })
+        pid = create.json()["id"]
+        lid = create.json()["lineas"][0]["id"]
+        client.post(f"/api/pedidos/{pid}/enviar")
+        client.post(f"/api/pedidos/{pid}/recibir", json={
+            "lineas": [{"linea_id": lid, "cantidad_recibida": 10}],
+        })
+
+        # Perla gets recounted after the delivery, becoming the latest session.
+        test_db.add(InventarioRegistro(
+            ingrediente_id=tubos["perla_bru1"].id, cantidad=6, unidad="unidad",
+            fecha_registro=date(2026, 8, 10),
+        ))
+        test_db.flush()
+
+        data = client.get(f"/api/ingredientes/{tubos['karamo_bru1'].id}/historial-frozen?ubicacion=BRU1").json()
+        sabores = {s["nombre"]: s for s in data["sabores"]}
+        pedido_date = [d for d in data["fechas"] if d not in ("2026-08-01", "2026-08-10")][0]
+        # The delivery day itself: exempt, shows the bumped total (15).
+        assert sabores["Frozen Karamo Bru1"]["valores"][pedido_date]["cantidad"] == 15
+        # By 08-10 Karamo is genuinely stale (no delivery or count that day,
+        # and Perla's count is now the latest session) — zeroed.
+        assert sabores["Frozen Karamo Bru1"]["valores"]["2026-08-10"]["cantidad"] == 0
+        assert sabores["Frozen Perla Bru1"]["valores"]["2026-08-10"]["cantidad"] == 6
 
     def test_pedido_marker_con_ubicacion_heredada_null(self, client, test_db, tubos):
         """Reproduces the exact 2026-08-20 bug: the initial manual count has
