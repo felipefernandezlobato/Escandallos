@@ -582,26 +582,35 @@ def movimientos_ingrediente(ingrediente_id: int, db: Session) -> list[dict]:
     return eventos
 
 
-FROZEN_TUBE_PARENT_IDS = (289, 290)  # Tubos Frozen Bru1 / Bru2
+FROZEN_TUBE_PARENT_BY_UBICACION = {"BRU1": 289, "BRU2": 290}  # Tubos Frozen Bru1 / Bru2
 
 
 def historial_frozen_por_ubicacion(ubicacion: str, db: Session) -> dict:
     """Daily pivot of frozen-tube flavor stock at a single location (BRU1 or
     BRU2), for the "Historial de Conteos" table on ingredientes/289 and /290.
 
+    Location is determined by which parent a flavor belongs to (289=Bru1,
+    290=Bru2) — every frozen flavor has two separate child ingredients, one
+    per location (e.g. "Frozen Ethiopia Karamo Bru1" id 375 under 289, and
+    "Frozen Ethiopia Karamo Bru2" id 387 under 290) — NOT by the `ubicacion`
+    column on InventarioRegistro/MermaRegistro. That column is unreliable for
+    these ingredients: a delivery received via recibir_pedido() inherits
+    whatever ubicacion the ingredient's last record had, so once one manual
+    count is entered without setting it, every subsequent auto-inserted
+    "Pedido recibido" row keeps inheriting a null ubicacion forever after —
+    which is exactly what silently hid Karamo/Perla's 2026-08-20 delivery
+    from this table (its InventarioRegistro existed, cantidad_actual and
+    all, just with ubicacion=None instead of 'BRU1'/'BRU2'). Since each
+    flavor's location is already fully determined by which of the two
+    per-location ingredients a record was saved against, that column simply
+    isn't needed to scope this query.
+
     Flavors are identified via grupo_ingrediente_id (same structural relation
     movimientos_ingrediente uses for the "Movimientos" table on the same
     page) — NOT via `suplemento_frozen` (a pricing field that can be unset
     for a flavor that's still actively counted, e.g. the documented "Frozen
     Nicaragua El Suspiro missing frozen pricing columns" gap; filtering on it
-    silently dropped any such flavor's counts from this table). All frozen
-    flavors currently live as children of a single parent (see
-    create_coffee_ingredients.py) — 289 and 290 are unioned here in case that
-    ever changes. BRU1 vs BRU2 is determined purely by each
-    InventarioRegistro's `ubicacion`, not by which of the two parent pages
-    you're viewing. That's why this ignores the ingrediente_id in its caller
-    and returns the same location-scoped feed regardless of whether it was
-    requested from page 289 or 290.
+    silently dropped any such flavor's counts from this table).
 
     Each date column is every day with a movement (count, order, or waste)
     for ANY flavor at this location — not weekly-sampled like the /inventario
@@ -609,9 +618,8 @@ def historial_frozen_por_ubicacion(ubicacion: str, db: Session) -> dict:
     that date (last known count, carried forward), plus any pedido/merma
     events that landed on that exact date for tooltip display.
     """
-    tubo_ids_set: set[int] = set()
-    for pid in FROZEN_TUBE_PARENT_IDS:
-        tubo_ids_set.update(_child_ids(pid, db))
+    parent_id = FROZEN_TUBE_PARENT_BY_UBICACION.get(ubicacion)
+    tubo_ids_set = set(_child_ids(parent_id, db)) if parent_id else set()
     if not tubo_ids_set:
         return {"ubicacion": ubicacion, "fechas": [], "sabores": []}
 
@@ -626,19 +634,13 @@ def historial_frozen_por_ubicacion(ubicacion: str, db: Session) -> dict:
 
     registros = (
         db.query(InventarioRegistro)
-        .filter(
-            InventarioRegistro.ingrediente_id.in_(tubo_ids),
-            InventarioRegistro.ubicacion == ubicacion,
-        )
+        .filter(InventarioRegistro.ingrediente_id.in_(tubo_ids))
         .order_by(InventarioRegistro.ingrediente_id, InventarioRegistro.fecha_registro.asc(), InventarioRegistro.id.asc())
         .all()
     )
     mermas = (
         db.query(MermaRegistro)
-        .filter(
-            MermaRegistro.ingrediente_id.in_(tubo_ids),
-            MermaRegistro.ubicacion == ubicacion,
-        )
+        .filter(MermaRegistro.ingrediente_id.in_(tubo_ids))
         .all()
     )
 
