@@ -99,6 +99,7 @@ class MovimientoOut(BaseModel):
     unidad: str
     detalle: Optional[str] = None
     sabor: Optional[str] = None
+    cantidad_actual: Optional[float] = None
 
 
 # --- Lineas de Receta ---

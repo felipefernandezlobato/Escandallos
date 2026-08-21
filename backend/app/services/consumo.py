@@ -499,6 +499,21 @@ def movimientos_ingrediente(ingrediente_id: int, db: Session) -> list[dict]:
 
     eventos: list[dict] = []
 
+    conteos = (
+        db.query(InventarioRegistro)
+        .filter(InventarioRegistro.ingrediente_id.in_(target_ids))
+        .order_by(InventarioRegistro.ingrediente_id, InventarioRegistro.fecha_registro.asc(), InventarioRegistro.id.asc())
+        .all()
+    )
+    # The InventarioRegistro row a "Pedido recibido" insert creates already
+    # holds the resulting stock total — reuse it as `cantidad_actual` for the
+    # matching "pedido" event below instead of recomputing it.
+    stock_tras_recibido: dict[tuple[int, str], float] = {
+        (r.ingrediente_id, str(r.fecha_registro)): r.cantidad
+        for r in conteos
+        if _es_pedido_recibido(r)
+    }
+
     pedidos = (
         db.query(LineaPedido, Pedido)
         .join(Pedido, LineaPedido.pedido_id == Pedido.id)
@@ -511,13 +526,15 @@ def movimientos_ingrediente(ingrediente_id: int, db: Session) -> list[dict]:
         .all()
     )
     for linea, pedido in pedidos:
+        fecha = str(pedido.fecha_recepcion or pedido.fecha)
         eventos.append({
-            "fecha": str(pedido.fecha_recepcion or pedido.fecha),
+            "fecha": fecha,
             "tipo": "pedido",
             "cantidad": linea.cantidad_recibida,
             "unidad": linea.unidad,
             "detalle": f"Pedido #{pedido.id} — {pedido.proveedor}",
             "sabor": nombres.get(linea.ingrediente_id),
+            "cantidad_actual": stock_tras_recibido.get((linea.ingrediente_id, fecha)),
         })
 
     mermas = (
@@ -533,14 +550,9 @@ def movimientos_ingrediente(ingrediente_id: int, db: Session) -> list[dict]:
             "unidad": m.unidad,
             "detalle": m.notas or m.motivo,
             "sabor": nombres.get(m.ingrediente_id),
+            "cantidad_actual": None,
         })
 
-    conteos = (
-        db.query(InventarioRegistro)
-        .filter(InventarioRegistro.ingrediente_id.in_(target_ids))
-        .order_by(InventarioRegistro.ingrediente_id, InventarioRegistro.fecha_registro.asc(), InventarioRegistro.id.asc())
-        .all()
-    )
     anterior: dict[int, InventarioRegistro] = {}
     for r in conteos:
         prev = anterior.get(r.ingrediente_id)
@@ -561,6 +573,7 @@ def movimientos_ingrediente(ingrediente_id: int, db: Session) -> list[dict]:
             "cantidad": round(delta, 3),
             "unidad": r.unidad,
             "detalle": r.notas,
+            "cantidad_actual": r.cantidad,
             "sabor": nombres.get(r.ingrediente_id),
         })
         anterior[r.ingrediente_id] = r

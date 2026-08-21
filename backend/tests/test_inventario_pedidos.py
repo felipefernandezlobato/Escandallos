@@ -673,7 +673,9 @@ class TestMovimientos:
         tipos = {m["tipo"]: m for m in movimientos}
 
         assert tipos["pedido"]["cantidad"] == 10
+        assert tipos["pedido"]["cantidad_actual"] == 15  # 5 base + 10 recibidos
         assert tipos["merma"]["cantidad"] == -2
+        assert tipos["merma"]["cantidad_actual"] is None
         # Conteo del 2026-01-01: delta = 5 - 0 = 5 (primer conteo).
         # Conteo del 2030-01-01: delta = 20 - 15 (base 5 + pedido 10) = 5,
         # no 20 - 5 = 15 (eso duplicaría el pedido).
@@ -681,6 +683,7 @@ class TestMovimientos:
             [m for m in movimientos if m["tipo"] == "conteo"], key=lambda m: m["fecha"]
         )
         assert [c["cantidad"] for c in conteos] == [5, 5]
+        assert [c["cantidad_actual"] for c in conteos] == [5, 20]
 
     def test_movimientos_padre_incluye_sabor(self, client, test_db, frozen):
         test_db.add_all([

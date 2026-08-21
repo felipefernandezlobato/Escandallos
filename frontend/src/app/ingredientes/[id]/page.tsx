@@ -474,7 +474,8 @@ export default function IngredienteDetailPage() {
                     {isFrozenParent && <th className="px-4 py-2 font-medium">Sabor</th>}
                     <th className="px-4 py-2 font-medium">Tipo</th>
                     <th className="px-4 py-2 font-medium">Detalle</th>
-                    <th className="px-4 py-2 font-medium text-right">Cantidad</th>
+                    <th className="px-4 py-2 font-medium text-right">Cambio</th>
+                    <th className="px-4 py-2 font-medium text-right">Stock</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -496,6 +497,9 @@ export default function IngredienteDetailPage() {
                       >
                         {m.cantidad > 0 ? "+" : ""}
                         {m.cantidad} {m.unidad}
+                      </td>
+                      <td className="px-4 py-2 text-right font-mono text-[#6B5E52]">
+                        {m.cantidad_actual != null ? `${m.cantidad_actual} ${m.unidad}` : "—"}
                       </td>
                     </tr>
                   ))}

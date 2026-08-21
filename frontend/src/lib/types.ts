@@ -90,6 +90,7 @@ export interface Movimiento {
   unidad: string;
   detalle: string | null;
   sabor: string | null;
+  cantidad_actual: number | null;
 }
 
 export interface Alerta {
