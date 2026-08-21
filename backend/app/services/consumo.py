@@ -582,6 +582,99 @@ def movimientos_ingrediente(ingrediente_id: int, db: Session) -> list[dict]:
     return eventos
 
 
+def historial_frozen_por_ubicacion(ubicacion: str, db: Session) -> dict:
+    """Daily pivot of frozen-tube flavor stock at a single location (BRU1 or
+    BRU2), for the "Historial de Conteos" table on ingredientes/289 and /290.
+
+    Flavors are identified via `suplemento_frozen` (same convention as
+    /api/menu/frozen) rather than via grupo_ingrediente_id — all frozen
+    flavors currently live as children of a single parent (see
+    create_coffee_ingredients.py); BRU1 vs BRU2 is determined purely by each
+    InventarioRegistro's `ubicacion`, not by which of the two parent pages
+    you're viewing. That's why this ignores the ingrediente_id in its caller
+    and returns the same location-scoped feed regardless of whether it was
+    requested from page 289 or 290.
+
+    Each date column is every day with a movement (count, order, or waste)
+    for ANY flavor at this location — not weekly-sampled like the /inventario
+    historial tab. Each cell carries the flavor's running counted stock as of
+    that date (last known count, carried forward), plus any pedido/merma
+    events that landed on that exact date for tooltip display.
+    """
+    tubos = (
+        db.query(Ingrediente)
+        .filter(Ingrediente.suplemento_frozen.isnot(None))
+        .order_by(Ingrediente.nombre)
+        .all()
+    )
+    if not tubos:
+        return {"ubicacion": ubicacion, "fechas": [], "sabores": []}
+
+    tubo_ids = [t.id for t in tubos]
+    nombres = {t.id: t.nombre for t in tubos}
+
+    registros = (
+        db.query(InventarioRegistro)
+        .filter(
+            InventarioRegistro.ingrediente_id.in_(tubo_ids),
+            InventarioRegistro.ubicacion == ubicacion,
+        )
+        .order_by(InventarioRegistro.ingrediente_id, InventarioRegistro.fecha_registro.asc(), InventarioRegistro.id.asc())
+        .all()
+    )
+    mermas = (
+        db.query(MermaRegistro)
+        .filter(
+            MermaRegistro.ingrediente_id.in_(tubo_ids),
+            MermaRegistro.ubicacion == ubicacion,
+        )
+        .all()
+    )
+
+    per_child_days: dict[int, dict] = {}
+    for r in registros:
+        # Later id on the same day overwrites — same-day correction, not a
+        # second event (mirrors _day_total's same-ubicacion-same-day rule).
+        per_child_days.setdefault(r.ingrediente_id, {})[r.fecha_registro] = r
+
+    mermas_by_child_day: dict[tuple, list] = {}
+    for m in mermas:
+        mermas_by_child_day.setdefault((m.ingrediente_id, m.fecha), []).append(m)
+
+    fechas = sorted(
+        {d for days in per_child_days.values() for d in days}
+        | {d for (_cid, d) in mermas_by_child_day}
+    )
+
+    sabores = []
+    for tid in tubo_ids:
+        days = per_child_days.get(tid, {})
+        has_merma = any(cid == tid for cid, _d in mermas_by_child_day)
+        if not days and not has_merma:
+            continue
+        valores = {}
+        last_qty = None
+        last_unidad = None
+        for d in fechas:
+            if d in days:
+                last_qty = days[d].cantidad
+                last_unidad = days[d].unidad
+            eventos = []
+            if d in days and _es_pedido_recibido(days[d]):
+                eventos.append({"tipo": "pedido", "detalle": days[d].notas, "cantidad": None})
+            for m in mermas_by_child_day.get((tid, d), []):
+                eventos.append({"tipo": "merma", "detalle": m.notas or m.motivo, "cantidad": -m.cantidad})
+            valores[str(d)] = {"cantidad": last_qty, "eventos": eventos}
+        sabores.append({
+            "ingrediente_id": tid,
+            "nombre": nombres[tid],
+            "unidad": last_unidad,
+            "valores": valores,
+        })
+
+    return {"ubicacion": ubicacion, "fechas": [str(d) for d in fechas], "sabores": sabores}
+
+
 def tendencia_consumo(historial: list[dict]) -> str:
     if len(historial) < 4:
         return "estable"

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/api";
 import { useToast } from "@/components/Toast";
-import type { Ingrediente, HistorialPrecio, Movimiento, Receta } from "@/lib/types";
+import type { Ingrediente, HistorialPrecio, Movimiento, Receta, HistorialFrozen } from "@/lib/types";
 import Link from "next/link";
 
 interface PrecioProveedor {
@@ -62,6 +62,10 @@ export default function IngredienteDetailPage() {
   const [chartRange, setChartRange] = useState<"3m" | "all">("3m");
   const [frozenTubes, setFrozenTubes] = useState<FrozenTubeCompare[]>([]);
   const [movimientos, setMovimientos] = useState<Movimiento[]>([]);
+  const [ubicacionFrozen, setUbicacionFrozen] = useState<"BRU1" | "BRU2">(
+    Number(id) === 290 ? "BRU2" : "BRU1"
+  );
+  const [historialFrozen, setHistorialFrozen] = useState<HistorialFrozen | null>(null);
 
   const isFrozenParent = FROZEN_PARENT_IDS.includes(Number(id));
   const isFrozenTube =
@@ -101,6 +105,13 @@ export default function IngredienteDetailPage() {
       .catch(() => setMovimientos([]));
   }, [id, isFrozenTube]);
 
+  useEffect(() => {
+    if (!isFrozenParent) return;
+    apiFetch<HistorialFrozen>(`/api/ingredientes/${id}/historial-frozen?ubicacion=${ubicacionFrozen}`)
+      .then(setHistorialFrozen)
+      .catch(() => setHistorialFrozen(null));
+  }, [id, isFrozenParent, ubicacionFrozen]);
+
   const handleDelete = async () => {
     if (!confirm("¿Eliminar este ingrediente?")) return;
     try {
@@ -119,6 +130,14 @@ export default function IngredienteDetailPage() {
         month: "2-digit",
         year: "numeric",
       });
+    } catch {
+      return fecha;
+    }
+  };
+
+  const formatFechaCorta = (fecha: string) => {
+    try {
+      return new Date(fecha).toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit" });
     } catch {
       return fecha;
     }
@@ -189,6 +208,70 @@ export default function IngredienteDetailPage() {
           </tfoot>
         </table>
       </div>
+    </div>
+  ) : null;
+
+  const historialFrozenSection = isFrozenParent ? (
+    <div className="bg-white border border-[#E8DFD3] rounded-lg overflow-hidden">
+      <div className="flex flex-wrap items-center justify-between gap-2 px-4 pt-4 pb-2">
+        <h2 className="text-lg font-semibold">Historial de Conteos</h2>
+        <div className="flex gap-1">
+          {(["BRU1", "BRU2"] as const).map((u) => (
+            <button
+              key={u}
+              onClick={() => setUbicacionFrozen(u)}
+              className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
+                ubicacionFrozen === u ? "bg-[#8B1A2B] text-white" : "bg-[#F5F0E8] text-[#6B5E52] hover:bg-[#E8DFD3]"
+              }`}
+            >
+              {u}
+            </button>
+          ))}
+        </div>
+      </div>
+      {!historialFrozen || historialFrozen.sabores.length === 0 ? (
+        <p className="text-sm text-[#6B5E52]/70 px-4 pb-4">Sin conteos registrados en {ubicacionFrozen}</p>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="bg-[#F5F0E8] text-left text-[#6B5E52] border-b border-[#E8DFD3]">
+                <th className="px-4 py-2 font-medium sticky left-0 bg-[#F5F0E8]">Sabor</th>
+                {[...historialFrozen.fechas].reverse().map((f) => (
+                  <th key={f} className="px-3 py-2 font-medium text-right whitespace-nowrap">
+                    {formatFechaCorta(f)}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {historialFrozen.sabores.map((s) => (
+                <tr key={s.ingrediente_id} className="border-b border-[#E8DFD3]/50 hover:bg-[#F5F0E8]/50">
+                  <td className="px-4 py-2 sticky left-0 bg-white">
+                    <Link href={`/ingredientes/${s.ingrediente_id}`} className="text-[#8B1A2B] hover:underline">
+                      {s.nombre}
+                    </Link>
+                  </td>
+                  {[...historialFrozen.fechas].reverse().map((f) => {
+                    const valor = s.valores[f];
+                    const eventos = valor?.eventos ?? [];
+                    const tienePedido = eventos.some((e) => e.tipo === "pedido");
+                    const tieneMerma = eventos.some((e) => e.tipo === "merma");
+                    const tooltip = eventos.map((e) => e.detalle).filter(Boolean).join(" · ") || undefined;
+                    return (
+                      <td key={f} className="px-3 py-2 text-right font-mono whitespace-nowrap" title={tooltip}>
+                        {valor?.cantidad ?? "—"}
+                        {tienePedido && <span className="inline-block w-1.5 h-1.5 rounded-full bg-blue-500 ml-1" />}
+                        {tieneMerma && <span className="inline-block w-1.5 h-1.5 rounded-full bg-red-500 ml-1" />}
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   ) : null;
 
@@ -779,6 +862,7 @@ export default function IngredienteDetailPage() {
       <div className="space-y-6">
         {header}
         {frozenTableSection}
+        {historialFrozenSection}
         {consumoSection}
         {movimientosSection}
         {detailSections}

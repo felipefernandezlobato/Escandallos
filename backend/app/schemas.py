@@ -102,6 +102,30 @@ class MovimientoOut(BaseModel):
     cantidad_actual: Optional[float] = None
 
 
+class HistorialFrozenEvento(BaseModel):
+    tipo: str
+    detalle: Optional[str] = None
+    cantidad: Optional[float] = None
+
+
+class HistorialFrozenValor(BaseModel):
+    cantidad: Optional[float] = None
+    eventos: list[HistorialFrozenEvento] = []
+
+
+class HistorialFrozenSabor(BaseModel):
+    ingrediente_id: int
+    nombre: str
+    unidad: Optional[str] = None
+    valores: dict[str, HistorialFrozenValor]
+
+
+class HistorialFrozenOut(BaseModel):
+    ubicacion: str
+    fechas: list[str]
+    sabores: list[HistorialFrozenSabor]
+
+
 # --- Lineas de Receta ---
 
 class LineaRecetaBase(BaseModel):

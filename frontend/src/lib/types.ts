@@ -93,6 +93,30 @@ export interface Movimiento {
   cantidad_actual: number | null;
 }
 
+export interface HistorialFrozenEvento {
+  tipo: "pedido" | "merma";
+  detalle: string | null;
+  cantidad: number | null;
+}
+
+export interface HistorialFrozenValor {
+  cantidad: number | null;
+  eventos: HistorialFrozenEvento[];
+}
+
+export interface HistorialFrozenSabor {
+  ingrediente_id: number;
+  nombre: string;
+  unidad: string | null;
+  valores: Record<string, HistorialFrozenValor>;
+}
+
+export interface HistorialFrozen {
+  ubicacion: string;
+  fechas: string[];
+  sabores: HistorialFrozenSabor[];
+}
+
 export interface Alerta {
   tipo: string;
   mensaje: string;

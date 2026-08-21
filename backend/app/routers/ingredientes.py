@@ -9,6 +9,7 @@ from app.auth import get_current_user
 from app.database import get_db
 from app.models import Categoria, HistorialPrecio, Ingrediente, LineaReceta, PrecioProveedor, Proveedor, Receta
 from app.schemas import (
+    HistorialFrozenOut,
     HistorialPrecioOut,
     IngredienteCreate,
     IngredienteOut,
@@ -16,7 +17,7 @@ from app.schemas import (
     MovimientoOut,
     RecetaOut,
 )
-from app.services.consumo import movimientos_ingrediente
+from app.services.consumo import historial_frozen_por_ubicacion, movimientos_ingrediente
 from app.services.costes import (
     coste_por_racion,
     coste_por_unidad_uso,
@@ -219,6 +220,19 @@ def movimientos(ingrediente_id: int, db: Session = Depends(get_db), user=Depends
     if not ing:
         raise HTTPException(404, "Ingrediente no encontrado")
     return movimientos_ingrediente(ingrediente_id, db)
+
+
+@router.get("/{ingrediente_id}/historial-frozen", response_model=HistorialFrozenOut)
+def historial_frozen(
+    ingrediente_id: int,
+    ubicacion: str = Query(..., pattern="^(BRU1|BRU2)$"),
+    db: Session = Depends(get_db),
+    user=Depends(get_current_user),
+):
+    ing = db.get(Ingrediente, ingrediente_id)
+    if not ing:
+        raise HTTPException(404, "Ingrediente no encontrado")
+    return historial_frozen_por_ubicacion(ubicacion, db)
 
 
 @router.delete("/{ingrediente_id}/historial/{historial_id}")

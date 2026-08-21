@@ -707,6 +707,150 @@ class TestMovimientos:
         assert resp.status_code == 404
 
 
+class TestHistorialFrozen:
+    @pytest.fixture
+    def tubos(self, test_db):
+        cafe_cat = Categoria(id=5, nombre="Café", tipo="ingrediente")
+        test_db.add(cafe_cat)
+        test_db.flush()
+
+        karamo = Ingrediente(
+            nombre="Frozen Karamo", categoria_id=5,
+            unidad_compra="unidad", cantidad_compra=1, precio_compra=3.0,
+            unidad_uso="unidad", merma_porcentaje=0.0,
+            suplemento_frozen=1.5, coste_kg_frozen=20.0,
+        )
+        perla = Ingrediente(
+            nombre="Frozen Perla", categoria_id=5,
+            unidad_compra="unidad", cantidad_compra=1, precio_compra=3.0,
+            unidad_uso="unidad", merma_porcentaje=0.0,
+            suplemento_frozen=1.5, coste_kg_frozen=20.0,
+        )
+        test_db.add_all([karamo, perla])
+        test_db.flush()
+        return {"karamo": karamo, "perla": perla}
+
+    def test_sin_tubos_frozen(self, client, seed):
+        resp = client.get("/api/ingredientes/1/historial-frozen?ubicacion=BRU1")
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["ubicacion"] == "BRU1"
+        assert data["fechas"] == []
+        assert data["sabores"] == []
+
+    def test_ubicacion_invalida(self, client, tubos):
+        resp = client.get(f"/api/ingredientes/{tubos['karamo'].id}/historial-frozen?ubicacion=BRU3")
+        assert resp.status_code == 422
+
+    def test_ingrediente_no_existe(self, client, tubos):
+        resp = client.get("/api/ingredientes/999999/historial-frozen?ubicacion=BRU1")
+        assert resp.status_code == 404
+
+    def test_conteos_por_ubicacion_y_carry_forward(self, client, test_db, tubos):
+        test_db.add_all([
+            InventarioRegistro(
+                ingrediente_id=tubos["karamo"].id, cantidad=12, unidad="unidad",
+                fecha_registro=date(2026, 8, 1), ubicacion="BRU1",
+            ),
+            InventarioRegistro(
+                ingrediente_id=tubos["karamo"].id, cantidad=9, unidad="unidad",
+                fecha_registro=date(2026, 8, 5), ubicacion="BRU1",
+            ),
+            # Perla only counted at BRU2 — must not leak into BRU1's response.
+            InventarioRegistro(
+                ingrediente_id=tubos["perla"].id, cantidad=4, unidad="unidad",
+                fecha_registro=date(2026, 8, 3), ubicacion="BRU2",
+            ),
+        ])
+        test_db.flush()
+
+        bru1 = client.get(f"/api/ingredientes/{tubos['karamo'].id}/historial-frozen?ubicacion=BRU1").json()
+        assert bru1["fechas"] == ["2026-08-01", "2026-08-05"]
+        sabores = {s["nombre"]: s for s in bru1["sabores"]}
+        assert set(sabores) == {"Frozen Karamo"}  # Perla has no BRU1 data — excluded
+        assert sabores["Frozen Karamo"]["valores"]["2026-08-01"]["cantidad"] == 12
+        assert sabores["Frozen Karamo"]["valores"]["2026-08-05"]["cantidad"] == 9
+
+        bru2 = client.get(f"/api/ingredientes/{tubos['perla'].id}/historial-frozen?ubicacion=BRU2").json()
+        assert bru2["fechas"] == ["2026-08-03"]
+        assert {s["nombre"] for s in bru2["sabores"]} == {"Frozen Perla"}
+        assert bru2["sabores"][0]["valores"]["2026-08-03"]["cantidad"] == 4
+
+    def test_carry_forward_en_dia_de_otro_sabor(self, client, test_db, tubos):
+        """A date column introduced by one flavor's count must carry forward
+        the other flavor's last known quantity, not show it as missing."""
+        test_db.add_all([
+            InventarioRegistro(
+                ingrediente_id=tubos["karamo"].id, cantidad=12, unidad="unidad",
+                fecha_registro=date(2026, 8, 1), ubicacion="BRU1",
+            ),
+            InventarioRegistro(
+                ingrediente_id=tubos["perla"].id, cantidad=6, unidad="unidad",
+                fecha_registro=date(2026, 8, 3), ubicacion="BRU1",
+            ),
+        ])
+        test_db.flush()
+
+        data = client.get(f"/api/ingredientes/{tubos['karamo'].id}/historial-frozen?ubicacion=BRU1").json()
+        assert data["fechas"] == ["2026-08-01", "2026-08-03"]
+        sabores = {s["nombre"]: s for s in data["sabores"]}
+        # Karamo wasn't recounted on 08-03, but its last known value carries forward.
+        assert sabores["Frozen Karamo"]["valores"]["2026-08-03"]["cantidad"] == 12
+        # Perla had no count before 08-01 — no data yet for that date.
+        assert sabores["Frozen Perla"]["valores"]["2026-08-01"]["cantidad"] is None
+
+    def test_pedido_marker(self, client, test_db, tubos):
+        test_db.add(InventarioRegistro(
+            ingrediente_id=tubos["karamo"].id, cantidad=5, unidad="unidad",
+            fecha_registro=date(2026, 8, 1), ubicacion="BRU1",
+        ))
+        test_db.flush()
+
+        create = client.post("/api/pedidos", json={
+            "proveedor": "Dabov",
+            "lineas": [
+                {"ingrediente_id": tubos["karamo"].id, "cantidad_pedida": 10, "unidad": "unidad"},
+            ],
+        })
+        pid = create.json()["id"]
+        lid = create.json()["lineas"][0]["id"]
+        client.post(f"/api/pedidos/{pid}/enviar")
+        recibir = client.post(f"/api/pedidos/{pid}/recibir", json={
+            "lineas": [{"linea_id": lid, "cantidad_recibida": 10}],
+        })
+        assert recibir.status_code == 200
+
+        data = client.get(f"/api/ingredientes/{tubos['karamo'].id}/historial-frozen?ubicacion=BRU1").json()
+        today = data["fechas"][-1]
+        karamo = data["sabores"][0]
+        assert karamo["valores"][today]["cantidad"] == 15  # 5 base + 10 recibidos
+        tipos = {e["tipo"] for e in karamo["valores"][today]["eventos"]}
+        assert "pedido" in tipos
+
+    def test_merma_marker_no_afecta_conteo(self, client, test_db, tubos):
+        test_db.add(InventarioRegistro(
+            ingrediente_id=tubos["karamo"].id, cantidad=8, unidad="unidad",
+            fecha_registro=date(2026, 8, 1), ubicacion="BRU1",
+        ))
+        test_db.flush()
+
+        merma = client.post("/api/mermas", json={
+            "ingrediente_id": tubos["karamo"].id, "cantidad": 2, "unidad": "unidad",
+            "motivo": "roto", "ubicacion": "BRU1", "fecha": "2026-08-04",
+        })
+        assert merma.status_code in (200, 201)
+
+        data = client.get(f"/api/ingredientes/{tubos['karamo'].id}/historial-frozen?ubicacion=BRU1").json()
+        assert "2026-08-04" in data["fechas"]
+        karamo = data["sabores"][0]
+        # No recount on 08-04 — quantity carries forward from the last count (8).
+        assert karamo["valores"]["2026-08-04"]["cantidad"] == 8
+        eventos = karamo["valores"]["2026-08-04"]["eventos"]
+        assert len(eventos) == 1
+        assert eventos[0]["tipo"] == "merma"
+        assert eventos[0]["cantidad"] == -2
+
+
 class TestInventarioActualizar:
     def test_actualizar_cantidad(self, client, seed):
         client.post("/api/inventario", json={
