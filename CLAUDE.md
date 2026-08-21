@@ -147,13 +147,22 @@ Render start command is `bash start.sh` (set in dashboard, NOT render.yaml). It 
 - **Multi-supplier:** DABOV and BD (Brewing Dealers). Naming: "size SUPPLIER name" (e.g., "1kg DABOV Brazil By Dabov", "200g BD Lord")
 - **Formats:** 1kg beans, 200g retail, 100g/130g competition, frozen tubes, capsules
 - **Multi-location:** `ubicacion` field on inventario_registros (BRU1/BRU2)
-- **Frozen tubes:** separate parents per location, `consumo_override_semanal` from Lightspeed POS, `par_level_override` (10/200g flavor, 6/130g flavor)
-- **Frozen tube pricing:** `coste_kg_frozen` (CHF/kg), `suplemento_frozen` (+X CHF), `frozen_origen_id` (FK to source bag)
+- **Frozen tubes:** separate parents per location — 289 = "Tubos Frozen Bru1", 290 = "Tubos Frozen Bru2". Each flavor has **two separate child ingredients**, one per parent (e.g. "Frozen Ethiopia Karamo Bru1" vs "...Bru2"), NOT one child distinguished by `ubicacion`. `consumo_override_semanal` from Lightspeed POS, `par_level_override` (10/200g flavor, 6/130g flavor)
+- **Frozen tube `ubicacion` is unreliable, don't use it for location:** `recibir_pedido()` inherits `ubicacion` from the ingredient's last record, so once one manual count omits it, every later auto-inserted "Pedido recibido" row keeps propagating a null value forever (this silently hid a real delivery from the Historial de Conteos table on 2026-08-20). Since each flavor already has a separate ingredient per location, always resolve frozen-tube location via `grupo_ingrediente_id` (289 vs 290) — never via the `ubicacion` column.
+- **Frozen tube pricing:** `coste_kg_frozen` (CHF/kg), `suplemento_frozen` (+X CHF), `frozen_origen_id` (FK to source bag). This can be unset for a flavor that's still actively counted (e.g. Nicaragua El Suspiro historically) — don't use it to identify "is this a frozen tube," use `grupo_ingrediente_id` instead.
 - **Dynamic frozen menu:** `/api/menu/frozen` returns visible tubes based on tube stock + bag stock + pending orders. No hardcoded data.
 - **Café analysis table:** always visible in Cafe tab, single `/api/inventario/cafe-resumen` endpoint
 - **Gestionar Cafés:** modal to activate/deactivate coffees
 - Display order everywhere: MARRÓN → ROJO → BLACK → GOLD
 - 100g/130g bags → always GOLD parent regardless of color classification
+
+### Historial de Conteos (ingredientes/289, /290)
+
+- Daily pivot table on the Tubos Frozen Bru1/Bru2 ingredient detail pages: flavor rows × every day with a count/order/waste event (not weekly-sampled like `/inventario`'s historial tab), with a BRU1/BRU2 toggle
+- Backend: `historial_frozen_por_ubicacion()` in `backend/app/services/consumo.py`, endpoint `GET /api/ingredientes/{id}/historial-frozen?ubicacion=BRU1|BRU2`
+- A flavor not part of the location's most recent synchronized counting session shows **0** for that date, not a stale carried-forward value — same rule `stock_actual()`/`stock_historial_serie()` already apply for café (see Inventory Stock Rules above), just kept per-flavor instead of summed. A delivery is exempt and always shows its own bumped total even if the flavor wasn't manually recounted that day
+- Only `activo=True` flavors shown, matching "Stock Frozen Tubes"/`/api/menu/frozen` (active-only) directly above it on the same page
+- A flavor with zero records at a given location correctly doesn't appear in that location's table at all (e.g. a newly-added BD flavor only counted at BRU2 so far won't show in the BRU1 tab)
 
 ## Oat Milk Variant
 
