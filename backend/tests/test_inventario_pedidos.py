@@ -799,6 +799,25 @@ class TestHistorialFrozen:
         assert {s["nombre"] for s in data["sabores"]} == {"Frozen Perla Bru2"}
         assert data["sabores"][0]["valores"]["2026-08-20"]["cantidad"] == 10
 
+    def test_excluye_sabores_inactivos(self, client, test_db, tubos):
+        """A discontinued flavor (activo=False) keeps its historical
+        InventarioRegistro rows, but must not show up here — matches the
+        active-only "Stock Frozen Tubes" table (backed by /api/menu/frozen)
+        right above it on the same page."""
+        tubos["karamo_bru1"].activo = False
+        test_db.add(InventarioRegistro(
+            ingrediente_id=tubos["karamo_bru1"].id, cantidad=12, unidad="unidad",
+            fecha_registro=date(2026, 8, 1),
+        ))
+        test_db.add(InventarioRegistro(
+            ingrediente_id=tubos["perla_bru1"].id, cantidad=6, unidad="unidad",
+            fecha_registro=date(2026, 8, 1),
+        ))
+        test_db.flush()
+
+        data = client.get(f"/api/ingredientes/{tubos['perla_bru1'].id}/historial-frozen?ubicacion=BRU1").json()
+        assert {s["nombre"] for s in data["sabores"]} == {"Frozen Perla Bru1"}
+
     def test_ubicacion_columna_ignorada_solo_importa_el_parent(self, client, test_db, tubos):
         """Regression for the 2026-08-20 bug: a record's `ubicacion` column
         must NOT gate visibility — only which parent (289/290) the flavor

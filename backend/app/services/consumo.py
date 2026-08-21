@@ -612,6 +612,13 @@ def historial_frozen_por_ubicacion(ubicacion: str, db: Session) -> dict:
     Nicaragua El Suspiro missing frozen pricing columns" gap; filtering on it
     silently dropped any such flavor's counts from this table).
 
+    Only `activo=True` flavors are included, matching the "Stock Frozen
+    Tubes" comparison table above it on the same page (backed by
+    /api/menu/frozen, also active-only) — a discontinued flavor keeps its
+    historical InventarioRegistro rows for cost/records purposes, but
+    shouldn't keep showing up in a table meant to reflect what's currently
+    being counted.
+
     Each date column is every day with a movement (count, order, or waste)
     for ANY flavor at this location — not weekly-sampled like the /inventario
     historial tab. A flavor that wasn't part of the location's most recent
@@ -631,7 +638,7 @@ def historial_frozen_por_ubicacion(ubicacion: str, db: Session) -> dict:
 
     tubos = (
         db.query(Ingrediente)
-        .filter(Ingrediente.id.in_(tubo_ids_set))
+        .filter(Ingrediente.id.in_(tubo_ids_set), Ingrediente.activo.is_(True))
         .order_by(Ingrediente.nombre)
         .all()
     )
