@@ -714,21 +714,33 @@ class TestHistorialFrozen:
         test_db.add(cafe_cat)
         test_db.flush()
 
+        parent = Ingrediente(
+            id=289, nombre="Tubos Frozen Bru1", categoria_id=5,
+            unidad_compra="unidad", cantidad_compra=1, precio_compra=0,
+            unidad_uso="unidad", merma_porcentaje=0.0,
+        )
+        test_db.add(parent)
+        test_db.flush()
+
         karamo = Ingrediente(
             nombre="Frozen Karamo", categoria_id=5,
             unidad_compra="unidad", cantidad_compra=1, precio_compra=3.0,
             unidad_uso="unidad", merma_porcentaje=0.0,
-            suplemento_frozen=1.5, coste_kg_frozen=20.0,
+            grupo_ingrediente_id=289, suplemento_frozen=1.5, coste_kg_frozen=20.0,
         )
+        # No suplemento_frozen/coste_kg_frozen set — mirrors the real
+        # "Frozen Nicaragua El Suspiro missing frozen pricing columns" gap.
+        # A flavor still counted in inventory must show up here regardless
+        # of whether its retail pricing has been configured.
         perla = Ingrediente(
             nombre="Frozen Perla", categoria_id=5,
             unidad_compra="unidad", cantidad_compra=1, precio_compra=3.0,
             unidad_uso="unidad", merma_porcentaje=0.0,
-            suplemento_frozen=1.5, coste_kg_frozen=20.0,
+            grupo_ingrediente_id=289,
         )
         test_db.add_all([karamo, perla])
         test_db.flush()
-        return {"karamo": karamo, "perla": perla}
+        return {"parent": parent, "karamo": karamo, "perla": perla}
 
     def test_sin_tubos_frozen(self, client, seed):
         resp = client.get("/api/ingredientes/1/historial-frozen?ubicacion=BRU1")
@@ -745,6 +757,21 @@ class TestHistorialFrozen:
     def test_ingrediente_no_existe(self, client, tubos):
         resp = client.get("/api/ingredientes/999999/historial-frozen?ubicacion=BRU1")
         assert resp.status_code == 404
+
+    def test_incluye_sabor_sin_precio_frozen_configurado(self, client, test_db, tubos):
+        """Regression: a flavor missing suplemento_frozen/coste_kg_frozen
+        (pricing not set up yet) must still show its counts — resolution is
+        via grupo_ingrediente_id, not the pricing fields."""
+        test_db.add(InventarioRegistro(
+            ingrediente_id=tubos["perla"].id, cantidad=10, unidad="unidad",
+            fecha_registro=date(2026, 8, 20), ubicacion="BRU2",
+        ))
+        test_db.flush()
+
+        data = client.get(f"/api/ingredientes/{tubos['perla'].id}/historial-frozen?ubicacion=BRU2").json()
+        assert data["fechas"] == ["2026-08-20"]
+        assert {s["nombre"] for s in data["sabores"]} == {"Frozen Perla"}
+        assert data["sabores"][0]["valores"]["2026-08-20"]["cantidad"] == 10
 
     def test_conteos_por_ubicacion_y_carry_forward(self, client, test_db, tubos):
         test_db.add_all([

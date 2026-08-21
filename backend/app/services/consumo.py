@@ -582,14 +582,22 @@ def movimientos_ingrediente(ingrediente_id: int, db: Session) -> list[dict]:
     return eventos
 
 
+FROZEN_TUBE_PARENT_IDS = (289, 290)  # Tubos Frozen Bru1 / Bru2
+
+
 def historial_frozen_por_ubicacion(ubicacion: str, db: Session) -> dict:
     """Daily pivot of frozen-tube flavor stock at a single location (BRU1 or
     BRU2), for the "Historial de Conteos" table on ingredientes/289 and /290.
 
-    Flavors are identified via `suplemento_frozen` (same convention as
-    /api/menu/frozen) rather than via grupo_ingrediente_id — all frozen
+    Flavors are identified via grupo_ingrediente_id (same structural relation
+    movimientos_ingrediente uses for the "Movimientos" table on the same
+    page) — NOT via `suplemento_frozen` (a pricing field that can be unset
+    for a flavor that's still actively counted, e.g. the documented "Frozen
+    Nicaragua El Suspiro missing frozen pricing columns" gap; filtering on it
+    silently dropped any such flavor's counts from this table). All frozen
     flavors currently live as children of a single parent (see
-    create_coffee_ingredients.py); BRU1 vs BRU2 is determined purely by each
+    create_coffee_ingredients.py) — 289 and 290 are unioned here in case that
+    ever changes. BRU1 vs BRU2 is determined purely by each
     InventarioRegistro's `ubicacion`, not by which of the two parent pages
     you're viewing. That's why this ignores the ingrediente_id in its caller
     and returns the same location-scoped feed regardless of whether it was
@@ -601,15 +609,18 @@ def historial_frozen_por_ubicacion(ubicacion: str, db: Session) -> dict:
     that date (last known count, carried forward), plus any pedido/merma
     events that landed on that exact date for tooltip display.
     """
+    tubo_ids_set: set[int] = set()
+    for pid in FROZEN_TUBE_PARENT_IDS:
+        tubo_ids_set.update(_child_ids(pid, db))
+    if not tubo_ids_set:
+        return {"ubicacion": ubicacion, "fechas": [], "sabores": []}
+
     tubos = (
         db.query(Ingrediente)
-        .filter(Ingrediente.suplemento_frozen.isnot(None))
+        .filter(Ingrediente.id.in_(tubo_ids_set))
         .order_by(Ingrediente.nombre)
         .all()
     )
-    if not tubos:
-        return {"ubicacion": ubicacion, "fechas": [], "sabores": []}
-
     tubo_ids = [t.id for t in tubos]
     nombres = {t.id: t.nombre for t in tubos}
 
