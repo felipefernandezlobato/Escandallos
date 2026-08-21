@@ -459,78 +459,60 @@ export default function IngredienteDetailPage() {
           </table>
         )}
       </div>
-
-      {isFrozenTube && (
-        <div className="bg-white border border-[#E8DFD3] rounded-lg overflow-hidden">
-          <h2 className="text-lg font-semibold px-4 pt-4 pb-2">Movimientos</h2>
-          {movimientos.length === 0 ? (
-            <p className="text-sm text-[#6B5E52]/70 px-4 pb-4">Sin movimientos registrados</p>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="bg-[#F5F0E8] text-left text-[#6B5E52] border-b border-[#E8DFD3]">
-                    <th className="px-4 py-2 font-medium">Fecha</th>
-                    {isFrozenParent && <th className="px-4 py-2 font-medium">Sabor</th>}
-                    <th className="px-4 py-2 font-medium">Tipo</th>
-                    <th className="px-4 py-2 font-medium">Detalle</th>
-                    <th className="px-4 py-2 font-medium text-right">Cambio</th>
-                    <th className="px-4 py-2 font-medium text-right">Stock</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {movimientos.map((m, i) => (
-                    <tr key={i} className="border-b border-[#E8DFD3]/50">
-                      <td className="px-4 py-2">{formatFecha(m.fecha)}</td>
-                      {isFrozenParent && <td className="px-4 py-2">{m.sabor ?? "—"}</td>}
-                      <td className="px-4 py-2 capitalize">{m.tipo}</td>
-                      <td className="px-4 py-2 text-[#6B5E52]">{m.detalle ?? "—"}</td>
-                      <td
-                        className={
-                          "px-4 py-2 text-right font-mono " +
-                          (m.cantidad > 0
-                            ? "text-green-600"
-                            : m.cantidad < 0
-                              ? "text-red-600"
-                              : "text-[#6B5E52]")
-                        }
-                      >
-                        {m.cantidad > 0 ? "+" : ""}
-                        {m.cantidad} {m.unidad}
-                      </td>
-                      <td className="px-4 py-2 text-right font-mono text-[#6B5E52]">
-                        {m.cantidad_actual != null ? `${m.cantidad_actual} ${m.unidad}` : "—"}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-      )}
     </>
   );
 
-  return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <button onClick={() => router.back()} className="text-sm text-[#8B1A2B] hover:underline">
-            &larr; Volver
-          </button>
-          <h1 className="text-2xl font-bold mt-1">{ingrediente.nombre}</h1>
+  const movimientosSection = (
+    <div className="bg-white border border-[#E8DFD3] rounded-lg overflow-hidden">
+      <h2 className="text-lg font-semibold px-4 pt-4 pb-2">Movimientos</h2>
+      {movimientos.length === 0 ? (
+        <p className="text-sm text-[#6B5E52]/70 px-4 pb-4">Sin movimientos registrados</p>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="bg-[#F5F0E8] text-left text-[#6B5E52] border-b border-[#E8DFD3]">
+                <th className="px-4 py-2 font-medium">Fecha</th>
+                {isFrozenParent && <th className="px-4 py-2 font-medium">Sabor</th>}
+                <th className="px-4 py-2 font-medium">Tipo</th>
+                <th className="px-4 py-2 font-medium">Detalle</th>
+                <th className="px-4 py-2 font-medium text-right">Cambio</th>
+                <th className="px-4 py-2 font-medium text-right">Stock</th>
+              </tr>
+            </thead>
+            <tbody>
+              {movimientos.map((m, i) => (
+                <tr key={i} className="border-b border-[#E8DFD3]/50">
+                  <td className="px-4 py-2">{formatFecha(m.fecha)}</td>
+                  {isFrozenParent && <td className="px-4 py-2">{m.sabor ?? "—"}</td>}
+                  <td className="px-4 py-2 capitalize">{m.tipo}</td>
+                  <td className="px-4 py-2 text-[#6B5E52]">{m.detalle ?? "—"}</td>
+                  <td
+                    className={
+                      "px-4 py-2 text-right font-mono " +
+                      (m.cantidad > 0
+                        ? "text-green-600"
+                        : m.cantidad < 0
+                          ? "text-red-600"
+                          : "text-[#6B5E52]")
+                    }
+                  >
+                    {m.cantidad > 0 ? "+" : ""}
+                    {m.cantidad} {m.unidad}
+                  </td>
+                  <td className="px-4 py-2 text-right font-mono text-[#6B5E52]">
+                    {m.cantidad_actual != null ? `${m.cantidad_actual} ${m.unidad}` : "—"}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-      </div>
+      )}
+    </div>
+  );
 
-      {/* Frozen: table + chart first. Normal: details sections first */}
-      {isFrozenParent && frozenTableSection}
-
-      {!isFrozenParent && detailSections}
-
-      {/* Consumo y Stock */}
-      {consumo && (consumo.historial.length > 0 || (consumo.stock_historial && consumo.stock_historial.length > 0)) && (() => {
+  const consumoSection = consumo && (consumo.historial.length > 0 || (consumo.stock_historial && consumo.stock_historial.length > 0)) && (() => {
         const threeMonthsAgo = new Date();
         threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
         const cutoffDate = threeMonthsAgo.toISOString().slice(0, 10);
@@ -732,53 +714,84 @@ export default function IngredienteDetailPage() {
           })()}
         </div>
         );
-      })()}
+      })();
 
-      {/* Recetas que lo usan */}
-      <div className="bg-white border border-[#E8DFD3] rounded-lg overflow-hidden">
-        <h2 className="text-lg font-semibold px-4 pt-4 pb-2">Recetas que lo usan</h2>
-        {recetas.length === 0 ? (
-          <p className="text-sm text-[#6B5E52]/70 px-4 pb-4">
-            Este ingrediente no se usa en ninguna receta
-          </p>
-        ) : (
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-[#F5F0E8] text-left text-[#6B5E52] border-b border-[#E8DFD3]">
-                <th className="px-4 py-2 font-medium">Receta</th>
-                <th className="px-4 py-2 font-medium">Categoria</th>
-                <th className="px-4 py-2 font-medium text-right">x</th>
+  const recetasSection = (
+    <div className="bg-white border border-[#E8DFD3] rounded-lg overflow-hidden">
+      <h2 className="text-lg font-semibold px-4 pt-4 pb-2">Recetas que lo usan</h2>
+      {recetas.length === 0 ? (
+        <p className="text-sm text-[#6B5E52]/70 px-4 pb-4">
+          Este ingrediente no se usa en ninguna receta
+        </p>
+      ) : (
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="bg-[#F5F0E8] text-left text-[#6B5E52] border-b border-[#E8DFD3]">
+              <th className="px-4 py-2 font-medium">Receta</th>
+              <th className="px-4 py-2 font-medium">Categoria</th>
+              <th className="px-4 py-2 font-medium text-right">x</th>
+            </tr>
+          </thead>
+          <tbody>
+            {recetas.map((r) => {
+              const multi = r.precio_venta && r.coste_por_porcion > 0 ? r.precio_venta / r.coste_por_porcion : null;
+              return (
+              <tr key={r.id} className="border-b border-[#E8DFD3]/50">
+                <td className="px-4 py-2">
+                  <Link href={`/recetas/${r.id}`} className="text-[#8B1A2B] hover:underline">
+                    {r.nombre}
+                  </Link>
+                </td>
+                <td className="px-4 py-2 text-[#6B5E52]">{r.categoria_nombre}</td>
+                <td className={`px-4 py-2 text-right font-mono ${
+                  multi === null ? "text-[#6B5E52]/50" :
+                  multi >= 8 ? "text-green-600 font-medium" :
+                  multi >= 5 ? "text-orange-500" :
+                  "text-red-600 font-medium"
+                }`}>
+                  {multi !== null ? `x${multi.toFixed(1)}` : "—"}
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {recetas.map((r) => {
-                const multi = r.precio_venta && r.coste_por_porcion > 0 ? r.precio_venta / r.coste_por_porcion : null;
-                return (
-                <tr key={r.id} className="border-b border-[#E8DFD3]/50">
-                  <td className="px-4 py-2">
-                    <Link href={`/recetas/${r.id}`} className="text-[#8B1A2B] hover:underline">
-                      {r.nombre}
-                    </Link>
-                  </td>
-                  <td className="px-4 py-2 text-[#6B5E52]">{r.categoria_nombre}</td>
-                  <td className={`px-4 py-2 text-right font-mono ${
-                    multi === null ? "text-[#6B5E52]/50" :
-                    multi >= 8 ? "text-green-600 font-medium" :
-                    multi >= 5 ? "text-orange-500" :
-                    "text-red-600 font-medium"
-                  }`}>
-                    {multi !== null ? `x${multi.toFixed(1)}` : "—"}
-                  </td>
-                </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        )}
-      </div>
+              );
+            })}
+          </tbody>
+        </table>
+      )}
+    </div>
+  );
 
-      {/* Frozen parents: detail sections at the bottom */}
-      {isFrozenParent && detailSections}
+  const header = (
+    <div className="flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <button onClick={() => router.back()} className="text-sm text-[#8B1A2B] hover:underline">
+          &larr; Volver
+        </button>
+        <h1 className="text-2xl font-bold mt-1">{ingrediente.nombre}</h1>
+      </div>
+    </div>
+  );
+
+  if (isFrozenTube) {
+    // Frozen tubes: consumo/stock chart and movimientos come first — that's
+    // what changes day to day — everything else (prices, recetas) below.
+    return (
+      <div className="space-y-6">
+        {header}
+        {consumoSection}
+        {movimientosSection}
+        {frozenTableSection}
+        {detailSections}
+        {recetasSection}
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {header}
+      {detailSections}
+      {consumoSection}
+      {recetasSection}
     </div>
   );
 }
