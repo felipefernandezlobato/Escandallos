@@ -13,8 +13,10 @@ from app.schemas import (
     IngredienteCreate,
     IngredienteOut,
     IngredienteUpdate,
+    MovimientoOut,
     RecetaOut,
 )
+from app.services.consumo import movimientos_ingrediente
 from app.services.costes import (
     coste_por_racion,
     coste_por_unidad_uso,
@@ -209,6 +211,14 @@ def historial_precios(ingrediente_id: int, db: Session = Depends(get_db), user=D
         .order_by(HistorialPrecio.fecha_cambio.desc())
         .all()
     )
+
+
+@router.get("/{ingrediente_id}/movimientos", response_model=list[MovimientoOut])
+def movimientos(ingrediente_id: int, db: Session = Depends(get_db), user=Depends(get_current_user)):
+    ing = db.get(Ingrediente, ingrediente_id)
+    if not ing:
+        raise HTTPException(404, "Ingrediente no encontrado")
+    return movimientos_ingrediente(ingrediente_id, db)
 
 
 @router.delete("/{ingrediente_id}/historial/{historial_id}")

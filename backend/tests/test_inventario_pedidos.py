@@ -602,6 +602,108 @@ class TestPedidoRecibirCafeFrozen:
         assert stocks[frozen["perla"].id]["total"] == 3
 
 
+class TestMovimientos:
+    @pytest.fixture
+    def frozen(self, test_db):
+        cafe_cat = Categoria(id=5, nombre="Café", tipo="ingrediente")
+        test_db.add(cafe_cat)
+        test_db.flush()
+
+        parent = Ingrediente(
+            nombre="Tubos Frozen Bru1", categoria_id=5,
+            unidad_compra="unidad", cantidad_compra=1, precio_compra=0,
+            unidad_uso="unidad", merma_porcentaje=0.0,
+        )
+        test_db.add(parent)
+        test_db.flush()
+
+        karamo = Ingrediente(
+            nombre="Frozen Karamo Bru1", categoria_id=5,
+            unidad_compra="unidad", cantidad_compra=1, precio_compra=3.0,
+            unidad_uso="unidad", merma_porcentaje=0.0,
+            grupo_ingrediente_id=parent.id,
+        )
+        perla = Ingrediente(
+            nombre="Frozen Perla Bru1", categoria_id=5,
+            unidad_compra="unidad", cantidad_compra=1, precio_compra=3.0,
+            unidad_uso="unidad", merma_porcentaje=0.0,
+            grupo_ingrediente_id=parent.id,
+        )
+        test_db.add_all([karamo, perla])
+        test_db.flush()
+        return {"parent": parent, "karamo": karamo, "perla": perla}
+
+    def test_movimientos_leaf_incluye_conteo_pedido_y_merma(self, client, test_db, frozen):
+        # Conteo inicial.
+        test_db.add(InventarioRegistro(
+            ingrediente_id=frozen["karamo"].id, cantidad=5, unidad="unidad",
+            fecha_registro=date(2026, 1, 1), ubicacion="BRU1",
+        ))
+        test_db.flush()
+
+        # Pedido recibido.
+        create = client.post("/api/pedidos", json={
+            "proveedor": "Dabov",
+            "lineas": [
+                {"ingrediente_id": frozen["karamo"].id, "cantidad_pedida": 10, "unidad": "unidad"},
+            ],
+        })
+        pid = create.json()["id"]
+        lid = create.json()["lineas"][0]["id"]
+        client.post(f"/api/pedidos/{pid}/enviar")
+        client.post(f"/api/pedidos/{pid}/recibir", json={
+            "lineas": [{"linea_id": lid, "cantidad_recibida": 10}],
+        })
+
+        # Merma.
+        client.post("/api/mermas", json={
+            "ingrediente_id": frozen["karamo"].id, "cantidad": 2, "unidad": "unidad",
+            "motivo": "roto",
+        })
+
+        # Segundo conteo manual, muy posterior al pedido (que usa la fecha de
+        # hoy) — no debe incluir el bump del pedido en su delta.
+        test_db.add(InventarioRegistro(
+            ingrediente_id=frozen["karamo"].id, cantidad=20, unidad="unidad",
+            fecha_registro=date(2030, 1, 1), ubicacion="BRU1",
+        ))
+        test_db.flush()
+
+        movimientos = client.get(f"/api/ingredientes/{frozen['karamo'].id}/movimientos").json()
+        tipos = {m["tipo"]: m for m in movimientos}
+
+        assert tipos["pedido"]["cantidad"] == 10
+        assert tipos["merma"]["cantidad"] == -2
+        # Conteo del 2026-01-01: delta = 5 - 0 = 5 (primer conteo).
+        # Conteo del 2030-01-01: delta = 20 - 15 (base 5 + pedido 10) = 5,
+        # no 20 - 5 = 15 (eso duplicaría el pedido).
+        conteos = sorted(
+            [m for m in movimientos if m["tipo"] == "conteo"], key=lambda m: m["fecha"]
+        )
+        assert [c["cantidad"] for c in conteos] == [5, 5]
+
+    def test_movimientos_padre_incluye_sabor(self, client, test_db, frozen):
+        test_db.add_all([
+            InventarioRegistro(
+                ingrediente_id=frozen["karamo"].id, cantidad=5, unidad="unidad",
+                fecha_registro=date(2026, 1, 1), ubicacion="BRU1",
+            ),
+            InventarioRegistro(
+                ingrediente_id=frozen["perla"].id, cantidad=3, unidad="unidad",
+                fecha_registro=date(2026, 1, 1), ubicacion="BRU1",
+            ),
+        ])
+        test_db.flush()
+
+        movimientos = client.get(f"/api/ingredientes/{frozen['parent'].id}/movimientos").json()
+        sabores = {m["sabor"] for m in movimientos}
+        assert sabores == {"Frozen Karamo Bru1", "Frozen Perla Bru1"}
+
+    def test_movimientos_ingrediente_no_existe(self, client, seed):
+        resp = client.get("/api/ingredientes/999999/movimientos")
+        assert resp.status_code == 404
+
+
 class TestInventarioActualizar:
     def test_actualizar_cantidad(self, client, seed):
         client.post("/api/inventario", json={

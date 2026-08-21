@@ -83,6 +83,15 @@ export interface HistorialPrecio {
   fecha_cambio: string | null;
 }
 
+export interface Movimiento {
+  fecha: string;
+  tipo: "pedido" | "merma" | "conteo";
+  cantidad: number;
+  unidad: string;
+  detalle: string | null;
+  sabor: string | null;
+}
+
 export interface Alerta {
   tipo: string;
   mensaje: string;

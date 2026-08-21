@@ -92,6 +92,15 @@ class HistorialPrecioOut(BaseModel):
     model_config = {"from_attributes": True}
 
 
+class MovimientoOut(BaseModel):
+    fecha: str
+    tipo: str
+    cantidad: float
+    unidad: str
+    detalle: Optional[str] = None
+    sabor: Optional[str] = None
+
+
 # --- Lineas de Receta ---
 
 class LineaRecetaBase(BaseModel):

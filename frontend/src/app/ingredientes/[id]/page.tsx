@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/api";
 import { useToast } from "@/components/Toast";
-import type { Ingrediente, HistorialPrecio, Receta } from "@/lib/types";
+import type { Ingrediente, HistorialPrecio, Movimiento, Receta } from "@/lib/types";
 import Link from "next/link";
 
 interface PrecioProveedor {
@@ -61,8 +61,13 @@ export default function IngredienteDetailPage() {
   const [editValue, setEditValue] = useState("");
   const [chartRange, setChartRange] = useState<"3m" | "all">("3m");
   const [frozenTubes, setFrozenTubes] = useState<FrozenTubeCompare[]>([]);
+  const [movimientos, setMovimientos] = useState<Movimiento[]>([]);
 
   const isFrozenParent = FROZEN_PARENT_IDS.includes(Number(id));
+  const isFrozenTube =
+    isFrozenParent ||
+    (ingrediente?.grupo_ingrediente_id != null &&
+      FROZEN_PARENT_IDS.includes(ingrediente.grupo_ingrediente_id));
 
   useEffect(() => {
     setLoading(true);
@@ -88,6 +93,13 @@ export default function IngredienteDetailPage() {
       .catch(() => setNotFound(true))
       .finally(() => setLoading(false));
   }, [id]);
+
+  useEffect(() => {
+    if (!isFrozenTube) return;
+    apiFetch<Movimiento[]>(`/api/ingredientes/${id}/movimientos`)
+      .then(setMovimientos)
+      .catch(() => setMovimientos([]));
+  }, [id, isFrozenTube]);
 
   const handleDelete = async () => {
     if (!confirm("¿Eliminar este ingrediente?")) return;
@@ -447,6 +459,52 @@ export default function IngredienteDetailPage() {
           </table>
         )}
       </div>
+
+      {isFrozenTube && (
+        <div className="bg-white border border-[#E8DFD3] rounded-lg overflow-hidden">
+          <h2 className="text-lg font-semibold px-4 pt-4 pb-2">Movimientos</h2>
+          {movimientos.length === 0 ? (
+            <p className="text-sm text-[#6B5E52]/70 px-4 pb-4">Sin movimientos registrados</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-[#F5F0E8] text-left text-[#6B5E52] border-b border-[#E8DFD3]">
+                    <th className="px-4 py-2 font-medium">Fecha</th>
+                    {isFrozenParent && <th className="px-4 py-2 font-medium">Sabor</th>}
+                    <th className="px-4 py-2 font-medium">Tipo</th>
+                    <th className="px-4 py-2 font-medium">Detalle</th>
+                    <th className="px-4 py-2 font-medium text-right">Cantidad</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {movimientos.map((m, i) => (
+                    <tr key={i} className="border-b border-[#E8DFD3]/50">
+                      <td className="px-4 py-2">{formatFecha(m.fecha)}</td>
+                      {isFrozenParent && <td className="px-4 py-2">{m.sabor ?? "—"}</td>}
+                      <td className="px-4 py-2 capitalize">{m.tipo}</td>
+                      <td className="px-4 py-2 text-[#6B5E52]">{m.detalle ?? "—"}</td>
+                      <td
+                        className={
+                          "px-4 py-2 text-right font-mono " +
+                          (m.cantidad > 0
+                            ? "text-green-600"
+                            : m.cantidad < 0
+                              ? "text-red-600"
+                              : "text-[#6B5E52]")
+                        }
+                      >
+                        {m.cantidad > 0 ? "+" : ""}
+                        {m.cantidad} {m.unidad}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
     </>
   );
 

@@ -6,7 +6,7 @@ from typing import Dict, List, Optional
 from sqlalchemy import distinct, func
 from sqlalchemy.orm import Session
 
-from app.models import InventarioRegistro, LineaPedido, Pedido, Ingrediente, Proveedor
+from app.models import InventarioRegistro, LineaPedido, MermaRegistro, Pedido, Ingrediente, Proveedor
 
 
 def _base_unit(unit_str: str) -> str:
@@ -469,6 +469,104 @@ def stock_por_ubicacion(ingrediente_id: int, db: Session) -> dict:
         result[loc]["cantidad"] = round(result[loc]["cantidad"], 3)
 
     return result
+
+
+def movimientos_ingrediente(ingrediente_id: int, db: Session) -> list[dict]:
+    """Combined +/- movement feed for an ingredient (or all its children, if
+    it's a parent group like the frozen-tube "Tubos Frozen Bru1/Bru2").
+
+    Three real sources, merged and sorted by date (most recent first):
+    - "pedido": a received order line (real, positive) — cantidad_recibida.
+    - "merma": a waste record (real, negative) — cantidad.
+    - "conteo": a manual inventory count (inferred), shown as the delta vs
+      the previous manual count for that same leaf. "Pedido recibido" inserts
+      are excluded here — they're already surfaced as "pedido" events, and
+      including them would both double-count and inflate the next real
+      count's delta. Free-text notas (e.g. a hand-written "Traspaso...") are
+      passed through as `detalle` so transfers are still visible, even
+      though they aren't classified as their own event type.
+
+    Each item also includes `sabor` (the leaf's own nombre) when the target
+    has children, so a combined feed across flavors can be told apart.
+    """
+    children = _child_ids(ingrediente_id, db)
+    target_ids = children or [ingrediente_id]
+    nombres = (
+        {i.id: i.nombre for i in db.query(Ingrediente).filter(Ingrediente.id.in_(target_ids)).all()}
+        if children
+        else {}
+    )
+
+    eventos: list[dict] = []
+
+    pedidos = (
+        db.query(LineaPedido, Pedido)
+        .join(Pedido, LineaPedido.pedido_id == Pedido.id)
+        .filter(
+            LineaPedido.ingrediente_id.in_(target_ids),
+            Pedido.estado == "recibido",
+            LineaPedido.cantidad_recibida.isnot(None),
+            LineaPedido.cantidad_recibida > 0,
+        )
+        .all()
+    )
+    for linea, pedido in pedidos:
+        eventos.append({
+            "fecha": str(pedido.fecha_recepcion or pedido.fecha),
+            "tipo": "pedido",
+            "cantidad": linea.cantidad_recibida,
+            "unidad": linea.unidad,
+            "detalle": f"Pedido #{pedido.id} — {pedido.proveedor}",
+            "sabor": nombres.get(linea.ingrediente_id),
+        })
+
+    mermas = (
+        db.query(MermaRegistro)
+        .filter(MermaRegistro.ingrediente_id.in_(target_ids))
+        .all()
+    )
+    for m in mermas:
+        eventos.append({
+            "fecha": str(m.fecha),
+            "tipo": "merma",
+            "cantidad": -m.cantidad,
+            "unidad": m.unidad,
+            "detalle": m.notas or m.motivo,
+            "sabor": nombres.get(m.ingrediente_id),
+        })
+
+    conteos = (
+        db.query(InventarioRegistro)
+        .filter(InventarioRegistro.ingrediente_id.in_(target_ids))
+        .order_by(InventarioRegistro.ingrediente_id, InventarioRegistro.fecha_registro.asc(), InventarioRegistro.id.asc())
+        .all()
+    )
+    anterior: dict[int, InventarioRegistro] = {}
+    for r in conteos:
+        prev = anterior.get(r.ingrediente_id)
+        if _es_pedido_recibido(r):
+            # Already surfaced as its own "pedido" event above — still update
+            # the running baseline so the NEXT manual count's delta reflects
+            # only what changed since the delivery, not the delivery itself.
+            anterior[r.ingrediente_id] = r
+            continue
+        if prev is not None and prev.fecha_registro == r.fecha_registro:
+            # Same-day correction (not a new session) — replace, don't diff.
+            anterior[r.ingrediente_id] = r
+            continue
+        delta = r.cantidad - (prev.cantidad if prev else 0)
+        eventos.append({
+            "fecha": str(r.fecha_registro),
+            "tipo": "conteo",
+            "cantidad": round(delta, 3),
+            "unidad": r.unidad,
+            "detalle": r.notas,
+            "sabor": nombres.get(r.ingrediente_id),
+        })
+        anterior[r.ingrediente_id] = r
+
+    eventos.sort(key=lambda e: e["fecha"], reverse=True)
+    return eventos
 
 
 def tendencia_consumo(historial: list[dict]) -> str:
