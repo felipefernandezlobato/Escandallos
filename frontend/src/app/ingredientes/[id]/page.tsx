@@ -774,12 +774,13 @@ export default function IngredienteDetailPage() {
   if (isFrozenTube) {
     // Frozen tubes: consumo/stock chart and movimientos come first — that's
     // what changes day to day — everything else (prices, recetas) below.
+    // Parent pages (289/290) lead with the cross-flavor stock comparison.
     return (
       <div className="space-y-6">
         {header}
+        {frozenTableSection}
         {consumoSection}
         {movimientosSection}
-        {frozenTableSection}
         {detailSections}
         {recetasSection}
       </div>
