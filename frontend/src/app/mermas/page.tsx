@@ -233,15 +233,13 @@ function MermasContent() {
     setTimeout(() => searchInputRef.current?.focus(), 0);
   };
 
-  const addFreeText = () => {
-    const name = searchQuery.trim();
-    if (!name) return;
+  const addOtro = () => {
     const item: BatchItem = {
       key: nextKey,
       tipo: "otro",
       ingrediente_id: null,
       receta_id: null,
-      nombre: name,
+      nombre: "",
       cantidad: "1",
       unidad: "unidad",
       motivo: "caducado",
@@ -276,6 +274,10 @@ function MermasContent() {
     }
 
     for (const item of batchItems) {
+      if (item.tipo === "otro" && !item.nombre.trim()) {
+        toast(`Falta la descripcion de un item "Otro"`, "error");
+        return;
+      }
       const cantidad = parseFloat(item.cantidad.replace(",", "."));
       if (isNaN(cantidad) || cantidad <= 0) {
         toast(`"${item.nombre}": cantidad debe ser mayor a 0`, "error");
@@ -343,7 +345,8 @@ function MermasContent() {
 
   // ── Search keyboard navigation ──
 
-  const totalDropdownItems = searchResults.length + (searchQuery.trim() ? 1 : 0);
+  const showOtroOption = searchResults.length === 0 && searchQuery.trim().length > 0;
+  const totalDropdownItems = searchResults.length + (showOtroOption ? 1 : 0);
 
   const handleSearchKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "ArrowDown") {
@@ -356,12 +359,12 @@ function MermasContent() {
       e.preventDefault();
       if (highlightIndex >= 0 && highlightIndex < searchResults.length) {
         addToBatch(searchResults[highlightIndex]);
-      } else if (highlightIndex === searchResults.length && searchQuery.trim()) {
-        addFreeText();
+      } else if (highlightIndex === searchResults.length && showOtroOption) {
+        addOtro();
       } else if (searchResults.length === 1) {
         addToBatch(searchResults[0]);
-      } else if (searchResults.length === 0 && searchQuery.trim()) {
-        addFreeText();
+      } else if (showOtroOption) {
+        addOtro();
       }
     } else if (e.key === "Escape") {
       setShowDropdown(false);
@@ -586,7 +589,7 @@ function MermasContent() {
               {/* Unified search input */}
               <div className="relative">
                 <label className="block text-xs text-[#6B5E52] mb-1">
-                  Buscar ingrediente o receta
+                  Buscar ingrediente o receta (si no hay coincidencia, podras agregar como &quot;Otro&quot;)
                 </label>
                 <input
                   ref={searchInputRef}
@@ -611,11 +614,6 @@ function MermasContent() {
                     ref={dropdownRef}
                     className="absolute z-20 left-0 right-0 mt-1 bg-white border border-[#D4C4A8] rounded-lg shadow-lg max-h-60 overflow-y-auto"
                   >
-                    {searchResults.length === 0 && (
-                      <div className="px-3 py-2 text-sm text-[#6B5E52]">
-                        Sin resultados
-                      </div>
-                    )}
                     {searchResults.map((result, idx) => (
                       <button
                         key={`${result.tipo}-${result.id}`}
@@ -631,16 +629,21 @@ function MermasContent() {
                         </span>
                       </button>
                     ))}
-                    {searchQuery.trim() && (
-                      <button
-                        type="button"
-                        onClick={addFreeText}
-                        className={`w-full text-left px-3 py-2 text-sm border-t border-[#E8DFD3] hover:bg-[#F5F0E8] text-[#6B5E52] ${
-                          highlightIndex === searchResults.length ? "bg-[#F5F0E8]" : ""
-                        }`}
-                      >
-                        Agregar como otro: &quot;{searchQuery.trim()}&quot;
-                      </button>
+                    {showOtroOption && (
+                      <>
+                        <div className="px-3 py-2 text-sm text-[#6B5E52]">
+                          Sin resultados
+                        </div>
+                        <button
+                          type="button"
+                          onClick={addOtro}
+                          className={`w-full text-left px-3 py-2 text-sm border-t border-[#E8DFD3] hover:bg-[#F5F0E8] text-[#6B5E52] ${
+                            highlightIndex === searchResults.length ? "bg-[#F5F0E8]" : ""
+                          }`}
+                        >
+                          Agregar como &quot;Otro&quot;
+                        </button>
+                      </>
                     )}
                   </div>
                 )}
@@ -658,21 +661,27 @@ function MermasContent() {
                       className="border border-[#E8DFD3] rounded-lg p-3 space-y-2"
                     >
                       {/* Name + remove */}
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium text-[#3D2E22]">
-                          {item.nombre}
-                          <span className="ml-1 text-xs text-[#6B5E52]">
-                            ({item.tipo === "ingrediente"
-                              ? "Ingrediente"
-                              : item.tipo === "receta"
-                              ? "Receta"
-                              : "Otro"})
+                      <div className="flex items-center justify-between gap-2">
+                        {item.tipo === "otro" ? (
+                          <input
+                            type="text"
+                            placeholder="Descripcion (obligatorio)"
+                            value={item.nombre}
+                            onChange={(e) => updateBatchItem(item.key, "nombre", e.target.value)}
+                            className="flex-1 border border-[#D4C4A8] rounded px-2 py-1 text-sm font-medium text-[#3D2E22]"
+                          />
+                        ) : (
+                          <span className="text-sm font-medium text-[#3D2E22]">
+                            {item.nombre}
+                            <span className="ml-1 text-xs text-[#6B5E52]">
+                              ({item.tipo === "ingrediente" ? "Ingrediente" : "Receta"})
+                            </span>
                           </span>
-                        </span>
+                        )}
                         <button
                           type="button"
                           onClick={() => removeFromBatch(item.key)}
-                          className="text-red-500 hover:text-red-700 text-xs"
+                          className="text-red-500 hover:text-red-700 text-xs shrink-0"
                         >
                           Quitar
                         </button>
