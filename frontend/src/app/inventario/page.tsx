@@ -862,7 +862,7 @@ function InventarioContent() {
                             else if (n.includes("200") && n.includes("marr")) { displayNames[d.id] = "200g MARRÓN"; sortOrder[d.id] = 3; }
                             else if (n.includes("200") && n.includes("rojo")) { displayNames[d.id] = "200g ROJO"; sortOrder[d.id] = 4; }
                             else if (n.includes("200") && n.includes("black")) { displayNames[d.id] = "200g BLACK"; sortOrder[d.id] = 5; }
-                            else if (n.includes("gold") || n.includes("130")) { displayNames[d.id] = "130g GOLD"; sortOrder[d.id] = 6; }
+                            else if (n.includes("gold") || n.includes("130") || n.includes("100g")) { displayNames[d.id] = "130g GOLD"; sortOrder[d.id] = 6; }
                             else if (n.includes("cápsula") || n.includes("capsula")) { displayNames[d.id] = "Cápsulas"; sortOrder[d.id] = 7; }
                             else if (n.includes("frozen bru1") || n.includes("tubos frozen bru1")) { displayNames[d.id] = "Frozen BRU1"; sortOrder[d.id] = 8; }
                             else if (n.includes("frozen bru2") || n.includes("tubos frozen bru2")) { displayNames[d.id] = "Frozen BRU2"; sortOrder[d.id] = 9; }
@@ -918,7 +918,7 @@ function InventarioContent() {
                 const cafeSections: { title: string; keywords: string[] }[] = [
                   { title: "CAFÉS DE KILO", keywords: ["kilo", "grano"] },
                   { title: "CAFÉS DE 200G", keywords: ["200g"] },
-                  { title: "CAFÉS DE 130G / COMPETITION", keywords: ["130g", "gold"] },
+                  { title: "CAFÉS DE 130G / COMPETITION", keywords: ["130g", "100g", "gold"] },
                   { title: "CÁPSULAS", keywords: ["cápsula", "capsula"] },
                   { title: "FROZEN TUBES", keywords: ["frozen", "tubo"] },
                 ];
@@ -1622,7 +1622,7 @@ function InventarioContent() {
                       if (n.startsWith("retail ") && n.includes("200g")) return 30;
                       if (n.includes("200g") || n.includes("200 g")) return 30;
                       if (n.startsWith("retail ") && !n.includes("200g")) return 40;
-                      if (n.includes("130g") || n.includes("130 g")) return 40;
+                      if (n.includes("130g") || n.includes("130 g") || n.includes("100g") || n.includes("100 g")) return 40;
                       if (n.includes("coffee retail")) return 45;
                       if (n.includes("tubos frozen")) return 50;
                       if (n.startsWith("frozen") || n.includes("frozen")) return 60;
@@ -1683,7 +1683,7 @@ function InventarioContent() {
                       if (n.startsWith("retail ") && n.includes("200g")) return `= Total ${color || "200g"}`;
                       if (n.includes("200g") || n.includes("200 g")) return color ? `200g · ${color}` : "200g";
                       if (n.startsWith("retail ") && !n.includes("200g")) return `= Total ${color || "GOLD"}`;
-                      if (n.includes("130g") || n.includes("130 g")) return "130g · GOLD";
+                      if (n.includes("130g") || n.includes("130 g") || n.includes("100g") || n.includes("100 g")) return "100g/130g · GOLD";
                       if (n.includes("coffee retail")) return "= Total Retail";
                       if (n.includes("tubos frozen")) return "Tubos Frozen";
                       if (n.startsWith("frozen") || n.includes("frozen")) return "Frozen";
