@@ -236,7 +236,7 @@ export default function IngredienteDetailPage() {
           <table className="w-full text-sm">
             <thead>
               <tr className="bg-[#F5F0E8] text-left text-[#6B5E52] border-b border-[#E8DFD3]">
-                <th className="px-4 py-2 font-medium sticky left-0 bg-[#F5F0E8] min-w-[180px]">Sabor</th>
+                <th className="px-4 py-2 font-medium sticky left-0 bg-[#F5F0E8] min-w-[260px] whitespace-nowrap">Sabor</th>
                 {[...historialFrozen.fechas].reverse().map((f) => (
                   <th key={f} className="px-3 py-2 font-medium text-right whitespace-nowrap">
                     {formatFechaCorta(f)}
@@ -247,7 +247,7 @@ export default function IngredienteDetailPage() {
             <tbody>
               {historialFrozen.sabores.map((s) => (
                 <tr key={s.ingrediente_id} className="border-b border-[#E8DFD3]/50 hover:bg-[#F5F0E8]/50">
-                  <td className="px-4 py-2 sticky left-0 bg-white min-w-[180px]">
+                  <td className="px-4 py-2 sticky left-0 bg-white min-w-[260px] whitespace-nowrap">
                     <Link href={`/ingredientes/${s.ingrediente_id}`} className="text-[#8B1A2B] hover:underline">
                       {s.nombre}
                     </Link>
