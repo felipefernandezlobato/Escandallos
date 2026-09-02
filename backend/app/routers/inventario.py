@@ -21,6 +21,7 @@ from app.schemas import (
     StockHistorialItem,
 )
 from app.services.consumo import (
+    _day_total,
     calcular_par_y_safety,
     consumo_medio_semanal,
     consumo_semanal,
@@ -213,7 +214,7 @@ def inventario_pivot(
 ):
     registros = (
         db.query(InventarioRegistro)
-        .order_by(InventarioRegistro.fecha_registro.desc())
+        .order_by(InventarioRegistro.ingrediente_id, InventarioRegistro.fecha_registro, InventarioRegistro.id)
         .all()
     )
 
@@ -222,31 +223,40 @@ def inventario_pivot(
 
     cafe_ids = {i.id for i in db.query(Ingrediente.id).filter(Ingrediente.categoria_id == 5).all()}
 
+    # Group by (ingrediente, dia), preserving id-ascending order within each day
+    # so the day's total matches stock_actual()/_day_total() elsewhere: same
+    # ubicacion same day = correction (latest wins), different ubicacion = additive.
+    dias_por_ing: dict[int, dict] = {}
+    unidad_por_ing: dict[int, str] = {}
+    for r in registros:
+        dias_por_ing.setdefault(r.ingrediente_id, {}).setdefault(r.fecha_registro, []).append(r)
+        unidad_por_ing[r.ingrediente_id] = r.unidad
+
     fechas_set: set[str] = set()
     by_ing: dict[int, dict] = {}
-    latest_date_per_ing_week: dict[tuple[int, str], date] = {}
-    for r in registros:
-        week = to_week_key(r.fecha_registro)
-        fechas_set.add(week)
-        if r.ingrediente_id not in by_ing:
-            ing = ings.get(r.ingrediente_id)
-            by_ing[r.ingrediente_id] = {
-                "ingrediente_id": r.ingrediente_id,
-                "ingrediente_nombre": ing.nombre if ing else "",
-                "unidad": r.unidad,
-                "fechas": {},
-            }
-        key = (r.ingrediente_id, week)
-        if key not in latest_date_per_ing_week:
-            latest_date_per_ing_week[key] = r.fecha_registro
-        latest = latest_date_per_ing_week[key]
-        if r.fecha_registro == latest:
-            if r.ingrediente_id in cafe_ids:
-                by_ing[r.ingrediente_id]["fechas"][week] = round(
-                    by_ing[r.ingrediente_id]["fechas"].get(week, 0) + r.cantidad, 2
-                )
+    for ing_id, dias in dias_por_ing.items():
+        ing = ings.get(ing_id)
+        latest_day_por_week: dict[str, date] = {}
+        for dia in dias:
+            week = to_week_key(dia)
+            fechas_set.add(week)
+            if week not in latest_day_por_week or dia > latest_day_por_week[week]:
+                latest_day_por_week[week] = dia
+
+        fechas: dict[str, float] = {}
+        for week, dia in latest_day_por_week.items():
+            regs = dias[dia]
+            if ing_id in cafe_ids:
+                fechas[week] = round(_day_total(regs), 2)
             else:
-                by_ing[r.ingrediente_id]["fechas"][week] = round(r.cantidad, 2)
+                fechas[week] = round(regs[-1].cantidad, 2)
+
+        by_ing[ing_id] = {
+            "ingrediente_id": ing_id,
+            "ingrediente_nombre": ing.nombre if ing else "",
+            "unidad": unidad_por_ing[ing_id],
+            "fechas": fechas,
+        }
 
     fechas_sorted = sorted(fechas_set, reverse=True)
 
