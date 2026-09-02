@@ -639,9 +639,11 @@ def historial_frozen_por_ubicacion(ubicacion: str, db: Session) -> dict:
     tubos = (
         db.query(Ingrediente)
         .filter(Ingrediente.id.in_(tubo_ids_set), Ingrediente.activo.is_(True))
-        .order_by(Ingrediente.nombre)
         .all()
     )
+    # Same ordering as "Stock Frozen Tubes" (/api/menu/frozen): most expensive
+    # first, by coste_kg_frozen, treating missing cost as 0.
+    tubos.sort(key=lambda t: -(t.coste_kg_frozen or 0))
     tubo_ids = [t.id for t in tubos]
     nombres = {t.id: t.nombre for t in tubos}
 
