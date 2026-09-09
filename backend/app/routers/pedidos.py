@@ -419,13 +419,14 @@ def recibir_pedido(
             continue
         linea.cantidad_recibida = item.cantidad_recibida
 
+    fecha_recepcion = data.fecha_recepcion or date.today()
     p.estado = "recibido"
-    p.fecha_recepcion = date.today()
+    p.fecha_recepcion = fecha_recepcion
 
     for linea in p.lineas:
         if not linea.cantidad_recibida or linea.cantidad_recibida <= 0:
             continue
-        base = stock_base_recepcion_pedido(linea.ingrediente_id, db)
+        base = stock_base_recepcion_pedido(linea.ingrediente_id, db, as_of_fecha=fecha_recepcion)
         stock_actual = base["cantidad"] if base else 0
         nueva_cantidad = stock_actual + linea.cantidad_recibida
         unidad = (base and base.get("unidad")) or linea.unidad
@@ -437,7 +438,7 @@ def recibir_pedido(
             ingrediente_id=linea.ingrediente_id,
             cantidad=nueva_cantidad,
             unidad=unidad,
-            fecha_registro=date.today(),
+            fecha_registro=fecha_recepcion,
             notas=f"Pedido #{p.id} recibido",
             ubicacion=ubicacion,
         ))

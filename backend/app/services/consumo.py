@@ -219,7 +219,7 @@ def _day_total(records: list) -> float:
     return sum(by_loc.values())
 
 
-def _stock_actual_leaf(ingrediente_id: int, db: Session) -> Optional[dict]:
+def _stock_actual_leaf(ingrediente_id: int, db: Session, as_of_fecha: Optional[date] = None) -> Optional[dict]:
     """Get latest stock for a single (leaf) ingredient.
     Café (cat 5): sums same-day records per distinct ubicacion (BRU1 + BRU2),
     with same-ubicacion same-day duplicates treated as a correction.
@@ -230,13 +230,18 @@ def _stock_actual_leaf(ingrediente_id: int, db: Session) -> Optional[dict]:
     the raw latest date) to decide whether this leaf was part of the group's
     latest counting session — receiving an order for one flavor must not
     fake a new session that zeroes out siblings that weren't in that delivery.
+
+    `as_of_fecha`, when given, restricts every query to records on or before
+    that date — used by stock_base_recepcion_pedido() to compute the correct
+    baseline for a backdated order receipt (e.g. a delivery confirmed today
+    for a receipt date last week must not double-count records added since).
+    Live stock display (stock_actual()) never passes this — it always wants
+    "right now".
     """
-    ultimo = (
-        db.query(InventarioRegistro)
-        .filter(InventarioRegistro.ingrediente_id == ingrediente_id)
-        .order_by(InventarioRegistro.fecha_registro.desc(), InventarioRegistro.id.desc())
-        .first()
-    )
+    query = db.query(InventarioRegistro).filter(InventarioRegistro.ingrediente_id == ingrediente_id)
+    if as_of_fecha is not None:
+        query = query.filter(InventarioRegistro.fecha_registro <= as_of_fecha)
+    ultimo = query.order_by(InventarioRegistro.fecha_registro.desc(), InventarioRegistro.id.desc()).first()
     if not ultimo:
         return None
 
@@ -260,12 +265,12 @@ def _stock_actual_leaf(ingrediente_id: int, db: Session) -> Optional[dict]:
 
     fecha_conteo = ultimo.fecha_registro
     if es_recibido:
-        historial = (
-            db.query(InventarioRegistro)
-            .filter(InventarioRegistro.ingrediente_id == ingrediente_id)
-            .order_by(InventarioRegistro.fecha_registro.desc(), InventarioRegistro.id.desc())
-            .all()
-        )
+        historial_q = db.query(InventarioRegistro).filter(InventarioRegistro.ingrediente_id == ingrediente_id)
+        if as_of_fecha is not None:
+            historial_q = historial_q.filter(InventarioRegistro.fecha_registro <= as_of_fecha)
+        historial = historial_q.order_by(
+            InventarioRegistro.fecha_registro.desc(), InventarioRegistro.id.desc()
+        ).all()
         conteo = next((r for r in historial if not _es_pedido_recibido(r)), None)
         fecha_conteo = conteo.fecha_registro if conteo else None
 
@@ -335,15 +340,20 @@ def stock_actual(ingrediente_id: int, db: Session) -> Optional[dict]:
     }
 
 
-def stock_base_recepcion_pedido(ingrediente_id: int, db: Session) -> dict:
+def stock_base_recepcion_pedido(ingrediente_id: int, db: Session, as_of_fecha: Optional[date] = None) -> dict:
     """Effective current stock for a single leaf ingredient, used as the
     baseline when adding stock from a received order (recibir_pedido). For
     café items in a synchronized counting group, applies the same
     "zero if not counted in the group's latest session" rule as stock_actual()
     — so a flavor that was blank (0) in the last count doesn't inherit a
     stale pre-zero quantity just because its own last raw record predates
-    that session. Falls back to the leaf's raw last known value otherwise."""
-    leaf = _stock_actual_leaf(ingrediente_id, db)
+    that session. Falls back to the leaf's raw last known value otherwise.
+
+    `as_of_fecha` (the order's fecha_recepcion, when backdated) restricts the
+    baseline to records on or before that date, so a receipt entered today
+    for a delivery last week is added on top of the stock as it stood back
+    then — not on top of whatever's been counted since."""
+    leaf = _stock_actual_leaf(ingrediente_id, db, as_of_fecha=as_of_fecha)
     if not leaf:
         return {"cantidad": 0.0, "unidad": None, "ubicacion": None}
 
@@ -355,7 +365,7 @@ def stock_base_recepcion_pedido(ingrediente_id: int, db: Session) -> dict:
 
     latest_fecha_conteo = None
     for sib_id in _child_ids(ing.grupo_ingrediente_id, db):
-        sib = _stock_actual_leaf(sib_id, db)
+        sib = _stock_actual_leaf(sib_id, db, as_of_fecha=as_of_fecha)
         if sib and sib["fecha_conteo"] and (
             latest_fecha_conteo is None or sib["fecha_conteo"] > latest_fecha_conteo
         ):

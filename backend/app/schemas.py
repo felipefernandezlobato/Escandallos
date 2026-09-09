@@ -377,6 +377,7 @@ class RecibirLineaItem(BaseModel):
 
 class RecibirPedidoRequest(BaseModel):
     lineas: list[RecibirLineaItem]
+    fecha_recepcion: Optional[date] = None
 
 
 # --- Recomendación ---

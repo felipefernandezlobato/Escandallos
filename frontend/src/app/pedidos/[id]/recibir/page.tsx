@@ -19,6 +19,7 @@ export default function RecibirPedidoPage() {
   const id = params.id as string;
   const [pedido, setPedido] = useState<PedidoDetail | null>(null);
   const [lineas, setLineas] = useState<Record<number, RecibirLinea>>({});
+  const [fechaRecepcion, setFechaRecepcion] = useState(() => new Date().toISOString().slice(0, 10));
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -47,6 +48,7 @@ export default function RecibirPedidoPage() {
         cantidad_recibida: parseFloat(l.cantidad_recibida) || 0,
         precio_unitario: l.precio_unitario ? parseFloat(l.precio_unitario) : null,
       })),
+      fecha_recepcion: fechaRecepcion,
     };
     try {
       const result = await apiFetch<{ ok: boolean; precios_actualizados: number }>(
@@ -110,6 +112,18 @@ export default function RecibirPedidoPage() {
       <p className="text-sm text-[#6B5E52]">
         Ajusta las cantidades reales recibidas y los precios si han cambiado.
       </p>
+
+      <div>
+        <label className="block text-sm font-medium text-[#6B5E52] mb-1">
+          Fecha de recepcion
+        </label>
+        <input
+          type="date"
+          value={fechaRecepcion}
+          onChange={(e) => setFechaRecepcion(e.target.value)}
+          className="border border-[#D4C4A8] rounded px-3 py-1.5 text-sm"
+        />
+      </div>
 
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
