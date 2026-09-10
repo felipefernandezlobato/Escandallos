@@ -130,6 +130,7 @@ function InventarioContent() {
   const [fechas, setFechas] = useState<string[]>([]);
   const [semanas, setSemanas] = useState<string[]>([]);
   const [historial, setHistorial] = useState<InventarioSnapshot | null>(null);
+  const [showInactive, setShowInactive] = useState(false);
   const [pivot, setPivot] = useState<{
     fechas: string[];
     ingredientes: Array<{
@@ -442,6 +443,9 @@ function InventarioContent() {
     if (!cat) return false;
     return cat.seccion === vista;
   };
+
+  const isActivo = (ingredienteId: number): boolean =>
+    ingredientes.find((i) => i.id === ingredienteId)?.activo !== false;
 
   // Get parent ingredient IDs (groups) for cafe section
   const parentIds = new Set(
@@ -1447,6 +1451,16 @@ function InventarioContent() {
                 ← Ver pivot
               </button>
             )}
+            <button
+              onClick={() => setShowInactive(!showInactive)}
+              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors border ${
+                showInactive
+                  ? "bg-[#8B1A2B] text-white border-[#8B1A2B]"
+                  : "text-[#6B5E52] border-[#D4C4A8] hover:bg-[#F5F0E8]"
+              }`}
+            >
+              {showInactive ? "Ocultar inactivos" : "Mostrar inactivos"}
+            </button>
           </div>
 
           {activeSemana && loadingHistorial ? (
@@ -1469,7 +1483,7 @@ function InventarioContent() {
                     </tr>
                   </thead>
                   {(() => {
-                    const filteredRegistros = historial.registros.filter((r) => matchesVista(r.ingrediente_id, r.ingrediente_nombre));
+                    const filteredRegistros = historial.registros.filter((r) => matchesVista(r.ingrediente_id, r.ingrediente_nombre) && (showInactive || isActivo(r.ingrediente_id)));
                     const byDate: Record<string, typeof historial.registros> = {};
                     for (const r of filteredRegistros) {
                       const d = String(r.fecha_registro);
@@ -1597,7 +1611,7 @@ function InventarioContent() {
                     </tr>
                   </thead>
                   {(() => {
-                    const filtered = pivot.ingredientes.filter((ing) => matchesVista(ing.ingrediente_id, ing.ingrediente_nombre));
+                    const filtered = pivot.ingredientes.filter((ing) => matchesVista(ing.ingrediente_id, ing.ingrediente_nombre) && (showInactive || isActivo(ing.ingrediente_id)));
                     const getGroup = (ingId: number, ingName: string): { name: string; orden: number } => {
                       if (ingName.toLowerCase().includes("sibarist")) return { name: "Sibarist", orden: 999 };
                       const fullIng = ingredientes.find((i) => i.id === ingId);
