@@ -1627,7 +1627,7 @@ function InventarioContent() {
                       if (!grouped[g.name]) grouped[g.name] = { orden: g.orden, items: [] };
                       grouped[g.name].items.push(ing);
                     }
-                    const COLOR_ORDER: Record<number, number> = { 73: 0, 277: 1, 326: 0, 325: 1, 327: 3, 328: 2 };
+                    const COLOR_ORDER: Record<number, number> = { 73: 0, 277: 1, 326: 0, 325: 1, 327: 2, 328: 3 };
                     const COLOR_NAMES: Record<number, string> = { 73: "MARRÓN", 277: "ROJO", 326: "MARRÓN", 325: "ROJO", 327: "BLACK", 328: "GOLD" };
                     const coffeeSubOrder = (name: string): number => {
                       const n = name.toLowerCase();
@@ -1651,8 +1651,8 @@ function InventarioContent() {
                       const n = (name || fullIng?.nombre || "").toLowerCase();
                       if (n.includes("marrón")) return 0;
                       if (n.includes("rojo")) return 1;
-                      if (n.includes("gold")) return 2;
-                      if (n.includes("black")) return 3;
+                      if (n.includes("black")) return 2;
+                      if (n.includes("gold")) return 3;
                       return 5;
                     };
                     const coffeeColorName = (ingId: number, name?: string): string => {

@@ -35,8 +35,8 @@ _COLOR_BY_GROUP: dict[int, str] = {
 _COLOR_ORDER: dict[str, int] = {
     "MARRÓN": 0,
     "ROJO": 1,
-    "GOLD": 2,
-    "BLACK": 3,
+    "BLACK": 2,
+    "GOLD": 3,
 }
 
 

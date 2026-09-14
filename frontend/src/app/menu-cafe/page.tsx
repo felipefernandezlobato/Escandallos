@@ -64,8 +64,8 @@ const COLOR_ORDER: Record<string, number> = {
   "MARRÓN": 0,
   "MARRON": 0,
   "ROJO": 1,
-  "GOLD": 2,
-  "BLACK": 3,
+  "BLACK": 2,
+  "GOLD": 3,
 };
 
 function colorSortKey(color: string | null): number {
