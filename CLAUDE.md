@@ -151,6 +151,7 @@ Render start command is `bash start.sh` (set in dashboard, NOT render.yaml). It 
 - **Frozen tubes:** separate parents per location — 289 = "Tubos Frozen Bru1", 290 = "Tubos Frozen Bru2". Each flavor has **two separate child ingredients**, one per parent (e.g. "Frozen Ethiopia Karamo Bru1" vs "...Bru2"), NOT one child distinguished by `ubicacion`. `consumo_override_semanal` from Lightspeed POS, `par_level_override` (10/200g flavor, 6/130g flavor)
 - **Frozen tube `ubicacion` is unreliable, don't use it for location:** `recibir_pedido()` inherits `ubicacion` from the ingredient's last record, so once one manual count omits it, every later auto-inserted "Pedido recibido" row keeps propagating a null value forever (this silently hid a real delivery from the Historial de Conteos table on 2026-08-20). Since each flavor already has a separate ingredient per location, always resolve frozen-tube location via `grupo_ingrediente_id` (289 vs 290) — never via the `ubicacion` column.
 - **Frozen tube pricing:** `coste_kg_frozen` (CHF/kg), `suplemento_frozen` (+X CHF), `frozen_origen_id` (FK to source bag). This can be unset for a flavor that's still actively counted (e.g. Nicaragua El Suspiro historically) — don't use it to identify "is this a frozen tube," use `grupo_ingrediente_id` instead.
+- **`coste_kg_frozen` is a stored snapshot, NOT derived.** Nothing recalculates it when the source bag's price changes, so it drifts silently. Correct value is always `bolsa.precio_compra / tamaño_bolsa_en_kg` (size from the name prefix: `200g`→0.2, `130g`→0.13, `100g`→0.1). After any price update touching a bag used as `frozen_origen_id`, recompute it for **both** the Bru1 and Bru2 tube of that flavor. On 2026-09-14 eight DABOV tubes were found stale — COE Salvador stored 86.81 vs 101.15 real, a +14.34 CHF/kg understatement that made the margin look far better than it was. Never adjust `suplemento_frozen` as part of this: that's a menu-price decision the user makes.
 - **Dynamic frozen menu:** `/api/menu/frozen` returns visible tubes based on tube stock + bag stock + pending orders. No hardcoded data.
 - **Café analysis table:** always visible in Cafe tab, single `/api/inventario/cafe-resumen` endpoint
 - **Gestionar Cafés:** modal to activate/deactivate coffees
@@ -207,7 +208,7 @@ Render start command is `bash start.sh` (set in dashboard, NOT render.yaml). It 
 ## Café Pivot Sorting
 
 - Sub-category order: 1kg → 200g → 130g → Coffee Retail Bags → Tubos Frozen → Frozen → Cápsulas
-- Within each size: sorted by color (MARRÓN → ROJO → GOLD → BLACK) via `grupo_ingrediente_id` with name fallback
+- Within each size: sorted by color (MARRÓN → ROJO → BLACK → GOLD) via `grupo_ingrediente_id` with name fallback. This order is duplicated in three places that must stay in sync: `_COLOR_ORDER` in `backend/app/routers/cafe.py`, `COLOR_ORDER` in `frontend/src/app/menu-cafe/page.tsx`, and `COLOR_ORDER`/`coffeeColorOrder` in the inventario pivot
 - Color sub-headers: "1kg · MARRÓN", "200g · ROJO", "130g · GOLD" etc.
 - Total rows (Café en grano, Retail color groups, Coffee Retail Bags) styled bold, sort LAST within their color group
 - `coffeeColorOrder`/`coffeeColorName` fall through to name-based detection when `grupo_ingrediente_id` not in COLOR_ORDER
@@ -220,6 +221,29 @@ Render start command is `bash start.sh` (set in dashboard, NOT render.yaml). It 
 - All 1kg, 200g, 130g bags and capsules have prices set
 - Frozen tubes: use `coste_kg_frozen` + `suplemento_frozen` + `frozen_origen_id`, NOT `precio_compra`
 - Pending: Frozen Nicaragua El Suspiro missing frozen pricing columns
+
+## Frozen Tube Menu Pricing
+
+Constants live in `menu_frozen()` (`backend/app/routers/menu.py`):
+- **19 g per tube** → `chf_per_tube = coste_kg_frozen * 0.019`
+- Doppio base price **3.90 CHF**, doppio cost **0.41 CHF**
+- Menu price = `3.90 + suplemento_frozen`
+- `multi_supplement = suplemento / (chf_per_tube - 0.41)` — what you charge extra vs what the tube actually costs extra over a normal doppio. **Judge a supplement by this**, not by raw margin
+- Supplements follow a **linear +2 (cheapest CHF/kg) to +14 (most expensive)** scale, set 2026-09-14. Keeps multipliers in the x7–x10 band; before the restructure they ranged x6.2 to x15.8
+- Supplements are a **carta decision, not a formula output** — always ask the user, never auto-assign. Some sit deliberately off-curve (Blossom at x13.6)
+- Karamo, Colombia Banana, Panama Lerida and Mexico Geisha keep their old supplements: being run down, not reordered
+- A tube is only visible on the menu if tube stock > 0, bag stock > 0, or the bag has a pending order
+
+Creating a tube: **two** ingredients per flavor (Bru1 → `grupo_ingrediente_id` 289, Bru2 → 290), `categoria_id` 5, unidad `unidad`, `precio_compra` 0, plus the three frozen columns.
+
+## Partial Deliveries
+
+There is **no "parcial" pedido state**. `POST /api/pedidos/{id}/recibir` takes per-line `cantidad_recibida` but always flips the whole pedido to `recibido`. For a partial delivery:
+1. Receive the original pedido with the quantities that actually arrived (missing lines = 0, which creates no inventory record)
+2. Create a new pedido, same proveedor, `estado = "enviado"`, one line per outstanding item at the missing quantity, carrying `precio_unitario` over
+3. Add a nota pointing back at the original
+
+This keeps the remainder counted as stock-on-order — "pending" is `estado IN ('borrador','enviado')` (`_batch_has_pending_orders` in `routers/menu.py`), feeding par levels, `/api/menu/frozen` and recomendaciones. Call `recibir_pedido()` in-process rather than writing raw SQL: it adds the delivery on top of existing stock via `stock_base_recepcion_pedido()` and inherits the leaf's last known `ubicacion`.
 
 ## Ingredient Detail Page
 
