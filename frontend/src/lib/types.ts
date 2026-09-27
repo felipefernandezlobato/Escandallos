@@ -101,7 +101,16 @@ export interface HistorialFrozenEvento {
 
 export interface HistorialFrozenValor {
   cantidad: number | null;
+  /** Tubes gained that day from deliveries, null when there was none. */
+  anadido: number | null;
   eventos: HistorialFrozenEvento[];
+}
+
+export interface HistorialFrozenTotales {
+  stock: number;
+  anadido: number;
+  /** null on the first column — no previous day to compare against. */
+  consumido: number | null;
 }
 
 export interface HistorialFrozenSabor {
@@ -115,6 +124,7 @@ export interface HistorialFrozen {
   ubicacion: string;
   fechas: string[];
   sabores: HistorialFrozenSabor[];
+  totales: Record<string, HistorialFrozenTotales>;
 }
 
 export interface Alerta {

@@ -1,4 +1,5 @@
 import math
+import re
 from collections import OrderedDict
 from datetime import date, timedelta
 from typing import Dict, List, Optional
@@ -595,6 +596,56 @@ def movimientos_ingrediente(ingrediente_id: int, db: Session) -> list[dict]:
 FROZEN_TUBE_PARENT_BY_UBICACION = {"BRU1": 289, "BRU2": 290}  # Tubos Frozen Bru1 / Bru2
 
 
+def _anadido_frozen_por_dia(registros: list, tubo_ids: list, db: Session) -> dict:
+    """How much each flavor gained per day from deliveries: {(tid, fecha): qty}.
+
+    A "Pedido recibido" InventarioRegistro stores the resulting TOTAL, not the
+    amount added, so the delivered quantity has to come from the pedido line
+    the notas points at ("Pedido #N recibido" — see recibir_pedido()). Two
+    deliveries can land on the same flavor the same day (Mexico Geisha got
+    both #111 and #121 on 2026-09-23), so these are summed rather than
+    last-one-wins like per_child_days: the day's total gain is what the
+    "Añadido" row and the "15 (6+9)" cell breakdown both need.
+
+    A delivery whose pedido line can't be resolved is simply omitted, leaving
+    the cell to render as a plain count — better than guessing an amount from
+    the stock delta, which would silently fold in consumption since the last
+    count.
+    """
+    pedido_por_registro: dict[int, int] = {}
+    for r in registros:
+        if not _es_pedido_recibido(r):
+            continue
+        m = re.search(r"#(\d+)", r.notas or "")
+        if m:
+            pedido_por_registro[r.id] = int(m.group(1))
+    if not pedido_por_registro:
+        return {}
+
+    lineas = (
+        db.query(LineaPedido)
+        .filter(
+            LineaPedido.pedido_id.in_(set(pedido_por_registro.values())),
+            LineaPedido.ingrediente_id.in_(tubo_ids),
+        )
+        .all()
+    )
+    qty_por_pedido_sabor = {
+        (l.pedido_id, l.ingrediente_id): l.cantidad_recibida for l in lineas
+    }
+
+    anadido: dict[tuple, float] = {}
+    for r in registros:
+        pedido_id = pedido_por_registro.get(r.id)
+        if pedido_id is None:
+            continue
+        qty = qty_por_pedido_sabor.get((pedido_id, r.ingrediente_id))
+        if qty:
+            key = (r.ingrediente_id, r.fecha_registro)
+            anadido[key] = anadido.get(key, 0.0) + qty
+    return anadido
+
+
 def historial_frozen_por_ubicacion(ubicacion: str, db: Session) -> dict:
     """Daily pivot of frozen-tube flavor stock at a single location (BRU1 or
     BRU2), for the "Historial de Conteos" table on ingredientes/289 and /290.
@@ -681,6 +732,8 @@ def historial_frozen_por_ubicacion(ubicacion: str, db: Session) -> dict:
     for m in mermas:
         mermas_by_child_day.setdefault((m.ingrediente_id, m.fecha), []).append(m)
 
+    anadido_by_child_day = _anadido_frozen_por_dia(registros, tubo_ids, db)
+
     fechas = sorted(
         {d for days in per_child_days.values() for d in days}
         | {d for (_cid, d) in mermas_by_child_day}
@@ -725,7 +778,11 @@ def historial_frozen_por_ubicacion(ubicacion: str, db: Session) -> dict:
             for m in mermas_by_child_day.get((tid, d), []):
                 eventos.append({"tipo": "merma", "detalle": m.notas or m.motivo, "cantidad": -m.cantidad})
 
-            per_child_valores[tid][str(d)] = {"cantidad": cantidad, "eventos": eventos}
+            per_child_valores[tid][str(d)] = {
+                "cantidad": cantidad,
+                "anadido": anadido_by_child_day.get((tid, d)),
+                "eventos": eventos,
+            }
 
     sabores = []
     for tid in tubo_ids:
@@ -742,7 +799,43 @@ def historial_frozen_por_ubicacion(ubicacion: str, db: Session) -> dict:
             "valores": valores,
         })
 
-    return {"ubicacion": ubicacion, "fechas": [str(d) for d in fechas], "sabores": sabores}
+    # Daily footer rows. Summed over the flavors actually rendered (sabores,
+    # not tubo_ids) so the columns visibly add up to the Total row — a flavor
+    # dropped for having no data anywhere must not contribute a phantom 0.
+    #
+    # Consumido = stock del día anterior + añadido − stock actual, i.e. every
+    # tube that left the freezer, mermas included (they still get their own
+    # red dot on the cell). Deliberately NOT clamped at 0: a negative value
+    # means stock grew with no delivery behind it — a miscount or an untracked
+    # transfer — and hiding that would hide the data problem. Undefined on the
+    # first column, which has no previous day to compare against.
+    sabor_ids = [s["ingrediente_id"] for s in sabores]
+    totales: dict[str, dict] = {}
+    stock_anterior: Optional[float] = None
+    for d in fechas:
+        clave = str(d)
+        stock = sum(
+            per_child_valores[tid][clave]["cantidad"] or 0.0
+            for tid in sabor_ids
+            if clave in per_child_valores[tid]
+        )
+        anadido = sum(anadido_by_child_day.get((tid, d), 0.0) for tid in sabor_ids)
+        totales[clave] = {
+            "stock": round(stock, 3),
+            "anadido": round(anadido, 3),
+            "consumido": (
+                None if stock_anterior is None
+                else round(stock_anterior + anadido - stock, 3)
+            ),
+        }
+        stock_anterior = stock
+
+    return {
+        "ubicacion": ubicacion,
+        "fechas": [str(d) for d in fechas],
+        "sabores": sabores,
+        "totales": totales,
+    }
 
 
 def tendencia_consumo(historial: list[dict]) -> str:

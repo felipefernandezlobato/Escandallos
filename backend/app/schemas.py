@@ -110,6 +110,7 @@ class HistorialFrozenEvento(BaseModel):
 
 class HistorialFrozenValor(BaseModel):
     cantidad: Optional[float] = None
+    anadido: Optional[float] = None
     eventos: list[HistorialFrozenEvento] = []
 
 
@@ -120,10 +121,17 @@ class HistorialFrozenSabor(BaseModel):
     valores: dict[str, HistorialFrozenValor]
 
 
+class HistorialFrozenTotales(BaseModel):
+    stock: float
+    anadido: float
+    consumido: Optional[float] = None
+
+
 class HistorialFrozenOut(BaseModel):
     ubicacion: str
     fechas: list[str]
     sabores: list[HistorialFrozenSabor]
+    totales: dict[str, HistorialFrozenTotales] = {}
 
 
 # --- Lineas de Receta ---

@@ -991,6 +991,117 @@ class TestHistorialFrozen:
         assert eventos[0]["tipo"] == "merma"
         assert eventos[0]["cantidad"] == -2
 
+    def _recibir(self, client, ingrediente_id, cantidad):
+        create = client.post("/api/pedidos", json={
+            "proveedor": "Dabov",
+            "lineas": [{"ingrediente_id": ingrediente_id, "cantidad_pedida": cantidad, "unidad": "unidad"}],
+        })
+        pid = create.json()["id"]
+        lid = create.json()["lineas"][0]["id"]
+        client.post(f"/api/pedidos/{pid}/enviar")
+        client.post(f"/api/pedidos/{pid}/recibir", json={
+            "lineas": [{"linea_id": lid, "cantidad_recibida": cantidad}],
+        })
+
+    def test_anadido_expone_la_cantidad_entregada(self, client, test_db, tubos):
+        """The delivery's InventarioRegistro only stores the resulting total,
+        so `anadido` has to be resolved from the pedido line the notas points
+        at — that's what lets the cell render "15 (5+10)"."""
+        test_db.add(InventarioRegistro(
+            ingrediente_id=tubos["karamo_bru1"].id, cantidad=5, unidad="unidad",
+            fecha_registro=date(2026, 8, 1),
+        ))
+        test_db.flush()
+        self._recibir(client, tubos["karamo_bru1"].id, 10)
+
+        data = client.get(f"/api/ingredientes/{tubos['karamo_bru1'].id}/historial-frozen?ubicacion=BRU1").json()
+        entrega = data["fechas"][-1]
+        celda = data["sabores"][0]["valores"][entrega]
+        assert celda["cantidad"] == 15
+        assert celda["anadido"] == 10
+        # The count-only day has nothing added.
+        assert data["sabores"][0]["valores"]["2026-08-01"]["anadido"] is None
+
+    def test_anadido_suma_dos_entregas_el_mismo_dia(self, client, test_db, tubos):
+        """Two pedidos can land on one flavor the same day (Mexico Geisha got
+        #111 and #121 on 2026-09-23). per_child_days keeps only the last
+        record, so the added amounts must be summed separately or the cell
+        under-reports the day's gain."""
+        test_db.add(InventarioRegistro(
+            ingrediente_id=tubos["karamo_bru1"].id, cantidad=1, unidad="unidad",
+            fecha_registro=date(2026, 8, 1),
+        ))
+        test_db.flush()
+        self._recibir(client, tubos["karamo_bru1"].id, 6)
+        self._recibir(client, tubos["karamo_bru1"].id, 6)
+
+        data = client.get(f"/api/ingredientes/{tubos['karamo_bru1'].id}/historial-frozen?ubicacion=BRU1").json()
+        entrega = data["fechas"][-1]
+        assert data["sabores"][0]["valores"][entrega]["anadido"] == 12
+
+    def test_totales_stock_anadido_consumido(self, client, test_db, tubos):
+        """Footer rows. Consumido = stock previo + añadido − stock actual,
+        so a day where everything delivered stays in the freezer reads 0."""
+        test_db.add_all([
+            InventarioRegistro(
+                ingrediente_id=tubos["karamo_bru1"].id, cantidad=10, unidad="unidad",
+                fecha_registro=date(2026, 8, 1),
+            ),
+            InventarioRegistro(
+                ingrediente_id=tubos["perla_bru1"].id, cantidad=4, unidad="unidad",
+                fecha_registro=date(2026, 8, 1),
+            ),
+            # Both recounted together on 08-05: 14 -> 9, so 5 tubes went out.
+            InventarioRegistro(
+                ingrediente_id=tubos["karamo_bru1"].id, cantidad=6, unidad="unidad",
+                fecha_registro=date(2026, 8, 5),
+            ),
+            InventarioRegistro(
+                ingrediente_id=tubos["perla_bru1"].id, cantidad=3, unidad="unidad",
+                fecha_registro=date(2026, 8, 5),
+            ),
+        ])
+        test_db.flush()
+
+        data = client.get(f"/api/ingredientes/{tubos['karamo_bru1'].id}/historial-frozen?ubicacion=BRU1").json()
+        totales = data["totales"]
+        assert totales["2026-08-01"] == {"stock": 14.0, "anadido": 0.0, "consumido": None}
+        assert totales["2026-08-05"] == {"stock": 9.0, "anadido": 0.0, "consumido": 5.0}
+
+    def test_consumido_cero_cuando_solo_hubo_entrega(self, client, test_db, tubos):
+        """A delivery-only day leaves every other flavor's value intact, so
+        the whole gain lands in stock and nothing reads as consumed."""
+        test_db.add(InventarioRegistro(
+            ingrediente_id=tubos["karamo_bru1"].id, cantidad=5, unidad="unidad",
+            fecha_registro=date(2026, 8, 1),
+        ))
+        test_db.flush()
+        self._recibir(client, tubos["karamo_bru1"].id, 10)
+
+        data = client.get(f"/api/ingredientes/{tubos['karamo_bru1'].id}/historial-frozen?ubicacion=BRU1").json()
+        entrega = data["fechas"][-1]
+        assert data["totales"][entrega] == {"stock": 15.0, "anadido": 10.0, "consumido": 0.0}
+
+    def test_totales_solo_suman_sabores_visibles(self, client, test_db, tubos):
+        """Totals are summed over the flavors actually returned, so the column
+        adds up to what's rendered. An inactive flavor contributes nothing."""
+        tubos["perla_bru1"].activo = False
+        test_db.add_all([
+            InventarioRegistro(
+                ingrediente_id=tubos["karamo_bru1"].id, cantidad=10, unidad="unidad",
+                fecha_registro=date(2026, 8, 1),
+            ),
+            InventarioRegistro(
+                ingrediente_id=tubos["perla_bru1"].id, cantidad=7, unidad="unidad",
+                fecha_registro=date(2026, 8, 1),
+            ),
+        ])
+        test_db.flush()
+
+        data = client.get(f"/api/ingredientes/{tubos['karamo_bru1'].id}/historial-frozen?ubicacion=BRU1").json()
+        assert {s["nombre"] for s in data["sabores"]} == {"Frozen Karamo Bru1"}
+        assert data["totales"]["2026-08-01"]["stock"] == 10.0
+
 
 class TestInventarioActualizar:
     def test_actualizar_cantidad(self, client, seed):

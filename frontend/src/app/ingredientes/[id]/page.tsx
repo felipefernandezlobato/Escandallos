@@ -143,6 +143,10 @@ export default function IngredienteDetailPage() {
     }
   };
 
+  // Tube counts are whole numbers in practice; drop the decimals unless a
+  // fractional value actually shows up, so the footer stays scannable.
+  const fmtNum = (n: number) => (Number.isInteger(n) ? String(n) : n.toFixed(2).replace(/\.?0+$/, ""));
+
   const saveField = async (field: string, value: string) => {
     try {
       await apiFetch(`/api/ingredientes/${id}`, {
@@ -258,10 +262,23 @@ export default function IngredienteDetailPage() {
                     const tienePedido = eventos.some((e) => e.tipo === "pedido");
                     const tieneMerma = eventos.some((e) => e.tipo === "merma");
                     const tooltip = eventos.map((e) => e.detalle).filter(Boolean).join(" · ") || undefined;
+                    // A resolved delivery shows its arithmetic inline — "15 (6+9)"
+                    // reads as "ended at 15: had 6, received 9" — which says more
+                    // than a dot. Falls back to the dot when the pedido line
+                    // couldn't be resolved, so the delivery is still flagged.
+                    const anadido = valor?.anadido ?? null;
+                    const desglose = anadido != null && valor?.cantidad != null;
                     return (
                       <td key={f} className="px-3 py-2 text-right font-mono whitespace-nowrap" title={tooltip}>
                         {valor?.cantidad ?? "—"}
-                        {tienePedido && <span className="inline-block w-1.5 h-1.5 rounded-full bg-blue-500 ml-1" />}
+                        {desglose && (
+                          <span className="text-blue-600 ml-1">
+                            ({fmtNum(valor!.cantidad! - anadido)}+{fmtNum(anadido)})
+                          </span>
+                        )}
+                        {tienePedido && !desglose && (
+                          <span className="inline-block w-1.5 h-1.5 rounded-full bg-blue-500 ml-1" />
+                        )}
                         {tieneMerma && <span className="inline-block w-1.5 h-1.5 rounded-full bg-red-500 ml-1" />}
                       </td>
                     );
@@ -269,7 +286,37 @@ export default function IngredienteDetailPage() {
                 </tr>
               ))}
             </tbody>
+            <tfoot className="border-t-2 border-[#E8DFD3]">
+              {([
+                { clave: "stock", etiqueta: "Total", clase: "font-semibold" },
+                { clave: "anadido", etiqueta: "Añadido", clase: "text-blue-600" },
+                { clave: "consumido", etiqueta: "Consumido", clase: "text-[#6B5E52]" },
+              ] as const).map(({ clave, etiqueta, clase }) => (
+                <tr key={clave} className="bg-[#F5F0E8]/60">
+                  <td className={`px-4 py-2 sticky left-0 bg-[#F5F0E8] min-w-[260px] whitespace-nowrap font-medium ${clase}`}>
+                    {etiqueta}
+                  </td>
+                  {[...historialFrozen.fechas].reverse().map((f) => {
+                    const total = historialFrozen.totales?.[f];
+                    const v = total?.[clave] ?? null;
+                    return (
+                      <td
+                        key={f}
+                        className={`px-3 py-2 text-right font-mono whitespace-nowrap ${clase} ${
+                          clave !== "stock" && !v ? "opacity-40" : ""
+                        }`}
+                      >
+                        {v == null ? "—" : fmtNum(v)}
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
+            </tfoot>
           </table>
+          <p className="text-xs text-[#6B5E52]/70 px-4 py-2 border-t border-[#E8DFD3]">
+            Consumido = total del día anterior + añadido − total del día. Incluye mermas.
+          </p>
         </div>
       )}
     </div>
