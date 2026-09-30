@@ -4,7 +4,7 @@ from collections import OrderedDict
 from datetime import date, timedelta
 from typing import Dict, List, Optional
 
-from sqlalchemy import distinct, func, or_
+from sqlalchemy import distinct, func
 from sqlalchemy.orm import Session
 
 from app.models import InventarioRegistro, LineaPedido, MermaRegistro, Pedido, Ingrediente, Proveedor
@@ -82,8 +82,12 @@ def _consumo_semanal_leaf(ingrediente_id: int, db: Session, semanas: int = 12) -
         .order_by(InventarioRegistro.fecha_registro, InventarioRegistro.id)
         .all()
     )
-    # Exclude "Pedido recibido" records — they duplicate order data and inflate consumption
-    filtered = [r for r in all_inventarios if not (r.notas and "recibido" in r.notas.lower())]
+    # Exclude auto-inserted delivery records — they duplicate order data (the
+    # delivered amount comes back in below as `received_between`, read from
+    # LineaPedido) and would inflate consumption. Uses the same strict marker
+    # as everywhere else: a hand-typed "Recibido 4 tubos de BRU1" is a real
+    # count of a transfer and must stay in the series.
+    filtered = [r for r in all_inventarios if not _es_fila_de_pedido(r)]
     if all_inventarios:
         target_unit = all_inventarios[-1].unidad
     else:
@@ -218,34 +222,30 @@ def _es_pedido_recibido(registro) -> bool:
     return bool(registro.notas and "recibido" in registro.notas.lower())
 
 
-_MARCADOR_PEDIDO = re.compile(r"^Pedido #\d+ recibido$")
-# Portable (SQLite + PostgreSQL, no regex) LIKE form of the same marker, for
-# filtering in SQL. Looser than the regex, but still tight enough to leave
-# hand-typed notes like "Recibido 4 tubos de BRU1" alone.
-MARCADOR_PEDIDO_LIKE = "Pedido #%recibido"
+# Auto-inserted delivery markers: "Pedido #103 recibido" from recibir_pedido(),
+# plus the bare "Pedido recibido" of the historically imported rows.
+_MARCADOR_PEDIDO = re.compile(r"^Pedido(?: #\d+)? recibido$")
 
 
 def _notas_de_pedido(notas: Optional[str]) -> bool:
-    """Whether a notas string is the auto-inserted delivery marker."""
+    """Whether a notas string is an auto-inserted delivery marker.
+
+    Deliberately stricter than _es_pedido_recibido()'s substring test: a
+    hand-typed note such as "Recibido 4 tubos de BRU1" is somebody recording a
+    real transfer between shops and must keep counting as stock (two such rows
+    exist, both café). Anchored at both ends on purpose — "Pedido #55 (parcial)
+    recibido" is a plausible thing for someone to type on a manual count, and
+    it must not be mistaken for the generated marker.
+
+    Test this in Python, never as a SQL LIKE: an approximation of this pattern
+    classifies such notes differently from the real thing, which would make
+    /api/menu/frozen disagree with stock_actual() on the same day's data."""
     return bool(notas and _MARCADOR_PEDIDO.match(notas.strip()))
 
 
 def _es_fila_de_pedido(registro) -> bool:
-    """True only for the row recibir_pedido() auto-inserts, whose notas are
-    exactly "Pedido #<id> recibido".
-
-    Deliberately stricter than _es_pedido_recibido(): a hand-typed note such
-    as "Recibido 4 tubos de BRU1" is somebody recording a real transfer
-    between shops, which must keep counting as stock. Matching it loosely
-    would silently drop those tubes (two such rows exist, both café)."""
+    """Whether this record is an auto-inserted delivery row rather than a count."""
     return _notas_de_pedido(registro.notas)
-
-
-def condicion_no_es_fila_de_pedido(col):
-    """SQL counterpart of `not _es_fila_de_pedido(...)`, for batch queries that
-    need the same rule without loading rows. Kept next to the Python version so
-    the two can't drift."""
-    return or_(col.is_(None), ~col.like(MARCADOR_PEDIDO_LIKE))
 
 
 def _day_por_ubicacion(records: list) -> dict:
@@ -1178,7 +1178,8 @@ def consumo_medio_batch(
             continue
 
         raw_inv = inv_by_id.get(iid, [])
-        filtered = [r for r in raw_inv if not (r.notas and "recibido" in r.notas.lower())]
+        # Same strict marker as _consumo_semanal_leaf() — see the note there.
+        filtered = [r for r in raw_inv if not _es_fila_de_pedido(r)]
         target_unit = raw_inv[-1].unidad if raw_inv else (ing.unidad_compra if ing else "unidad")
 
         # Collapse same-day records — same stock rule as _consumo_semanal_leaf()

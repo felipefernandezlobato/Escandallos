@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 from app.auth import get_current_user
 from app.database import get_db
 from app.models import Ingrediente, InventarioRegistro, LineaPedido, Pedido
-from app.services.consumo import _notas_de_pedido, condicion_no_es_fila_de_pedido
+from app.services.consumo import _notas_de_pedido
 
 router = APIRouter(prefix="/api/menu", tags=["menu"])
 
@@ -59,21 +59,28 @@ def _batch_latest_stocks(
     if not date_map:
         return {iid: {"total": 0.0, "by_location": {}} for iid in ingredient_ids}
 
-    # Same as max_dates but excluding "Pedido recibido" inserts — this is the
-    # date that actually defines a synchronized counting session.
-    conteo_dates = (
+    # Same as max_dates but excluding delivery inserts — this is the date that
+    # actually defines a synchronized counting session. Grouped in Python
+    # rather than in SQL because the marker test has to be exactly the one
+    # _day_por_ubicacion() uses: a SQL LIKE approximation of it would also
+    # swallow a hand-typed note like "Pedido #55 (parcial) recibido", turning a
+    # real count into a delivery for this code path only and making
+    # /api/menu/frozen disagree with stock_actual() on the same data.
+    fechas_y_notas = (
         db.query(
             InventarioRegistro.ingrediente_id,
-            func.max(InventarioRegistro.fecha_registro).label("max_fecha"),
+            InventarioRegistro.fecha_registro,
+            InventarioRegistro.notas,
         )
-        .filter(
-            InventarioRegistro.ingrediente_id.in_(ingredient_ids),
-            condicion_no_es_fila_de_pedido(InventarioRegistro.notas),
-        )
-        .group_by(InventarioRegistro.ingrediente_id)
+        .filter(InventarioRegistro.ingrediente_id.in_(ingredient_ids))
         .all()
     )
-    conteo_date_map = {row[0]: row[1] for row in conteo_dates}
+    conteo_date_map: dict[int, object] = {}
+    for iid, fecha, notas in fechas_y_notas:
+        if _notas_de_pedido(notas):
+            continue
+        if iid not in conteo_date_map or fecha > conteo_date_map[iid]:
+            conteo_date_map[iid] = fecha
 
     group_max_date: dict[int, object] = {}
     if group_of:

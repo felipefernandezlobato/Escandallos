@@ -1511,7 +1511,8 @@ class TestConteoMandaSobreEntrega:
 
     @pytest.fixture
     def cafe_bolsa(self, test_db):
-        cafe_cat = Categoria(id=5, nombre="Café", tipo="ingrediente")
+        # seccion="cafe" is what /api/cafe/catalogo selects on.
+        cafe_cat = Categoria(id=5, nombre="Café", tipo="ingrediente", seccion="cafe")
         test_db.add(cafe_cat)
         test_db.flush()
         bolsa = Ingrediente(
@@ -1652,3 +1653,77 @@ class TestConteoMandaSobreEntrega:
         total = sum(h["cantidad"] for h in _consumo_semanal_leaf(cafe_bolsa.id, test_db, semanas=12))
         # 24 -> 14, so 10 consumed. Not 62 -> 14 = 48.
         assert total == 10
+
+    def test_nota_parecida_al_marcador_sigue_siendo_conteo(self, test_db, cafe_bolsa):
+        """"Pedido #55 (parcial) recibido" is a hand-typed note on a real
+        count. A SQL LIKE approximation of the marker used to swallow it in
+        menu.py only, making /api/menu/frozen disagree with stock_actual()."""
+        from app.routers.menu import _batch_latest_stocks
+        from app.services.consumo import stock_actual
+
+        dia = date(2026, 9, 23)
+        test_db.add_all([
+            self._reg(cafe_bolsa, 4, date(2026, 9, 16), "BRU1"),
+            self._reg(cafe_bolsa, 9, dia, "BRU1", "Pedido #55 (parcial) recibido"),
+        ])
+        test_db.flush()
+
+        leaf = stock_actual(cafe_bolsa.id, test_db)
+        assert leaf["cantidad"] == 9
+        assert leaf["es_recibido"] is False  # es un conteo, no una entrega
+        assert leaf["fecha_conteo"] == dia
+        # menu.py tiene su propia copia de la regla: debe coincidir.
+        assert _batch_latest_stocks([cafe_bolsa.id], test_db)[cafe_bolsa.id]["total"] == 9
+
+    def test_consumo_medio_batch_coincide_con_la_version_individual(self, test_db, cafe_bolsa):
+        from app.services.consumo import _consumo_semanal_leaf, consumo_medio_batch
+
+        pedido = Pedido(
+            fecha=date(2026, 9, 10), proveedor="Dabov", estado="recibido",
+            fecha_recepcion=date(2026, 9, 23),
+        )
+        test_db.add(pedido)
+        test_db.flush()
+        test_db.add(LineaPedido(
+            pedido_id=pedido.id, ingrediente_id=cafe_bolsa.id,
+            cantidad_pedida=15, cantidad_recibida=15, unidad="kg",
+        ))
+        test_db.add_all([
+            self._reg(cafe_bolsa, 23, date(2026, 9, 23), "BRU1"),
+            self._reg(cafe_bolsa, 1, date(2026, 9, 23), "BRU2"),
+            self._reg(cafe_bolsa, 39, date(2026, 9, 23), "BRU2", "Pedido #103 recibido"),
+            self._reg(cafe_bolsa, 12, date(2026, 9, 30), "BRU1"),
+            self._reg(cafe_bolsa, 2, date(2026, 9, 30), "BRU2"),
+        ])
+        test_db.flush()
+
+        individual = _consumo_semanal_leaf(cafe_bolsa.id, test_db, semanas=12)
+        media_individual = round(sum(h["cantidad"] for h in individual) / len(individual), 2)
+        batch = consumo_medio_batch([cafe_bolsa.id], test_db, semanas=12)
+        assert batch[cafe_bolsa.id]["consumo_medio"] == media_individual
+
+    def test_catalogo_cafe_aplica_la_misma_regla(self, client, test_db, cafe_bolsa):
+        dia = date(2026, 9, 23)
+        test_db.add_all([
+            self._reg(cafe_bolsa, 23, dia, "BRU1"),
+            self._reg(cafe_bolsa, 1, dia, "BRU2"),
+            self._reg(cafe_bolsa, 39, dia, "BRU2", "Pedido #103 recibido"),
+        ])
+        test_db.flush()
+
+        # Same walk as test_catalogo_cafe_no_infla_el_stock: the payload nests
+        # items under format/colour groups.
+        encontrado = None
+        stack = [client.get("/api/cafe/catalogo").json()]
+        while stack:
+            cur = stack.pop()
+            if isinstance(cur, dict):
+                if cur.get("id") == cafe_bolsa.id:
+                    encontrado = cur
+                    break
+                stack.extend(cur.values())
+            elif isinstance(cur, list):
+                stack.extend(cur)
+
+        assert encontrado is not None
+        assert encontrado["stock"] == 24
