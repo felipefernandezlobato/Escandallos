@@ -1325,6 +1325,35 @@ class TestPivotDesgloseUbicaciones:
         # Cocina es de una sola ubicacion: gana el ultimo registro, sin desglose.
         assert fresas["fechas_ubic"] == {}
 
+    def test_registro_sin_ubicacion_suprime_desglose(self, client, test_db, cafe):
+        from app.services.conversiones import to_week_key
+
+        # Una tercera fila con ubicacion nula tambien suma al total (es su
+        # propio bucket), asi que BRU1+BRU2 ya no cuadra con lo que se ve al
+        # lado: mejor sin desglose que con uno que no sume.
+        semana_d = date(2026, 1, 26)
+        test_db.add_all([
+            InventarioRegistro(
+                ingrediente_id=cafe["helena"].id, cantidad=2, unidad="kg",
+                fecha_registro=semana_d, ubicacion="BRU1",
+            ),
+            InventarioRegistro(
+                ingrediente_id=cafe["helena"].id, cantidad=3, unidad="kg",
+                fecha_registro=semana_d, ubicacion="BRU2",
+            ),
+            InventarioRegistro(
+                ingrediente_id=cafe["helena"].id, cantidad=5, unidad="kg",
+                fecha_registro=semana_d, ubicacion=None,
+            ),
+        ])
+        test_db.flush()
+
+        data = client.get("/api/inventario/pivot").json()
+        semana = to_week_key(semana_d)
+        helena = self._fila(data, "1kg DABOV Helena")
+        assert helena["fechas"][semana] == 10
+        assert semana not in helena["fechas_ubic"]
+
 
 class TestConsumoSemanalMismaUbicacion:
     """Two records at the SAME ubicacion on the same day are a correction
