@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/api";
+import { formatFechaISO } from "@/lib/format";
 import { useToast } from "@/components/Toast";
 import type { Ingrediente, HistorialPrecio, Movimiento, Receta, HistorialFrozen } from "@/lib/types";
 import Link from "next/link";
@@ -124,24 +125,10 @@ export default function IngredienteDetailPage() {
 
   const formatFecha = (fecha: string | null) => {
     if (!fecha) return "—";
-    try {
-      return new Date(fecha).toLocaleDateString("es-ES", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-      });
-    } catch {
-      return fecha;
-    }
+    return formatFechaISO(fecha, { conAno: true });
   };
 
-  const formatFechaCorta = (fecha: string) => {
-    try {
-      return new Date(fecha).toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit" });
-    } catch {
-      return fecha;
-    }
-  };
+  const formatFechaCorta = (fecha: string) => formatFechaISO(fecha);
 
   // Tube counts are whole numbers in practice; drop the decimals unless a
   // fractional value actually shows up, so the footer stays scannable.
@@ -466,7 +453,7 @@ export default function IngredienteDetailPage() {
                         <div>{p.proveedor}</div>
                         {p.fecha && (
                           <div className="text-xs text-[#6B5E52]/60 font-normal">
-                            Ult. {new Date(p.fecha).toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit", year: "numeric" })}
+                            Ult. {formatFechaISO(p.fecha, { conAno: true })}
                           </div>
                         )}
                       </td>

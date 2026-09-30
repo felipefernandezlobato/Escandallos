@@ -1,3 +1,29 @@
+/** Format an API date ("2026-09-30") for display, without moving the day.
+ *
+ * The backend stores these as calendar dates, not instants, and sends them as
+ * plain "YYYY-MM-DD". `new Date("2026-09-30")` parses that as midnight **UTC**,
+ * so `toLocaleDateString()` then renders it in the viewer's own timezone and
+ * hands back the day before to anyone west of UTC — the Historial de Conteos
+ * showed a count taken on 30/9 as 29/9, every column shifted by one. Pinning
+ * the formatter to UTC keeps the two ends on the same clock.
+ *
+ * weekKeyToLabel() below is immune for the same reason: it builds and reads
+ * its date entirely in UTC.
+ */
+export function formatFechaISO(
+  fecha: string,
+  opts: { conAno?: boolean } = {},
+): string {
+  const d = new Date(fecha);
+  if (Number.isNaN(d.getTime())) return fecha;
+  return d.toLocaleDateString("es-ES", {
+    day: "2-digit",
+    month: "2-digit",
+    ...(opts.conAno ? { year: "numeric" as const } : {}),
+    timeZone: "UTC",
+  });
+}
+
 export function weekKeyToLabel(weekKey: string): string {
   const m = weekKey.match(/^w(\d+)\.(\d+)$/);
   if (!m) return weekKey;
