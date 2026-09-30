@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 from app.auth import get_current_user
 from app.database import get_db
 from app.models import Ingrediente, InventarioRegistro, LineaPedido, Pedido
+from app.services.consumo import _notas_de_pedido, condicion_no_es_fila_de_pedido
 
 router = APIRouter(prefix="/api/menu", tags=["menu"])
 
@@ -67,10 +68,7 @@ def _batch_latest_stocks(
         )
         .filter(
             InventarioRegistro.ingrediente_id.in_(ingredient_ids),
-            or_(
-                InventarioRegistro.notas.is_(None),
-                ~InventarioRegistro.notas.ilike("%recibido%"),
-            ),
+            condicion_no_es_fila_de_pedido(InventarioRegistro.notas),
         )
         .group_by(InventarioRegistro.ingrediente_id)
         .all()
@@ -100,6 +98,7 @@ def _batch_latest_stocks(
             InventarioRegistro.ingrediente_id,
             InventarioRegistro.ubicacion,
             InventarioRegistro.cantidad,
+            InventarioRegistro.notas,
         )
         .filter(or_(*conditions))
         .order_by(InventarioRegistro.id.asc())
@@ -108,8 +107,18 @@ def _batch_latest_stocks(
 
     # A same-day, same-location duplicate is a correction (latest wins), not
     # additive — only genuinely different ubicaciones (BRU1 + BRU2) should sum.
+    # And a manual count outranks a same-day delivery row: when the
+    # ingredient's latest date holds any count, its "Pedido #N recibido" rows
+    # are dropped, because the count was taken after the delivery was put away
+    # and already includes it. Same rule as _day_por_ubicacion() in
+    # consumo.py — these two must stay in sync.
+    conto_ese_dia = {
+        iid for iid, fecha in date_map.items() if conteo_date_map.get(iid) == fecha
+    }
     latest_by_loc: dict[tuple, float] = {}
-    for iid, loc, qty in rows:
+    for iid, loc, qty, notas in rows:
+        if iid in conto_ese_dia and _notas_de_pedido(notas):
+            continue
         latest_by_loc[(iid, loc)] = qty
 
     result: dict[int, dict] = {iid: {"total": 0.0, "by_location": {}} for iid in ingredient_ids}

@@ -4,7 +4,7 @@ from collections import OrderedDict
 from datetime import date, timedelta
 from typing import Dict, List, Optional
 
-from sqlalchemy import distinct, func
+from sqlalchemy import distinct, func, or_
 from sqlalchemy.orm import Session
 
 from app.models import InventarioRegistro, LineaPedido, MermaRegistro, Pedido, Ingrediente, Proveedor
@@ -218,6 +218,36 @@ def _es_pedido_recibido(registro) -> bool:
     return bool(registro.notas and "recibido" in registro.notas.lower())
 
 
+_MARCADOR_PEDIDO = re.compile(r"^Pedido #\d+ recibido$")
+# Portable (SQLite + PostgreSQL, no regex) LIKE form of the same marker, for
+# filtering in SQL. Looser than the regex, but still tight enough to leave
+# hand-typed notes like "Recibido 4 tubos de BRU1" alone.
+MARCADOR_PEDIDO_LIKE = "Pedido #%recibido"
+
+
+def _notas_de_pedido(notas: Optional[str]) -> bool:
+    """Whether a notas string is the auto-inserted delivery marker."""
+    return bool(notas and _MARCADOR_PEDIDO.match(notas.strip()))
+
+
+def _es_fila_de_pedido(registro) -> bool:
+    """True only for the row recibir_pedido() auto-inserts, whose notas are
+    exactly "Pedido #<id> recibido".
+
+    Deliberately stricter than _es_pedido_recibido(): a hand-typed note such
+    as "Recibido 4 tubos de BRU1" is somebody recording a real transfer
+    between shops, which must keep counting as stock. Matching it loosely
+    would silently drop those tubes (two such rows exist, both café)."""
+    return _notas_de_pedido(registro.notas)
+
+
+def condicion_no_es_fila_de_pedido(col):
+    """SQL counterpart of `not _es_fila_de_pedido(...)`, for batch queries that
+    need the same rule without loading rows. Kept next to the Python version so
+    the two can't drift."""
+    return or_(col.is_(None), ~col.like(MARCADOR_PEDIDO_LIKE))
+
+
 def _day_por_ubicacion(records: list) -> dict:
     """Quantity per distinct ubicacion for same-day records of one ingredient.
     Records must be pre-sorted by id ascending. Two records at the SAME
@@ -225,8 +255,20 @@ def _day_por_ubicacion(records: list) -> dict:
     records at DIFFERENT ubicaciones (e.g. BRU1 + BRU2) are genuinely additive.
     A null ubicacion is its own bucket, like any other key.
 
+    **A manual count outranks a delivery.** The team counts after putting a
+    delivery away, so the count already includes it — if this day has any
+    manual count for the ingredient, the auto-inserted "Pedido #N recibido"
+    rows are dropped. Keeping them would add a figure that recibir_pedido()
+    computed as a total across BOTH shops on top of the other shop's own
+    count: that is what inflated week 39 of 2026 by 133 units after Pedido
+    #103 landed on a counting day. A delivery still defines the day's stock
+    when nobody counted (otherwise stock would go stale between sessions).
+
     Single source of truth for this rule — _day_total() sums it, and the
     inventario pivot reads it to show the BRU1/BRU2 breakdown per cell."""
+    conteos = [r for r in records if not _es_fila_de_pedido(r)]
+    if conteos:
+        records = conteos
     by_loc: dict = {}
     for r in records:
         by_loc[r.ubicacion] = r.cantidad
@@ -267,7 +309,6 @@ def _stock_actual_leaf(ingrediente_id: int, db: Session, as_of_fecha: Optional[d
 
     ing = db.query(Ingrediente).get(ingrediente_id)
     is_cafe = ing and ing.categoria_id == CAFE_CATEGORIA_ID
-    es_recibido = _es_pedido_recibido(ultimo)
 
     if is_cafe:
         registros_dia = (
@@ -280,8 +321,15 @@ def _stock_actual_leaf(ingrediente_id: int, db: Session, as_of_fecha: Optional[d
             .all()
         )
         cantidad = _day_total(registros_dia)
+        # A manual count outranks a delivery (see _day_por_ubicacion), so this
+        # day is a real counting session whenever it holds any count — even if
+        # the delivery row happens to be the last one inserted.
+        es_recibido = all(_es_fila_de_pedido(r) for r in registros_dia)
+        es_fila_pedido = _es_fila_de_pedido
     else:
         cantidad = ultimo.cantidad
+        es_recibido = _es_pedido_recibido(ultimo)
+        es_fila_pedido = _es_pedido_recibido
 
     fecha_conteo = ultimo.fecha_registro
     if es_recibido:
@@ -291,7 +339,7 @@ def _stock_actual_leaf(ingrediente_id: int, db: Session, as_of_fecha: Optional[d
         historial = historial_q.order_by(
             InventarioRegistro.fecha_registro.desc(), InventarioRegistro.id.desc()
         ).all()
-        conteo = next((r for r in historial if not _es_pedido_recibido(r)), None)
+        conteo = next((r for r in historial if not es_fila_pedido(r)), None)
         fecha_conteo = conteo.fecha_registro if conteo else None
 
     return {
@@ -445,7 +493,12 @@ def stock_historial_serie(ingrediente_id: int, db: Session) -> list[dict]:
                 idx[cid] += 1
             if day_date is not None:
                 day_total = _day_total(day_records) if sum_same_day else day_records[-1].cantidad
-                es_recibido = all(_es_pedido_recibido(r) for r in day_records)
+                # Café: a day holding any manual count is a counting session,
+                # and _day_total() has already dropped that day's delivery
+                # rows. Non-café keeps the looser marker it has always used
+                # (legacy rows say just "Pedido recibido", with no order id).
+                es_fila_pedido = _es_fila_de_pedido if sum_same_day else _es_pedido_recibido
+                es_recibido = all(es_fila_pedido(r) for r in day_records)
                 last_val[cid] = (day_total, day_date, es_recibido)
                 if not es_recibido:
                     last_conteo_fecha[cid] = day_date
@@ -740,12 +793,22 @@ def historial_frozen_por_ubicacion(ubicacion: str, db: Session) -> dict:
     )
 
     per_child_days: dict[int, dict] = {}
+    pedido_por_dia: dict[tuple, object] = {}
     for r in registros:
         # Later id on the same day overwrites — same-day correction, not a
         # second event. Each of these ingredients is already single-location
         # by construction (see docstring), so unlike _day_total elsewhere,
         # same-day records are never summed across ubicaciones here.
-        per_child_days.setdefault(r.ingrediente_id, {})[r.fecha_registro] = r
+        if _es_fila_de_pedido(r):
+            pedido_por_dia[(r.ingrediente_id, r.fecha_registro)] = r
+        dia = per_child_days.setdefault(r.ingrediente_id, {})
+        previo = dia.get(r.fecha_registro)
+        # A manual count outranks a same-day delivery row whatever the
+        # insertion order: the count is taken after the tubes are put away, so
+        # it already includes them. Mirrors _day_por_ubicacion().
+        if previo is not None and _es_fila_de_pedido(r) and not _es_fila_de_pedido(previo):
+            continue
+        dia[r.fecha_registro] = r
 
     mermas_by_child_day: dict[tuple, list] = {}
     for m in mermas:
@@ -770,7 +833,7 @@ def historial_frozen_por_ubicacion(ubicacion: str, db: Session) -> dict:
             r = per_child_days.get(tid, {}).get(d)
             if r is None:
                 continue
-            es_recibido = _es_pedido_recibido(r)
+            es_recibido = _es_fila_de_pedido(r)
             last_val[tid] = (r.cantidad, es_recibido)
             if not es_recibido:
                 last_conteo_fecha[tid] = d
@@ -791,9 +854,11 @@ def historial_frozen_por_ubicacion(ubicacion: str, db: Session) -> dict:
                     cantidad = 0.0  # not part of the latest session
 
             eventos = []
-            r = per_child_days.get(tid, {}).get(d)
-            if r is not None and _es_pedido_recibido(r):
-                eventos.append({"tipo": "pedido", "detalle": r.notas, "cantidad": None})
+            # Keep showing the delivery badge even when that day's manual
+            # count outranked the delivery row for the stock figure.
+            pedido_r = pedido_por_dia.get((tid, d))
+            if pedido_r is not None:
+                eventos.append({"tipo": "pedido", "detalle": pedido_r.notas, "cantidad": None})
             for m in mermas_by_child_day.get((tid, d), []):
                 eventos.append({"tipo": "merma", "detalle": m.notas or m.motivo, "cantidad": -m.cantidad})
 

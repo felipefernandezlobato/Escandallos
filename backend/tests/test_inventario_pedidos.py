@@ -538,10 +538,16 @@ class TestPedidoRecibirCafeFrozen:
         karamo_stock = stock_actual(frozen["karamo"].id, test_db)
         assert karamo_stock["cantidad"] == 6
 
-    def test_recibir_mismo_dia_que_conteo_no_duplica(self, client, test_db, frozen):
-        """A manual count and an order delivery landing on the same calendar
-        date must not be double-counted as if "Pedido recibido" (ubicacion
-        unset) were a third distinct location alongside BRU1/BRU2."""
+    def test_conteo_del_mismo_dia_manda_sobre_la_entrega(self, client, test_db, frozen):
+        """For café the manual count is the truth: the team counts after
+        putting a delivery away, so the count already includes it. A delivery
+        landing on a day that was counted must not add anything on top.
+
+        This is what stops the "Pedido recibido" row — whose quantity
+        recibir_pedido() computes across BOTH shops — from being stacked on the
+        other shop's own count (Pedido #103 inflated week 39 of 2026 by 133
+        units that way). The delivery still sets the stock on days when nobody
+        counted; see test_recibir_crea_inventario."""
         from app.services.consumo import stock_actual
 
         # Today's manual count for Karamo at BRU1.
@@ -567,10 +573,14 @@ class TestPedidoRecibirCafeFrozen:
             "lineas": [{"linea_id": lid, "cantidad_recibida": 10}],
         })
 
-        # 7 (today's count) + 10 received = 17, not 7 + 17 = 24 from treating
-        # the order-received row as an extra "None" location.
+        # The count of 7 stands on its own — not 17 (delivery added on top) and
+        # not 24 (delivery treated as a third location).
         karamo_stock = stock_actual(frozen["karamo"].id, test_db)
-        assert karamo_stock["cantidad"] == 17
+        assert karamo_stock["cantidad"] == 7
+        # The day still counts as a real counting session even though the
+        # delivery row was inserted last, so siblings aren't zeroed out.
+        assert karamo_stock["es_recibido"] is False
+        assert karamo_stock["fecha_conteo"] == date.today()
 
     def test_batch_latest_stocks_no_zera_hermanos(self, client, test_db, frozen):
         """Same rule, verified against menu.py's independent implementation
@@ -1492,3 +1502,153 @@ class TestConsumoSemanalMismaUbicacion:
 
         assert encontrado is not None, "el ingrediente no aparece en el catalogo"
         assert encontrado["stock"] == 7
+
+
+class TestConteoMandaSobreEntrega:
+    """Café rule: the manual count is the truth. A delivery only sets the
+    stock when nobody counted that day — the team counts after putting a
+    delivery away, so a count already includes what arrived."""
+
+    @pytest.fixture
+    def cafe_bolsa(self, test_db):
+        cafe_cat = Categoria(id=5, nombre="Café", tipo="ingrediente")
+        test_db.add(cafe_cat)
+        test_db.flush()
+        bolsa = Ingrediente(
+            nombre="1kg DABOV Ethiopia By Dabov", categoria_id=5,
+            unidad_compra="kg", cantidad_compra=1, precio_compra=20.0,
+            unidad_uso="kg", merma_porcentaje=0.0,
+        )
+        test_db.add(bolsa)
+        test_db.flush()
+        return bolsa
+
+    @staticmethod
+    def _reg(ing, cantidad, fecha, ubicacion, notas=None):
+        return InventarioRegistro(
+            ingrediente_id=ing.id, cantidad=cantidad, unidad="kg",
+            fecha_registro=fecha, ubicacion=ubicacion, notas=notas,
+        )
+
+    def test_entrega_no_se_suma_al_conteo_de_la_otra_tienda(self, test_db, cafe_bolsa):
+        """The exact Pedido #103 shape: counts at both shops, then a delivery
+        row tagged BRU2 whose quantity is already the two-shop total."""
+        from app.services.consumo import stock_actual
+
+        dia = date(2026, 9, 23)
+        test_db.add_all([
+            self._reg(cafe_bolsa, 23, dia, "BRU1"),
+            self._reg(cafe_bolsa, 1, dia, "BRU2"),
+            self._reg(cafe_bolsa, 39, dia, "BRU2", "Pedido #103 recibido"),
+        ])
+        test_db.flush()
+
+        # 23 + 1, not 23 + 39 = 62.
+        assert stock_actual(cafe_bolsa.id, test_db)["cantidad"] == 24
+
+    def test_entrega_manda_si_nadie_conto_ese_dia(self, test_db, cafe_bolsa):
+        """Otherwise stock would go stale between counting sessions and the
+        recommendation engine would re-order something that just arrived."""
+        from app.services.consumo import stock_actual
+
+        test_db.add_all([
+            self._reg(cafe_bolsa, 4, date(2026, 9, 16), "BRU1"),
+            self._reg(cafe_bolsa, 19, date(2026, 9, 18), "BRU1", "Pedido #103 recibido"),
+        ])
+        test_db.flush()
+
+        assert stock_actual(cafe_bolsa.id, test_db)["cantidad"] == 19
+
+    def test_nota_escrita_a_mano_no_es_una_entrega(self, test_db, cafe_bolsa):
+        """"Recibido 4 tubos de BRU1" is somebody recording a real transfer
+        between shops. Matching the marker loosely on the word "recibido"
+        would silently drop those 4 units."""
+        from app.services.consumo import stock_actual
+
+        dia = date(2026, 8, 12)
+        test_db.add_all([
+            self._reg(cafe_bolsa, 1, dia, "BRU2"),
+            self._reg(cafe_bolsa, 5, dia, "BRU2", "Recibido 4 tubos de BRU1"),
+        ])
+        test_db.flush()
+
+        # Same ubicacion, same day = correction, latest wins: 5, not 1.
+        assert stock_actual(cafe_bolsa.id, test_db)["cantidad"] == 5
+
+    def test_serie_historica_aplica_la_misma_regla(self, test_db, cafe_bolsa):
+        from app.services.consumo import stock_historial_serie
+
+        test_db.add_all([
+            self._reg(cafe_bolsa, 4, date(2026, 9, 16), "BRU1"),
+            self._reg(cafe_bolsa, 23, date(2026, 9, 23), "BRU1"),
+            self._reg(cafe_bolsa, 1, date(2026, 9, 23), "BRU2"),
+            self._reg(cafe_bolsa, 39, date(2026, 9, 23), "BRU2", "Pedido #103 recibido"),
+        ])
+        test_db.flush()
+
+        serie = {p["fecha"]: p["cantidad"] for p in stock_historial_serie(cafe_bolsa.id, test_db)}
+        assert serie["2026-09-16"] == 4
+        assert serie["2026-09-23"] == 24
+
+    def test_pivot_aplica_la_misma_regla(self, client, test_db, cafe_bolsa):
+        from app.services.conversiones import to_week_key
+
+        dia = date(2026, 9, 23)
+        test_db.add_all([
+            self._reg(cafe_bolsa, 23, dia, "BRU1"),
+            self._reg(cafe_bolsa, 1, dia, "BRU2"),
+            self._reg(cafe_bolsa, 39, dia, "BRU2", "Pedido #103 recibido"),
+        ])
+        test_db.flush()
+
+        data = client.get("/api/inventario/pivot").json()
+        fila = next(r for r in data["ingredientes"] if r["ingrediente_id"] == cafe_bolsa.id)
+        semana = to_week_key(dia)
+        assert fila["fechas"][semana] == 24
+        assert fila["fechas_ubic"][semana] == {"BRU1": 23, "BRU2": 1}
+
+    def test_batch_latest_stocks_aplica_la_misma_regla(self, test_db, cafe_bolsa):
+        """menu.py keeps its own implementation of this rule; it must agree."""
+        from app.routers.menu import _batch_latest_stocks
+
+        dia = date(2026, 9, 23)
+        test_db.add_all([
+            self._reg(cafe_bolsa, 23, dia, "BRU1"),
+            self._reg(cafe_bolsa, 1, dia, "BRU2"),
+            self._reg(cafe_bolsa, 39, dia, "BRU2", "Pedido #103 recibido"),
+        ])
+        test_db.flush()
+
+        stocks = _batch_latest_stocks([cafe_bolsa.id], test_db)
+        assert stocks[cafe_bolsa.id]["total"] == 24
+        assert stocks[cafe_bolsa.id]["by_location"] == {"BRU1": 23, "BRU2": 1}
+
+    def test_consumo_no_se_infla_por_la_entrega(self, test_db, cafe_bolsa):
+        """The inflated 23.09 total was also feeding consumption, and through
+        it the par levels."""
+        from app.services.consumo import _consumo_semanal_leaf
+
+        # _consumo_semanal_leaf() anchors its window on the latest received
+        # order, so the delivery has to exist as a real pedido too.
+        pedido = Pedido(
+            fecha=date(2026, 9, 10), proveedor="Dabov", estado="recibido",
+            fecha_recepcion=date(2026, 9, 23),
+        )
+        test_db.add(pedido)
+        test_db.flush()
+        test_db.add(LineaPedido(
+            pedido_id=pedido.id, ingrediente_id=cafe_bolsa.id,
+            cantidad_pedida=15, cantidad_recibida=15, unidad="kg",
+        ))
+        test_db.add_all([
+            self._reg(cafe_bolsa, 23, date(2026, 9, 23), "BRU1"),
+            self._reg(cafe_bolsa, 1, date(2026, 9, 23), "BRU2"),
+            self._reg(cafe_bolsa, 39, date(2026, 9, 23), "BRU2", "Pedido #103 recibido"),
+            self._reg(cafe_bolsa, 12, date(2026, 9, 30), "BRU1"),
+            self._reg(cafe_bolsa, 2, date(2026, 9, 30), "BRU2"),
+        ])
+        test_db.flush()
+
+        total = sum(h["cantidad"] for h in _consumo_semanal_leaf(cafe_bolsa.id, test_db, semanas=12))
+        # 24 -> 14, so 10 consumed. Not 62 -> 14 = 48.
+        assert total == 10
