@@ -1324,3 +1324,142 @@ class TestPivotDesgloseUbicaciones:
         fresas = self._fila(data, "Fresas")
         # Cocina es de una sola ubicacion: gana el ultimo registro, sin desglose.
         assert fresas["fechas_ubic"] == {}
+
+
+class TestConsumoSemanalMismaUbicacion:
+    """Two records at the SAME ubicacion on the same day are a correction
+    (latest wins), not two locations to add up. `_consumo_semanal_leaf` used
+    to sum every same-day record raw, so a re-count inflated that day's stock
+    and the following interval's consumption.
+
+    Reported 2026-09-30 on /ingredientes/73 (Café en grano MARRÓN): the
+    "Consumo Semanal" bar for w39.26 read 31 kg while the stock line only
+    dropped 43 -> 30. Ruanda Mahembe had two BRU1 rows of 18 on 2026-09-17,
+    summed to 36, so its consumption came out 36 - 9 = 27 instead of 9."""
+
+    @pytest.fixture
+    def cafe_leaf(self, test_db):
+        test_db.add(Categoria(id=5, nombre="Café", tipo="ingrediente", seccion="cafe"))
+        test_db.flush()
+        ing = Ingrediente(
+            nombre="1kg DABOV Ruanda Mahembe", categoria_id=5,
+            unidad_compra="kg", cantidad_compra=1, precio_compra=20.0,
+            unidad_uso="kg", merma_porcentaje=0.0,
+        )
+        otro = Ingrediente(
+            nombre="Otro", categoria_id=5,
+            unidad_compra="kg", cantidad_compra=1, precio_compra=1.0,
+            unidad_uso="kg", merma_porcentaje=0.0,
+        )
+        test_db.add_all([ing, otro])
+        test_db.flush()
+
+        # Un pedido recibido cualquiera fija la ventana temporal que usa
+        # _consumo_semanal_leaf; es de OTRO ingrediente para no aportar
+        # cantidad recibida a este.
+        pedido = Pedido(
+            fecha=date(2026, 9, 23), proveedor="Dabov",
+            estado="recibido", fecha_recepcion=date(2026, 9, 23),
+        )
+        test_db.add(pedido)
+        test_db.flush()
+        test_db.add(LineaPedido(
+            pedido_id=pedido.id, ingrediente_id=otro.id,
+            cantidad_pedida=1, cantidad_recibida=1, unidad="kg",
+        ))
+
+        test_db.add_all([
+            # Sesion del 17: se cuenta BRU1=18, se corrige a 18 otra vez, BRU2=0.
+            InventarioRegistro(
+                ingrediente_id=ing.id, cantidad=18, unidad="kg",
+                fecha_registro=date(2026, 9, 17), ubicacion="BRU1",
+            ),
+            InventarioRegistro(
+                ingrediente_id=ing.id, cantidad=18, unidad="kg",
+                fecha_registro=date(2026, 9, 17), ubicacion="BRU1",
+            ),
+            InventarioRegistro(
+                ingrediente_id=ing.id, cantidad=0, unidad="kg",
+                fecha_registro=date(2026, 9, 17), ubicacion="BRU2",
+            ),
+            # Sesion del 23: BRU1=9, BRU2=0.
+            InventarioRegistro(
+                ingrediente_id=ing.id, cantidad=9, unidad="kg",
+                fecha_registro=date(2026, 9, 23), ubicacion="BRU1",
+            ),
+            InventarioRegistro(
+                ingrediente_id=ing.id, cantidad=0, unidad="kg",
+                fecha_registro=date(2026, 9, 23), ubicacion="BRU2",
+            ),
+        ])
+        test_db.flush()
+        return ing
+
+    def test_duplicado_misma_ubicacion_no_infla_consumo(self, test_db, cafe_leaf):
+        from app.services.consumo import consumo_semanal
+
+        data = {x["semana"]: x["cantidad"] for x in consumo_semanal(cafe_leaf.id, test_db)}
+        # 18 (no 36) - 9 = 9, coherente con lo que muestra la serie de stock.
+        assert data["w39.26"] == 9
+
+    def test_consumo_cuadra_con_la_serie_de_stock(self, test_db, cafe_leaf):
+        from app.services.consumo import consumo_semanal, stock_actual
+
+        data = {x["semana"]: x["cantidad"] for x in consumo_semanal(cafe_leaf.id, test_db)}
+        stock_17 = 18  # lo que reporta _day_total para el 17
+        assert stock_actual(cafe_leaf.id, test_db)["cantidad"] == 9
+        assert data["w39.26"] == stock_17 - 9
+
+    def test_ubicaciones_distintas_siguen_sumando(self, test_db, cafe_leaf):
+        """La corrección no debe romper el caso normal BRU1 + BRU2."""
+        from app.services.consumo import consumo_semanal
+
+        test_db.query(InventarioRegistro).filter(
+            InventarioRegistro.ingrediente_id == cafe_leaf.id,
+            InventarioRegistro.fecha_registro == date(2026, 9, 23),
+            InventarioRegistro.ubicacion == "BRU2",
+        ).update({"cantidad": 4})
+        test_db.flush()
+
+        data = {x["semana"]: x["cantidad"] for x in consumo_semanal(cafe_leaf.id, test_db)}
+        # 18 - (9 + 4) = 5
+        assert data["w39.26"] == 5
+
+    def test_batch_coincide_con_la_version_individual(self, test_db, cafe_leaf):
+        """consumo_medio_batch() duplica la lógica de consumo_medio_semanal();
+        si una aplica la regla de corrección y la otra no, el listado de
+        inventario y la ficha del ingrediente muestran cifras distintas."""
+        from app.services.consumo import consumo_medio_batch, consumo_medio_semanal
+
+        batch = consumo_medio_batch([cafe_leaf.id], test_db)
+        assert batch[cafe_leaf.id]["consumo_medio"] == consumo_medio_semanal(
+            cafe_leaf.id, test_db
+        )
+
+    def test_catalogo_cafe_no_infla_el_stock(self, client, test_db, cafe_leaf):
+        """/api/cafe/catalogo tenía el mismo raw-sum. El catálogo solo mira el
+        último día contado, así que la corrección tiene que estar ahí: se
+        recuenta BRU1 del 23 y pasa de 9 a 7. Correcto = 7 + 0 (BRU2); el
+        raw-sum daría 9 + 0 + 7 = 16."""
+        test_db.add(InventarioRegistro(
+            ingrediente_id=cafe_leaf.id, cantidad=7, unidad="kg",
+            fecha_registro=date(2026, 9, 23), ubicacion="BRU1",
+        ))
+        test_db.flush()
+
+        items = client.get("/api/cafe/catalogo").json()
+
+        encontrado = None
+        stack = [items]
+        while stack:
+            cur = stack.pop()
+            if isinstance(cur, dict):
+                if cur.get("id") == cafe_leaf.id:
+                    encontrado = cur
+                    break
+                stack.extend(cur.values())
+            elif isinstance(cur, list):
+                stack.extend(cur)
+
+        assert encontrado is not None, "el ingrediente no aparece en el catalogo"
+        assert encontrado["stock"] == 7

@@ -79,7 +79,7 @@ def _consumo_semanal_leaf(ingrediente_id: int, db: Session, semanas: int = 12) -
             InventarioRegistro.ingrediente_id == ingrediente_id,
             InventarioRegistro.fecha_registro >= inicio,
         )
-        .order_by(InventarioRegistro.fecha_registro)
+        .order_by(InventarioRegistro.fecha_registro, InventarioRegistro.id)
         .all()
     )
     # Exclude "Pedido recibido" records — they duplicate order data and inflate consumption
@@ -89,14 +89,17 @@ def _consumo_semanal_leaf(ingrediente_id: int, db: Session, semanas: int = 12) -
     else:
         target_unit = ing.unidad_compra if ing else "unidad"
 
-    # Aggregate same-day records (BRU1 + BRU2 entries) into single data points
+    # Collapse same-day records into a single data point per day, using the
+    # same stock rule as _stock_actual_leaf(): café sums distinct ubicaciones
+    # (BRU1 + BRU2) with a same-ubicacion repeat treated as a correction,
+    # everything else is single-location so the last record of the day wins.
+    # Raw-summing every same-day row instead turns a re-count into extra
+    # stock and inflates the next interval's consumption.
     from collections import OrderedDict
-    day_sums: OrderedDict[date, float] = OrderedDict()
-    day_units: dict[date, str] = {}
+    is_cafe = bool(ing and ing.categoria_id == CAFE_CATEGORIA_ID)
+    day_records: OrderedDict[date, list] = OrderedDict()
     for r in filtered:
-        day_sums[r.fecha_registro] = day_sums.get(r.fecha_registro, 0) + r.cantidad
-        if r.fecha_registro not in day_units:
-            day_units[r.fecha_registro] = r.unidad
+        day_records.setdefault(r.fecha_registro, []).append(r)
 
     class _AggRecord:
         def __init__(self, fecha, cantidad, unidad):
@@ -105,7 +108,14 @@ def _consumo_semanal_leaf(ingrediente_id: int, db: Session, semanas: int = 12) -
             self.unidad = unidad
             self.notas = None
 
-    inventarios = [_AggRecord(f, q, day_units[f]) for f, q in day_sums.items()]
+    inventarios = [
+        _AggRecord(
+            fecha,
+            _day_total(regs) if is_cafe else regs[-1].cantidad,
+            regs[0].unidad,
+        )
+        for fecha, regs in day_records.items()
+    ]
 
     pedidos_recibidos = (
         db.query(LineaPedido.cantidad_recibida, LineaPedido.unidad, Pedido.fecha_recepcion)
@@ -1060,7 +1070,7 @@ def consumo_medio_batch(
             InventarioRegistro.ingrediente_id.in_(ingrediente_ids),
             InventarioRegistro.fecha_registro >= inicio,
         )
-        .order_by(InventarioRegistro.fecha_registro)
+        .order_by(InventarioRegistro.fecha_registro, InventarioRegistro.id)
         .all()
     )
     inv_by_id: Dict[int, list] = {iid: [] for iid in ingrediente_ids}
@@ -1106,17 +1116,21 @@ def consumo_medio_batch(
         filtered = [r for r in raw_inv if not (r.notas and "recibido" in r.notas.lower())]
         target_unit = raw_inv[-1].unidad if raw_inv else (ing.unidad_compra if ing else "unidad")
 
-        # Aggregate same-day records
-        day_sums: OrderedDict[date, float] = OrderedDict()
-        day_units: dict[date, str] = {}
+        # Collapse same-day records — same stock rule as _consumo_semanal_leaf()
+        # and _stock_actual_leaf(): café sums distinct ubicaciones, everything
+        # else keeps the last record of the day (a correction, not a 2nd count).
+        is_cafe = bool(ing and ing.categoria_id == CAFE_CATEGORIA_ID)
+        day_records: OrderedDict[date, list] = OrderedDict()
         for r in filtered:
-            day_sums[r.fecha_registro] = day_sums.get(r.fecha_registro, 0) + r.cantidad
-            if r.fecha_registro not in day_units:
-                day_units[r.fecha_registro] = r.unidad
+            day_records.setdefault(r.fecha_registro, []).append(r)
 
         inventarios = [
-            type("R", (), {"fecha_registro": f, "cantidad": q, "unidad": day_units[f]})
-            for f, q in day_sums.items()
+            type("R", (), {
+                "fecha_registro": f,
+                "cantidad": _day_total(regs) if is_cafe else regs[-1].cantidad,
+                "unidad": regs[0].unidad,
+            })
+            for f, regs in day_records.items()
         ]
 
         pedidos = orders_by_id.get(iid, [])

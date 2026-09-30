@@ -181,7 +181,14 @@ Render start command is `bash start.sh` (set in dashboard, NOT render.yaml). It 
 - If a café ingredient was **not counted** in the latest session, assume stock is **0** — never carry forward old values
 - Within a parent group (e.g., "Café en grano ROJO"), only children counted on the most recent date contribute to the total
 - **Frozen tube flavors are counted the same way** — all flavors are counted together in one session (BRU1 and BRU2 separately, grouped under "Tubos Frozen Bru1"/"Bru2"). A flavor left blank on count day means 0, not carried forward — same "zero if not counted in the latest session" rule as every other café item. (Prior to 2026-08-20 this had a documented exception treating frozen tubes as counted independently per flavor; that was wrong — the count is a synchronized session like everything else in café, and blank fields on that form mean 0)
-- This exact stock logic is duplicated in **three places** that must be kept in sync: `_stock_actual_leaf`/`_day_total` and `stock_historial_serie` in `consumo.py`, and `_batch_latest_stocks` in `menu.py` (feeds `/api/menu/frozen`, grouped by each ingredient's `grupo_ingrediente_id` — tubes by their Bru1/Bru2 parent, source bags by their own retail-color parent). A fix in one needs to be checked/applied in the other two
+- This exact stock logic is duplicated in **six places** that must be kept in sync. A fix in one needs to be checked/applied in all the others:
+  1. `_stock_actual_leaf`/`_day_total` in `consumo.py`
+  2. `stock_historial_serie` in `consumo.py`
+  3. `_batch_latest_stocks` in `menu.py` (feeds `/api/menu/frozen`, grouped by each ingredient's `grupo_ingrediente_id` — tubes by their Bru1/Bru2 parent, source bags by their own retail-color parent)
+  4. the pivot in `routers/inventario.py` (uses `_day_por_ubicacion`)
+  5. `_consumo_semanal_leaf` **and** `consumo_medio_batch` in `consumo.py` — these collapse same-day records to build the consumption series
+  6. `catalogo_cafe` and `update_pvp` in `routers/cafe.py`
+- **The same-ubicacion correction rule is the part that keeps getting missed.** Two records at the same `ubicacion` on the same day are a correction (latest `id` wins); only *distinct* ubicaciones are additive. Anything that raw-sums every same-day row is wrong. On 2026-09-30 this made `/ingredientes/73` (Café en grano MARRÓN) show 31 kg consumed in w39 instead of 13: Ruanda Mahembe had two BRU1 rows of 18 on 2026-09-17 that were summed to 36. Always collapse via `_day_total()`/`_day_por_ubicacion()` (café) or "last record of the day" (everything else) — never `sum(r.cantidad for r in same_day)`. `_day_por_ubicacion()` requires records sorted by `id` **ascending**, so check the query's `order_by` before passing a list in
 
 ### Kitchen / Bar / Other categories
 - **Single location** — no BRU1/BRU2 concept, one count per item

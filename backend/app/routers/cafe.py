@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from app.auth import get_current_user
 from app.database import get_db
 from app.models import Ingrediente, Categoria, InventarioRegistro
-from app.services.consumo import consumo_medio_batch
+from app.services.consumo import _day_total, consumo_medio_batch
 
 router = APIRouter(prefix="/api/cafe", tags=["cafe"])
 
@@ -174,7 +174,11 @@ def catalogo_cafe(
         if inv_records:
             latest_date = inv_records[0].fecha_registro
             stock_unit = inv_records[0].unidad
-            stock_qty = sum(r.cantidad for r in inv_records if r.fecha_registro == latest_date)
+            # Sum distinct ubicaciones (BRU1 + BRU2); a repeat at the same
+            # ubicacion that day is a correction, not a second count.
+            # inv_records is newest-first, _day_total() needs id ascending.
+            del_dia = [r for r in inv_records if r.fecha_registro == latest_date][::-1]
+            stock_qty = _day_total(del_dia)
 
         # Consumo — from batch result
         cd = consumo_batch.get(ing.id, {"consumo_medio": 0.0, "tendencia": "estable"})
@@ -281,9 +285,10 @@ def update_pvp(
                 InventarioRegistro.ingrediente_id == ingrediente_id,
                 InventarioRegistro.fecha_registro == ultimo.fecha_registro,
             )
+            .order_by(InventarioRegistro.id.asc())
             .all()
         )
-        stock_qty = sum(r.cantidad for r in same_day)
+        stock_qty = _day_total(same_day)
 
     pvp = ing.precio_venta
     coste = ing.precio_compra
