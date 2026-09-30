@@ -538,16 +538,12 @@ class TestPedidoRecibirCafeFrozen:
         karamo_stock = stock_actual(frozen["karamo"].id, test_db)
         assert karamo_stock["cantidad"] == 6
 
-    def test_conteo_del_mismo_dia_manda_sobre_la_entrega(self, client, test_db, frozen):
-        """For café the manual count is the truth: the team counts after
-        putting a delivery away, so the count already includes it. A delivery
-        landing on a day that was counted must not add anything on top.
-
-        This is what stops the "Pedido recibido" row — whose quantity
-        recibir_pedido() computes across BOTH shops — from being stacked on the
-        other shop's own count (Pedido #103 inflated week 39 of 2026 by 133
-        units that way). The delivery still sets the stock on days when nobody
-        counted; see test_recibir_crea_inventario."""
+    def test_entrega_se_suma_al_conteo_de_una_sola_tienda(self, client, test_db, frozen):
+        """A frozen tube flavor lives at one shop only, so a delivery landing
+        on a counted day is a correct running total and must win — Pedido #122
+        delivered 5 Tennessee tubes to BRU1 after Nelson had counted 0 there
+        that same morning. Only a day counted at BOTH shops makes the delivery
+        row unusable; see test_entrega_no_se_suma_al_conteo_de_la_otra_tienda."""
         from app.services.consumo import stock_actual
 
         # Today's manual count for Karamo at BRU1.
@@ -573,10 +569,10 @@ class TestPedidoRecibirCafeFrozen:
             "lineas": [{"linea_id": lid, "cantidad_recibida": 10}],
         })
 
-        # The count of 7 stands on its own — not 17 (delivery added on top) and
-        # not 24 (delivery treated as a third location).
+        # 7 (today's count) + 10 received = 17. Not 24, which would come from
+        # treating the delivery row as an extra "None" location.
         karamo_stock = stock_actual(frozen["karamo"].id, test_db)
-        assert karamo_stock["cantidad"] == 7
+        assert karamo_stock["cantidad"] == 17
         # The day still counts as a real counting session even though the
         # delivery row was inserted last, so siblings aren't zeroed out.
         assert karamo_stock["es_recibido"] is False
@@ -1505,9 +1501,10 @@ class TestConsumoSemanalMismaUbicacion:
 
 
 class TestConteoMandaSobreEntrega:
-    """Café rule: the manual count is the truth. A delivery only sets the
-    stock when nobody counted that day — the team counts after putting a
-    delivery away, so a count already includes what arrived."""
+    """Café rule: a delivery row carries a total across ALL ubicaciones but is
+    tagged with only one, so it is unusable exactly when the day was counted at
+    both shops — then it gets dropped. Counted at one shop, it is a correct
+    running total and wins."""
 
     @pytest.fixture
     def cafe_bolsa(self, test_db):
@@ -1727,3 +1724,66 @@ class TestConteoMandaSobreEntrega:
 
         assert encontrado is not None
         assert encontrado["stock"] == 24
+
+    def test_entrega_tras_conteo_en_una_sola_tienda_se_suma(self, test_db, cafe_bolsa):
+        """The Pedido #122 shape, which the first version of this rule broke:
+        counted at BRU1 only, delivery to BRU1 the same day arriving after the
+        count. The delivery row is 0 + 5 for that one shop, so it is correct
+        and must win — dropping it lost 5 real tubes."""
+        from app.routers.menu import _batch_latest_stocks
+        from app.services.consumo import stock_actual
+
+        dia = date(2026, 9, 30)
+        test_db.add_all([
+            self._reg(cafe_bolsa, 0, dia, "BRU1"),
+            self._reg(cafe_bolsa, 5, dia, "BRU1", "Pedido #122 recibido"),
+        ])
+        test_db.flush()
+
+        leaf = stock_actual(cafe_bolsa.id, test_db)
+        assert leaf["cantidad"] == 5
+        # The day still holds a count, so it defines a counting session.
+        assert leaf["es_recibido"] is False
+        assert leaf["fecha_conteo"] == dia
+        assert _batch_latest_stocks([cafe_bolsa.id], test_db)[cafe_bolsa.id]["total"] == 5
+
+    def test_historial_frozen_no_descarta_la_entrega(self, test_db):
+        """historial_frozen_por_ubicacion keeps its own copy of the rule; frozen
+        flavors are single-shop by construction so a delivery must win there
+        too, while still showing its badge."""
+        from app.services.consumo import historial_frozen_por_ubicacion
+
+        cafe_cat = Categoria(id=5, nombre="Café", tipo="ingrediente", seccion="cafe")
+        test_db.add(cafe_cat)
+        test_db.flush()
+        # Location is resolved by parent id, hardcoded 289=Bru1 / 290=Bru2.
+        padre = Ingrediente(
+            id=289,
+            nombre="Tubos Frozen Bru1", categoria_id=5, unidad_compra="unidad",
+            cantidad_compra=1, precio_compra=0, unidad_uso="unidad", merma_porcentaje=0.0,
+        )
+        test_db.add(padre)
+        test_db.flush()
+        sabor = Ingrediente(
+            nombre="Frozen BD Tennessee Bru1", categoria_id=5, unidad_compra="unidad",
+            cantidad_compra=1, precio_compra=0, unidad_uso="unidad", merma_porcentaje=0.0,
+            grupo_ingrediente_id=padre.id, coste_kg_frozen=100.0,
+        )
+        test_db.add(sabor)
+        test_db.flush()
+
+        dia = date(2026, 9, 30)
+        test_db.add_all([
+            InventarioRegistro(ingrediente_id=sabor.id, cantidad=0, unidad="unidad",
+                               fecha_registro=dia, ubicacion="BRU1"),
+            InventarioRegistro(ingrediente_id=sabor.id, cantidad=5, unidad="unidad",
+                               fecha_registro=dia, ubicacion="BRU1",
+                               notas="Pedido #122 recibido"),
+        ])
+        test_db.flush()
+
+        hist = historial_frozen_por_ubicacion("BRU1", test_db)
+        fila = next(s for s in hist["sabores"] if s["ingrediente_id"] == sabor.id)
+        celda = fila["valores"][str(dia)]
+        assert celda["cantidad"] == 5
+        assert any(e["tipo"] == "pedido" for e in celda["eventos"])

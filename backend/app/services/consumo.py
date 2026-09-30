@@ -255,19 +255,25 @@ def _day_por_ubicacion(records: list) -> dict:
     records at DIFFERENT ubicaciones (e.g. BRU1 + BRU2) are genuinely additive.
     A null ubicacion is its own bucket, like any other key.
 
-    **A manual count outranks a delivery.** The team counts after putting a
-    delivery away, so the count already includes it — if this day has any
-    manual count for the ingredient, the auto-inserted "Pedido #N recibido"
-    rows are dropped. Keeping them would add a figure that recibir_pedido()
-    computed as a total across BOTH shops on top of the other shop's own
-    count: that is what inflated week 39 of 2026 by 133 units after Pedido
-    #103 landed on a counting day. A delivery still defines the day's stock
-    when nobody counted (otherwise stock would go stale between sessions).
+    **A delivery row is dropped when the day was counted at more than one
+    shop.** recibir_pedido() writes it as `stock + cantidad_recibida` where
+    `stock` is the total across ALL ubicaciones, yet tags the row with just
+    one of them (see stock_base_recepcion_pedido). For an ingredient counted
+    at a single shop that is harmless — the total *is* that shop's total, and
+    the row is a correct running figure that must win. But once the day holds
+    counts at BRU1 *and* BRU2, that one figure already contains both, and
+    summing it with the other shop's count adds the same stock twice: Pedido
+    #103 inflated week 39 of 2026 by 133 units exactly that way.
+
+    So the test is "did this day span two shops", not "is there a count".
+    Dropping deliveries whenever a count existed was wrong: Pedido #122
+    delivered 5 Tennessee tubes to BRU1 *after* Nelson counted 0 there the
+    same day, and discarding it lost the delivery.
 
     Single source of truth for this rule — _day_total() sums it, and the
     inventario pivot reads it to show the BRU1/BRU2 breakdown per cell."""
     conteos = [r for r in records if not _es_fila_de_pedido(r)]
-    if conteos:
+    if len({r.ubicacion for r in conteos}) > 1:
         records = conteos
     by_loc: dict = {}
     for r in records:
@@ -799,16 +805,14 @@ def historial_frozen_por_ubicacion(ubicacion: str, db: Session) -> dict:
         # second event. Each of these ingredients is already single-location
         # by construction (see docstring), so unlike _day_total elsewhere,
         # same-day records are never summed across ubicaciones here.
+        # Each of these ingredients is single-location by construction, so the
+        # cross-shop problem _day_por_ubicacion() guards against cannot arise
+        # here and a delivery row is a correct running total: plain latest-wins
+        # is right. Tracked separately only so the delivery badge still shows
+        # when a later manual count overwrote the row.
         if _es_fila_de_pedido(r):
             pedido_por_dia[(r.ingrediente_id, r.fecha_registro)] = r
-        dia = per_child_days.setdefault(r.ingrediente_id, {})
-        previo = dia.get(r.fecha_registro)
-        # A manual count outranks a same-day delivery row whatever the
-        # insertion order: the count is taken after the tubes are put away, so
-        # it already includes them. Mirrors _day_por_ubicacion().
-        if previo is not None and _es_fila_de_pedido(r) and not _es_fila_de_pedido(previo):
-            continue
-        dia[r.fecha_registro] = r
+        per_child_days.setdefault(r.ingrediente_id, {})[r.fecha_registro] = r
 
     mermas_by_child_day: dict[tuple, list] = {}
     for m in mermas:

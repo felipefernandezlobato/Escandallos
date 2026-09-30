@@ -114,19 +114,23 @@ def _batch_latest_stocks(
 
     # A same-day, same-location duplicate is a correction (latest wins), not
     # additive — only genuinely different ubicaciones (BRU1 + BRU2) should sum.
-    # And a manual count outranks a same-day delivery row: when the
-    # ingredient's latest date holds any count, its "Pedido #N recibido" rows
-    # are dropped, because the count was taken after the delivery was put away
-    # and already includes it. Same rule as _day_por_ubicacion() in
+    # And when the day was counted at BOTH shops, that day's delivery rows are
+    # dropped: recibir_pedido() writes them as a total across all ubicaciones
+    # but tags them with one, so summing them with the other shop's count
+    # counts the same stock twice. Same rule as _day_por_ubicacion() in
     # consumo.py — these two must stay in sync.
-    conto_ese_dia = {
-        iid for iid, fecha in date_map.items() if conteo_date_map.get(iid) == fecha
-    }
-    latest_by_loc: dict[tuple, float] = {}
+    por_ing: dict[int, list] = {}
     for iid, loc, qty, notas in rows:
-        if iid in conto_ese_dia and _notas_de_pedido(notas):
-            continue
-        latest_by_loc[(iid, loc)] = qty
+        por_ing.setdefault(iid, []).append((loc, qty, notas))
+
+    latest_by_loc: dict[tuple, float] = {}
+    for iid, dia in por_ing.items():
+        ubic_contadas = {loc for loc, _q, notas in dia if not _notas_de_pedido(notas)}
+        descartar_entregas = len(ubic_contadas) > 1
+        for loc, qty, notas in dia:
+            if descartar_entregas and _notas_de_pedido(notas):
+                continue
+            latest_by_loc[(iid, loc)] = qty
 
     result: dict[int, dict] = {iid: {"total": 0.0, "by_location": {}} for iid in ingredient_ids}
     for (iid, loc), qty in latest_by_loc.items():
