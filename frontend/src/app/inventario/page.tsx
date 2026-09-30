@@ -1645,7 +1645,9 @@ function InventarioContent() {
                       if (n.startsWith("retail ") && !n.includes("200g")) return 40;
                       if (n.includes("130g") || n.includes("130 g") || n.includes("100g") || n.includes("100 g")) return 40;
                       if (n.includes("coffee retail")) return 45;
-                      if (n.includes("tubos frozen")) return 50;
+                      // "Tubos Frozen" shares the flavors' bucket so it can sort
+                      // last among them as their total, like "= Café en grano".
+                      if (n.includes("tubos frozen")) return 60;
                       if (n.startsWith("frozen") || n.includes("frozen")) return 60;
                       if (n.includes("cápsula") || n.includes("capsula")) return 70;
                       return 80;
@@ -1676,7 +1678,8 @@ function InventarioContent() {
                     };
                     const isCoffeeTotalRow = (name: string): boolean => {
                       const n = name.toLowerCase();
-                      return n.includes("café en grano") || n.includes("coffee retail") || n.startsWith("retail ");
+                      return n.includes("café en grano") || n.includes("coffee retail")
+                        || n.startsWith("retail ") || n.includes("tubos frozen");
                     };
                     const sortItems = (items: typeof filtered, group: string) => {
                       const isCafe = vista === "cafe" && (group === "Café" || group.toLowerCase().includes("café"));
@@ -1706,8 +1709,10 @@ function InventarioContent() {
                       if (n.startsWith("retail ") && !n.includes("200g")) return `= Total ${color || "GOLD"}`;
                       if (n.includes("130g") || n.includes("130 g") || n.includes("100g") || n.includes("100 g")) return "100g/130g · GOLD";
                       if (n.includes("coffee retail")) return "= Total Retail";
-                      if (n.includes("tubos frozen")) return "Tubos Frozen";
-                      if (n.startsWith("frozen") || n.includes("frozen")) return "Frozen";
+                      // Both share the "Tubos Frozen" header; the total's label
+                      // starts with "=" so it doesn't open a second one.
+                      if (n.includes("tubos frozen")) return "= Total Tubos Frozen";
+                      if (n.startsWith("frozen") || n.includes("frozen")) return "Tubos Frozen";
                       if (n.includes("cápsula") || n.includes("capsula")) return "Cápsulas";
                       return "";
                     };

@@ -1787,3 +1787,143 @@ class TestConteoMandaSobreEntrega:
         celda = fila["valores"][str(dia)]
         assert celda["cantidad"] == 5
         assert any(e["tipo"] == "pedido" for e in celda["eventos"])
+
+
+class TestPivotTubosFrozenFundidos:
+    """Each frozen flavor is two ingredients, one per shop. In the pivot they
+    collapse into a single row carrying the (BRU1+BRU2) breakdown, so they read
+    like every other café line instead of taking two."""
+
+    @pytest.fixture
+    def tubos(self, test_db):
+        cafe_cat = Categoria(id=5, nombre="Café", tipo="ingrediente", seccion="cafe")
+        test_db.add(cafe_cat)
+        test_db.flush()
+
+        def parent(pid, nombre):
+            p = Ingrediente(
+                id=pid, nombre=nombre, categoria_id=5, unidad_compra="unidad",
+                cantidad_compra=1, precio_compra=0, unidad_uso="unidad",
+                merma_porcentaje=0.0,
+            )
+            test_db.add(p)
+            return p
+
+        # Ids are load-bearing: location is resolved from the parent, 289/290.
+        parent(289, "Tubos Frozen Bru1")
+        parent(290, "Tubos Frozen Bru2")
+        test_db.flush()
+
+        def sabor(nombre, padre, activo=True):
+            s = Ingrediente(
+                nombre=nombre, categoria_id=5, unidad_compra="unidad",
+                cantidad_compra=1, precio_compra=0, unidad_uso="unidad",
+                merma_porcentaje=0.0, grupo_ingrediente_id=padre, activo=activo,
+            )
+            test_db.add(s)
+            return s
+
+        creados = {
+            "lord_b1": sabor("Frozen BD Lord Bru1", 289),
+            "lord_b2": sabor("Frozen BD Lord Bru2", 290),
+            # The real asymmetric pair: dead at Bru1, still counted at Bru2.
+            "suspiro_b1": sabor("Frozen Nicaragua El Suspiro Bru1", 289, activo=False),
+            "suspiro_b2": sabor("Frozen Nicaragua El Suspiro Bru2", 290, activo=True),
+        }
+        test_db.flush()
+        return creados
+
+    @staticmethod
+    def _reg(ing, cantidad, fecha, ubicacion):
+        return InventarioRegistro(
+            ingrediente_id=ing.id, cantidad=cantidad, unidad="unidad",
+            fecha_registro=fecha, ubicacion=ubicacion,
+        )
+
+    @staticmethod
+    def _filas(data):
+        return {r["ingrediente_nombre"]: r for r in data["ingredientes"]}
+
+    def test_un_sabor_es_una_sola_fila_con_desglose(self, client, test_db, tubos):
+        from app.services.conversiones import to_week_key
+
+        dia = date(2026, 9, 30)
+        test_db.add_all([
+            self._reg(tubos["lord_b1"], 7, dia, "BRU1"),
+            self._reg(tubos["lord_b2"], 9, dia, "BRU2"),
+        ])
+        test_db.flush()
+
+        filas = self._filas(client.get("/api/inventario/pivot").json())
+        semana = to_week_key(dia)
+
+        assert "Frozen BD Lord Bru1" not in filas
+        assert "Frozen BD Lord Bru2" not in filas
+        lord = filas["Frozen BD Lord"]
+        assert lord["fechas"][semana] == 16
+        assert lord["fechas_ubic"][semana] == {"BRU1": 7, "BRU2": 9}
+
+    def test_la_ubicacion_nula_no_rompe_el_desglose(self, client, test_db, tubos):
+        """Delivery rows on tubes inherit a null ubicacion, so the split has to
+        come from the parent, not from that column."""
+        from app.services.conversiones import to_week_key
+
+        dia = date(2026, 9, 30)
+        test_db.add_all([
+            self._reg(tubos["lord_b1"], 7, dia, None),
+            self._reg(tubos["lord_b2"], 9, dia, None),
+        ])
+        test_db.flush()
+
+        filas = self._filas(client.get("/api/inventario/pivot").json())
+        semana = to_week_key(dia)
+        assert filas["Frozen BD Lord"]["fechas_ubic"][semana] == {"BRU1": 7, "BRU2": 9}
+
+    def test_sin_desglose_si_solo_se_conto_una_tienda(self, client, test_db, tubos):
+        from app.services.conversiones import to_week_key
+
+        dia = date(2026, 9, 30)
+        test_db.add(self._reg(tubos["lord_b1"], 7, dia, "BRU1"))
+        test_db.flush()
+
+        filas = self._filas(client.get("/api/inventario/pivot").json())
+        semana = to_week_key(dia)
+        lord = filas["Frozen BD Lord"]
+        assert lord["fechas"][semana] == 7
+        # No "(7+0)": BRU2 wasn't counted, it isn't empty.
+        assert semana not in lord["fechas_ubic"]
+
+    def test_la_fila_usa_el_id_del_lado_activo(self, client, test_db, tubos):
+        """El Suspiro is dead at Bru1 and alive at Bru2. The pivot hides
+        inactive ingredients by default, so keying the merged row on the dead
+        side would hide a flavor that is still being counted."""
+        dia = date(2026, 9, 30)
+        test_db.add_all([
+            self._reg(tubos["suspiro_b1"], 2, date(2026, 8, 19), "BRU1"),
+            self._reg(tubos["suspiro_b2"], 5, dia, "BRU2"),
+        ])
+        test_db.flush()
+
+        filas = self._filas(client.get("/api/inventario/pivot").json())
+        suspiro = filas["Frozen Nicaragua El Suspiro"]
+        assert suspiro["ingrediente_id"] == tubos["suspiro_b2"].id
+
+    def test_los_dos_padres_se_funden_en_uno(self, client, test_db, tubos):
+        from app.services.conversiones import to_week_key
+
+        dia = date(2026, 9, 30)
+        test_db.add_all([
+            self._reg(tubos["lord_b1"], 7, dia, "BRU1"),
+            self._reg(tubos["lord_b2"], 9, dia, "BRU2"),
+            self._reg(tubos["suspiro_b2"], 5, dia, "BRU2"),
+        ])
+        test_db.flush()
+
+        filas = self._filas(client.get("/api/inventario/pivot").json())
+        semana = to_week_key(dia)
+
+        assert "Tubos Frozen Bru1" not in filas
+        assert "Tubos Frozen Bru2" not in filas
+        padre = filas["Tubos Frozen"]
+        assert padre["fechas"][semana] == 21          # 7 + (9 + 5)
+        assert padre["fechas_ubic"][semana] == {"BRU1": 7, "BRU2": 14}

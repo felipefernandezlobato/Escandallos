@@ -20,7 +20,9 @@ from app.schemas import (
     RecomendacionOut,
     StockHistorialItem,
 )
+from app.routers.menu import _coffee_name
 from app.services.consumo import (
+    FROZEN_TUBE_PARENT_BY_UBICACION,
     _day_por_ubicacion,
     _day_total,
     calcular_par_y_safety,
@@ -241,6 +243,107 @@ def _desglose_hijos(by_ing: dict, child_ids: list, week: str, total: float) -> O
     return _desglose_ubicaciones(acumulado, total)
 
 
+def _par_fundido(
+    lado_bru1: Optional[dict], lado_bru2: Optional[dict], nombre: str
+) -> Optional[dict]:
+    """Merge one flavor's two per-shop rows into a single pivot row.
+
+    A frozen flavor is two ingredients, one per shop, so neither row can ever
+    carry a BRU1/BRU2 breakdown of its own — each only has records at one
+    location. Here the breakdown comes from *which side* the number came from,
+    which is the reliable signal: `ubicacion` is missing on some of these rows
+    (auto-inserted delivery rows inherit a null), so it must not be used.
+
+    The breakdown is only emitted for weeks where BOTH shops have a figure —
+    same rule as _desglose_ubicaciones(). Showing "(0+5)" for a week where BRU1
+    simply wasn't counted would claim it was counted and empty.
+    """
+    lados = {"BRU1": lado_bru1, "BRU2": lado_bru2}
+    presentes = {loc: l for loc, l in lados.items() if l is not None}
+    if not presentes:
+        return None
+
+    semanas = {w for l in presentes.values() for w in l["fechas"]}
+    fechas: dict[str, float] = {}
+    fechas_ubic: dict[str, dict] = {}
+    for week in semanas:
+        por_loc = {
+            loc: l["fechas"][week] for loc, l in presentes.items() if week in l["fechas"]
+        }
+        total = round(sum(por_loc.values()), 2)
+        fechas[week] = total
+        desglose = _desglose_ubicaciones(por_loc, total)
+        if desglose:
+            fechas_ubic[week] = desglose
+
+    unidades = [l["unidad"] for l in presentes.values() if l.get("unidad")]
+    return {
+        "ingrediente_nombre": nombre,
+        "unidad": unidades[0] if unidades else "unidad",
+        "fechas": fechas,
+        "fechas_ubic": fechas_ubic,
+    }
+
+
+def _fundir_tubos_frozen(by_ing: dict, db: Session) -> None:
+    """Collapse each frozen flavor's Bru1 + Bru2 rows into one, in place.
+
+    Every other café item is a single ingredient counted at both shops, so it
+    already reads as "19 (14+5)". Frozen flavors were the exception, taking two
+    lines each (42 of them, plus the two "Tubos Frozen Bru1"/"Bru2" parents) and
+    never showing a breakdown. After this they read like the rest.
+
+    Pairing is by name with the shop suffix stripped — the same `_coffee_name`
+    rule /api/menu/frozen already groups by. Location comes from the parent
+    (289 = Bru1, 290 = Bru2), never from the `ubicacion` column.
+
+    The merged row keeps the id of an ACTIVE side, preferring Bru1: the pivot
+    hides inactive ingredients by default, and Frozen Nicaragua El Suspiro is
+    deactivated at Bru1 while still live at Bru2 — keying the row on the dead
+    side would hide a flavor that is still being counted.
+    """
+    padre_bru1 = FROZEN_TUBE_PARENT_BY_UBICACION["BRU1"]
+    padre_bru2 = FROZEN_TUBE_PARENT_BY_UBICACION["BRU2"]
+
+    hijos = (
+        db.query(Ingrediente)
+        .filter(Ingrediente.grupo_ingrediente_id.in_([padre_bru1, padre_bru2]))
+        .all()
+    )
+
+    # base name -> {"BRU1": Ingrediente, "BRU2": Ingrediente}
+    sabores: dict[str, dict[str, Ingrediente]] = {}
+    for h in hijos:
+        loc = "BRU1" if h.grupo_ingrediente_id == padre_bru1 else "BRU2"
+        sabores.setdefault(_coffee_name(h.nombre), {})[loc] = h
+
+    for base, lados in sabores.items():
+        b1, b2 = lados.get("BRU1"), lados.get("BRU2")
+        fundido = _par_fundido(
+            by_ing.get(b1.id) if b1 else None,
+            by_ing.get(b2.id) if b2 else None,
+            f"Frozen {base}",
+        )
+        for lado in (b1, b2):
+            if lado is not None:
+                by_ing.pop(lado.id, None)
+        if fundido is None:
+            continue
+        visible = next((l for l in (b1, b2) if l is not None and l.activo), None) or b1 or b2
+        fundido["ingrediente_id"] = visible.id
+        by_ing[visible.id] = fundido
+
+    # The two parent rows collapse the same way, into one "= Tubos Frozen".
+    padres = _par_fundido(
+        by_ing.get(padre_bru1), by_ing.get(padre_bru2), "Tubos Frozen"
+    )
+    by_ing.pop(padre_bru1, None)
+    by_ing.pop(padre_bru2, None)
+    if padres is not None:
+        padres["ingrediente_id"] = padre_bru1
+        by_ing[padre_bru1] = padres
+
+
 @router.get("/pivot")
 def inventario_pivot(
     db: Session = Depends(get_db),
@@ -360,6 +463,8 @@ def inventario_pivot(
                     "fechas": fechas_data,
                     "fechas_ubic": fechas_ubic_data,
                 }
+
+    _fundir_tubos_frozen(by_ing, db)
 
     # Count distinct weeks ordered for sorting (frequency, not volume)
     order_counts: dict[int, int] = {}
