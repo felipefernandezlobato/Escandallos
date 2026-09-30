@@ -1184,3 +1184,143 @@ class TestPedidoPorProveedor:
     def test_por_proveedor(self, client, seed):
         resp = client.get("/api/pedidos/por-proveedor")
         assert resp.status_code == 200
+
+
+class TestPivotDesgloseUbicaciones:
+    """The historial pivot shows a (BRU1, BRU2) breakdown next to each café
+    cell, but only when both shops were counted that day and the two parts add
+    up to the total shown next to them."""
+
+    @pytest.fixture
+    def cafe(self, test_db):
+        cafe_cat = Categoria(id=5, nombre="Café", tipo="ingrediente")
+        test_db.add(cafe_cat)
+        test_db.flush()
+
+        parent = Ingrediente(
+            nombre="Café en grano ROJO", categoria_id=5,
+            unidad_compra="kg", cantidad_compra=1, precio_compra=0,
+            unidad_uso="kg", merma_porcentaje=0.0,
+        )
+        test_db.add(parent)
+        test_db.flush()
+
+        helena = Ingrediente(
+            nombre="1kg DABOV Helena", categoria_id=5,
+            unidad_compra="kg", cantidad_compra=1, precio_compra=20.0,
+            unidad_uso="kg", merma_porcentaje=0.0,
+            grupo_ingrediente_id=parent.id,
+        )
+        ethiopia = Ingrediente(
+            nombre="1kg DABOV Ethiopia", categoria_id=5,
+            unidad_compra="kg", cantidad_compra=1, precio_compra=22.0,
+            unidad_uso="kg", merma_porcentaje=0.0,
+            grupo_ingrediente_id=parent.id,
+        )
+        test_db.add_all([helena, ethiopia])
+        test_db.flush()
+
+        def reg(ing, cantidad, fecha, ubicacion):
+            return InventarioRegistro(
+                ingrediente_id=ing.id, cantidad=cantidad, unidad="kg",
+                fecha_registro=fecha, ubicacion=ubicacion,
+            )
+
+        semana_a = date(2026, 1, 5)
+        semana_b = date(2026, 1, 12)
+        semana_c = date(2026, 1, 19)
+        test_db.add_all([
+            # Both shops counted: both leaves and the parent get a breakdown.
+            reg(helena, 4, semana_a, "BRU1"),
+            reg(helena, 2, semana_a, "BRU2"),
+            reg(ethiopia, 3, semana_a, "BRU1"),
+            reg(ethiopia, 1, semana_a, "BRU2"),
+            # Only BRU1 counted Helena, both shops counted Ethiopia.
+            reg(helena, 5, semana_b, "BRU1"),
+            reg(ethiopia, 2, semana_b, "BRU1"),
+            reg(ethiopia, 2, semana_b, "BRU2"),
+            # Same shop twice the same day = correction, not two locations.
+            reg(helena, 3, semana_c, "BRU1"),
+            reg(helena, 7, semana_c, "BRU1"),
+        ])
+        test_db.flush()
+        return {
+            "parent": parent, "helena": helena, "ethiopia": ethiopia,
+            "semana_a": semana_a, "semana_b": semana_b, "semana_c": semana_c,
+        }
+
+    @staticmethod
+    def _fila(data, nombre):
+        return next(r for r in data["ingredientes"] if r["ingrediente_nombre"] == nombre)
+
+    def test_desglose_cuando_ambas_tiendas_contaron(self, client, cafe):
+        from app.services.conversiones import to_week_key
+
+        data = client.get("/api/inventario/pivot").json()
+        semana = to_week_key(cafe["semana_a"])
+
+        helena = self._fila(data, "1kg DABOV Helena")
+        assert helena["fechas"][semana] == 6
+        assert helena["fechas_ubic"][semana] == {"BRU1": 4, "BRU2": 2}
+
+        ethiopia = self._fila(data, "1kg DABOV Ethiopia")
+        assert ethiopia["fechas"][semana] == 4
+        assert ethiopia["fechas_ubic"][semana] == {"BRU1": 3, "BRU2": 1}
+
+    def test_sin_desglose_si_solo_conto_una_tienda(self, client, cafe):
+        from app.services.conversiones import to_week_key
+
+        data = client.get("/api/inventario/pivot").json()
+        semana = to_week_key(cafe["semana_b"])
+
+        helena = self._fila(data, "1kg DABOV Helena")
+        assert helena["fechas"][semana] == 5
+        assert semana not in helena["fechas_ubic"]
+
+    def test_correccion_misma_tienda_no_es_desglose(self, client, cafe):
+        from app.services.conversiones import to_week_key
+
+        data = client.get("/api/inventario/pivot").json()
+        semana = to_week_key(cafe["semana_c"])
+
+        helena = self._fila(data, "1kg DABOV Helena")
+        assert helena["fechas"][semana] == 7
+        assert semana not in helena["fechas_ubic"]
+
+    def test_fila_total_suma_desglose_de_hijos(self, client, cafe):
+        from app.services.conversiones import to_week_key
+
+        data = client.get("/api/inventario/pivot").json()
+        parent = self._fila(data, "Café en grano ROJO")
+        semana = to_week_key(cafe["semana_a"])
+
+        assert parent["fechas"][semana] == 10
+        assert parent["fechas_ubic"][semana] == {"BRU1": 7, "BRU2": 3}
+
+    def test_fila_total_sin_desglose_si_un_hijo_no_lo_tiene(self, client, cafe):
+        from app.services.conversiones import to_week_key
+
+        data = client.get("/api/inventario/pivot").json()
+        parent = self._fila(data, "Café en grano ROJO")
+        semana = to_week_key(cafe["semana_b"])
+
+        # Helena solo se conto en BRU1 esa semana, asi que el total no puede
+        # mostrar un desglose que sume menos de lo que se ve al lado.
+        assert parent["fechas"][semana] == 9
+        assert semana not in parent["fechas_ubic"]
+
+    def test_no_cafe_nunca_lleva_desglose(self, client, test_db, seed):
+        test_db.add(InventarioRegistro(
+            ingrediente_id=seed["fresas"].id, cantidad=3, unidad="kg",
+            fecha_registro=date(2026, 1, 5), ubicacion="BRU1",
+        ))
+        test_db.add(InventarioRegistro(
+            ingrediente_id=seed["fresas"].id, cantidad=2, unidad="kg",
+            fecha_registro=date(2026, 1, 5), ubicacion="BRU2",
+        ))
+        test_db.flush()
+
+        data = client.get("/api/inventario/pivot").json()
+        fresas = self._fila(data, "Fresas")
+        # Cocina es de una sola ubicacion: gana el ultimo registro, sin desglose.
+        assert fresas["fechas_ubic"] == {}

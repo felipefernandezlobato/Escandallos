@@ -21,6 +21,7 @@ from app.schemas import (
     StockHistorialItem,
 )
 from app.services.consumo import (
+    _day_por_ubicacion,
     _day_total,
     calcular_par_y_safety,
     consumo_medio_semanal,
@@ -207,6 +208,39 @@ def listar_inventario(
     }
 
 
+_UBICACIONES_PIVOT = ("BRU1", "BRU2")
+
+
+def _desglose_ubicaciones(por_loc: dict, total: float) -> Optional[dict]:
+    """BRU1/BRU2 breakdown for one pivot cell, or None when it can't be shown
+    as an exact split of that cell's total: only one shop counted that day, or
+    a null-ubicacion record also contributed. Never show a breakdown that
+    doesn't add up to the number next to it."""
+    split = {loc: por_loc[loc] for loc in _UBICACIONES_PIVOT if loc in por_loc}
+    if len(split) < len(_UBICACIONES_PIVOT):
+        return None
+    if round(sum(split.values()), 2) != round(total, 2):
+        return None
+    return {loc: round(v, 2) for loc, v in split.items()}
+
+
+def _desglose_hijos(by_ing: dict, child_ids: list, week: str, total: float) -> Optional[dict]:
+    """Same breakdown for an aggregate (parent) row: sums the children's own
+    breakdowns. Returns None as soon as one contributing child lacks a
+    breakdown, so the parent never shows a split that misses a shop."""
+    acumulado = {loc: 0.0 for loc in _UBICACIONES_PIVOT}
+    for cid in child_ids:
+        hijo = by_ing.get(cid)
+        if hijo is None or week not in hijo["fechas"]:
+            continue
+        desglose = hijo["fechas_ubic"].get(week)
+        if desglose is None:
+            return None
+        for loc in _UBICACIONES_PIVOT:
+            acumulado[loc] += desglose[loc]
+    return _desglose_ubicaciones(acumulado, total)
+
+
 @router.get("/pivot")
 def inventario_pivot(
     db: Session = Depends(get_db),
@@ -244,10 +278,16 @@ def inventario_pivot(
                 latest_day_por_week[week] = dia
 
         fechas: dict[str, float] = {}
+        fechas_ubic: dict[str, dict] = {}
         for week, dia in latest_day_por_week.items():
             regs = dias[dia]
             if ing_id in cafe_ids:
-                fechas[week] = round(_day_total(regs), 2)
+                por_loc = _day_por_ubicacion(regs)
+                total = round(sum(por_loc.values()), 2)
+                fechas[week] = total
+                desglose = _desglose_ubicaciones(por_loc, total)
+                if desglose:
+                    fechas_ubic[week] = desglose
             else:
                 fechas[week] = round(regs[-1].cantidad, 2)
 
@@ -256,6 +296,7 @@ def inventario_pivot(
             "ingrediente_nombre": ing.nombre if ing else "",
             "unidad": unidad_por_ing[ing_id],
             "fechas": fechas,
+            "fechas_ubic": fechas_ubic,
         }
 
     fechas_sorted = sorted(fechas_set, reverse=True)
@@ -288,6 +329,9 @@ def inventario_pivot(
                     )
                     if total > 0:
                         by_ing[parent.id]["fechas"][week] = round(total, 2)
+                        desglose = _desglose_hijos(by_ing, child_ids, week, total)
+                        if desglose:
+                            by_ing[parent.id]["fechas_ubic"][week] = desglose
         else:
             # Parent has no records at all — build entirely from children
             child_ids = [
@@ -296,6 +340,7 @@ def inventario_pivot(
                 ).all()
             ]
             fechas_data: dict[str, float] = {}
+            fechas_ubic_data: dict[str, dict] = {}
             for week in fechas_sorted:
                 total = sum(
                     by_ing[cid]["fechas"].get(week, 0)
@@ -303,6 +348,9 @@ def inventario_pivot(
                 )
                 if total > 0:
                     fechas_data[week] = round(total, 2)
+                    desglose = _desglose_hijos(by_ing, child_ids, week, total)
+                    if desglose:
+                        fechas_ubic_data[week] = desglose
             if fechas_data:
                 child_units = [by_ing[cid]["unidad"] for cid in child_ids if cid in by_ing]
                 by_ing[parent.id] = {
@@ -310,6 +358,7 @@ def inventario_pivot(
                     "ingrediente_nombre": parent.nombre,
                     "unidad": child_units[0] if child_units else parent.unidad_compra,
                     "fechas": fechas_data,
+                    "fechas_ubic": fechas_ubic_data,
                 }
 
     # Count distinct weeks ordered for sorting (frequency, not volume)

@@ -138,6 +138,8 @@ function InventarioContent() {
       ingrediente_nombre: string;
       unidad: string;
       fechas: Record<string, number>;
+      // Solo en dias contados en las dos tiendas: { semana: { BRU1, BRU2 } }
+      fechas_ubic?: Record<string, Record<string, number>>;
     }>;
   } | null>(null);
   const [lastSaved, setLastSaved] = useState<string | null>(null);
@@ -1598,6 +1600,11 @@ function InventarioContent() {
               </p>
             ) : (
               <div className="overflow-x-auto">
+                {vista === "cafe" && (
+                  <p className="text-[10px] text-[#6B5E52]/60 mb-2">
+                    Entre parentesis: (BRU1 + BRU2) en los dias contados en las dos tiendas.
+                  </p>
+                )}
                 <table className="text-sm border-collapse">
                   <thead>
                     <tr className="border-b border-[#E8DFD3] text-left text-[#6B5E52]">
@@ -1740,11 +1747,20 @@ function InventarioContent() {
                                 </Link>
                               </td>
                               <td className={`py-1.5 px-2 whitespace-nowrap ${isTotal ? "text-[#3D2E22] font-bold" : "text-[#6B5E52]"}`}>{ing.unidad}</td>
-                              {pivot.fechas.map((f) => (
-                                <td key={f} className={`py-1.5 px-2 text-center ${isTotal ? "font-bold text-[#3D2E22]" : ""}`}>
-                                  {ing.fechas[f] !== undefined ? ing.fechas[f] : ""}
+                              {pivot.fechas.map((f) => {
+                                const valor = ing.fechas[f];
+                                const desglose = valor !== undefined ? ing.fechas_ubic?.[f] : undefined;
+                                return (
+                                <td key={f} className={`py-1.5 px-2 text-center whitespace-nowrap ${isTotal ? "font-bold text-[#3D2E22]" : ""}`}>
+                                  {valor !== undefined ? valor : ""}
+                                  {desglose && (
+                                    <span className="ml-0.5 text-[9px] font-normal tracking-tight text-[#6B5E52]/60">
+                                      ({desglose.BRU1}+{desglose.BRU2})
+                                    </span>
+                                  )}
                                 </td>
-                              ))}
+                                );
+                              })}
                             </tr>
                           </React.Fragment>
                           );

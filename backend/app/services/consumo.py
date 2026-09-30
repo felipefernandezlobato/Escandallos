@@ -208,16 +208,25 @@ def _es_pedido_recibido(registro) -> bool:
     return bool(registro.notas and "recibido" in registro.notas.lower())
 
 
-def _day_total(records: list) -> float:
-    """Sum quantities across distinct ubicaciones for same-day records of one
-    ingredient. Records must be pre-sorted by id ascending. Two records at the
-    SAME ubicacion on the same day are a correction (latest wins, not summed);
-    two records at DIFFERENT ubicaciones (e.g. BRU1 + BRU2) are genuinely
-    additive."""
+def _day_por_ubicacion(records: list) -> dict:
+    """Quantity per distinct ubicacion for same-day records of one ingredient.
+    Records must be pre-sorted by id ascending. Two records at the SAME
+    ubicacion on the same day are a correction (latest wins, not summed); two
+    records at DIFFERENT ubicaciones (e.g. BRU1 + BRU2) are genuinely additive.
+    A null ubicacion is its own bucket, like any other key.
+
+    Single source of truth for this rule — _day_total() sums it, and the
+    inventario pivot reads it to show the BRU1/BRU2 breakdown per cell."""
     by_loc: dict = {}
     for r in records:
         by_loc[r.ubicacion] = r.cantidad
-    return sum(by_loc.values())
+    return by_loc
+
+
+def _day_total(records: list) -> float:
+    """Sum quantities across distinct ubicaciones for same-day records of one
+    ingredient. See _day_por_ubicacion() for the correction/additive rule."""
+    return sum(_day_por_ubicacion(records).values())
 
 
 def _stock_actual_leaf(ingrediente_id: int, db: Session, as_of_fecha: Optional[date] = None) -> Optional[dict]:
