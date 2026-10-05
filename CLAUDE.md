@@ -165,6 +165,7 @@ Render start command is `bash start.sh` (set in dashboard, NOT render.yaml). It 
 - A flavor not part of the location's most recent synchronized counting session shows **0** for that date, not a stale carried-forward value — same rule `stock_actual()`/`stock_historial_serie()` already apply for café (see Inventory Stock Rules above), just kept per-flavor instead of summed. A delivery is exempt and always shows its own bumped total even if the flavor wasn't manually recounted that day
 - Only `activo=True` flavors shown, matching "Stock Frozen Tubes"/`/api/menu/frozen` (active-only) directly above it on the same page
 - A flavor with zero records at a given location correctly doesn't appear in that location's table at all (e.g. a newly-added BD flavor only counted at BRU2 so far won't show in the BRU1 tab)
+- **Same-day rows here are plain latest-wins, deliberately.** These flavors are single-shop ingredients, so the cross-shop problem `_day_por_ubicacion()` guards against cannot arise and a delivery row is always a correct running total. A `pedido_por_dia` dict is kept separately only so the delivery badge still shows on a day where a later manual count overwrote the row. This table is NOT the place to apply the "drop the delivery" rule — doing so on 2026-09-30 ate three real deliveries
 
 ## Oat Milk Variant
 
@@ -220,13 +221,20 @@ Render start command is `bash start.sh` (set in dashboard, NOT render.yaml). It 
 
 ## Café Pivot Sorting
 
-- Sub-category order: 1kg → 200g → 130g → Coffee Retail Bags → Tubos Frozen → Frozen → Cápsulas
+- Sub-category order: 1kg → 200g → 130g → Coffee Retail Bags → Tubos Frozen (flavors + their total) → Cápsulas
 - Within each size: sorted by color (MARRÓN → ROJO → BLACK → GOLD) via `grupo_ingrediente_id` with name fallback. This order is duplicated in three places that must stay in sync: `_COLOR_ORDER` in `backend/app/routers/cafe.py`, `COLOR_ORDER` in `frontend/src/app/menu-cafe/page.tsx`, and `COLOR_ORDER`/`coffeeColorOrder` in the inventario pivot
 - Color sub-headers: "1kg · MARRÓN", "200g · ROJO", "130g · GOLD" etc.
 - Total rows (Café en grano, Retail color groups, Coffee Retail Bags) styled bold, sort LAST within their color group
 - `coffeeColorOrder`/`coffeeColorName` fall through to name-based detection when `grupo_ingrediente_id` not in COLOR_ORDER
 - Pivot auto-aggregates parent totals from children (`_child_ids` recursive for grandchildren)
 - Retail color groups (325-328) are children of Coffee Retail Bags (279)
+- **Every café cell shows its two-shop split inline: `19 (14+5)`.** Served as `fechas_ubic` on `/api/inventario/pivot` and rendered as a 9px muted span. It is emitted **only when `BRU1 + BRU2` equals the total beside it** — a breakdown that doesn't add up is worse than none, so a day counted at one shop only, or one where a null-`ubicacion` row also contributed, shows a bare number. Aggregate rows sum their children's splits and show one only if every contributing child has its own. Keep it at 9px with `tracking-tight`: the `30.09.26` header sets the column width and even `114 (39+75)` fits underneath, so the breakdown costs no horizontal space
+- Use `+`, not a comma, between the two figures. With a comma `62 (23,39)` reads as the number 23.39 in Spanish and `0.5 (0,5)` shows the same figure twice in two notations
+- **Frozen flavors are merged into ONE pivot row each** (`_fundir_tubos_frozen` in `routers/inventario.py`), so `Frozen BD Lord Bru1` + `...Bru2` become `Frozen BD Lord  14 (7+7)`. Without this they take two lines and can never show a split, since each ingredient only has records at one location. Consequences to remember:
+  - **Pivot rows no longer map 1:1 to ingredient ids.** A merged row carries the id of an **active** side (preferring Bru1) because the pivot hides inactive ingredients by default — `Frozen Nicaragua El Suspiro` is deactivated at Bru1 but still counted at Bru2, and keying on the dead side would hide it. `/api/inventario/pivot` is only consumed by the inventario page; check that before relying on row ids elsewhere
+  - Pairing strips the shop suffix via `_coffee_name()` from `menu.py` — the same rule `/api/menu/frozen` groups by. Don't write a second one
+  - The split comes from the **parent** (289/290), never from `ubicacion` — see the frozen-tube warning above
+  - The two parents collapse into one `= Tubos Frozen` total row, which sorts last in its section like `= Café en grano ROJO`
 
 ## Dabov Pricing
 
@@ -234,6 +242,14 @@ Render start command is `bash start.sh` (set in dashboard, NOT render.yaml). It 
 - All 1kg, 200g, 130g bags and capsules have prices set
 - Frozen tubes: use `coste_kg_frozen` + `suplemento_frozen` + `frozen_origen_id`, NOT `precio_compra`
 - Pending: Frozen Nicaragua El Suspiro missing frozen pricing columns
+
+## BD (Brewing Dealers) Pricing
+
+- EUR→CHF multiplier: **0.935**. Verified 2026-10-05 against order #1374 — it reproduced all 14 existing app prices **to the cent**, so use it to cross-check a BD order confirmation before entering it. A line that doesn't reconcile is a mapping error, not a price change
+- `lineas_pedido.precio_unitario` is stored in **CHF**, never EUR (`ingredientes.precio_eur` holds the EUR figure when known)
+- **Bigger bag is usually cheaper per kg, but not always — check, don't assume.** Lalo: 100g = 52.90 CHF/kg vs 200g = 47.60 (−10 %). Tennessee: 100g = 85.10 CHF/kg vs 200g = 94.90 (**+11.5 %**). For a flavour sold in both formats, the break-even for the 200 g is `2 × (100 g price)` — above that, keep sourcing tubes from the 100 g bag
+- A BD order confirmation may omit the format on a line. Infer it from the per-unit price against `ingredientes.precio_compra`, don't guess from the name
+- `proveedores.lead_time_dias` says 7, but real deliveries were 11 days (#94: 03-09 → 14-09) and 20 days (#68: 04-08 → 24-08). Treat ~2 weeks as the planning lead. **Not corrected in the DB** — needs the user's call since it shifts every BD par level
 
 ## Frozen Tube Menu Pricing
 
@@ -246,6 +262,14 @@ Constants live in `menu_frozen()` (`backend/app/routers/menu.py`):
 - Supplements are a **carta decision, not a formula output** — always ask the user, never auto-assign. Some sit deliberately off-curve (Blossom at x13.6)
 - Karamo, Colombia Banana, Panama Lerida and Mexico Geisha keep their old supplements: being run down, not reordered
 - A tube is only visible on the menu if tube stock > 0, bag stock > 0, or the bag has a pending order
+
+### Demand baseline (measured, use this for ordering)
+
+- **~24 frozen tubes/week in total**, across all active flavours — set by customer traffic, not by how many flavours are on the carta. Measured from Lightspeed exports: 223 tubes over 9 weeks (Jul–Sep 2026) and 209 over 8.86 weeks (Aug–Oct 2026), i.e. flat. Split **BRU1 36 % / BRU2 64 %**
+- Adding flavours **splits** that total, it does not grow it: each existing flavour's rate drops by `old_count / (old_count + new)`. Across 18–19 flavours the per-flavour rate is ~1.3 tubes/week
+- **Never take this total from `consumo_medio_semanal`** — it gave 71/week, 3x too high (see Consumption & Ordering below and `docs/sesiones/2026-09-30.md`). Read the POS export
+- Retail bag baseline over the same window: **159 bags sold (79,5/month)** vs **197 bags consumed (98,5/month)** — the ~38 gap is ~20 into tubes plus ~18 waste/staff/cupping. Quote whichever the question actually asks for
+- Export details (which CSV rows, the `Coffee Bags` category including capsules, no date column) are in `docs/sesiones/2026-10-05.md`
 
 Creating a tube: **two** ingredients per flavor (Bru1 → `grupo_ingrediente_id` 289, Bru2 → 290), `categoria_id` 5, unidad `unidad`, `precio_compra` 0, plus the three frozen columns.
 
@@ -304,6 +328,7 @@ This keeps the remainder counted as stock-on-order — "pending" is `estado IN (
 
 - **No emojis** anywhere in the app — not in nav, headers, buttons, badges, or text
 - Navigation uses text labels only (no emoji icons)
+- **Format API dates with `formatFechaISO()` (`lib/format.ts`), never `new Date(fecha).toLocaleDateString()`.** The backend sends calendar dates as plain `"YYYY-MM-DD"`; `new Date()` parses that as midnight **UTC** and `toLocaleDateString` then renders it in the viewer's timezone, handing back the previous day to anyone west of UTC. On 2026-09-30 the Historial de Conteos showed a count taken on 30/9 as 29/9, every column shifted by one. It had been live for ages and nobody saw it: from Basel (UTC+1/+2) it renders correctly. **Reproduce date complaints with `TZ=America/Argentina/Buenos_Aires` before dismissing them.** `weekKeyToLabel()` is immune because it builds and reads its date entirely in UTC
 
 ## Safety
 
