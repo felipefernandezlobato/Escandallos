@@ -175,11 +175,13 @@ Render start command is `bash start.sh` (set in dashboard, NOT render.yaml). It 
 
 ## Inventory Stock Rules
 
-### Café (categoria_id=5) — BRU1 + BRU2
+### Café section (categorías 5, 17, 18) — BRU1 + BRU2
 - BRU1 and BRU2 are **two physical locations**. Nelson counts stock at each location separately
-- **Everything** in café is counted at both locations: 1kg bags, 200g bags, 130g bags, frozen tubes, capsules
+- **Everything** in café is counted at both locations: 1kg bags, 200g bags, 130g bags, frozen tubes, capsules — **and also Té+ (Chai, Matcha, Prana Chai, Hojicha, Chocolate) and the Sibarist filters**
+- **The per-shop rule keys off `categorias.seccion == 'cafe'`, NOT `categoria_id == 5`.** Resolve it with `cafe_categoria_ids(db)` in `consumo.py` — never re-test the category inline. It was hardcoded to 5 until 2026-10-13, which silently excluded Cafetería (17) and Té+ (18): those fell into the single-location branch, where the last record of the day wins, so one shop's count was discarded on **every** counting day. Prana Chai 250g read 10 with 17 really in stock; Matcha 60g read 0 with 2. 158 (item, day) pairs were affected since August. The old rows are all `ubicacion = NULL` on both shops, so they still collapse the same way and were deliberately **not** migrated — the numbers only correct themselves from the next count on
 - **Sum only distinct ubicaciones** on the same day (BRU1 count + BRU2 count = total). Two records at the **same** ubicacion on the same day are a correction (latest one wins) — do NOT sum them, or same-day transfer/adjustment notes double-count stock
-- If a café ingredient was **not counted** in the latest session, assume stock is **0** — never carry forward old values
+- `POST /api/inventario` **rejects (422) a café-section record with no `ubicacion`**, and `ubicacion` is a `Literal["BRU1","BRU2"]`. The whole batch is validated before anything is written. This is the guard that stops the bug above from recurring
+- If a café ingredient was **not counted** in the latest session, assume stock is **0** — never carry forward old values. This "synchronized session" rule is **narrower**: it still keys off `CAFE_CATEGORIA_ID = 5`, because it only makes sense for the coffee parent/child groups (`zero_if_uncounted` in `stock_actual`/`stock_historial_serie`, and `stock_base_recepcion_pedido`). Té+ and Cafetería are flat — no parents, no children — so each shop keeps its last known value. Don't "unify" these two predicates: they answer different questions
 - Within a parent group (e.g., "Café en grano ROJO"), only children counted on the most recent date contribute to the total
 - **Frozen tube flavors are counted the same way** — all flavors are counted together in one session (BRU1 and BRU2 separately, grouped under "Tubos Frozen Bru1"/"Bru2"). A flavor left blank on count day means 0, not carried forward — same "zero if not counted in the latest session" rule as every other café item. (Prior to 2026-08-20 this had a documented exception treating frozen tubes as counted independently per flavor; that was wrong — the count is a synchronized session like everything else in café, and blank fields on that form mean 0)
 - This exact stock logic is duplicated in **six places** that must be kept in sync. A fix in one needs to be checked/applied in all the others:
@@ -191,6 +193,9 @@ Render start command is `bash start.sh` (set in dashboard, NOT render.yaml). It 
   6. `catalogo_cafe` and `update_pvp` in `routers/cafe.py`
 
   (plus `historial_frozen_por_ubicacion` in `consumo.py`, which keeps a per-flavor variant of the same rule)
+
+  Of these, 3, 6 and `catalogo_cafe` never had a category gate at all — they apply the rule to whatever ids they're given, which degenerates safely to latest-wins for single-location items. Only 1, 2, 4 and 5 gate on the category, and those now call `cafe_categoria_ids(db)`.
+- **Pass `cafe_cat_ids` down through loops.** `stock_actual`, `consumo_semanal`, `consumo_medio_semanal`, `calcular_par_y_safety`, `_stock_actual_leaf`, `_consumo_semanal_leaf` and `stock_base_recepcion_pedido` all take an optional `cafe_cat_ids` and self-resolve when it's omitted. Any endpoint that loops over ingredients (`recomendacion_pedido`, `consumo_medio_batch`, `alertas_stock`, `cafe_resumen`) must resolve it **once** above the loop — otherwise every row costs an extra Neon round trip
 - **A delivery row is dropped only when that day was counted at BOTH shops.** `recibir_pedido()` writes it as `(stock across ALL ubicaciones) + cantidad_recibida` but tags it with **one** `ubicacion` — whichever the last record happened to have. Counted at a single shop that is harmless: the total *is* that shop's total, so the row is a correct running figure and must win (latest wins). Counted at two, that one figure already contains both and summing it with the other shop's count books the same stock twice. Implemented in `_day_por_ubicacion()`; `_batch_latest_stocks` carries its own copy. For consumption the delivered amount is read from `lineas_pedido.cantidad_recibida`, never from the inventory row.
   - Pedido #103 (2026-09-23) is the case it fixes: 17 café items inflated by 133 units, Ethiopia showing `23 (BRU1) + 39 (delivery) = 62` instead of 24. It has happened exactly once — it needs an item counted at *both* shops received on a counting day
   - **Do not widen this to "any count outranks the delivery".** That was tried on 2026-09-30 and silently ate three real deliveries the same day: Pedido #122 put 5 Tennessee + 6 Lalo tubes into BRU1 and Pedido #123 put 7 COE Ethiopia into BRU2, all *after* Nelson had counted those flavors at 0 that morning. A count does not always precede the delivery, and frozen tubes are single-shop ingredients so the delivery row is always trustworthy for them — `historial_frozen_por_ubicacion` deliberately keeps plain latest-wins
@@ -218,6 +223,17 @@ Render start command is `bash start.sh` (set in dashboard, NOT render.yaml). It 
 - All in-page state (tab, vista, showRecomendaciones) uses local `useState`
 - URL synced with `window.history.replaceState()` for deep linking
 - `useRouter` removed entirely from inventario page
+
+## Registrar Stock — per-shop café counting
+
+The BRU1/BRU2 tabs genuinely drive the form (since 2026-10-13; before that they only stamped `ubicacion` at save time and never filtered anything).
+
+- **One ingredient, two inputs.** There is no per-shop split in the DB for anything except frozen tubes. `stock` (keyed by ingredient id) always holds the shop whose tab is open; `stockCafePorUbic` holds the other. `cambiarUbicacionCafe()` swaps them, emptying the incoming bucket so a quantity lives in exactly one place
+- **Frozen tubes are the exception** — they really are two ingredients (parents 289/290). The tab shows only the matching parent. That filter must run **after** the section keyword match, or the frozen parent gets claimed by whichever section iterates first (it landed under "CAFÉS DE KILO" once) and marked `assigned`, leaving "FROZEN TUBES" empty
+- **The `ubicacion` tag is decided by category section, not by `grupo_ingrediente_id`** (`cafeSectionIds`, same rule as `matchesVista`). Using the latter is exactly what left Chai/Matcha/Sibarist saving with no shop
+- **The draft (`bru_inventario_draft`, v2) stores the active shop.** Without it a reload shows the shop you were counting under the other shop's tab, and the next save files real BRU2 counts as BRU1 — worse, switching tabs to "fix" it overwrites the other shop's real count. A v1 draft (no `v` field) is migrated into BRU1 with a "Verifica BRU1/BRU2" toast rather than dropped
+- One "Guardar" persists **both** shops, but only from the café view — from cocina/bar the parked café values stay in the draft instead of being filed without the per-shop confirmation
+- After a successful save, set `omitirGuardadoBorrador` before clearing state: otherwise the autosave effect re-fires and rewrites the draft from the still-filled `stock`, resurrecting what was just saved
 
 ## Café Pivot Sorting
 
