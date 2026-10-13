@@ -1,6 +1,6 @@
 "use client";
 
-import React, { Suspense, useEffect, useState, useCallback } from "react";
+import React, { Suspense, useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { apiFetch } from "@/lib/api";
@@ -64,7 +64,11 @@ type CafePorUbicacion = Record<Ubicacion, Record<number, string>>;
 
 const emptyCafePorUbicacion = (): CafePorUbicacion => ({ BRU1: {}, BRU2: {} });
 
-function saveDraft(stock: Record<number, StockEntry>, cafePorUbic: CafePorUbicacion) {
+function saveDraft(
+  stock: Record<number, StockEntry>,
+  cafePorUbic: CafePorUbicacion,
+  ubicacionCafe: Ubicacion
+) {
   const filled: Record<number, StockEntry> = {};
   for (const [id, entry] of Object.entries(stock)) {
     if (entry.cantidad !== "" && parseFloat(entry.cantidad) >= 0) {
@@ -84,7 +88,16 @@ function saveDraft(stock: Record<number, StockEntry>, cafePorUbic: CafePorUbicac
   if (Object.keys(filled).length > 0 || cafeCount > 0) {
     localStorage.setItem(
       STORAGE_KEY,
-      JSON.stringify({ ts: Date.now(), v: 2, data: filled, cafePorUbic: cafeFilled })
+      JSON.stringify({
+        ts: Date.now(),
+        v: 2,
+        data: filled,
+        cafePorUbic: cafeFilled,
+        // Which shop `data` belongs to. Without it a reload would show the
+        // shop you were counting under the other shop's tab, and the next
+        // save would file real BRU2 counts as BRU1.
+        ubicacionCafe,
+      })
     );
   } else {
     localStorage.removeItem(STORAGE_KEY);
@@ -96,7 +109,12 @@ function saveDraft(stock: Record<number, StockEntry>, cafePorUbic: CafePorUbicac
 // the draft was written — BRU1, the default — rather than dropped. Losing a
 // half-finished count on deploy day would be worse than a value landing in the
 // wrong tab, which staff can see and move.
-function loadDraft(): { data: Record<number, StockEntry>; cafePorUbic: CafePorUbicacion; migrado: boolean } | null {
+function loadDraft(): {
+  data: Record<number, StockEntry>;
+  cafePorUbic: CafePorUbicacion;
+  ubicacionCafe: Ubicacion;
+  migrado: boolean;
+} | null {
   const raw = localStorage.getItem(STORAGE_KEY);
   if (!raw) return null;
   try {
@@ -114,10 +132,11 @@ function loadDraft(): { data: Record<number, StockEntry>; cafePorUbic: CafePorUb
           BRU1: parsed.cafePorUbic.BRU1 || {},
           BRU2: parsed.cafePorUbic.BRU2 || {},
         },
+        ubicacionCafe: parsed.ubicacionCafe === "BRU2" ? "BRU2" : "BRU1",
         migrado: false,
       };
     }
-    return { data, cafePorUbic: emptyCafePorUbicacion(), migrado: true };
+    return { data, cafePorUbic: emptyCafePorUbicacion(), ubicacionCafe: "BRU1", migrado: true };
   } catch {
     localStorage.removeItem(STORAGE_KEY);
     return null;
@@ -308,6 +327,7 @@ function InventarioContent() {
             restoredCount += Object.keys(draft.cafePorUbic[u]).length;
           }
           setStockCafePorUbic(draft.cafePorUbic);
+          setUbicacionCafe(draft.ubicacionCafe);
           if (restoredCount > 0) {
             toast(
               draft.migrado
@@ -383,11 +403,18 @@ function InventarioContent() {
 
   // Save draft to localStorage whenever stock changes (skip during initial load)
   const [draftReady, setDraftReady] = useState(false);
+  // Set right before the state resets that follow a successful save. Without
+  // it, clearing stockCafePorUbic re-fires this effect and rewrites the draft
+  // from the still-filled `stock`, resurrecting the counts just saved.
+  const omitirGuardadoBorrador = useRef(false);
   useEffect(() => {
-    if (draftReady) {
-      saveDraft(stock, stockCafePorUbic);
+    if (!draftReady) return;
+    if (omitirGuardadoBorrador.current) {
+      omitirGuardadoBorrador.current = false;
+      return;
     }
-  }, [stock, stockCafePorUbic, draftReady]);
+    saveDraft(stock, stockCafePorUbic, ubicacionCafe);
+  }, [stock, stockCafePorUbic, ubicacionCafe, draftReady]);
 
   useEffect(() => {
     if (showRecomendaciones && recomendaciones.length > 0) {
@@ -538,7 +565,10 @@ function InventarioContent() {
       if (cantidad !== "") saliente[id] = cantidad;
     }
     const entrante = stockCafePorUbic[nueva];
-    setStockCafePorUbic((prev) => ({ ...prev, [ubicacionCafe]: saliente }));
+    // The incoming shop's values move into `stock`, so its bucket is emptied:
+    // a quantity must live in exactly one place, or the draft persists it
+    // twice and the restore count double-counts it.
+    setStockCafePorUbic((prev) => ({ ...prev, [ubicacionCafe]: saliente, [nueva]: {} }));
     setStock((prev) => {
       const next = { ...prev };
       for (const id of cafeSectionIds) {
@@ -671,7 +701,10 @@ function InventarioContent() {
 
   // Counts still parked in the other shop's tab. Included so one "Guardar"
   // persists both shops instead of silently dropping whichever tab is closed.
+  // Only from the café view: saving kitchen stock must not also file a café
+  // count the user can't see, bypassing the per-shop confirmation.
   const registrosOtraTienda = () => {
+    if (vista !== "cafe") return [];
     const otra = otraUbicacion(ubicacionCafe);
     return Object.entries(stockCafePorUbic[otra])
       .filter(([, cantidad]) => cantidad !== "" && parseFloat(cantidad) >= 0)
@@ -704,6 +737,7 @@ function InventarioContent() {
         method: "POST",
         body: JSON.stringify({ registros }),
       });
+      omitirGuardadoBorrador.current = true;
       localStorage.removeItem(STORAGE_KEY);
       setStockCafePorUbic(emptyCafePorUbicacion());
       setConfirmandoGuardar(false);
@@ -754,7 +788,7 @@ function InventarioContent() {
     // invisible to them.
     if (vista === "cafe") {
       setStockCafePorUbic((prev) => ({ ...prev, [ubicacionCafe]: {} }));
-      saveDraft(cleared, { ...stockCafePorUbic, [ubicacionCafe]: {} });
+      saveDraft(cleared, { ...stockCafePorUbic, [ubicacionCafe]: {} }, ubicacionCafe);
     } else {
       setStockCafePorUbic(emptyCafePorUbicacion());
       localStorage.removeItem(STORAGE_KEY);
@@ -765,9 +799,12 @@ function InventarioContent() {
   const filledCountActiva = Object.values(stock).filter(
     (s) => s.cantidad !== "" && parseFloat(s.cantidad) >= 0
   ).length;
-  const filledCountOtra = Object.values(
-    stockCafePorUbic[otraUbicacion(ubicacionCafe)]
-  ).filter((c) => c !== "" && parseFloat(c) >= 0).length;
+  const filledCountOtra =
+    vista === "cafe"
+      ? Object.values(stockCafePorUbic[otraUbicacion(ubicacionCafe)]).filter(
+          (c) => c !== "" && parseFloat(c) >= 0
+        ).length
+      : 0;
   const filledCount = filledCountActiva + filledCountOtra;
 
   const formatUltimoConteo = (ingId: number): string => {
@@ -1117,14 +1154,18 @@ function InventarioContent() {
                     {cafeSections.map((section) => {
                       const sectionParents = allParents.filter((p) => {
                         if (assigned.has(p.id)) return false;
+                        const n = p.nombre.toLowerCase();
+                        if (!section.keywords.some((kw) => n.includes(kw))) return false;
                         // Frozen flavors exist twice, once per shop. Show only
                         // the parent for the tab that's open, so the counter
-                        // isn't handed both shops' lists at the same time.
+                        // isn't handed both shops' lists at the same time. This
+                        // must stay *after* the keyword match: short-circuiting
+                        // before it let the frozen parent be claimed by whatever
+                        // section ran first (CAFÉS DE KILO) and marked assigned.
                         if (FROZEN_PARENT_IDS.includes(p.id)) {
                           return p.id === FROZEN_PARENT_POR_UBICACION[ubicacionCafe];
                         }
-                        const n = p.nombre.toLowerCase();
-                        return section.keywords.some((kw) => n.includes(kw));
+                        return true;
                       });
                       sectionParents.forEach((p) => assigned.add(p.id));
                       const colorOrder = ["marrón", "marron", "rojo", "black", "negro", "gold", "oro", "dorado"];

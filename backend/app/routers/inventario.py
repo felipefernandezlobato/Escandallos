@@ -611,11 +611,14 @@ def alertas_stock(
 
     ingredientes = db.query(Ingrediente).order_by(Ingrediente.nombre).all()
     alertas = []
+    # Resolved once: this loops over every ingredient, so letting each call
+    # look the categories up itself would be one extra Neon round trip per row.
+    cafe_cat_ids = cafe_categoria_ids(db)
     for ing in ingredientes:
-        media = consumo_medio_semanal(ing.id, db)
+        media = consumo_medio_semanal(ing.id, db, cafe_cat_ids=cafe_cat_ids)
         if media <= 0:
             continue
-        stk = stock_actual(ing.id, db)
+        stk = stock_actual(ing.id, db, cafe_cat_ids=cafe_cat_ids)
         if stk is None or stk["fecha"] < cutoff:
             continue
         stock_qty = stk["cantidad"]
@@ -692,14 +695,15 @@ def cafe_resumen(
         .all()
     )
     result = []
+    cafe_cat_ids = cafe_categoria_ids(db)
     for p in parents:
-        media = consumo_medio_semanal(p.id, db)
-        calc = calcular_par_y_safety(p.id, db)
-        stk = stock_actual(p.id, db)
+        media = consumo_medio_semanal(p.id, db, cafe_cat_ids=cafe_cat_ids)
+        calc = calcular_par_y_safety(p.id, db, cafe_cat_ids=cafe_cat_ids)
+        stk = stock_actual(p.id, db, cafe_cat_ids=cafe_cat_ids)
         stk_qty = stk["cantidad"] if stk else 0
         stk_unit = stk["unidad"] if stk else p.unidad_compra
         ubicaciones = stock_por_ubicacion(p.id, db)
-        hist = consumo_semanal(p.id, db)
+        hist = consumo_semanal(p.id, db, cafe_cat_ids=cafe_cat_ids)
         trend = tendencia_consumo(hist)
         result.append({
             "id": p.id,
