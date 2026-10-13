@@ -39,6 +39,8 @@ const otraUbicacion = (u: Ubicacion): Ubicacion => (u === "BRU1" ? "BRU2" : "BRU
 // parents. Everything else in café is one ingredient counted at both shops.
 const FROZEN_PARENT_POR_UBICACION: Record<Ubicacion, number> = { BRU1: 289, BRU2: 290 };
 const FROZEN_PARENT_IDS = Object.values(FROZEN_PARENT_POR_UBICACION);
+// Mirrors _BRU_SUFFIX in backend/app/routers/menu.py (_coffee_name).
+const BRU_SUFIJO = /\s+Bru[12]$/i;
 
 function saveDraftCantidades(cantidades: Record<number, string>) {
   localStorage.setItem(REC_DRAFT_KEY, JSON.stringify({ ts: Date.now(), cantidades }));
@@ -586,6 +588,16 @@ function InventarioContent() {
     return stockCafePorUbic[otraUbicacion(ubicacionCafe)][id] ?? null;
   };
 
+  // The shop being counted, shown on the item itself. There is one ingredient
+  // per SKU — the suffix is display only, nothing in the DB is named this way.
+  // Frozen tubes are the exception: they really are two ingredients and their
+  // names already end in Bru1/Bru2, so they must not get a second suffix.
+  const nombreConTienda = (ing: Ingrediente): string => {
+    if (vista !== "cafe" || !cafeSectionIds.has(ing.id)) return ing.nombre;
+    if (BRU_SUFIJO.test(ing.nombre)) return ing.nombre;
+    return `${ing.nombre} ${ubicacionCafe === "BRU1" ? "Bru1" : "Bru2"}`;
+  };
+
   // Shows the count already entered at the shop whose tab is closed, so the
   // same figure doesn't get typed twice under the wrong one.
   const hintOtraTienda = (id: number) => {
@@ -1117,8 +1129,8 @@ function InventarioContent() {
                 const renderItem = (ing: Ingrediente) => (
                   <div key={ing.id} className="flex items-center gap-2 bg-white border border-[#E8DFD3] rounded-lg px-3 py-2">
                     <div className="flex-1 min-w-0">
-                      <Link href={`/ingredientes/${ing.id}`} className="text-sm truncate block text-[#8B1A2B] hover:underline" title={ing.nombre}>
-                        {ing.nombre}
+                      <Link href={`/ingredientes/${ing.id}`} className="text-sm truncate block text-[#8B1A2B] hover:underline" title={nombreConTienda(ing)}>
+                        {nombreConTienda(ing)}
                       </Link>
                       <span className="text-[10px] text-[#6B5E52]/60">
                         {formatUltimoConteo(ing.id)}
@@ -1232,8 +1244,8 @@ function InventarioContent() {
                                 className="flex items-center gap-2 bg-white border border-[#E8DFD3] rounded-lg px-3 py-2"
                               >
                                 <div className="flex-1 min-w-0">
-                                  <Link href={`/ingredientes/${ing.id}`} className="text-sm truncate block text-[#8B1A2B] hover:underline" title={ing.nombre}>
-                                    {ing.nombre}
+                                  <Link href={`/ingredientes/${ing.id}`} className="text-sm truncate block text-[#8B1A2B] hover:underline" title={nombreConTienda(ing)}>
+                                    {nombreConTienda(ing)}
                                   </Link>
                                   <span className="text-[10px] text-[#6B5E52]/60">
                                     {formatUltimoConteo(ing.id)}
@@ -1275,8 +1287,8 @@ function InventarioContent() {
                           className="flex items-center gap-2 bg-white border border-[#E8DFD3] rounded-lg px-3 py-2"
                         >
                           <div className="flex-1 min-w-0">
-                            <Link href={`/ingredientes/${ing.id}`} className="text-sm truncate block text-[#8B1A2B] hover:underline" title={ing.nombre}>
-                              {ing.nombre}
+                            <Link href={`/ingredientes/${ing.id}`} className="text-sm truncate block text-[#8B1A2B] hover:underline" title={nombreConTienda(ing)}>
+                              {nombreConTienda(ing)}
                             </Link>
                             <span className="text-[10px] text-[#6B5E52]/60">
                               {formatUltimoConteo(ing.id)}
