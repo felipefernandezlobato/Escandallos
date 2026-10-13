@@ -235,6 +235,13 @@ The BRU1/BRU2 tabs genuinely drive the form (since 2026-10-13; before that they 
 - **The draft (`bru_inventario_draft`, v2) stores the active shop.** Without it a reload shows the shop you were counting under the other shop's tab, and the next save files real BRU2 counts as BRU1 — worse, switching tabs to "fix" it overwrites the other shop's real count. A v1 draft (no `v` field) is migrated into BRU1 with a "Verifica BRU1/BRU2" toast rather than dropped
 - One "Guardar" persists **both** shops, but only from the café view — from cocina/bar the parked café values stay in the draft instead of being filed without the per-shop confirmation
 - After a successful save, set `omitirGuardadoBorrador` before clearing state: otherwise the autosave effect re-fires and rewrites the draft from the still-filled `stock`, resurrecting what was just saved
+- **The active shop is appended to the item name** (`Prana Chai 250g Bru1`) via `nombreConTienda()` — display only, the DB has one ingredient per SKU. Frozen tubes already end in Bru1/Bru2 in their real name, so they're detected with the same `\s+Bru[12]$` regex the backend uses in `_coffee_name()` and never get a second suffix. Cocina/bar never get one; neither does the Análisis tab's ingredient picker, where the figure is both shops combined
+- **Item names wrap, they do not truncate.** At 3 cards per row the name has ~214 px (~28 chars) and the café median *with* the suffix is 29, so `truncate` hid 37 of 143 items (`300g DABOV El Salvador Los Angeles COE#4 2025 Bru1` is 50 chars). Use `leading-tight break-words` and let it run to a second line. Don't "fix" a future overflow by dropping to 2 cards per row — that adds 50% more scrolling for the 106 short names to help the few long ones
+- Scope is the café **area** (cocina and bar are explicitly out), confirmed by the user 2026-10-13: *"todo lo que está en el área de café, no cocina ni bar, solo café"*
+
+### Open question — Té+ may not be a two-shop item at all
+
+The per-shop summing assumes chai/matcha/Prana are counted at **both** shops, so Prana Chai 250g now reads **17** (10+7). **This has not been confirmed with the user.** If those two same-day records were re-counts rather than two shops, the correct figure is 7 and the app will over-report every Té+/Sibarist item from the next count onward. Evidence against the assumption: 2026-09-17 holds **three** records for Chai (`0|0|0`) and Matcha 7 Spoon (`28|28|2`), and three records cannot be two shops. Stored history is unaffected either way (old rows are `ubicacion` NULL). If the answer turns out to be one shop: revert per-shop summing for categories 17/18 to latest-wins, drop their `ubicacion` tag and suffix, and keep all of it on categoria 5.
 
 ## Café Pivot Sorting
 
