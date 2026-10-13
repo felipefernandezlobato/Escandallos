@@ -1129,7 +1129,7 @@ function InventarioContent() {
                 const renderItem = (ing: Ingrediente) => (
                   <div key={ing.id} className="flex items-center gap-2 bg-white border border-[#E8DFD3] rounded-lg px-3 py-2">
                     <div className="flex-1 min-w-0">
-                      <Link href={`/ingredientes/${ing.id}`} className="text-sm truncate block text-[#8B1A2B] hover:underline" title={nombreConTienda(ing)}>
+                      <Link href={`/ingredientes/${ing.id}`} className="text-sm block text-[#8B1A2B] hover:underline leading-tight break-words" title={nombreConTienda(ing)}>
                         {nombreConTienda(ing)}
                       </Link>
                       <span className="text-[10px] text-[#6B5E52]/60">
@@ -1244,7 +1244,7 @@ function InventarioContent() {
                                 className="flex items-center gap-2 bg-white border border-[#E8DFD3] rounded-lg px-3 py-2"
                               >
                                 <div className="flex-1 min-w-0">
-                                  <Link href={`/ingredientes/${ing.id}`} className="text-sm truncate block text-[#8B1A2B] hover:underline" title={nombreConTienda(ing)}>
+                                  <Link href={`/ingredientes/${ing.id}`} className="text-sm block text-[#8B1A2B] hover:underline leading-tight break-words" title={nombreConTienda(ing)}>
                                     {nombreConTienda(ing)}
                                   </Link>
                                   <span className="text-[10px] text-[#6B5E52]/60">
@@ -1287,7 +1287,7 @@ function InventarioContent() {
                           className="flex items-center gap-2 bg-white border border-[#E8DFD3] rounded-lg px-3 py-2"
                         >
                           <div className="flex-1 min-w-0">
-                            <Link href={`/ingredientes/${ing.id}`} className="text-sm truncate block text-[#8B1A2B] hover:underline" title={nombreConTienda(ing)}>
+                            <Link href={`/ingredientes/${ing.id}`} className="text-sm block text-[#8B1A2B] hover:underline leading-tight break-words" title={nombreConTienda(ing)}>
                               {nombreConTienda(ing)}
                             </Link>
                             <span className="text-[10px] text-[#6B5E52]/60">
