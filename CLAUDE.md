@@ -239,9 +239,11 @@ The BRU1/BRU2 tabs genuinely drive the form (since 2026-10-13; before that they 
 - **Item names wrap, they do not truncate.** At 3 cards per row the name has ~214 px (~28 chars) and the café median *with* the suffix is 29, so `truncate` hid 37 of 143 items (`300g DABOV El Salvador Los Angeles COE#4 2025 Bru1` is 50 chars). Use `leading-tight break-words` and let it run to a second line. Don't "fix" a future overflow by dropping to 2 cards per row — that adds 50% more scrolling for the 106 short names to help the few long ones
 - Scope is the café **area** (cocina and bar are explicitly out), confirmed by the user 2026-10-13: *"todo lo que está en el área de café, no cocina ni bar, solo café"*
 
-### Open question — Té+ may not be a two-shop item at all
+### Everything in the café area is counted at both shops — confirmed
 
-The per-shop summing assumes chai/matcha/Prana are counted at **both** shops, so Prana Chai 250g now reads **17** (10+7). **This has not been confirmed with the user.** If those two same-day records were re-counts rather than two shops, the correct figure is 7 and the app will over-report every Té+/Sibarist item from the next count onward. Evidence against the assumption: 2026-09-17 holds **three** records for Chai (`0|0|0`) and Matcha 7 Spoon (`28|28|2`), and three records cannot be two shops. Stored history is unaffected either way (old rows are `ubicacion` NULL). If the answer turns out to be one shop: revert per-shop summing for categories 17/18 to latest-wins, drop their `ubicacion` tag and suffix, and keep all of it on categoria 5.
+Confirmed by the user 2026-10-13: *"everything in coffee should be able to count in bru1 and bru2"*. That covers all **153** active ingredients across categorías 5, 17 and 18 — beans, retail bags, capsules, frozen tubes, Té+ (Chai, Matcha, Prana, Hojicha, Chocolate) and the Sibarist filters alike. So per-shop summing is correct for the whole area: Prana Chai 250g reading **17** (10 + 7) is right, not 10 and not 7.
+
+A day with **three** records for one item (2026-09-17 has `0|0|0` for Chai and `28|28|2` for Matcha 7 Spoon) is therefore two shops **plus a correction**, not evidence against the rule — which is exactly why the same-`ubicacion`-same-day collapse must stay in place: two records at the *same* shop are a correction (latest wins), only *distinct* shops add up.
 
 ## Café Pivot Sorting
 
