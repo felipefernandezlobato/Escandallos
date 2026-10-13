@@ -266,6 +266,8 @@ function InventarioContent() {
   const [editCantidad, setEditCantidad] = useState("");
   const [ubicacionCafe, setUbicacionCafe] = useState<Ubicacion>("BRU1");
   const [confirmandoGuardar, setConfirmandoGuardar] = useState(false);
+  // Which section the phone is currently scrolled into, for the sticky bar.
+  const [seccionVisible, setSeccionVisible] = useState("");
   const [showGestionarCafes, setShowGestionarCafes] = useState(false);
   const [newCoffeeName, setNewCoffeeName] = useState("");
   const [newCoffeeParent, setNewCoffeeParent] = useState<number | null>(null);
@@ -402,6 +404,31 @@ function InventarioContent() {
       .catch(() => {})
       .finally(() => setCafeAnalisisLoading(false));
   }, [vista, loading, ingredientes.length, lastSaved]);
+
+  // The counting list runs ~12 phone screens, and the section headers scroll
+  // away with everything else. Track the last header that has passed under the
+  // sticky bar so it can always say where you are.
+  useEffect(() => {
+    if (tab !== "registrar") return;
+    let raf = 0;
+    const alScrollear = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        let actual = "";
+        for (const h of document.querySelectorAll<HTMLElement>("[data-seccion-conteo]")) {
+          if (h.getBoundingClientRect().top > 64) break;
+          actual = h.dataset.seccionConteo || "";
+        }
+        setSeccionVisible(actual);
+      });
+    };
+    alScrollear();
+    window.addEventListener("scroll", alScrollear, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", alScrollear);
+      cancelAnimationFrame(raf);
+    };
+  }, [tab, vista, ubicacionCafe, showRecomendaciones, loading]);
 
   // Save draft to localStorage whenever stock changes (skip during initial load)
   const [draftReady, setDraftReady] = useState(false);
@@ -598,6 +625,60 @@ function InventarioContent() {
     return `${ing.nombre} ${ubicacionCafe === "BRU1" ? "Bru1" : "Bru2"}`;
   };
 
+  // One counting row. Three places used to render this markup by hand and it
+  // drifted every time something changed, so it lives here once. Nelson counts
+  // ~124 of these on a phone, hence the mobile-specific shape.
+  const renderFilaConteo = (ing: Ingrediente, unidadPorDefecto: string) => {
+    const meta = (
+      <>
+        <span className="text-[10px] text-[#6B5E52]/60">{formatUltimoConteo(ing.id)}</span>
+        {hintOtraTienda(ing.id)}
+      </>
+    );
+    return (
+      <div
+        key={ing.id}
+        className="flex flex-col gap-0.5 py-1.5 md:flex-row md:items-center md:gap-2 md:py-2 bg-white border border-[#E8DFD3] rounded-lg px-3"
+      >
+        {/* On a phone the name gets the full card width, so most fit on one
+            line; the quantity moves to its own row where it can be tappable. */}
+        <div className="min-w-0 md:flex-1">
+          <Link
+            href={`/ingredientes/${ing.id}`}
+            className="text-sm block text-[#8B1A2B] hover:underline leading-tight break-words"
+            title={nombreConTienda(ing)}
+          >
+            {nombreConTienda(ing)}
+          </Link>
+          <span className="hidden md:block">{meta}</span>
+        </div>
+        {/* md:contents dissolves this wrapper on desktop, leaving the original
+            single-row layout untouched. */}
+        <div className="flex items-center gap-2 md:contents">
+          <span className="flex-1 md:hidden">{meta}</span>
+          <input
+            type="text"
+            inputMode="decimal"
+            placeholder="0"
+            value={stock[ing.id]?.cantidad ?? ""}
+            onChange={(e) => {
+              const v = e.target.value.replace(",", ".");
+              if (v === "" || /^\d*\.?\d*$/.test(v))
+                setStock((prev) => ({
+                  ...prev,
+                  [ing.id]: { ...prev[ing.id], cantidad: v },
+                }));
+            }}
+            className="w-24 min-h-[44px] md:w-20 md:min-h-0 border border-[#D4C4A8] rounded px-2 py-1 text-sm text-right"
+          />
+          <span className="text-xs text-[#6B5E52] w-8">
+            {stock[ing.id]?.unidad || unidadPorDefecto}
+          </span>
+        </div>
+      </div>
+    );
+  };
+
   // Shows the count already entered at the shop whose tab is closed, so the
   // same figure doesn't get typed twice under the wrong one.
   const hintOtraTienda = (id: number) => {
@@ -699,6 +780,30 @@ function InventarioContent() {
       .map((c) => ({ ...c, items: ingredientesFiltrados.filter((i) => i.categoria_id === c.id) }))
       .filter((g) => g.items.length > 0);
   })();
+
+  // Items actually on screen right now, so the phone progress counter reflects
+  // what's being counted rather than all 412 ingredients. Mirrors what the two
+  // list blocks below render — including hiding the other shop's frozen tubes.
+  const idsVisibles = new Set<number>();
+  for (const g of porCategoria) {
+    const items = g.sibaristFamilies ? g.sibaristFamilies.flatMap((f) => f.items) : g.items;
+    for (const it of items) idsVisibles.add(it.id);
+  }
+  if (vista === "cafe") {
+    for (const ing of ingredientes) {
+      const padre = ing.grupo_ingrediente_id;
+      if (padre == null || ing.activo === false) continue;
+      // Colour groups (325-328) are children of "Coffee Retail Bags" but are
+      // themselves parents — they render as sub-headers, not as input rows.
+      if (parentIds.has(ing.id)) continue;
+      if (FROZEN_PARENT_IDS.includes(padre) && padre !== FROZEN_PARENT_POR_UBICACION[ubicacionCafe]) continue;
+      idsVisibles.add(ing.id);
+    }
+  }
+  const contadosVisibles = [...idsVisibles].filter((id) => {
+    const c = stock[id]?.cantidad;
+    return c !== undefined && c !== "" && parseFloat(c) >= 0;
+  }).length;
 
   // Counts typed into the tab that is currently open.
   const registrosTiendaActiva = () =>
@@ -995,6 +1100,22 @@ function InventarioContent() {
             )}
           </div>
 
+          {/* Phone-only orientation strip. The shop toggle and the section
+              headers both scroll out of view within the first screen of a
+              ~12-screen list, so this keeps shop, section and progress on
+              screen the whole way down. Desktop shows all three already. */}
+          {!showRecomendaciones && !loading && idsVisibles.size > 0 && (
+            <div className="md:hidden sticky top-0 z-20 -mx-4 px-4 py-2 bg-[#F5F0E8]/95 backdrop-blur border-b border-[#E8DFD3] flex items-center justify-between gap-2">
+              <span className="text-xs font-medium text-[#8B1A2B] truncate">
+                {vista === "cafe" && `${ubicacionCafe} · `}
+                {seccionVisible || "Registrar stock"}
+              </span>
+              <span className="text-xs text-[#6B5E52] shrink-0 tabular-nums">
+                {contadosVisibles}/{idsVisibles.size}
+              </span>
+            </div>
+          )}
+
           {/* Cafe grouped coffees section */}
           {vista === "cafe" && !loading && Object.keys(childrenByParent).length > 0 && (
             <div className="space-y-4">
@@ -1126,40 +1247,7 @@ function InventarioContent() {
 
                 const assigned = new Set<number>();
 
-                const renderItem = (ing: Ingrediente) => (
-                  <div key={ing.id} className="flex items-center gap-2 bg-white border border-[#E8DFD3] rounded-lg px-3 py-2">
-                    <div className="flex-1 min-w-0">
-                      <Link href={`/ingredientes/${ing.id}`} className="text-sm block text-[#8B1A2B] hover:underline leading-tight break-words" title={nombreConTienda(ing)}>
-                        {nombreConTienda(ing)}
-                      </Link>
-                      <span className="text-[10px] text-[#6B5E52]/60">
-                        {formatUltimoConteo(ing.id)}
-                      </span>
-                      {hintOtraTienda(ing.id)}
-                    </div>
-                    <input
-                      type="text"
-                      inputMode="decimal"
-                      placeholder="0"
-                      value={stock[ing.id]?.cantidad ?? ""}
-                      onChange={(e) => {
-                        const v = e.target.value.replace(",", ".");
-                        if (v === "" || /^\d*\.?\d*$/.test(v))
-                          setStock((prev) => ({
-                            ...prev,
-                            [ing.id]: {
-                              ...prev[ing.id],
-                              cantidad: v,
-                            },
-                          }));
-                      }}
-                      className="w-20 border border-[#D4C4A8] rounded px-2 py-1 text-sm text-right"
-                    />
-                    <span className="text-xs text-[#6B5E52] w-8">
-                      {stock[ing.id]?.unidad || ing.unidad_compra}
-                    </span>
-                  </div>
-                );
+                const renderItem = (ing: Ingrediente) => renderFilaConteo(ing, ing.unidad_compra);
 
                 return (
                   <>
@@ -1196,7 +1284,7 @@ function InventarioContent() {
                       if (parentsWithChildren.length === 0) return null;
                       return (
                         <div key={section.title}>
-                          <h2 className="text-sm font-semibold text-[#8B1A2B] uppercase tracking-wider mb-2 border-b border-[#E8DFD3] pb-1">
+                          <h2 data-seccion-conteo={section.title} className="text-sm font-semibold text-[#8B1A2B] uppercase tracking-wider mb-2 border-b border-[#E8DFD3] pb-1">
                             {section.title}
                           </h2>
                           {parentsWithChildren.map((parent, pi) => {
@@ -1228,7 +1316,7 @@ function InventarioContent() {
             <div className="space-y-6">
               {porCategoria.map((grupo) => (
                 <div key={grupo.id}>
-                  <h2 className="text-sm font-semibold text-[#8B1A2B] uppercase tracking-wider mb-2 border-b border-[#E8DFD3] pb-1">
+                  <h2 data-seccion-conteo={grupo.nombre} className="text-sm font-semibold text-[#8B1A2B] uppercase tracking-wider mb-2 border-b border-[#E8DFD3] pb-1">
                     {grupo.nombre}
                   </h2>
                   {grupo.sibaristFamilies ? (
@@ -1238,86 +1326,14 @@ function InventarioContent() {
                           {fi > 0 && <div className="border-t border-[#D4C4A8] my-2" />}
                           <p className="text-xs text-[#6B5E52]/70 font-medium mb-1 mt-1">{fam.family}</p>
                           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-                            {fam.items.map((ing) => (
-                              <div
-                                key={ing.id}
-                                className="flex items-center gap-2 bg-white border border-[#E8DFD3] rounded-lg px-3 py-2"
-                              >
-                                <div className="flex-1 min-w-0">
-                                  <Link href={`/ingredientes/${ing.id}`} className="text-sm block text-[#8B1A2B] hover:underline leading-tight break-words" title={nombreConTienda(ing)}>
-                                    {nombreConTienda(ing)}
-                                  </Link>
-                                  <span className="text-[10px] text-[#6B5E52]/60">
-                                    {formatUltimoConteo(ing.id)}
-                                  </span>
-                                  {hintOtraTienda(ing.id)}
-                                </div>
-                                <input
-                                  type="text"
-                                  inputMode="decimal"
-                                  placeholder="0"
-                                  value={stock[ing.id]?.cantidad ?? ""}
-                                  onChange={(e) => {
-                                    const v = e.target.value.replace(",", ".");
-                                    if (v === "" || /^\d*\.?\d*$/.test(v))
-                                      setStock((prev) => ({
-                                        ...prev,
-                                        [ing.id]: {
-                                          ...prev[ing.id],
-                                          cantidad: v,
-                                        },
-                                      }));
-                                  }}
-                                  className="w-20 border border-[#D4C4A8] rounded px-2 py-1 text-sm text-right"
-                                />
-                                <span className="text-xs text-[#6B5E52] w-8">
-                                  {stock[ing.id]?.unidad || ing.unidad_uso}
-                                </span>
-                              </div>
-                            ))}
+                            {fam.items.map((ing) => renderFilaConteo(ing, ing.unidad_uso))}
                           </div>
                         </div>
                       ))}
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-                      {grupo.items.map((ing) => (
-                        <div
-                          key={ing.id}
-                          className="flex items-center gap-2 bg-white border border-[#E8DFD3] rounded-lg px-3 py-2"
-                        >
-                          <div className="flex-1 min-w-0">
-                            <Link href={`/ingredientes/${ing.id}`} className="text-sm block text-[#8B1A2B] hover:underline leading-tight break-words" title={nombreConTienda(ing)}>
-                              {nombreConTienda(ing)}
-                            </Link>
-                            <span className="text-[10px] text-[#6B5E52]/60">
-                              {formatUltimoConteo(ing.id)}
-                            </span>
-                            {hintOtraTienda(ing.id)}
-                          </div>
-                          <input
-                            type="text"
-                            inputMode="decimal"
-                            placeholder="0"
-                            value={stock[ing.id]?.cantidad ?? ""}
-                            onChange={(e) => {
-                              const v = e.target.value.replace(",", ".");
-                              if (v === "" || /^\d*\.?\d*$/.test(v))
-                                setStock((prev) => ({
-                                  ...prev,
-                                  [ing.id]: {
-                                    ...prev[ing.id],
-                                    cantidad: v,
-                                  },
-                                }));
-                            }}
-                            className="w-20 border border-[#D4C4A8] rounded px-2 py-1 text-sm text-right"
-                          />
-                          <span className="text-xs text-[#6B5E52] w-8">
-                            {stock[ing.id]?.unidad || ing.unidad_uso}
-                          </span>
-                        </div>
-                      ))}
+                      {grupo.items.map((ing) => renderFilaConteo(ing, ing.unidad_uso))}
                     </div>
                   )}
                 </div>
@@ -1432,8 +1448,11 @@ function InventarioContent() {
             );
           })()}
 
+          {/* -mx/px must match AppShell's wrapper padding (px-4). With -mx-6
+              the bar hung 8px past each edge and gave the phone a permanent
+              horizontal scroll. */}
           {!showRecomendaciones && (
-            <div className="sticky bottom-16 md:bottom-0 bg-[#F5F0E8] border-t border-[#E8DFD3] -mx-6 px-6 py-3 flex items-center justify-between">
+            <div className="sticky bottom-16 md:bottom-0 bg-[#F5F0E8] border-t border-[#E8DFD3] -mx-4 px-4 py-3 flex items-center justify-between">
               <div className="text-sm text-[#6B5E52]">
                 {lastSaved && <span>Guardado a las {lastSaved}</span>}
               </div>
