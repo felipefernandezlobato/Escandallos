@@ -31,6 +31,15 @@ interface InventarioSnapshot {
 const STORAGE_KEY = "bru_inventario_draft";
 const REC_DRAFT_KEY = "bru_rec_draft";
 
+type Ubicacion = "BRU1" | "BRU2";
+const UBICACIONES: Ubicacion[] = ["BRU1", "BRU2"];
+const otraUbicacion = (u: Ubicacion): Ubicacion => (u === "BRU1" ? "BRU2" : "BRU1");
+
+// Frozen tube flavors are two ingredients, one per shop, hanging off these
+// parents. Everything else in café is one ingredient counted at both shops.
+const FROZEN_PARENT_POR_UBICACION: Record<Ubicacion, number> = { BRU1: 289, BRU2: 290 };
+const FROZEN_PARENT_IDS = Object.values(FROZEN_PARENT_POR_UBICACION);
+
 function saveDraftCantidades(cantidades: Record<number, string>) {
   localStorage.setItem(REC_DRAFT_KEY, JSON.stringify({ ts: Date.now(), cantidades }));
 }
@@ -51,21 +60,43 @@ function loadDraftCantidades(): Record<number, string> | null {
   }
 }
 
-function saveDraft(stock: Record<number, StockEntry>) {
+type CafePorUbicacion = Record<Ubicacion, Record<number, string>>;
+
+const emptyCafePorUbicacion = (): CafePorUbicacion => ({ BRU1: {}, BRU2: {} });
+
+function saveDraft(stock: Record<number, StockEntry>, cafePorUbic: CafePorUbicacion) {
   const filled: Record<number, StockEntry> = {};
   for (const [id, entry] of Object.entries(stock)) {
     if (entry.cantidad !== "" && parseFloat(entry.cantidad) >= 0) {
       filled[Number(id)] = entry;
     }
   }
-  if (Object.keys(filled).length > 0) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ ts: Date.now(), data: filled }));
+  const cafeFilled: CafePorUbicacion = emptyCafePorUbicacion();
+  let cafeCount = 0;
+  for (const u of UBICACIONES) {
+    for (const [id, cantidad] of Object.entries(cafePorUbic[u])) {
+      if (cantidad !== "" && parseFloat(cantidad) >= 0) {
+        cafeFilled[u][Number(id)] = cantidad;
+        cafeCount++;
+      }
+    }
+  }
+  if (Object.keys(filled).length > 0 || cafeCount > 0) {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({ ts: Date.now(), v: 2, data: filled, cafePorUbic: cafeFilled })
+    );
   } else {
     localStorage.removeItem(STORAGE_KEY);
   }
 }
 
-function loadDraft(): Record<number, StockEntry> | null {
+// A v1 draft (pre per-shop counting) has no `cafePorUbic`. Its café values were
+// typed without a shop, so they're restored into the shop that was active when
+// the draft was written — BRU1, the default — rather than dropped. Losing a
+// half-finished count on deploy day would be worse than a value landing in the
+// wrong tab, which staff can see and move.
+function loadDraft(): { data: Record<number, StockEntry>; cafePorUbic: CafePorUbicacion; migrado: boolean } | null {
   const raw = localStorage.getItem(STORAGE_KEY);
   if (!raw) return null;
   try {
@@ -75,7 +106,18 @@ function loadDraft(): Record<number, StockEntry> | null {
       localStorage.removeItem(STORAGE_KEY);
       return null;
     }
-    return parsed.data;
+    const data: Record<number, StockEntry> = parsed.data || {};
+    if (parsed.v === 2 && parsed.cafePorUbic) {
+      return {
+        data,
+        cafePorUbic: {
+          BRU1: parsed.cafePorUbic.BRU1 || {},
+          BRU2: parsed.cafePorUbic.BRU2 || {},
+        },
+        migrado: false,
+      };
+    }
+    return { data, cafePorUbic: emptyCafePorUbicacion(), migrado: true };
   } catch {
     localStorage.removeItem(STORAGE_KEY);
     return null;
@@ -123,6 +165,11 @@ function InventarioContent() {
   const [ingredientes, setIngredientes] = useState<Ingrediente[]>([]);
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [stock, setStock] = useState<Record<number, StockEntry>>({});
+  // Café is counted at BRU1 and BRU2 separately. `stock` always holds the
+  // shop whose tab is open; this holds the other one, so switching tabs swaps
+  // the two instead of overwriting a half-finished count. Cocina and bar are
+  // single-location and never appear here.
+  const [stockCafePorUbic, setStockCafePorUbic] = useState<CafePorUbicacion>(emptyCafePorUbicacion);
   const [buscar, setBuscar] = useState("");
   const [filtroCategoria, setFiltroCategoria] = useState("");
   const [loading, setLoading] = useState(true);
@@ -196,7 +243,8 @@ function InventarioContent() {
   }>>([]);
   const [editingRegistro, setEditingRegistro] = useState<number | null>(null);
   const [editCantidad, setEditCantidad] = useState("");
-  const [ubicacionCafe, setUbicacionCafe] = useState<"BRU1" | "BRU2">("BRU1");
+  const [ubicacionCafe, setUbicacionCafe] = useState<Ubicacion>("BRU1");
+  const [confirmandoGuardar, setConfirmandoGuardar] = useState(false);
   const [showGestionarCafes, setShowGestionarCafes] = useState(false);
   const [newCoffeeName, setNewCoffeeName] = useState("");
   const [newCoffeeParent, setNewCoffeeParent] = useState<number | null>(null);
@@ -249,15 +297,24 @@ function InventarioContent() {
         const draft = loadDraft();
         if (draft) {
           let restoredCount = 0;
-          for (const [id, entry] of Object.entries(draft)) {
+          for (const [id, entry] of Object.entries(draft.data)) {
             const numId = Number(id);
             if (initial[numId]) {
               initial[numId] = { ...initial[numId], cantidad: entry.cantidad, unidad: entry.unidad };
               restoredCount++;
             }
           }
+          for (const u of UBICACIONES) {
+            restoredCount += Object.keys(draft.cafePorUbic[u]).length;
+          }
+          setStockCafePorUbic(draft.cafePorUbic);
           if (restoredCount > 0) {
-            toast(`${restoredCount} valores restaurados del borrador anterior.`, "success");
+            toast(
+              draft.migrado
+                ? `${restoredCount} valores restaurados del borrador anterior. Verifica BRU1/BRU2.`
+                : `${restoredCount} valores restaurados del borrador anterior.`,
+              "success"
+            );
           }
         }
 
@@ -328,9 +385,9 @@ function InventarioContent() {
   const [draftReady, setDraftReady] = useState(false);
   useEffect(() => {
     if (draftReady) {
-      saveDraft(stock);
+      saveDraft(stock, stockCafePorUbic);
     }
-  }, [stock, draftReady]);
+  }, [stock, stockCafePorUbic, draftReady]);
 
   useEffect(() => {
     if (showRecomendaciones && recomendaciones.length > 0) {
@@ -457,10 +514,59 @@ function InventarioContent() {
   );
 
   // Get children grouped by parent
-  const cafeGrouped = ingredientes.filter(
-    (i) => i.grupo_ingrediente_id != null && i.activo !== false
+  // Every ingredient the café tab can count, grouped coffees AND the
+  // non-grouped Té+/Sibarist items. Same rule as matchesVista() so the two can
+  // never disagree. Tagging ubicacion by "has a grupo_ingrediente_id" instead
+  // is what left Chai, Matcha and the Sibarist filters saving with no shop at
+  // all: both shops' counts landed identical and the later overwrote the other.
+  const cafeSectionIds = new Set(
+    ingredientes
+      .filter((i) => {
+        if (i.nombre.toLowerCase().includes("sibarist")) return true;
+        return categorias.find((c) => c.id === i.categoria_id)?.seccion === "cafe";
+      })
+      .map((i) => i.id)
   );
-  const cafeGroupedIds = new Set(cafeGrouped.map((i) => i.id));
+
+  // Swap the two shops' café values in and out of `stock`. Cocina/bar entries
+  // are untouched: they're never in cafeSectionIds.
+  const cambiarUbicacionCafe = (nueva: Ubicacion) => {
+    if (nueva === ubicacionCafe) return;
+    const saliente: Record<number, string> = {};
+    for (const id of cafeSectionIds) {
+      const cantidad = stock[id]?.cantidad ?? "";
+      if (cantidad !== "") saliente[id] = cantidad;
+    }
+    const entrante = stockCafePorUbic[nueva];
+    setStockCafePorUbic((prev) => ({ ...prev, [ubicacionCafe]: saliente }));
+    setStock((prev) => {
+      const next = { ...prev };
+      for (const id of cafeSectionIds) {
+        if (!next[id]) continue;
+        next[id] = { ...next[id], cantidad: entrante[id] ?? "" };
+      }
+      return next;
+    });
+    setUbicacionCafe(nueva);
+  };
+
+  // What the other shop already has typed in, for the inline hint.
+  const valorOtraTienda = (id: number): string | null => {
+    if (vista !== "cafe" || !cafeSectionIds.has(id)) return null;
+    return stockCafePorUbic[otraUbicacion(ubicacionCafe)][id] ?? null;
+  };
+
+  // Shows the count already entered at the shop whose tab is closed, so the
+  // same figure doesn't get typed twice under the wrong one.
+  const hintOtraTienda = (id: number) => {
+    const v = valorOtraTienda(id);
+    if (v === null || v === "") return null;
+    return (
+      <span className="text-[10px] text-[#6B5E52]/50 ml-1 tracking-tight">
+        {otraUbicacion(ubicacionCafe)}: {v}
+      </span>
+    );
+  };
 
   // Group children by parent
   const childrenByParent: Record<number, Ingrediente[]> = {};
@@ -552,16 +658,40 @@ function InventarioContent() {
       .filter((g) => g.items.length > 0);
   })();
 
-  const handleSave = async () => {
-    setSaving(true);
-    const registros = Object.values(stock)
+  // Counts typed into the tab that is currently open.
+  const registrosTiendaActiva = () =>
+    Object.values(stock)
       .filter((s) => s.cantidad !== "" && parseFloat(s.cantidad) >= 0)
       .map((s) => ({
         ingrediente_id: s.ingrediente_id,
         cantidad: parseFloat(s.cantidad),
         unidad: s.unidad,
-        ...(cafeGroupedIds.has(s.ingrediente_id) ? { ubicacion: ubicacionCafe } : {}),
+        ...(cafeSectionIds.has(s.ingrediente_id) ? { ubicacion: ubicacionCafe } : {}),
       }));
+
+  // Counts still parked in the other shop's tab. Included so one "Guardar"
+  // persists both shops instead of silently dropping whichever tab is closed.
+  const registrosOtraTienda = () => {
+    const otra = otraUbicacion(ubicacionCafe);
+    return Object.entries(stockCafePorUbic[otra])
+      .filter(([, cantidad]) => cantidad !== "" && parseFloat(cantidad) >= 0)
+      .map(([idStr, cantidad]) => {
+        const id = Number(idStr);
+        return {
+          ingrediente_id: id,
+          cantidad: parseFloat(cantidad),
+          unidad:
+            stock[id]?.unidad ||
+            ingredientes.find((i) => i.id === id)?.unidad_compra ||
+            "unidad",
+          ubicacion: otra,
+        };
+      });
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    const registros = [...registrosTiendaActiva(), ...registrosOtraTienda()];
 
     if (registros.length === 0) {
       toast("No hay datos para guardar. Introduce al menos una cantidad.", "error");
@@ -575,6 +705,8 @@ function InventarioContent() {
         body: JSON.stringify({ registros }),
       });
       localStorage.removeItem(STORAGE_KEY);
+      setStockCafePorUbic(emptyCafePorUbicacion());
+      setConfirmandoGuardar(false);
       setLastSaved(new Date().toLocaleTimeString("es"));
       const inv = await apiFetch<{ fechas: string[] }>("/api/inventario");
       setFechas(inv.fechas || []);
@@ -617,12 +749,26 @@ function InventarioContent() {
       };
     }
     setStock(cleared);
-    localStorage.removeItem(STORAGE_KEY);
+    // In café this only empties the shop on screen — the other tab may hold a
+    // count someone else is halfway through, and wiping it from here would be
+    // invisible to them.
+    if (vista === "cafe") {
+      setStockCafePorUbic((prev) => ({ ...prev, [ubicacionCafe]: {} }));
+      saveDraft(cleared, { ...stockCafePorUbic, [ubicacionCafe]: {} });
+    } else {
+      setStockCafePorUbic(emptyCafePorUbicacion());
+      localStorage.removeItem(STORAGE_KEY);
+    }
+    setConfirmandoGuardar(false);
   };
 
-  const filledCount = Object.values(stock).filter(
+  const filledCountActiva = Object.values(stock).filter(
     (s) => s.cantidad !== "" && parseFloat(s.cantidad) >= 0
   ).length;
+  const filledCountOtra = Object.values(
+    stockCafePorUbic[otraUbicacion(ubicacionCafe)]
+  ).filter((c) => c !== "" && parseFloat(c) >= 0).length;
+  const filledCount = filledCountActiva + filledCountOtra;
 
   const formatUltimoConteo = (ingId: number): string => {
     const entry = ultimoConteo[String(ingId)];
@@ -808,7 +954,7 @@ function InventarioContent() {
                   <span className="text-sm font-medium text-[#6B5E52]">Ubicacion:</span>
                   <div className="flex rounded-lg overflow-hidden border border-[#D4C4A8]">
                     <button
-                      onClick={() => setUbicacionCafe("BRU1")}
+                      onClick={() => cambiarUbicacionCafe("BRU1")}
                       className={`px-4 py-1.5 text-sm font-medium transition-colors ${
                         ubicacionCafe === "BRU1"
                           ? "bg-[#8B1A2B] text-white"
@@ -818,7 +964,7 @@ function InventarioContent() {
                       BRU1
                     </button>
                     <button
-                      onClick={() => setUbicacionCafe("BRU2")}
+                      onClick={() => cambiarUbicacionCafe("BRU2")}
                       className={`px-4 py-1.5 text-sm font-medium transition-colors border-l border-[#D4C4A8] ${
                         ubicacionCafe === "BRU2"
                           ? "bg-[#8B1A2B] text-white"
@@ -940,6 +1086,7 @@ function InventarioContent() {
                       <span className="text-[10px] text-[#6B5E52]/60">
                         {formatUltimoConteo(ing.id)}
                       </span>
+                      {hintOtraTienda(ing.id)}
                     </div>
                     <input
                       type="text"
@@ -970,6 +1117,12 @@ function InventarioContent() {
                     {cafeSections.map((section) => {
                       const sectionParents = allParents.filter((p) => {
                         if (assigned.has(p.id)) return false;
+                        // Frozen flavors exist twice, once per shop. Show only
+                        // the parent for the tab that's open, so the counter
+                        // isn't handed both shops' lists at the same time.
+                        if (FROZEN_PARENT_IDS.includes(p.id)) {
+                          return p.id === FROZEN_PARENT_POR_UBICACION[ubicacionCafe];
+                        }
                         const n = p.nombre.toLowerCase();
                         return section.keywords.some((kw) => n.includes(kw));
                       });
@@ -1044,6 +1197,7 @@ function InventarioContent() {
                                   <span className="text-[10px] text-[#6B5E52]/60">
                                     {formatUltimoConteo(ing.id)}
                                   </span>
+                                  {hintOtraTienda(ing.id)}
                                 </div>
                                 <input
                                   type="text"
@@ -1086,6 +1240,7 @@ function InventarioContent() {
                             <span className="text-[10px] text-[#6B5E52]/60">
                               {formatUltimoConteo(ing.id)}
                             </span>
+                            {hintOtraTienda(ing.id)}
                           </div>
                           <input
                             type="text"
@@ -1241,13 +1396,36 @@ function InventarioContent() {
                   </button>
                 )}
                 {filledCount > 0 && (
-                  <button
-                    onClick={handleSave}
-                    disabled={saving}
-                    className="bg-[#8B1A2B] text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-[#6B1420] transition-colors disabled:opacity-50"
-                  >
-                    {saving ? "Guardando..." : `Guardar inventario (${filledCount})`}
-                  </button>
+                  vista === "cafe" && confirmandoGuardar && !saving ? (
+                    // Nothing else tells the counter which shop they're about
+                    // to file under, and the tag is invisible once saved.
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-[#6B5E52]">
+                        {filledCountActiva} conteos de {ubicacionCafe}
+                        {filledCountOtra > 0 && ` (+${filledCountOtra} de ${otraUbicacion(ubicacionCafe)})`}
+                      </span>
+                      <button
+                        onClick={handleSave}
+                        className="bg-[#8B1A2B] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#6B1420] transition-colors"
+                      >
+                        Confirmar
+                      </button>
+                      <button
+                        onClick={() => setConfirmandoGuardar(false)}
+                        className="bg-white border border-[#D4C4A8] text-[#6B5E52] px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#F5F0E8] transition-colors"
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => (vista === "cafe" ? setConfirmandoGuardar(true) : handleSave())}
+                      disabled={saving}
+                      className="bg-[#8B1A2B] text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-[#6B1420] transition-colors disabled:opacity-50"
+                    >
+                      {saving ? "Guardando..." : `Guardar inventario (${filledCount})`}
+                    </button>
+                  )
                 )}
               </div>
             </div>

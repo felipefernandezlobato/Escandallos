@@ -3,7 +3,7 @@ Tests de endpoints de inventario y pedidos.
 """
 
 import os
-from datetime import date
+from datetime import date, timedelta
 
 os.environ.setdefault(
     "AUTH_PASSWORD_HASH",
@@ -433,7 +433,7 @@ class TestPedidoRecibirCafeFrozen:
 
     @pytest.fixture
     def frozen(self, test_db):
-        cafe_cat = Categoria(id=5, nombre="Café", tipo="ingrediente")
+        cafe_cat = Categoria(id=5, nombre="Café", tipo="ingrediente", seccion="cafe")
         test_db.add(cafe_cat)
         test_db.flush()
 
@@ -611,7 +611,7 @@ class TestPedidoRecibirCafeFrozen:
 class TestMovimientos:
     @pytest.fixture
     def frozen(self, test_db):
-        cafe_cat = Categoria(id=5, nombre="Café", tipo="ingrediente")
+        cafe_cat = Categoria(id=5, nombre="Café", tipo="ingrediente", seccion="cafe")
         test_db.add(cafe_cat)
         test_db.flush()
 
@@ -721,7 +721,7 @@ class TestHistorialFrozen:
         Karamo Bru1" under parent 289, "Frozen Karamo Bru2" under parent
         290) — location lives in which parent a flavor belongs to, not in
         the `ubicacion` column on its InventarioRegistro rows."""
-        cafe_cat = Categoria(id=5, nombre="Café", tipo="ingrediente")
+        cafe_cat = Categoria(id=5, nombre="Café", tipo="ingrediente", seccion="cafe")
         test_db.add(cafe_cat)
         test_db.flush()
 
@@ -1199,7 +1199,7 @@ class TestPivotDesgloseUbicaciones:
 
     @pytest.fixture
     def cafe(self, test_db):
-        cafe_cat = Categoria(id=5, nombre="Café", tipo="ingrediente")
+        cafe_cat = Categoria(id=5, nombre="Café", tipo="ingrediente", seccion="cafe")
         test_db.add(cafe_cat)
         test_db.flush()
 
@@ -1927,3 +1927,230 @@ class TestPivotTubosFrozenFundidos:
         padre = filas["Tubos Frozen"]
         assert padre["fechas"][semana] == 21          # 7 + (9 + 5)
         assert padre["fechas_ubic"][semana] == {"BRU1": 7, "BRU2": 14}
+
+
+class TestCafeSeccionSeCuentaPorTienda:
+    """BRU1 + BRU2 summing must cover the whole café *section* — Café (5),
+    Cafetería (17, filtros Sibarist) and Té+ (18) — not just categoria 5.
+
+    Gating it on categoria_id == 5 meant a Té+/Cafetería item counted at both
+    shops fell into the single-location branch, where the last record of the
+    day wins: one shop's count was discarded on every counting day. Live
+    example that motivated this: Prana Chai 250g read 10 when the real total
+    across both shops was 17.
+    """
+
+    @pytest.fixture
+    def te(self, test_db):
+        test_db.add_all([
+            Categoria(id=5, nombre="Café", tipo="ingrediente", seccion="cafe"),
+            Categoria(id=17, nombre="Cafetería", tipo="ingrediente", seccion="cafe"),
+            Categoria(id=18, nombre="Té+", tipo="ingrediente", seccion="cafe"),
+            Categoria(id=38, nombre="Lácteos", tipo="ingrediente", seccion="cocina"),
+        ])
+        test_db.flush()
+        chai = Ingrediente(
+            nombre="Prana Chai 250g", categoria_id=18, unidad_compra="unidad",
+            cantidad_compra=1, precio_compra=20.0, unidad_uso="unidad", merma_porcentaje=0.0,
+        )
+        filtro = Ingrediente(
+            nombre="Sibarist Cone Fast M x25", categoria_id=17, unidad_compra="unidad",
+            cantidad_compra=1, precio_compra=12.0, unidad_uso="unidad", merma_porcentaje=0.0,
+        )
+        leche = Ingrediente(
+            nombre="Leche entera", categoria_id=38, unidad_compra="litro",
+            cantidad_compra=1, precio_compra=1.5, unidad_uso="ml", merma_porcentaje=0.0,
+        )
+        test_db.add_all([chai, filtro, leche])
+        test_db.flush()
+        return {"chai": chai, "filtro": filtro, "leche": leche}
+
+    def test_te_suma_las_dos_tiendas(self, te, test_db):
+        """The reported bug: BRU1=10 + BRU2=7 must read 17, not 10."""
+        from app.services.consumo import stock_actual
+
+        dia = date(2026, 10, 7)
+        test_db.add_all([
+            InventarioRegistro(ingrediente_id=te["chai"].id, cantidad=10, unidad="unidad",
+                               fecha_registro=dia, ubicacion="BRU1"),
+            InventarioRegistro(ingrediente_id=te["chai"].id, cantidad=7, unidad="unidad",
+                               fecha_registro=dia, ubicacion="BRU2"),
+        ])
+        test_db.flush()
+
+        assert stock_actual(te["chai"].id, test_db)["cantidad"] == 17
+
+    def test_cafeteria_sibarist_suma_las_dos_tiendas(self, te, test_db):
+        from app.services.consumo import stock_actual
+
+        dia = date(2026, 10, 7)
+        test_db.add_all([
+            InventarioRegistro(ingrediente_id=te["filtro"].id, cantidad=3, unidad="unidad",
+                               fecha_registro=dia, ubicacion="BRU1"),
+            InventarioRegistro(ingrediente_id=te["filtro"].id, cantidad=2, unidad="unidad",
+                               fecha_registro=dia, ubicacion="BRU2"),
+        ])
+        test_db.flush()
+
+        assert stock_actual(te["filtro"].id, test_db)["cantidad"] == 5
+
+    def test_misma_tienda_dos_veces_es_correccion(self, te, test_db):
+        """Two records at the SAME shop on one day are a correction, not a
+        second count — the rule that already protects categoria 5."""
+        from app.services.consumo import stock_actual
+
+        dia = date(2026, 10, 7)
+        test_db.add_all([
+            InventarioRegistro(ingrediente_id=te["chai"].id, cantidad=10, unidad="unidad",
+                               fecha_registro=dia, ubicacion="BRU1"),
+            InventarioRegistro(ingrediente_id=te["chai"].id, cantidad=12, unidad="unidad",
+                               fecha_registro=dia, ubicacion="BRU1"),
+            InventarioRegistro(ingrediente_id=te["chai"].id, cantidad=7, unidad="unidad",
+                               fecha_registro=dia, ubicacion="BRU2"),
+        ])
+        test_db.flush()
+
+        assert stock_actual(te["chai"].id, test_db)["cantidad"] == 19  # 12 + 7, not 29
+
+    def test_historico_sin_ubicacion_no_cambia(self, te, test_db):
+        """The ~437 pre-existing café rows have ubicacion NULL on both records.
+        Those group under one bucket, so the total stays latest-wins exactly as
+        before — extending the rule must not retro-change any stored history."""
+        from app.services.consumo import stock_actual
+
+        dia = date(2026, 9, 30)
+        test_db.add_all([
+            InventarioRegistro(ingrediente_id=te["chai"].id, cantidad=16, unidad="unidad",
+                               fecha_registro=dia),
+            InventarioRegistro(ingrediente_id=te["chai"].id, cantidad=9, unidad="unidad",
+                               fecha_registro=dia),
+        ])
+        test_db.flush()
+
+        assert stock_actual(te["chai"].id, test_db)["cantidad"] == 9
+
+    def test_cocina_sigue_siendo_de_una_sola_ubicacion(self, te, test_db):
+        """Kitchen/bar are single-location: two same-day records are a
+        correction, and the later one wins. Must not start summing."""
+        from app.services.consumo import stock_actual
+
+        dia = date(2026, 10, 7)
+        test_db.add_all([
+            InventarioRegistro(ingrediente_id=te["leche"].id, cantidad=4, unidad="litro",
+                               fecha_registro=dia),
+            InventarioRegistro(ingrediente_id=te["leche"].id, cantidad=6, unidad="litro",
+                               fecha_registro=dia),
+        ])
+        test_db.flush()
+
+        assert stock_actual(te["leche"].id, test_db)["cantidad"] == 6
+
+    def test_consumo_batch_coincide_con_la_version_individual(self, te, test_db):
+        """consumo_medio_batch carries its own copy of the collapse rule; it
+        must agree with the single-ingredient path for a Té+ item too."""
+        from app.services.consumo import _consumo_semanal_leaf, consumo_medio_batch
+
+        for n, (b1, b2) in enumerate([(20, 10), (16, 8), (12, 5), (9, 3)]):
+            dia = date(2026, 9, 9) + timedelta(weeks=n)
+            test_db.add_all([
+                InventarioRegistro(ingrediente_id=te["chai"].id, cantidad=b1, unidad="unidad",
+                                   fecha_registro=dia, ubicacion="BRU1"),
+                InventarioRegistro(ingrediente_id=te["chai"].id, cantidad=b2, unidad="unidad",
+                                   fecha_registro=dia, ubicacion="BRU2"),
+            ])
+        pedido = Pedido(proveedor="Prana", estado="recibido", fecha_recepcion=date(2026, 9, 30))
+        test_db.add(pedido)
+        test_db.flush()
+
+        serie = _consumo_semanal_leaf(te["chai"].id, test_db)
+        individual = round(sum(s["cantidad"] for s in serie) / len(serie), 2) if serie else 0.0
+        batch = consumo_medio_batch([te["chai"].id], test_db)[te["chai"].id]["consumo_medio"]
+        assert batch == individual
+        # 30 -> 12 across both shops is real drawdown, so it must be non-zero.
+        assert batch > 0
+
+    def test_pivot_muestra_el_desglose_para_te(self, te, test_db, client):
+        from app.services.conversiones import to_week_key
+
+        dia = date(2026, 10, 7)
+        test_db.add_all([
+            InventarioRegistro(ingrediente_id=te["chai"].id, cantidad=10, unidad="unidad",
+                               fecha_registro=dia, ubicacion="BRU1"),
+            InventarioRegistro(ingrediente_id=te["chai"].id, cantidad=7, unidad="unidad",
+                               fecha_registro=dia, ubicacion="BRU2"),
+        ])
+        test_db.commit()
+
+        r = client.get("/api/inventario/pivot")
+        assert r.status_code == 200
+        fila = next(
+            f for f in r.json()["ingredientes"]
+            if f["ingrediente_nombre"] == "Prana Chai 250g"
+        )
+        semana = to_week_key(dia)
+        assert fila["fechas"][semana] == 17
+        assert fila["fechas_ubic"][semana] == {"BRU1": 10, "BRU2": 7}
+
+
+class TestValidacionUbicacion:
+    """POST /api/inventario must refuse a café-section count with no shop —
+    that's how BRU1 and BRU2 became indistinguishable in the first place."""
+
+    @pytest.fixture
+    def ings(self, test_db):
+        test_db.add_all([
+            Categoria(id=18, nombre="Té+", tipo="ingrediente", seccion="cafe"),
+            Categoria(id=38, nombre="Lácteos", tipo="ingrediente", seccion="cocina"),
+        ])
+        test_db.flush()
+        chai = Ingrediente(
+            nombre="Prana Chai 250g", categoria_id=18, unidad_compra="unidad",
+            cantidad_compra=1, precio_compra=20.0, unidad_uso="unidad", merma_porcentaje=0.0,
+        )
+        leche = Ingrediente(
+            nombre="Leche entera", categoria_id=38, unidad_compra="litro",
+            cantidad_compra=1, precio_compra=1.5, unidad_uso="litro", merma_porcentaje=0.0,
+        )
+        test_db.add_all([chai, leche])
+        test_db.commit()
+        return {"chai": chai, "leche": leche}
+
+    def test_cafe_sin_ubicacion_es_rechazado(self, ings, client, test_db):
+        r = client.post("/api/inventario", json={
+            "registros": [
+                {"ingrediente_id": ings["chai"].id, "cantidad": 10, "unidad": "unidad"},
+            ],
+        })
+        assert r.status_code == 422
+        assert "Prana Chai 250g" in r.json()["detail"]
+        # Nothing may be written when the batch is rejected.
+        assert test_db.query(InventarioRegistro).count() == 0
+
+    def test_ubicacion_desconocida_es_rechazada(self, ings, client):
+        r = client.post("/api/inventario", json={
+            "registros": [
+                {"ingrediente_id": ings["chai"].id, "cantidad": 10,
+                 "unidad": "unidad", "ubicacion": "BRU3"},
+            ],
+        })
+        assert r.status_code == 422
+
+    def test_cafe_con_ubicacion_se_guarda(self, ings, client, test_db):
+        r = client.post("/api/inventario", json={
+            "registros": [
+                {"ingrediente_id": ings["chai"].id, "cantidad": 10,
+                 "unidad": "unidad", "ubicacion": "BRU1"},
+                {"ingrediente_id": ings["chai"].id, "cantidad": 7,
+                 "unidad": "unidad", "ubicacion": "BRU2"},
+            ],
+        })
+        assert r.status_code == 201
+        assert r.json()["registros_creados"] == 2
+
+    def test_cocina_sin_ubicacion_sigue_funcionando(self, ings, client):
+        r = client.post("/api/inventario", json={
+            "registros": [
+                {"ingrediente_id": ings["leche"].id, "cantidad": 4, "unidad": "litro"},
+            ],
+        })
+        assert r.status_code == 201

@@ -7,7 +7,7 @@ from typing import Dict, List, Optional
 from sqlalchemy import distinct, func
 from sqlalchemy.orm import Session
 
-from app.models import InventarioRegistro, LineaPedido, MermaRegistro, Pedido, Ingrediente, Proveedor
+from app.models import Categoria, InventarioRegistro, LineaPedido, MermaRegistro, Pedido, Ingrediente, Proveedor
 
 
 def _base_unit(unit_str: str) -> str:
@@ -60,8 +60,44 @@ def _child_ids(ingrediente_id: int, db: Session) -> list[int]:
     return result
 
 
-def _consumo_semanal_leaf(ingrediente_id: int, db: Session, semanas: int = 12) -> list[dict]:
+def cafe_categoria_ids(db: Session) -> set[int]:
+    """Category ids whose stock is counted separately at BRU1 and BRU2.
+
+    These are the categories of the inventory UI's "café" section — today
+    Café (5), Cafetería (17, the Sibarist filters) and Té+ (18). Same filter
+    catalogo_cafe() already uses, so "what the café tab shows" and "what gets
+    summed per shop" can never drift apart again.
+
+    Was hardcoded as CAFE_CATEGORIA_ID = 5, which silently excluded Té+ and
+    Cafetería: their BRU1 and BRU2 counts fell into the single-location
+    branch, where the last record of the day wins, so one shop's count was
+    discarded on every counting day (Prana Chai 250g read 10 instead of 17).
+
+    Note this is NOT the same predicate as the "blank means 0 in a
+    synchronized counting session" rule — that one is specific to the coffee
+    parent/child groups and stays on categoria 5 (see stock_actual()).
+    """
+    return {
+        c_id
+        for (c_id,) in db.query(Categoria.id).filter(Categoria.seccion == "cafe").all()
+    }
+
+
+def _es_por_tienda(ing: Optional[Ingrediente], cafe_cat_ids: set[int]) -> bool:
+    """True when this ingredient is counted at both shops, so same-day records
+    sum across distinct ubicaciones instead of the last one overwriting."""
+    return bool(ing and ing.categoria_id in cafe_cat_ids)
+
+
+def _consumo_semanal_leaf(
+    ingrediente_id: int,
+    db: Session,
+    semanas: int = 12,
+    cafe_cat_ids: Optional[set[int]] = None,
+) -> list[dict]:
     """Calculate weekly consumption for a single (leaf) ingredient."""
+    if cafe_cat_ids is None:
+        cafe_cat_ids = cafe_categoria_ids(db)
     most_recent = (
         db.query(func.max(Pedido.fecha_recepcion))
         .filter(Pedido.estado == "recibido")
@@ -100,7 +136,7 @@ def _consumo_semanal_leaf(ingrediente_id: int, db: Session, semanas: int = 12) -
     # Raw-summing every same-day row instead turns a re-count into extra
     # stock and inflates the next interval's consumption.
     from collections import OrderedDict
-    is_cafe = bool(ing and ing.categoria_id == CAFE_CATEGORIA_ID)
+    is_cafe = _es_por_tienda(ing, cafe_cat_ids)
     day_records: OrderedDict[date, list] = OrderedDict()
     for r in filtered:
         day_records.setdefault(r.fecha_registro, []).append(r)
@@ -182,20 +218,27 @@ def _consumo_semanal_leaf(ingrediente_id: int, db: Session, semanas: int = 12) -
     return result
 
 
-def consumo_semanal(ingrediente_id: int, db: Session, semanas: int = 12) -> list[dict]:
+def consumo_semanal(
+    ingrediente_id: int,
+    db: Session,
+    semanas: int = 12,
+    cafe_cat_ids: Optional[set[int]] = None,
+) -> list[dict]:
     """Calculate weekly consumption based on received orders and inventory changes.
 
     If the ingredient is a parent (has children), aggregates consumption from all children.
     Uses the most recent N weeks of data available, not a fixed window from today.
     """
+    if cafe_cat_ids is None:
+        cafe_cat_ids = cafe_categoria_ids(db)
     children = _child_ids(ingrediente_id, db)
     if not children:
-        return _consumo_semanal_leaf(ingrediente_id, db, semanas)
+        return _consumo_semanal_leaf(ingrediente_id, db, semanas, cafe_cat_ids)
 
     # Aggregate consumption from all children
     merged: dict[str, float] = {}
     for child_id in children:
-        child_data = _consumo_semanal_leaf(child_id, db, semanas)
+        child_data = _consumo_semanal_leaf(child_id, db, semanas, cafe_cat_ids)
         for item in child_data:
             merged[item["semana"]] = merged.get(item["semana"], 0) + item["cantidad"]
 
@@ -205,11 +248,16 @@ def consumo_semanal(ingrediente_id: int, db: Session, semanas: int = 12) -> list
     ]
 
 
-def consumo_medio_semanal(ingrediente_id: int, db: Session, semanas: int = 8) -> float:
+def consumo_medio_semanal(
+    ingrediente_id: int,
+    db: Session,
+    semanas: int = 8,
+    cafe_cat_ids: Optional[set[int]] = None,
+) -> float:
     ing = db.query(Ingrediente).get(ingrediente_id)
     if ing and ing.consumo_override_semanal is not None:
         return round(ing.consumo_override_semanal, 2)
-    historial = consumo_semanal(ingrediente_id, db, semanas)
+    historial = consumo_semanal(ingrediente_id, db, semanas, cafe_cat_ids)
     if not historial:
         return 0.0
     total = sum(h["cantidad"] for h in historial)
@@ -287,10 +335,16 @@ def _day_total(records: list) -> float:
     return sum(_day_por_ubicacion(records).values())
 
 
-def _stock_actual_leaf(ingrediente_id: int, db: Session, as_of_fecha: Optional[date] = None) -> Optional[dict]:
+def _stock_actual_leaf(
+    ingrediente_id: int,
+    db: Session,
+    as_of_fecha: Optional[date] = None,
+    cafe_cat_ids: Optional[set[int]] = None,
+) -> Optional[dict]:
     """Get latest stock for a single (leaf) ingredient.
-    Café (cat 5): sums same-day records per distinct ubicacion (BRU1 + BRU2),
-    with same-ubicacion same-day duplicates treated as a correction.
+    Café section (see cafe_categoria_ids): sums same-day records per distinct
+    ubicacion (BRU1 + BRU2), with same-ubicacion same-day duplicates treated
+    as a correction.
     Other: takes the last record of the latest day (correction overwrites).
 
     Also returns `fecha_conteo`: the date of the latest MANUAL count record,
@@ -306,6 +360,8 @@ def _stock_actual_leaf(ingrediente_id: int, db: Session, as_of_fecha: Optional[d
     Live stock display (stock_actual()) never passes this — it always wants
     "right now".
     """
+    if cafe_cat_ids is None:
+        cafe_cat_ids = cafe_categoria_ids(db)
     query = db.query(InventarioRegistro).filter(InventarioRegistro.ingrediente_id == ingrediente_id)
     if as_of_fecha is not None:
         query = query.filter(InventarioRegistro.fecha_registro <= as_of_fecha)
@@ -314,7 +370,7 @@ def _stock_actual_leaf(ingrediente_id: int, db: Session, as_of_fecha: Optional[d
         return None
 
     ing = db.query(Ingrediente).get(ingrediente_id)
-    is_cafe = ing and ing.categoria_id == CAFE_CATEGORIA_ID
+    is_cafe = _es_por_tienda(ing, cafe_cat_ids)
 
     if is_cafe:
         registros_dia = (
@@ -358,9 +414,19 @@ def _stock_actual_leaf(ingrediente_id: int, db: Session, as_of_fecha: Optional[d
     }
 
 
+# Categoria of the coffee parent/child groups (beans, retail bags, capsules,
+# frozen tubes). Narrower than cafe_categoria_ids(): it gates the "a child left
+# blank on count day is 0, not carried forward" synchronized-session rule and
+# the order-receipt stock baseline, both of which only make sense for those
+# grouped coffees. Té+ and Cafetería are flat (no parents, no children), so
+# they are counted per shop but keep each shop's last known value.
 CAFE_CATEGORIA_ID = 5
 
-def stock_actual(ingrediente_id: int, db: Session) -> Optional[dict]:
+def stock_actual(
+    ingrediente_id: int,
+    db: Session,
+    cafe_cat_ids: Optional[set[int]] = None,
+) -> Optional[dict]:
     """Get latest stock. If parent, sum latest stock of all children.
     For café (categoria_id=5), including frozen tube flavor groups: a flavor
     left blank on count day is 0, not carried forward — only children counted
@@ -368,9 +434,11 @@ def stock_actual(ingrediente_id: int, db: Session) -> Optional[dict]:
     total. "Pedido recibido" inserts never define that session themselves —
     a flavor bumped by a received order always contributes its current value.
     For other categories: use each child's last known stock."""
+    if cafe_cat_ids is None:
+        cafe_cat_ids = cafe_categoria_ids(db)
     children = _child_ids(ingrediente_id, db)
     if not children:
-        return _stock_actual_leaf(ingrediente_id, db)
+        return _stock_actual_leaf(ingrediente_id, db, cafe_cat_ids=cafe_cat_ids)
 
     ing = db.query(Ingrediente).get(ingrediente_id)
     zero_if_uncounted = ing and ing.categoria_id == CAFE_CATEGORIA_ID
@@ -379,7 +447,7 @@ def stock_actual(ingrediente_id: int, db: Session) -> Optional[dict]:
     latest_fecha = None
     latest_fecha_conteo = None
     for child_id in children:
-        stk = _stock_actual_leaf(child_id, db)
+        stk = _stock_actual_leaf(child_id, db, cafe_cat_ids=cafe_cat_ids)
         child_stocks.append(stk)
         if stk:
             if latest_fecha is None or stk["fecha"] > latest_fecha:
@@ -414,7 +482,12 @@ def stock_actual(ingrediente_id: int, db: Session) -> Optional[dict]:
     }
 
 
-def stock_base_recepcion_pedido(ingrediente_id: int, db: Session, as_of_fecha: Optional[date] = None) -> dict:
+def stock_base_recepcion_pedido(
+    ingrediente_id: int,
+    db: Session,
+    as_of_fecha: Optional[date] = None,
+    cafe_cat_ids: Optional[set[int]] = None,
+) -> dict:
     """Effective current stock for a single leaf ingredient, used as the
     baseline when adding stock from a received order (recibir_pedido). For
     café items in a synchronized counting group, applies the same
@@ -427,7 +500,9 @@ def stock_base_recepcion_pedido(ingrediente_id: int, db: Session, as_of_fecha: O
     baseline to records on or before that date, so a receipt entered today
     for a delivery last week is added on top of the stock as it stood back
     then — not on top of whatever's been counted since."""
-    leaf = _stock_actual_leaf(ingrediente_id, db, as_of_fecha=as_of_fecha)
+    if cafe_cat_ids is None:
+        cafe_cat_ids = cafe_categoria_ids(db)
+    leaf = _stock_actual_leaf(ingrediente_id, db, as_of_fecha=as_of_fecha, cafe_cat_ids=cafe_cat_ids)
     if not leaf:
         return {"cantidad": 0.0, "unidad": None, "ubicacion": None}
 
@@ -439,7 +514,7 @@ def stock_base_recepcion_pedido(ingrediente_id: int, db: Session, as_of_fecha: O
 
     latest_fecha_conteo = None
     for sib_id in _child_ids(ing.grupo_ingrediente_id, db):
-        sib = _stock_actual_leaf(sib_id, db, as_of_fecha=as_of_fecha)
+        sib = _stock_actual_leaf(sib_id, db, as_of_fecha=as_of_fecha, cafe_cat_ids=cafe_cat_ids)
         if sib and sib["fecha_conteo"] and (
             latest_fecha_conteo is None or sib["fecha_conteo"] > latest_fecha_conteo
         ):
@@ -476,7 +551,7 @@ def stock_historial_serie(ingrediente_id: int, db: Session) -> list[dict]:
     for r in all_registros:
         per_child.setdefault(r.ingrediente_id, []).append(r)
 
-    sum_same_day = ing.categoria_id == CAFE_CATEGORIA_ID
+    sum_same_day = _es_por_tienda(ing, cafe_categoria_ids(db))
     dates = sorted({r.fecha_registro for r in all_registros})
     idx = {cid: 0 for cid in per_child}
     last_val: dict[int, tuple] = {cid: None for cid in per_child}  # (cantidad, fecha, es_recibido)
@@ -983,16 +1058,18 @@ def _supplier_cycle_override(ingrediente_id: int, db: Session) -> Optional[float
 
 
 def calcular_par_y_safety(
-    ingrediente_id: int, db: Session
+    ingrediente_id: int, db: Session, cafe_cat_ids: Optional[set[int]] = None
 ) -> dict:
     """Calculate safety stock and par level using auto-detected ordering cycle
     and supplier-specific lead time.
     Returns dict with cycle_weeks, lead_weeks, safety_stock, par_level,
     or None values when insufficient data.
     """
+    if cafe_cat_ids is None:
+        cafe_cat_ids = cafe_categoria_ids(db)
     ing = db.query(Ingrediente).get(ingrediente_id)
     if ing and ing.par_level_override is not None:
-        media = consumo_medio_semanal(ingrediente_id, db)
+        media = consumo_medio_semanal(ingrediente_id, db, cafe_cat_ids=cafe_cat_ids)
         return {
             "cycle_weeks": 1.0,
             "lead_weeks": None,
@@ -1000,11 +1077,11 @@ def calcular_par_y_safety(
             "par_level": ing.par_level_override,
         }
 
-    media = consumo_medio_semanal(ingrediente_id, db)
+    media = consumo_medio_semanal(ingrediente_id, db, cafe_cat_ids=cafe_cat_ids)
     if media <= 0:
         return {"cycle_weeks": 1.0, "lead_weeks": None, "safety_stock": None, "par_level": None}
 
-    historial = consumo_semanal(ingrediente_id, db)
+    historial = consumo_semanal(ingrediente_id, db, cafe_cat_ids=cafe_cat_ids)
     if len(historial) < 3:
         return {"cycle_weeks": 1.0, "lead_weeks": None, "safety_stock": None, "par_level": None}
 
@@ -1051,10 +1128,13 @@ def recomendacion_pedido(
         return []
 
     resultado = []
+    # Resolved once for the whole batch: this endpoint is called with every
+    # active ingredient, and Neon round-trips are expensive.
+    cafe_cat_ids = cafe_categoria_ids(db)
 
     for ing in ingredientes:
-        media = consumo_medio_semanal(ing.id, db)
-        stk = stock_actual(ing.id, db)
+        media = consumo_medio_semanal(ing.id, db, cafe_cat_ids=cafe_cat_ids)
+        stk = stock_actual(ing.id, db, cafe_cat_ids=cafe_cat_ids)
         stock_qty = stk["cantidad"] if stk else 0
         unidad = stk["unidad"] if stk else ing.unidad_compra
 
@@ -1073,7 +1153,7 @@ def recomendacion_pedido(
             })
             continue
 
-        calc = calcular_par_y_safety(ing.id, db)
+        calc = calcular_par_y_safety(ing.id, db, cafe_cat_ids=cafe_cat_ids)
 
         if calc["par_level"] is None:
             resultado.append({
@@ -1170,6 +1250,8 @@ def consumo_medio_batch(
     # Bulk load ingredients for unit info
     ings = db.query(Ingrediente).filter(Ingrediente.id.in_(ingrediente_ids)).all()
     ing_map = {i.id: i for i in ings}
+    # One query for the whole batch — never inside the per-ingredient loop.
+    cafe_cat_ids = cafe_categoria_ids(db)
 
     result: Dict[int, dict] = {}
     for iid in ingrediente_ids:
@@ -1189,7 +1271,7 @@ def consumo_medio_batch(
         # Collapse same-day records — same stock rule as _consumo_semanal_leaf()
         # and _stock_actual_leaf(): café sums distinct ubicaciones, everything
         # else keeps the last record of the day (a correction, not a 2nd count).
-        is_cafe = bool(ing and ing.categoria_id == CAFE_CATEGORIA_ID)
+        is_cafe = _es_por_tienda(ing, cafe_cat_ids)
         day_records: OrderedDict[date, list] = OrderedDict()
         for r in filtered:
             day_records.setdefault(r.fecha_registro, []).append(r)

@@ -25,6 +25,7 @@ from app.services.consumo import (
     FROZEN_TUBE_PARENT_BY_UBICACION,
     _day_por_ubicacion,
     _day_total,
+    cafe_categoria_ids,
     calcular_par_y_safety,
     consumo_medio_semanal,
     consumo_semanal,
@@ -50,6 +51,30 @@ def registrar_inventario(
     user=Depends(get_current_user),
 ):
     fecha = date.fromisoformat(data.fecha) if data.fecha else date.today()
+
+    # A café-section count with no ubicacion is the bug this guard exists to
+    # stop: BRU1's and BRU2's records become indistinguishable, and the
+    # same-day collapse then keeps only the last one, silently discarding one
+    # shop's count. Validate the whole batch before writing anything, so a bad
+    # payload never lands half-saved.
+    cafe_cat_ids = cafe_categoria_ids(db)
+    sin_ubicacion = [
+        ing.nombre
+        for reg in data.registros
+        if (ing := db.get(Ingrediente, reg.ingrediente_id)) is not None
+        and ing.categoria_id in cafe_cat_ids
+        and reg.ubicacion is None
+    ]
+    if sin_ubicacion:
+        raise HTTPException(
+            status_code=422,
+            detail=(
+                "Falta la ubicacion (BRU1/BRU2) en articulos de cafe: "
+                + ", ".join(sin_ubicacion[:10])
+                + (f" y {len(sin_ubicacion) - 10} mas" if len(sin_ubicacion) > 10 else "")
+            ),
+        )
+
     creados = 0
     for reg in data.registros:
         ing = db.get(Ingrediente, reg.ingrediente_id)
@@ -358,7 +383,12 @@ def inventario_pivot(
     ing_ids = {r.ingrediente_id for r in registros}
     ings = {i.id: i for i in db.query(Ingrediente).filter(Ingrediente.id.in_(ing_ids)).all()}
 
-    cafe_ids = {i.id for i in db.query(Ingrediente.id).filter(Ingrediente.categoria_id == 5).all()}
+    cafe_ids = {
+        i.id
+        for i in db.query(Ingrediente.id)
+        .filter(Ingrediente.categoria_id.in_(cafe_categoria_ids(db)))
+        .all()
+    }
 
     # Group by (ingrediente, dia), preserving id-ascending order within each day
     # so the day's total matches stock_actual()/_day_total() elsewhere: same

@@ -1,9 +1,13 @@
 from __future__ import annotations
 
 from datetime import date, datetime
-from typing import Optional
+from typing import Literal, Optional
 
 from pydantic import BaseModel, Field, model_validator
+
+# The two shops. Inventory records for café-section ingredients are counted
+# separately at each; everything else is single-location and leaves it unset.
+Ubicacion = Literal["BRU1", "BRU2"]
 
 
 # --- Categorias ---
@@ -283,14 +287,14 @@ class InventarioRegistroCreate(BaseModel):
     cantidad: float
     unidad: str
     notas: Optional[str] = None
-    ubicacion: Optional[str] = None
+    ubicacion: Optional[Ubicacion] = None
 
 
 class InventarioRegistroUpdate(BaseModel):
     cantidad: Optional[float] = None
     unidad: Optional[str] = None
     notas: Optional[str] = None
-    ubicacion: Optional[str] = None
+    ubicacion: Optional[Ubicacion] = None
 
 
 class InventarioSnapshotCreate(BaseModel):
