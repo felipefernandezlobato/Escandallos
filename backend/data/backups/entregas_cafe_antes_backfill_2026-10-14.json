@@ -1,0 +1,1190 @@
+[
+ {
+  "id": 1161,
+  "ingrediente_id": 289,
+  "cantidad": 38.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-07-27",
+  "notas": "Pedido #52 recibido",
+  "ubicacion": null
+ },
+ {
+  "id": 1162,
+  "ingrediente_id": 289,
+  "cantidad": 43.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-07-27",
+  "notas": "Pedido #53 recibido",
+  "ubicacion": null
+ },
+ {
+  "id": 1163,
+  "ingrediente_id": 290,
+  "cantidad": 32.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-07-28",
+  "notas": "Pedido #54 recibido",
+  "ubicacion": null
+ },
+ {
+  "id": 2099,
+  "ingrediente_id": 422,
+  "cantidad": 3.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-08-14",
+  "notas": "Pedido #78 recibido",
+  "ubicacion": null
+ },
+ {
+  "id": 2100,
+  "ingrediente_id": 423,
+  "cantidad": 4.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-08-14",
+  "notas": "Pedido #78 recibido",
+  "ubicacion": null
+ },
+ {
+  "id": 2184,
+  "ingrediente_id": 375,
+  "cantidad": 12.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-08-20",
+  "notas": "Pedido #82 recibido",
+  "ubicacion": null
+ },
+ {
+  "id": 2185,
+  "ingrediente_id": 387,
+  "cantidad": 12.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-08-20",
+  "notas": "Pedido #82 recibido",
+  "ubicacion": null
+ },
+ {
+  "id": 2186,
+  "ingrediente_id": 388,
+  "cantidad": 13.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-08-20",
+  "notas": "Pedido #82 recibido",
+  "ubicacion": null
+ },
+ {
+  "id": 2220,
+  "ingrediente_id": 395,
+  "cantidad": 20.0,
+  "unidad": "kg",
+  "fecha_registro": "2026-08-24",
+  "notas": "Pedido #68 recibido",
+  "ubicacion": null
+ },
+ {
+  "id": 2221,
+  "ingrediente_id": 396,
+  "cantidad": 6.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-08-24",
+  "notas": "Pedido #68 recibido",
+  "ubicacion": null
+ },
+ {
+  "id": 2222,
+  "ingrediente_id": 397,
+  "cantidad": 6.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-08-24",
+  "notas": "Pedido #68 recibido",
+  "ubicacion": null
+ },
+ {
+  "id": 2223,
+  "ingrediente_id": 398,
+  "cantidad": 6.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-08-24",
+  "notas": "Pedido #68 recibido",
+  "ubicacion": null
+ },
+ {
+  "id": 2224,
+  "ingrediente_id": 399,
+  "cantidad": 6.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-08-24",
+  "notas": "Pedido #68 recibido",
+  "ubicacion": null
+ },
+ {
+  "id": 2225,
+  "ingrediente_id": 400,
+  "cantidad": 6.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-08-24",
+  "notas": "Pedido #68 recibido",
+  "ubicacion": null
+ },
+ {
+  "id": 2226,
+  "ingrediente_id": 401,
+  "cantidad": 6.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-08-24",
+  "notas": "Pedido #68 recibido",
+  "ubicacion": null
+ },
+ {
+  "id": 2227,
+  "ingrediente_id": 402,
+  "cantidad": 4.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-08-24",
+  "notas": "Pedido #68 recibido",
+  "ubicacion": null
+ },
+ {
+  "id": 2228,
+  "ingrediente_id": 403,
+  "cantidad": 4.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-08-24",
+  "notas": "Pedido #68 recibido",
+  "ubicacion": null
+ },
+ {
+  "id": 2229,
+  "ingrediente_id": 369,
+  "cantidad": 6.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-08-26",
+  "notas": "Pedido #83 recibido",
+  "ubicacion": "BRU1"
+ },
+ {
+  "id": 2230,
+  "ingrediente_id": 370,
+  "cantidad": 7.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-08-26",
+  "notas": "Pedido #83 recibido",
+  "ubicacion": "BRU1"
+ },
+ {
+  "id": 2231,
+  "ingrediente_id": 382,
+  "cantidad": 4.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-08-26",
+  "notas": "Pedido #83 recibido",
+  "ubicacion": "BRU2"
+ },
+ {
+  "id": 2232,
+  "ingrediente_id": 383,
+  "cantidad": 6.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-08-26",
+  "notas": "Pedido #83 recibido",
+  "ubicacion": "BRU2"
+ },
+ {
+  "id": 2233,
+  "ingrediente_id": 422,
+  "cantidad": 5.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-08-26",
+  "notas": "Pedido #84 recibido",
+  "ubicacion": "BRU1"
+ },
+ {
+  "id": 2234,
+  "ingrediente_id": 423,
+  "cantidad": 6.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-08-26",
+  "notas": "Pedido #84 recibido",
+  "ubicacion": "BRU2"
+ },
+ {
+  "id": 2406,
+  "ingrediente_id": 406,
+  "cantidad": 6.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-08-27",
+  "notas": "Pedido #89 recibido",
+  "ubicacion": "BRU1"
+ },
+ {
+  "id": 2407,
+  "ingrediente_id": 407,
+  "cantidad": 5.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-08-27",
+  "notas": "Pedido #89 recibido",
+  "ubicacion": "BRU2"
+ },
+ {
+  "id": 2443,
+  "ingrediente_id": 405,
+  "cantidad": 8.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-02",
+  "notas": "Pedido #90 recibido",
+  "ubicacion": "BRU2"
+ },
+ {
+  "id": 2444,
+  "ingrediente_id": 409,
+  "cantidad": 7.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-02",
+  "notas": "Pedido #90 recibido",
+  "ubicacion": "BRU2"
+ },
+ {
+  "id": 2445,
+  "ingrediente_id": 413,
+  "cantidad": 1.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-02",
+  "notas": "Pedido #91 recibido",
+  "ubicacion": "BRU2"
+ },
+ {
+  "id": 2784,
+  "ingrediente_id": 405,
+  "cantidad": 14.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-04",
+  "notas": "Pedido #95 recibido",
+  "ubicacion": "BRU2"
+ },
+ {
+  "id": 2785,
+  "ingrediente_id": 409,
+  "cantidad": 6.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-04",
+  "notas": "Pedido #95 recibido",
+  "ubicacion": "BRU2"
+ },
+ {
+  "id": 2786,
+  "ingrediente_id": 369,
+  "cantidad": 6.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-07",
+  "notas": "Pedido #96 recibido",
+  "ubicacion": "BRU1"
+ },
+ {
+  "id": 2787,
+  "ingrediente_id": 383,
+  "cantidad": 8.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-07",
+  "notas": "Pedido #96 recibido",
+  "ubicacion": "BRU2"
+ },
+ {
+  "id": 2788,
+  "ingrediente_id": 404,
+  "cantidad": 10.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-07",
+  "notas": "Pedido #97 recibido",
+  "ubicacion": "BRU1"
+ },
+ {
+  "id": 2789,
+  "ingrediente_id": 405,
+  "cantidad": 17.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-07",
+  "notas": "Pedido #97 recibido",
+  "ubicacion": "BRU2"
+ },
+ {
+  "id": 2790,
+  "ingrediente_id": 406,
+  "cantidad": 7.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-07",
+  "notas": "Pedido #97 recibido",
+  "ubicacion": "BRU1"
+ },
+ {
+  "id": 2791,
+  "ingrediente_id": 407,
+  "cantidad": 20.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-07",
+  "notas": "Pedido #97 recibido",
+  "ubicacion": "BRU2"
+ },
+ {
+  "id": 2792,
+  "ingrediente_id": 408,
+  "cantidad": 4.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-07",
+  "notas": "Pedido #97 recibido",
+  "ubicacion": "BRU1"
+ },
+ {
+  "id": 2793,
+  "ingrediente_id": 409,
+  "cantidad": 7.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-07",
+  "notas": "Pedido #97 recibido",
+  "ubicacion": "BRU2"
+ },
+ {
+  "id": 2794,
+  "ingrediente_id": 412,
+  "cantidad": 2.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-07",
+  "notas": "Pedido #97 recibido",
+  "ubicacion": "BRU1"
+ },
+ {
+  "id": 2795,
+  "ingrediente_id": 413,
+  "cantidad": 4.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-07",
+  "notas": "Pedido #97 recibido",
+  "ubicacion": "BRU2"
+ },
+ {
+  "id": 2796,
+  "ingrediente_id": 410,
+  "cantidad": 2.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-07",
+  "notas": "Pedido #98 recibido",
+  "ubicacion": "BRU1"
+ },
+ {
+  "id": 2797,
+  "ingrediente_id": 411,
+  "cantidad": 3.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-07",
+  "notas": "Pedido #98 recibido",
+  "ubicacion": "BRU2"
+ },
+ {
+  "id": 3052,
+  "ingrediente_id": 280,
+  "cantidad": 4.0,
+  "unidad": "kg",
+  "fecha_registro": "2026-09-04",
+  "notas": "Pedido #99 recibido",
+  "ubicacion": null
+ },
+ {
+  "id": 3053,
+  "ingrediente_id": 281,
+  "cantidad": 29.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-04",
+  "notas": "Pedido #99 recibido",
+  "ubicacion": null
+ },
+ {
+  "id": 3054,
+  "ingrediente_id": 291,
+  "cantidad": 5.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-11",
+  "notas": "Pedido #104 recibido",
+  "ubicacion": null
+ },
+ {
+  "id": 3055,
+  "ingrediente_id": 266,
+  "cantidad": 16.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-11",
+  "notas": "Pedido #104 recibido",
+  "ubicacion": null
+ },
+ {
+  "id": 3056,
+  "ingrediente_id": 268,
+  "cantidad": 6.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-11",
+  "notas": "Pedido #104 recibido",
+  "ubicacion": null
+ },
+ {
+  "id": 3057,
+  "ingrediente_id": 267,
+  "cantidad": 15.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-11",
+  "notas": "Pedido #104 recibido",
+  "ubicacion": null
+ },
+ {
+  "id": 3058,
+  "ingrediente_id": 447,
+  "cantidad": 10.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-11",
+  "notas": "Pedido #104 recibido",
+  "ubicacion": null
+ },
+ {
+  "id": 3059,
+  "ingrediente_id": 299,
+  "cantidad": 5.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-11",
+  "notas": "Pedido #104 recibido",
+  "ubicacion": null
+ },
+ {
+  "id": 3060,
+  "ingrediente_id": 446,
+  "cantidad": 5.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-11",
+  "notas": "Pedido #104 recibido",
+  "ubicacion": null
+ },
+ {
+  "id": 3061,
+  "ingrediente_id": 272,
+  "cantidad": 6.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-11",
+  "notas": "Pedido #104 recibido",
+  "ubicacion": null
+ },
+ {
+  "id": 3062,
+  "ingrediente_id": 448,
+  "cantidad": 5.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-11",
+  "notas": "Pedido #104 recibido",
+  "ubicacion": null
+ },
+ {
+  "id": 3063,
+  "ingrediente_id": 262,
+  "cantidad": 6.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-11",
+  "notas": "Pedido #104 recibido",
+  "ubicacion": null
+ },
+ {
+  "id": 3064,
+  "ingrediente_id": 264,
+  "cantidad": 5.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-11",
+  "notas": "Pedido #104 recibido",
+  "ubicacion": null
+ },
+ {
+  "id": 3129,
+  "ingrediente_id": 396,
+  "cantidad": 12.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-14",
+  "notas": "Pedido #94 recibido",
+  "ubicacion": "BRU1"
+ },
+ {
+  "id": 3130,
+  "ingrediente_id": 397,
+  "cantidad": 9.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-14",
+  "notas": "Pedido #94 recibido",
+  "ubicacion": "BRU1"
+ },
+ {
+  "id": 3131,
+  "ingrediente_id": 398,
+  "cantidad": 10.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-14",
+  "notas": "Pedido #94 recibido",
+  "ubicacion": "BRU1"
+ },
+ {
+  "id": 3132,
+  "ingrediente_id": 435,
+  "cantidad": 8.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-14",
+  "notas": "Pedido #94 recibido",
+  "ubicacion": "BRU1"
+ },
+ {
+  "id": 3133,
+  "ingrediente_id": 436,
+  "cantidad": 6.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-14",
+  "notas": "Pedido #94 recibido",
+  "ubicacion": "BRU1"
+ },
+ {
+  "id": 3134,
+  "ingrediente_id": 400,
+  "cantidad": 6.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-14",
+  "notas": "Pedido #94 recibido",
+  "ubicacion": "BRU1"
+ },
+ {
+  "id": 3135,
+  "ingrediente_id": 438,
+  "cantidad": 1.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-14",
+  "notas": "Pedido #94 recibido",
+  "ubicacion": "BRU1"
+ },
+ {
+  "id": 3136,
+  "ingrediente_id": 401,
+  "cantidad": 4.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-14",
+  "notas": "Pedido #94 recibido",
+  "ubicacion": "BRU1"
+ },
+ {
+  "id": 3137,
+  "ingrediente_id": 439,
+  "cantidad": 8.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-14",
+  "notas": "Pedido #94 recibido",
+  "ubicacion": "BRU1"
+ },
+ {
+  "id": 3138,
+  "ingrediente_id": 440,
+  "cantidad": 8.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-14",
+  "notas": "Pedido #94 recibido",
+  "ubicacion": "BRU1"
+ },
+ {
+  "id": 3139,
+  "ingrediente_id": 441,
+  "cantidad": 8.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-14",
+  "notas": "Pedido #94 recibido",
+  "ubicacion": "BRU1"
+ },
+ {
+  "id": 3140,
+  "ingrediente_id": 442,
+  "cantidad": 1.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-14",
+  "notas": "Pedido #94 recibido",
+  "ubicacion": "BRU1"
+ },
+ {
+  "id": 3141,
+  "ingrediente_id": 443,
+  "cantidad": 4.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-14",
+  "notas": "Pedido #94 recibido",
+  "ubicacion": "BRU1"
+ },
+ {
+  "id": 3142,
+  "ingrediente_id": 403,
+  "cantidad": 6.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-14",
+  "notas": "Pedido #94 recibido",
+  "ubicacion": "BRU1"
+ },
+ {
+  "id": 3143,
+  "ingrediente_id": 401,
+  "cantidad": 5.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-14",
+  "notas": "Pedido #105 recibido",
+  "ubicacion": "BRU1"
+ },
+ {
+  "id": 3144,
+  "ingrediente_id": 443,
+  "cantidad": 5.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-14",
+  "notas": "Pedido #105 recibido",
+  "ubicacion": "BRU1"
+ },
+ {
+  "id": 3145,
+  "ingrediente_id": 403,
+  "cantidad": 7.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-14",
+  "notas": "Pedido #105 recibido",
+  "ubicacion": "BRU1"
+ },
+ {
+  "id": 3146,
+  "ingrediente_id": 395,
+  "cantidad": 31.0,
+  "unidad": "kg",
+  "fecha_registro": "2026-09-14",
+  "notas": "Pedido #105 recibido",
+  "ubicacion": "BRU1"
+ },
+ {
+  "id": 3147,
+  "ingrediente_id": 440,
+  "cantidad": 9.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-14",
+  "notas": "Pedido #105 recibido",
+  "ubicacion": "BRU1"
+ },
+ {
+  "id": 3148,
+  "ingrediente_id": 439,
+  "cantidad": 9.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-14",
+  "notas": "Pedido #105 recibido",
+  "ubicacion": "BRU1"
+ },
+ {
+  "id": 3149,
+  "ingrediente_id": 435,
+  "cantidad": 9.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-14",
+  "notas": "Pedido #105 recibido",
+  "ubicacion": "BRU1"
+ },
+ {
+  "id": 3150,
+  "ingrediente_id": 441,
+  "cantidad": 9.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-14",
+  "notas": "Pedido #105 recibido",
+  "ubicacion": "BRU1"
+ },
+ {
+  "id": 3645,
+  "ingrediente_id": 375,
+  "cantidad": 10.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-23",
+  "notas": "Pedido #109 recibido",
+  "ubicacion": "BRU1"
+ },
+ {
+  "id": 3646,
+  "ingrediente_id": 387,
+  "cantidad": 10.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-23",
+  "notas": "Pedido #109 recibido",
+  "ubicacion": "BRU2"
+ },
+ {
+  "id": 3647,
+  "ingrediente_id": 423,
+  "cantidad": 6.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-23",
+  "notas": "Pedido #111 recibido",
+  "ubicacion": "BRU2"
+ },
+ {
+  "id": 3651,
+  "ingrediente_id": 407,
+  "cantidad": 14.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-24",
+  "notas": "Pedido #114 recibido",
+  "ubicacion": "BRU2"
+ },
+ {
+  "id": 3652,
+  "ingrediente_id": 369,
+  "cantidad": 14.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-24",
+  "notas": "Pedido #119 recibido",
+  "ubicacion": "BRU1"
+ },
+ {
+  "id": 3653,
+  "ingrediente_id": 383,
+  "cantidad": 15.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-24",
+  "notas": "Pedido #119 recibido",
+  "ubicacion": "BRU2"
+ },
+ {
+  "id": 3654,
+  "ingrediente_id": 409,
+  "cantidad": 6.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-23",
+  "notas": "Pedido #120 recibido",
+  "ubicacion": "BRU2"
+ },
+ {
+  "id": 3655,
+  "ingrediente_id": 413,
+  "cantidad": 8.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-23",
+  "notas": "Pedido #120 recibido",
+  "ubicacion": "BRU2"
+ },
+ {
+  "id": 3656,
+  "ingrediente_id": 423,
+  "cantidad": 12.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-23",
+  "notas": "Pedido #121 recibido",
+  "ubicacion": "BRU2"
+ },
+ {
+  "id": 3697,
+  "ingrediente_id": 352,
+  "cantidad": 16.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-23",
+  "notas": "Pedido #103 recibido",
+  "ubicacion": "BRU2"
+ },
+ {
+  "id": 3698,
+  "ingrediente_id": 353,
+  "cantidad": 16.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-23",
+  "notas": "Pedido #103 recibido",
+  "ubicacion": "BRU2"
+ },
+ {
+  "id": 3699,
+  "ingrediente_id": 350,
+  "cantidad": 12.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-23",
+  "notas": "Pedido #103 recibido",
+  "ubicacion": "BRU2"
+ },
+ {
+  "id": 3700,
+  "ingrediente_id": 348,
+  "cantidad": 8.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-23",
+  "notas": "Pedido #103 recibido",
+  "ubicacion": "BRU2"
+ },
+ {
+  "id": 3701,
+  "ingrediente_id": 344,
+  "cantidad": 16.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-23",
+  "notas": "Pedido #103 recibido",
+  "ubicacion": "BRU2"
+ },
+ {
+  "id": 3702,
+  "ingrediente_id": 347,
+  "cantidad": 16.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-23",
+  "notas": "Pedido #103 recibido",
+  "ubicacion": "BRU2"
+ },
+ {
+  "id": 3703,
+  "ingrediente_id": 364,
+  "cantidad": 20.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-23",
+  "notas": "Pedido #103 recibido",
+  "ubicacion": "BRU2"
+ },
+ {
+  "id": 3704,
+  "ingrediente_id": 330,
+  "cantidad": 39.0,
+  "unidad": "kg",
+  "fecha_registro": "2026-09-23",
+  "notas": "Pedido #103 recibido",
+  "ubicacion": "BRU2"
+ },
+ {
+  "id": 3705,
+  "ingrediente_id": 333,
+  "cantidad": 30.0,
+  "unidad": "kg",
+  "fecha_registro": "2026-09-23",
+  "notas": "Pedido #103 recibido",
+  "ubicacion": "BRU2"
+ },
+ {
+  "id": 3706,
+  "ingrediente_id": 444,
+  "cantidad": 2.0,
+  "unidad": "kg",
+  "fecha_registro": "2026-09-23",
+  "notas": "Pedido #103 recibido",
+  "ubicacion": "BRU2"
+ },
+ {
+  "id": 3707,
+  "ingrediente_id": 367,
+  "cantidad": 4.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-23",
+  "notas": "Pedido #103 recibido",
+  "ubicacion": "BRU2"
+ },
+ {
+  "id": 3708,
+  "ingrediente_id": 368,
+  "cantidad": 10.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-23",
+  "notas": "Pedido #103 recibido",
+  "ubicacion": "BRU2"
+ },
+ {
+  "id": 3709,
+  "ingrediente_id": 445,
+  "cantidad": 2.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-23",
+  "notas": "Pedido #103 recibido",
+  "ubicacion": "BRU2"
+ },
+ {
+  "id": 3710,
+  "ingrediente_id": 378,
+  "cantidad": 17.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-23",
+  "notas": "Pedido #103 recibido",
+  "ubicacion": "BRU2"
+ },
+ {
+  "id": 3711,
+  "ingrediente_id": 380,
+  "cantidad": 15.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-23",
+  "notas": "Pedido #103 recibido",
+  "ubicacion": "BRU2"
+ },
+ {
+  "id": 3712,
+  "ingrediente_id": 379,
+  "cantidad": 19.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-23",
+  "notas": "Pedido #103 recibido",
+  "ubicacion": "BRU2"
+ },
+ {
+  "id": 3713,
+  "ingrediente_id": 381,
+  "cantidad": 13.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-23",
+  "notas": "Pedido #103 recibido",
+  "ubicacion": "BRU2"
+ },
+ {
+  "id": 3784,
+  "ingrediente_id": 408,
+  "cantidad": 7.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-30",
+  "notas": "Pedido #122 recibido",
+  "ubicacion": "BRU1"
+ },
+ {
+  "id": 3785,
+  "ingrediente_id": 412,
+  "cantidad": 5.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-30",
+  "notas": "Pedido #122 recibido",
+  "ubicacion": "BRU1"
+ },
+ {
+  "id": 3898,
+  "ingrediente_id": 382,
+  "cantidad": 7.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-09-30",
+  "notas": "Pedido #123 recibido",
+  "ubicacion": "BRU2"
+ },
+ {
+  "id": 3934,
+  "ingrediente_id": 458,
+  "cantidad": 10.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-10-02",
+  "notas": "Pedido #125 recibido",
+  "ubicacion": "BRU2"
+ },
+ {
+  "id": 4135,
+  "ingrediente_id": 395,
+  "cantidad": 57.0,
+  "unidad": "kg",
+  "fecha_registro": "2026-10-07",
+  "notas": "Pedido #106 recibido",
+  "ubicacion": "BRU1"
+ },
+ {
+  "id": 4136,
+  "ingrediente_id": 451,
+  "cantidad": 5.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-10-08",
+  "notas": "Pedido #129 recibido",
+  "ubicacion": "BRU1"
+ },
+ {
+  "id": 4137,
+  "ingrediente_id": 452,
+  "cantidad": 6.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-10-08",
+  "notas": "Pedido #129 recibido",
+  "ubicacion": "BRU2"
+ },
+ {
+  "id": 4138,
+  "ingrediente_id": 453,
+  "cantidad": 6.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-10-08",
+  "notas": "Pedido #129 recibido",
+  "ubicacion": "BRU1"
+ },
+ {
+  "id": 4139,
+  "ingrediente_id": 454,
+  "cantidad": 6.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-10-08",
+  "notas": "Pedido #129 recibido",
+  "ubicacion": "BRU2"
+ },
+ {
+  "id": 4140,
+  "ingrediente_id": 455,
+  "cantidad": 5.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-10-08",
+  "notas": "Pedido #129 recibido",
+  "ubicacion": "BRU1"
+ },
+ {
+  "id": 4141,
+  "ingrediente_id": 456,
+  "cantidad": 5.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-10-08",
+  "notas": "Pedido #129 recibido",
+  "ubicacion": "BRU2"
+ },
+ {
+  "id": 4234,
+  "ingrediente_id": 463,
+  "cantidad": 1.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-10-09",
+  "notas": "Pedido #126 recibido",
+  "ubicacion": "BRU1"
+ },
+ {
+  "id": 4235,
+  "ingrediente_id": 439,
+  "cantidad": 9.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-10-09",
+  "notas": "Pedido #126 recibido",
+  "ubicacion": "BRU1"
+ },
+ {
+  "id": 4236,
+  "ingrediente_id": 436,
+  "cantidad": 10.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-10-09",
+  "notas": "Pedido #126 recibido",
+  "ubicacion": "BRU1"
+ },
+ {
+  "id": 4237,
+  "ingrediente_id": 403,
+  "cantidad": 6.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-10-09",
+  "notas": "Pedido #126 recibido",
+  "ubicacion": "BRU1"
+ },
+ {
+  "id": 4238,
+  "ingrediente_id": 443,
+  "cantidad": 10.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-10-09",
+  "notas": "Pedido #126 recibido",
+  "ubicacion": "BRU1"
+ },
+ {
+  "id": 4239,
+  "ingrediente_id": 438,
+  "cantidad": 1.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-10-09",
+  "notas": "Pedido #126 recibido",
+  "ubicacion": "BRU1"
+ },
+ {
+  "id": 4240,
+  "ingrediente_id": 401,
+  "cantidad": 5.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-10-09",
+  "notas": "Pedido #126 recibido",
+  "ubicacion": "BRU1"
+ },
+ {
+  "id": 4241,
+  "ingrediente_id": 441,
+  "cantidad": 11.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-10-09",
+  "notas": "Pedido #126 recibido",
+  "ubicacion": "BRU1"
+ },
+ {
+  "id": 4242,
+  "ingrediente_id": 440,
+  "cantidad": 13.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-10-09",
+  "notas": "Pedido #126 recibido",
+  "ubicacion": "BRU1"
+ },
+ {
+  "id": 4243,
+  "ingrediente_id": 400,
+  "cantidad": 7.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-10-09",
+  "notas": "Pedido #126 recibido",
+  "ubicacion": "BRU1"
+ },
+ {
+  "id": 4244,
+  "ingrediente_id": 435,
+  "cantidad": 11.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-10-09",
+  "notas": "Pedido #126 recibido",
+  "ubicacion": "BRU1"
+ },
+ {
+  "id": 4245,
+  "ingrediente_id": 398,
+  "cantidad": 11.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-10-09",
+  "notas": "Pedido #126 recibido",
+  "ubicacion": "BRU1"
+ },
+ {
+  "id": 4246,
+  "ingrediente_id": 397,
+  "cantidad": 11.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-10-09",
+  "notas": "Pedido #126 recibido",
+  "ubicacion": "BRU1"
+ },
+ {
+  "id": 4247,
+  "ingrediente_id": 396,
+  "cantidad": 15.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-10-09",
+  "notas": "Pedido #126 recibido",
+  "ubicacion": "BRU1"
+ },
+ {
+  "id": 4248,
+  "ingrediente_id": 395,
+  "cantidad": 92.0,
+  "unidad": "kg",
+  "fecha_registro": "2026-10-09",
+  "notas": "Pedido #126 recibido",
+  "ubicacion": "BRU1"
+ },
+ {
+  "id": 4249,
+  "ingrediente_id": 409,
+  "cantidad": 12.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-10-10",
+  "notas": "Pedido #130 recibido",
+  "ubicacion": "BRU2"
+ },
+ {
+  "id": 4250,
+  "ingrediente_id": 458,
+  "cantidad": 5.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-10-10",
+  "notas": "Pedido #130 recibido",
+  "ubicacion": "BRU2"
+ },
+ {
+  "id": 4251,
+  "ingrediente_id": 460,
+  "cantidad": 7.0,
+  "unidad": "unidad",
+  "fecha_registro": "2026-10-10",
+  "notas": "Pedido #130 recibido",
+  "ubicacion": "BRU2"
+ }
+]
