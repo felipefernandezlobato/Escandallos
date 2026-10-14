@@ -163,9 +163,15 @@ function InventarioContent() {
   );
   const [selectedSemana, setSelectedSemana] = useState(searchParams.get("semana") || "");
 
-  // Sync URL without triggering navigation (no re-render, no Suspense)
+  // Sync URL without triggering navigation (no re-render, no Suspense).
+  // Rebuilt from scratch on purpose, so a stale `view=recomendaciones` can't
+  // survive a tab change and reopen that screen on the next reload. The one
+  // param carried over is `seccion`: dropping it meant tapping a tab and then
+  // reloading landed you on Cocina in the middle of a café count.
   const syncUrl = useCallback((params: Record<string, string>) => {
     const sp = new URLSearchParams();
+    const seccion = new URLSearchParams(window.location.search).get("seccion");
+    if (seccion) sp.set("seccion", seccion);
     for (const [k, v] of Object.entries(params)) {
       if (v) sp.set(k, v);
     }
