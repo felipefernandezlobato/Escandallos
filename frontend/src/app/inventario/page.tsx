@@ -563,8 +563,7 @@ function InventarioContent() {
     return SIBARIST_FAMILIES.find((f) => n.startsWith(f)) || "Otros";
   };
 
-  const matchesVista = (ingredienteId: number, ingredienteNombre: string): boolean => {
-    if (ingredienteNombre.toLowerCase().includes("sibarist")) return vista === "cafe";
+  const matchesVista = (ingredienteId: number): boolean => {
     const fullIng = ingredientes.find((i) => i.id === ingredienteId);
     if (!fullIng) return false;
     const cat = categorias.find((c) => c.id === fullIng.categoria_id);
@@ -588,12 +587,16 @@ function InventarioContent() {
   // never disagree. Tagging ubicacion by "has a grupo_ingrediente_id" instead
   // is what left Chai, Matcha and the Sibarist filters saving with no shop at
   // all: both shops' counts landed identical and the later overwrote the other.
+  // Resolved purely by category section. It used to need an extra
+  // `nombre.includes("sibarist")` escape hatch, because the 52 filters sat in
+  // categoría 17 "Cafetería" — a tipo="receta" category, which this page never
+  // receives (it fetches ?tipo=ingrediente). They now live in their own
+  // "Filtros" ingredient category, so the name hack is gone. Anything new
+  // dropped into a recipe category would be invisible here rather than
+  // silently saved without a shop.
   const cafeSectionIds = new Set(
     ingredientes
-      .filter((i) => {
-        if (i.nombre.toLowerCase().includes("sibarist")) return true;
-        return categorias.find((c) => c.id === i.categoria_id)?.seccion === "cafe";
-      })
+      .filter((i) => categorias.find((c) => c.id === i.categoria_id)?.seccion === "cafe")
       .map((i) => i.id)
   );
 
@@ -1356,7 +1359,7 @@ function InventarioContent() {
           </>)}
 
           {!showRecomendaciones && registrosHoy.length > 0 && (() => {
-            const vistaRegistros = registrosHoy.filter((r) => matchesVista(r.ingrediente_id, r.ingrediente_nombre));
+            const vistaRegistros = registrosHoy.filter((r) => matchesVista(r.ingrediente_id));
             if (vistaRegistros.length === 0) return null;
             const grouped: Record<string, typeof registrosHoy> = {};
             for (const r of vistaRegistros) {
@@ -1548,7 +1551,7 @@ function InventarioContent() {
                   ingredientes.filter((i) => i.grupo_ingrediente_id).map((i) => i.id)
                 );
                 const vistaRecs = recomendaciones
-                  .filter((r) => matchesVista(r.ingrediente_id, r.ingrediente_nombre))
+                  .filter((r) => matchesVista(r.ingrediente_id))
                   .filter((r) => !childIdsWithParent.has(r.ingrediente_id));
                 const proveedores = Array.from(
                   new Set(vistaRecs.map((r) => r.proveedor))
@@ -1748,7 +1751,7 @@ function InventarioContent() {
                     </tr>
                   </thead>
                   {(() => {
-                    const filteredRegistros = historial.registros.filter((r) => matchesVista(r.ingrediente_id, r.ingrediente_nombre) && (showInactive || isActivo(r.ingrediente_id)));
+                    const filteredRegistros = historial.registros.filter((r) => matchesVista(r.ingrediente_id) && (showInactive || isActivo(r.ingrediente_id)));
                     const byDate: Record<string, typeof historial.registros> = {};
                     for (const r of filteredRegistros) {
                       const d = String(r.fecha_registro);
@@ -1881,7 +1884,7 @@ function InventarioContent() {
                     </tr>
                   </thead>
                   {(() => {
-                    const filtered = pivot.ingredientes.filter((ing) => matchesVista(ing.ingrediente_id, ing.ingrediente_nombre) && (showInactive || isActivo(ing.ingrediente_id)));
+                    const filtered = pivot.ingredientes.filter((ing) => matchesVista(ing.ingrediente_id) && (showInactive || isActivo(ing.ingrediente_id)));
                     const getGroup = (ingId: number, ingName: string): { name: string; orden: number } => {
                       if (ingName.toLowerCase().includes("sibarist")) return { name: "Sibarist", orden: 999 };
                       const fullIng = ingredientes.find((i) => i.id === ingId);

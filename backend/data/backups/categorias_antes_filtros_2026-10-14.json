@@ -1,0 +1,746 @@
+{
+ "categorias": [
+  {
+   "id": 1,
+   "nombre": "Lácteo",
+   "tipo": "ingrediente",
+   "margen_objetivo": null,
+   "orden": null,
+   "seccion": null
+  },
+  {
+   "id": 4,
+   "nombre": "Seco",
+   "tipo": "ingrediente",
+   "margen_objetivo": null,
+   "orden": null,
+   "seccion": null
+  },
+  {
+   "id": 6,
+   "nombre": "Alcohol",
+   "tipo": "ingrediente",
+   "margen_objetivo": null,
+   "orden": null,
+   "seccion": null
+  },
+  {
+   "id": 8,
+   "nombre": "Panadería",
+   "tipo": "ingrediente",
+   "margen_objetivo": null,
+   "orden": null,
+   "seccion": null
+  },
+  {
+   "id": 9,
+   "nombre": "Huevos",
+   "tipo": "ingrediente",
+   "margen_objetivo": null,
+   "orden": null,
+   "seccion": null
+  },
+  {
+   "id": 11,
+   "nombre": "Bebidas",
+   "tipo": "ingrediente",
+   "margen_objetivo": null,
+   "orden": null,
+   "seccion": null
+  },
+  {
+   "id": 12,
+   "nombre": "Otros",
+   "tipo": "ingrediente",
+   "margen_objetivo": null,
+   "orden": null,
+   "seccion": null
+  },
+  {
+   "id": 13,
+   "nombre": "Bebida",
+   "tipo": "receta",
+   "margen_objetivo": 70.0,
+   "orden": null,
+   "seccion": null
+  },
+  {
+   "id": 14,
+   "nombre": "Brunch",
+   "tipo": "receta",
+   "margen_objetivo": 65.0,
+   "orden": null,
+   "seccion": null
+  },
+  {
+   "id": 15,
+   "nombre": "Postre",
+   "tipo": "receta",
+   "margen_objetivo": 68.0,
+   "orden": null,
+   "seccion": null
+  },
+  {
+   "id": 16,
+   "nombre": "Snack",
+   "tipo": "receta",
+   "margen_objetivo": 65.0,
+   "orden": null,
+   "seccion": null
+  },
+  {
+   "id": 31,
+   "nombre": "Covin Croquetas",
+   "tipo": "ingrediente",
+   "margen_objetivo": null,
+   "orden": null,
+   "seccion": "cocina"
+  },
+  {
+   "id": 20,
+   "nombre": "Afterwork",
+   "tipo": "ingrediente",
+   "margen_objetivo": null,
+   "orden": null,
+   "seccion": null
+  },
+  {
+   "id": 21,
+   "nombre": "Ajos",
+   "tipo": "ingrediente",
+   "margen_objetivo": null,
+   "orden": null,
+   "seccion": null
+  },
+  {
+   "id": 22,
+   "nombre": "Alcaparras",
+   "tipo": "ingrediente",
+   "margen_objetivo": null,
+   "orden": null,
+   "seccion": null
+  },
+  {
+   "id": 23,
+   "nombre": "Carne Embutido",
+   "tipo": "ingrediente",
+   "margen_objetivo": null,
+   "orden": null,
+   "seccion": null
+  },
+  {
+   "id": 24,
+   "nombre": "Carne Huevo",
+   "tipo": "ingrediente",
+   "margen_objetivo": null,
+   "orden": null,
+   "seccion": null
+  },
+  {
+   "id": 25,
+   "nombre": "Carne Pescado",
+   "tipo": "ingrediente",
+   "margen_objetivo": null,
+   "orden": null,
+   "seccion": null
+  },
+  {
+   "id": 26,
+   "nombre": "Carne Picada",
+   "tipo": "ingrediente",
+   "margen_objetivo": null,
+   "orden": null,
+   "seccion": null
+  },
+  {
+   "id": 27,
+   "nombre": "Cava",
+   "tipo": "ingrediente",
+   "margen_objetivo": null,
+   "orden": null,
+   "seccion": null
+  },
+  {
+   "id": 29,
+   "nombre": "Covin Carne",
+   "tipo": "ingrediente",
+   "margen_objetivo": null,
+   "orden": null,
+   "seccion": null
+  },
+  {
+   "id": 30,
+   "nombre": "Covin Carne Embutido",
+   "tipo": "ingrediente",
+   "margen_objetivo": null,
+   "orden": null,
+   "seccion": null
+  },
+  {
+   "id": 32,
+   "nombre": "Especias Hierbas",
+   "tipo": "ingrediente",
+   "margen_objetivo": null,
+   "orden": null,
+   "seccion": null
+  },
+  {
+   "id": 34,
+   "nombre": "Film",
+   "tipo": "ingrediente",
+   "margen_objetivo": null,
+   "orden": null,
+   "seccion": null
+  },
+  {
+   "id": 36,
+   "nombre": "Fruta y Verdura",
+   "tipo": "ingrediente",
+   "margen_objetivo": null,
+   "orden": null,
+   "seccion": null
+  },
+  {
+   "id": 39,
+   "nombre": "Lácteos Leche",
+   "tipo": "ingrediente",
+   "margen_objetivo": null,
+   "orden": null,
+   "seccion": null
+  },
+  {
+   "id": 40,
+   "nombre": "Lácteos Queso",
+   "tipo": "ingrediente",
+   "margen_objetivo": null,
+   "orden": null,
+   "seccion": null
+  },
+  {
+   "id": 41,
+   "nombre": "Lácteos Queso Tablas",
+   "tipo": "ingrediente",
+   "margen_objetivo": null,
+   "orden": null,
+   "seccion": null
+  },
+  {
+   "id": 42,
+   "nombre": "Lácteos Repostería",
+   "tipo": "ingrediente",
+   "margen_objetivo": null,
+   "orden": null,
+   "seccion": null
+  },
+  {
+   "id": 46,
+   "nombre": "Repostería Choco",
+   "tipo": "ingrediente",
+   "margen_objetivo": null,
+   "orden": null,
+   "seccion": null
+  },
+  {
+   "id": 47,
+   "nombre": "Repostería Endulzante",
+   "tipo": "ingrediente",
+   "margen_objetivo": null,
+   "orden": null,
+   "seccion": null
+  },
+  {
+   "id": 73,
+   "nombre": "Hardware",
+   "tipo": "ingrediente",
+   "margen_objetivo": null,
+   "orden": 29,
+   "seccion": "cocina"
+  },
+  {
+   "id": 61,
+   "nombre": "Huevo",
+   "tipo": "ingrediente",
+   "margen_objetivo": null,
+   "orden": 1,
+   "seccion": "cocina"
+  },
+  {
+   "id": 7,
+   "nombre": "Carne",
+   "tipo": "ingrediente",
+   "margen_objetivo": null,
+   "orden": 2,
+   "seccion": "cocina"
+  },
+  {
+   "id": 62,
+   "nombre": "Embutido",
+   "tipo": "ingrediente",
+   "margen_objetivo": null,
+   "orden": 3,
+   "seccion": "cocina"
+  },
+  {
+   "id": 63,
+   "nombre": "Pescado",
+   "tipo": "ingrediente",
+   "margen_objetivo": null,
+   "orden": 4,
+   "seccion": "cocina"
+  },
+  {
+   "id": 38,
+   "nombre": "Lácteos",
+   "tipo": "ingrediente",
+   "margen_objetivo": null,
+   "orden": 5,
+   "seccion": "cocina"
+  },
+  {
+   "id": 64,
+   "nombre": "Queso",
+   "tipo": "ingrediente",
+   "margen_objetivo": null,
+   "orden": 6,
+   "seccion": "cocina"
+  },
+  {
+   "id": 37,
+   "nombre": "Frutos Secos",
+   "tipo": "ingrediente",
+   "margen_objetivo": null,
+   "orden": 7,
+   "seccion": "cocina"
+  },
+  {
+   "id": 2,
+   "nombre": "Fruta",
+   "tipo": "ingrediente",
+   "margen_objetivo": null,
+   "orden": 8,
+   "seccion": "cocina"
+  },
+  {
+   "id": 35,
+   "nombre": "Fruta Congelada",
+   "tipo": "ingrediente",
+   "margen_objetivo": null,
+   "orden": 9,
+   "seccion": "cocina"
+  },
+  {
+   "id": 3,
+   "nombre": "Verdura",
+   "tipo": "ingrediente",
+   "margen_objetivo": null,
+   "orden": 10,
+   "seccion": "cocina"
+  },
+  {
+   "id": 19,
+   "nombre": "Aceite / Aderezo",
+   "tipo": "ingrediente",
+   "margen_objetivo": null,
+   "orden": 11,
+   "seccion": "cocina"
+  },
+  {
+   "id": 65,
+   "nombre": "Aperitivo",
+   "tipo": "ingrediente",
+   "margen_objetivo": null,
+   "orden": 12,
+   "seccion": "cocina"
+  },
+  {
+   "id": 28,
+   "nombre": "Covin",
+   "tipo": "ingrediente",
+   "margen_objetivo": null,
+   "orden": 13,
+   "seccion": "cocina"
+  },
+  {
+   "id": 66,
+   "nombre": "Endulzante",
+   "tipo": "ingrediente",
+   "margen_objetivo": null,
+   "orden": 14,
+   "seccion": "cocina"
+  },
+  {
+   "id": 10,
+   "nombre": "Especias",
+   "tipo": "ingrediente",
+   "margen_objetivo": null,
+   "orden": 15,
+   "seccion": "cocina"
+  },
+  {
+   "id": 33,
+   "nombre": "Especias Adorno",
+   "tipo": "ingrediente",
+   "margen_objetivo": null,
+   "orden": 16,
+   "seccion": "cocina"
+  },
+  {
+   "id": 67,
+   "nombre": "Especias Frescas",
+   "tipo": "ingrediente",
+   "margen_objetivo": null,
+   "orden": 17,
+   "seccion": "cocina"
+  },
+  {
+   "id": 44,
+   "nombre": "Pan",
+   "tipo": "ingrediente",
+   "margen_objetivo": null,
+   "orden": 18,
+   "seccion": "cocina"
+  },
+  {
+   "id": 45,
+   "nombre": "Repostería",
+   "tipo": "ingrediente",
+   "margen_objetivo": null,
+   "orden": 19,
+   "seccion": "cocina"
+  },
+  {
+   "id": 68,
+   "nombre": "Chocolate",
+   "tipo": "ingrediente",
+   "margen_objetivo": null,
+   "orden": 20,
+   "seccion": "cocina"
+  },
+  {
+   "id": 43,
+   "nombre": "Material Cocina",
+   "tipo": "ingrediente",
+   "margen_objetivo": null,
+   "orden": 21,
+   "seccion": "cocina"
+  },
+  {
+   "id": 5,
+   "nombre": "Café",
+   "tipo": "ingrediente",
+   "margen_objetivo": null,
+   "orden": 22,
+   "seccion": "cafe"
+  },
+  {
+   "id": 18,
+   "nombre": "Té+",
+   "tipo": "ingrediente",
+   "margen_objetivo": null,
+   "orden": 23,
+   "seccion": "cafe"
+  },
+  {
+   "id": 17,
+   "nombre": "Cafetería",
+   "tipo": "receta",
+   "margen_objetivo": 80.0,
+   "orden": 24,
+   "seccion": "cafe"
+  },
+  {
+   "id": 69,
+   "nombre": "Soft Drinks",
+   "tipo": "ingrediente",
+   "margen_objetivo": null,
+   "orden": 25,
+   "seccion": "bar"
+  },
+  {
+   "id": 70,
+   "nombre": "Vino",
+   "tipo": "ingrediente",
+   "margen_objetivo": null,
+   "orden": 26,
+   "seccion": "bar"
+  },
+  {
+   "id": 71,
+   "nombre": "Cerveza",
+   "tipo": "ingrediente",
+   "margen_objetivo": null,
+   "orden": 27,
+   "seccion": "bar"
+  },
+  {
+   "id": 72,
+   "nombre": "Cocktails",
+   "tipo": "ingrediente",
+   "margen_objetivo": null,
+   "orden": 28,
+   "seccion": "bar"
+  }
+ ],
+ "ingredientes_cat17": [
+  {
+   "id": 446,
+   "nombre": "Sibarist Wave Fast S x25",
+   "categoria_id": 17
+  },
+  {
+   "id": 447,
+   "nombre": "Sibarist Hybrid Fast M x25",
+   "categoria_id": 17
+  },
+  {
+   "id": 448,
+   "nombre": "Sibarist Trapezoid Fast M x25",
+   "categoria_id": 17
+  },
+  {
+   "id": 266,
+   "nombre": "Sibarist Cone Fast M x25",
+   "categoria_id": 17
+  },
+  {
+   "id": 267,
+   "nombre": "Sibarist Cone Fast M x100",
+   "categoria_id": 17
+  },
+  {
+   "id": 268,
+   "nombre": "Sibarist Cone B3 M x25",
+   "categoria_id": 17
+  },
+  {
+   "id": 269,
+   "nombre": "Sibarist Cone B3 M x100",
+   "categoria_id": 17
+  },
+  {
+   "id": 256,
+   "nombre": "Sibarist Booster 45mm",
+   "categoria_id": 17
+  },
+  {
+   "id": 257,
+   "nombre": "Sibarist Booster Cone",
+   "categoria_id": 17
+  },
+  {
+   "id": 273,
+   "nombre": "Sibarist Wave Fast M x100",
+   "categoria_id": 17
+  },
+  {
+   "id": 252,
+   "nombre": "Sibarist Espresso Soft x25",
+   "categoria_id": 17
+  },
+  {
+   "id": 253,
+   "nombre": "Sibarist Espresso Soft x100",
+   "categoria_id": 17
+  },
+  {
+   "id": 254,
+   "nombre": "Sibarist Espresso High Cellulose x50",
+   "categoria_id": 17
+  },
+  {
+   "id": 255,
+   "nombre": "Sibarist Espresso High Cellulose x100",
+   "categoria_id": 17
+  },
+  {
+   "id": 262,
+   "nombre": "Sibarist Halo Fast x25",
+   "categoria_id": 17
+  },
+  {
+   "id": 263,
+   "nombre": "Sibarist Halo Fast x100",
+   "categoria_id": 17
+  },
+  {
+   "id": 264,
+   "nombre": "Sibarist Halo B3 x25",
+   "categoria_id": 17
+  },
+  {
+   "id": 265,
+   "nombre": "Sibarist Halo B3 x100",
+   "categoria_id": 17
+  },
+  {
+   "id": 270,
+   "nombre": "Sibarist Wave B3 x25",
+   "categoria_id": 17
+  },
+  {
+   "id": 271,
+   "nombre": "Sibarist Wave B3 x100",
+   "categoria_id": 17
+  },
+  {
+   "id": 274,
+   "nombre": "Sibarist Dripper Brewing System",
+   "categoria_id": 17
+  },
+  {
+   "id": 291,
+   "nombre": "Sibarist Cone Fast S x25",
+   "categoria_id": 17
+  },
+  {
+   "id": 292,
+   "nombre": "Sibarist Cone Fast S x100",
+   "categoria_id": 17
+  },
+  {
+   "id": 293,
+   "nombre": "Sibarist Cone B3 S x25",
+   "categoria_id": 17
+  },
+  {
+   "id": 294,
+   "nombre": "Sibarist Cone B3 S x100",
+   "categoria_id": 17
+  },
+  {
+   "id": 295,
+   "nombre": "Sibarist Hybrid B3 S x25",
+   "categoria_id": 17
+  },
+  {
+   "id": 296,
+   "nombre": "Sibarist Hybrid B3 S x100",
+   "categoria_id": 17
+  },
+  {
+   "id": 297,
+   "nombre": "Sibarist Flat Fast S x25",
+   "categoria_id": 17
+  },
+  {
+   "id": 298,
+   "nombre": "Sibarist Flat Fast S x100",
+   "categoria_id": 17
+  },
+  {
+   "id": 259,
+   "nombre": "Sibarist Flat B3 M x100",
+   "categoria_id": 17
+  },
+  {
+   "id": 258,
+   "nombre": "Sibarist Flat B3 M x25",
+   "categoria_id": 17
+  },
+  {
+   "id": 272,
+   "nombre": "Sibarist Wave Fast M x25",
+   "categoria_id": 17
+  },
+  {
+   "id": 299,
+   "nombre": "Sibarist Flat Fast M x25",
+   "categoria_id": 17
+  },
+  {
+   "id": 300,
+   "nombre": "Sibarist Flat Fast M x100",
+   "categoria_id": 17
+  },
+  {
+   "id": 301,
+   "nombre": "Sibarist Flat B3 S x25",
+   "categoria_id": 17
+  },
+  {
+   "id": 302,
+   "nombre": "Sibarist Flat B3 S x100",
+   "categoria_id": 17
+  },
+  {
+   "id": 303,
+   "nombre": "Sibarist Flat 2 Fast S x25",
+   "categoria_id": 17
+  },
+  {
+   "id": 304,
+   "nombre": "Sibarist Flat 2 Fast S x100",
+   "categoria_id": 17
+  },
+  {
+   "id": 305,
+   "nombre": "Sibarist Flat 2 B3 S x25",
+   "categoria_id": 17
+  },
+  {
+   "id": 306,
+   "nombre": "Sibarist Flat 2 B3 S x100",
+   "categoria_id": 17
+  },
+  {
+   "id": 307,
+   "nombre": "Sibarist Disc Fast 63 x25",
+   "categoria_id": 17
+  },
+  {
+   "id": 308,
+   "nombre": "Sibarist Disc Fast 63 x100",
+   "categoria_id": 17
+  },
+  {
+   "id": 309,
+   "nombre": "Sibarist Disc B3 63 x25",
+   "categoria_id": 17
+  },
+  {
+   "id": 310,
+   "nombre": "Sibarist Disc B3 63 x100",
+   "categoria_id": 17
+  },
+  {
+   "id": 311,
+   "nombre": "Sibarist Batch Brew Fast 8-12 x25",
+   "categoria_id": 17
+  },
+  {
+   "id": 312,
+   "nombre": "Sibarist Batch Brew Fast 8-12 x100",
+   "categoria_id": 17
+  },
+  {
+   "id": 313,
+   "nombre": "Sibarist Origami Fast S x25",
+   "categoria_id": 17
+  },
+  {
+   "id": 314,
+   "nombre": "Sibarist Origami Fast S x100",
+   "categoria_id": 17
+  },
+  {
+   "id": 315,
+   "nombre": "Sibarist Espresso HM x100",
+   "categoria_id": 17
+  },
+  {
+   "id": 316,
+   "nombre": "Sibarist Booster Cone UFO",
+   "categoria_id": 17
+  },
+  {
+   "id": 317,
+   "nombre": "Sibarist Booster 22mm",
+   "categoria_id": 17
+  },
+  {
+   "id": 318,
+   "nombre": "Sibarist Booster 63mm",
+   "categoria_id": 17
+  }
+ ]
+}
