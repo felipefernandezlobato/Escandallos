@@ -506,11 +506,33 @@ def stock_base_recepcion_pedido(
     if not leaf:
         return {"cantidad": 0.0, "unidad": None, "ubicacion": None}
 
+    if _fuera_de_la_sesion_del_grupo(ingrediente_id, db, leaf, as_of_fecha, cafe_cat_ids):
+        return {"cantidad": 0.0, "unidad": leaf["unidad"], "ubicacion": leaf["ubicacion"]}
+    return leaf
+
+
+def _fuera_de_la_sesion_del_grupo(
+    ingrediente_id: int,
+    db: Session,
+    leaf: dict,
+    as_of_fecha: Optional[date],
+    cafe_cat_ids: set[int],
+) -> bool:
+    """True when this leaf missed its group's latest counting session, so its
+    real stock is 0 and a delivery must be added on top of 0 rather than on
+    top of a stale pre-session figure.
+
+    Only applies to the grouped coffees (categoria 5 with a parent) — Té+ and
+    the Sibarist filters are flat, so they keep their last known value. Shared
+    by stock_base_recepcion_pedido() and stock_por_tienda_recepcion(); both
+    feed recibir_pedido() and must agree, or a delivery lands on the wrong
+    baseline depending on which path handled it.
+    """
     ing = db.query(Ingrediente).get(ingrediente_id)
     if not (ing and ing.categoria_id == CAFE_CATEGORIA_ID and ing.grupo_ingrediente_id):
-        return leaf
+        return False
     if leaf["es_recibido"]:
-        return leaf
+        return False
 
     latest_fecha_conteo = None
     for sib_id in _child_ids(ing.grupo_ingrediente_id, db):
@@ -520,9 +542,80 @@ def stock_base_recepcion_pedido(
         ):
             latest_fecha_conteo = sib["fecha_conteo"]
 
-    if latest_fecha_conteo is not None and leaf["fecha_conteo"] != latest_fecha_conteo:
-        return {"cantidad": 0.0, "unidad": leaf["unidad"], "ubicacion": leaf["ubicacion"]}
-    return leaf
+    return latest_fecha_conteo is not None and leaf["fecha_conteo"] != latest_fecha_conteo
+
+
+def stock_por_tienda_recepcion(
+    ingrediente_id: int,
+    db: Session,
+    as_of_fecha: Optional[date] = None,
+    cafe_cat_ids: Optional[set[int]] = None,
+) -> dict:
+    """Each shop's own last known stock for one leaf: {"BRU1": {...}, "BRU2": {...}}.
+
+    Used by recibir_pedido(). Goods always arrive at BRU1 (frozen tubes
+    excepted — their ingredient already names the shop), so a receipt bumps
+    BRU1 and restates BRU2 unchanged.
+
+    Both rows have to be written, not just BRU1: stock is only ever read from
+    an ingredient's *latest* date (see _stock_actual_leaf), so a day holding a
+    lone BRU1 row would silently drop BRU2's stock from the total. Writing the
+    pair also lets the pivot show a real "11 (8+3)" split on a delivery week
+    instead of the bare figure it shows today.
+
+    Both shops are read from the **single latest date that carries per-shop
+    data**, not independently per shop. Reading them independently
+    double-counts: a pre-2026-10-14 delivery row is tagged BRU1 but holds the
+    combined total of both shops, so pairing it with an older BRU2 count books
+    BRU2's stock twice (verified against production: Berraco went 11 to 20 on a
+    delivery of 6, instead of 17). Taking one date also matches how stock is
+    read everywhere else — `_stock_actual_leaf` only ever looks at the latest
+    date.
+
+    Only shops present on that date are returned, so no row is invented for a
+    café item that has never been counted at BRU2.
+
+    When the leaf has no per-shop history at all — every Té+ and Sibarist item
+    before the first count on the new form — its last known quantity is
+    returned as the BRU1 baseline. Returning nothing would make the delivery
+    overwrite real stock instead of adding to it (Prana Chai went 10 to 6 on a
+    delivery of 6, instead of 16).
+
+    Applies the same "zero if it missed the group's latest counting session"
+    rule as stock_base_recepcion_pedido(): otherwise a delivery would be added
+    on top of a stale pre-session figure.
+    """
+    if cafe_cat_ids is None:
+        cafe_cat_ids = cafe_categoria_ids(db)
+    leaf = _stock_actual_leaf(ingrediente_id, db, as_of_fecha=as_of_fecha, cafe_cat_ids=cafe_cat_ids)
+    if not leaf:
+        return {}
+    if _fuera_de_la_sesion_del_grupo(ingrediente_id, db, leaf, as_of_fecha, cafe_cat_ids):
+        return {}
+
+    q = db.query(InventarioRegistro).filter(
+        InventarioRegistro.ingrediente_id == ingrediente_id,
+        InventarioRegistro.ubicacion.isnot(None),
+    )
+    if as_of_fecha is not None:
+        q = q.filter(InventarioRegistro.fecha_registro <= as_of_fecha)
+    registros = q.order_by(
+        InventarioRegistro.fecha_registro.desc(), InventarioRegistro.id.desc()
+    ).all()
+
+    if not registros:
+        # No shop ever recorded for this leaf: keep its total as BRU1's base.
+        return {"BRU1": {"cantidad": leaf["cantidad"], "unidad": leaf["unidad"]}}
+
+    ultima_fecha = registros[0].fecha_registro
+    por_tienda: dict[str, dict] = {}
+    for r in registros:
+        if r.fecha_registro != ultima_fecha:
+            break
+        if r.ubicacion in por_tienda:
+            continue  # later id on the same day already won
+        por_tienda[r.ubicacion] = {"cantidad": r.cantidad, "unidad": r.unidad}
+    return por_tienda
 
 
 def stock_historial_serie(ingrediente_id: int, db: Session) -> list[dict]:
@@ -747,6 +840,7 @@ def movimientos_ingrediente(ingrediente_id: int, db: Session) -> list[dict]:
 
 
 FROZEN_TUBE_PARENT_BY_UBICACION = {"BRU1": 289, "BRU2": 290}  # Tubos Frozen Bru1 / Bru2
+FROZEN_TUBE_UBICACION_BY_PARENT = {v: k for k, v in FROZEN_TUBE_PARENT_BY_UBICACION.items()}
 
 
 def _anadido_frozen_por_dia(registros: list, tubo_ids: list, db: Session) -> dict:

@@ -113,6 +113,14 @@ export default function RecibirPedidoPage() {
         Ajusta las cantidades reales recibidas y los precios si han cambiado.
       </p>
 
+      {/* The destination is decided in recibir_pedido() and is invisible
+          otherwise, so say it here rather than leave it to be guessed. */}
+      <p className="text-sm text-[#6B5E52]">
+        Lo recibido se suma al stock de <span className="font-medium">BRU1</span>.
+        El stock de BRU2 no se toca. Los tubos frozen van a la tienda de su
+        propio ingrediente (Bru1 o Bru2).
+      </p>
+
       <div>
         <label className="block text-sm font-medium text-[#6B5E52] mb-1">
           Fecha de recepcion

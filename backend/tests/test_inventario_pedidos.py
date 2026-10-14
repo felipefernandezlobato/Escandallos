@@ -2154,3 +2154,259 @@ class TestValidacionUbicacion:
             ],
         })
         assert r.status_code == 201
+
+
+class TestRecepcionEntraPorBRU1:
+    """Goods always arrive at BRU1. Receiving bumps BRU1 by what arrived and
+    restates BRU2 unchanged, instead of writing one row holding both shops'
+    stock combined — which is what hid the (BRU1+BRU2) split on a delivery
+    week and caused the Pedido #103 double-count.
+
+    Frozen tubes are the exception: their ingredient already names the shop,
+    and an order routinely carries both halves of one flavour.
+    """
+
+    @pytest.fixture
+    def datos(self, test_db):
+        test_db.add_all([
+            Categoria(id=5, nombre="Café", tipo="ingrediente", seccion="cafe"),
+            Categoria(id=18, nombre="Té+", tipo="ingrediente", seccion="cafe"),
+            Categoria(id=38, nombre="Lácteos", tipo="ingrediente", seccion="cocina"),
+        ])
+        test_db.flush()
+
+        def ing(**kw):
+            d = dict(categoria_id=5, unidad_compra="unidad", cantidad_compra=1,
+                     precio_compra=5.0, unidad_uso="unidad", merma_porcentaje=0.0)
+            d.update(kw)
+            o = Ingrediente(**d)
+            test_db.add(o)
+            return o
+
+        # 289/290 are hardcoded as the frozen-tube parents everywhere.
+        padre_bru1 = ing(id=289, nombre="Tubos Frozen Bru1")
+        padre_bru2 = ing(id=290, nombre="Tubos Frozen Bru2")
+        test_db.flush()
+
+        d = {
+            "bolsa": ing(nombre="200g BD Berraco"),
+            "chai": ing(nombre="Prana Chai 250g", categoria_id=18),
+            "leche": ing(nombre="Leche entera", categoria_id=38,
+                         unidad_compra="litro", unidad_uso="litro"),
+            "tubo_bru2": ing(nombre="Frozen BD Blossom Bru2",
+                             grupo_ingrediente_id=padre_bru2.id),
+            "tubo_bru1": ing(nombre="Frozen BD Blossom Bru1",
+                             grupo_ingrediente_id=padre_bru1.id),
+        }
+        test_db.flush()
+        return d
+
+    @staticmethod
+    def _recibir(client, ingrediente_id, cantidad, unidad="unidad", fecha="2026-10-09"):
+        create = client.post("/api/pedidos", json={
+            "proveedor": "BD",
+            "lineas": [{"ingrediente_id": ingrediente_id, "cantidad_pedida": cantidad,
+                        "unidad": unidad}],
+        })
+        assert create.status_code in (200, 201), create.text
+        pedido = create.json()
+        linea_id = pedido["lineas"][0]["id"]
+        r = client.post(f"/api/pedidos/{pedido['id']}/recibir", json={
+            "fecha_recepcion": fecha,
+            "lineas": [{"linea_id": linea_id, "cantidad_recibida": cantidad}],
+        })
+        assert r.status_code == 200, r.text
+        return pedido["id"]
+
+    def _filas(self, test_db, ing_id, fecha=date(2026, 10, 9)):
+        return (
+            test_db.query(InventarioRegistro)
+            .filter(InventarioRegistro.ingrediente_id == ing_id,
+                    InventarioRegistro.fecha_registro == fecha)
+            .order_by(InventarioRegistro.id)
+            .all()
+        )
+
+    def test_bolsa_suma_a_bru1_y_arrastra_bru2(self, client, test_db, datos):
+        """BRU1=2, BRU2=3, llegan 6 -> BRU1=8 y BRU2=3, total 11."""
+        from app.services.consumo import stock_actual
+
+        test_db.add_all([
+            InventarioRegistro(ingrediente_id=datos["bolsa"].id, cantidad=2, unidad="unidad",
+                               fecha_registro=date(2026, 10, 7), ubicacion="BRU1"),
+            InventarioRegistro(ingrediente_id=datos["bolsa"].id, cantidad=3, unidad="unidad",
+                               fecha_registro=date(2026, 10, 7), ubicacion="BRU2"),
+        ])
+        test_db.commit()
+
+        self._recibir(client, datos["bolsa"].id, 6)
+
+        filas = self._filas(test_db, datos["bolsa"].id)
+        porubi = {f.ubicacion: f.cantidad for f in filas}
+        assert porubi == {"BRU1": 8, "BRU2": 3}
+        assert stock_actual(datos["bolsa"].id, test_db)["cantidad"] == 11
+
+    def test_la_semana_de_entrega_muestra_el_desglose(self, client, test_db, datos):
+        """The whole point: the pivot shows 11 (8+3), not a bare 11."""
+        from app.services.conversiones import to_week_key
+
+        test_db.add_all([
+            InventarioRegistro(ingrediente_id=datos["bolsa"].id, cantidad=2, unidad="unidad",
+                               fecha_registro=date(2026, 10, 7), ubicacion="BRU1"),
+            InventarioRegistro(ingrediente_id=datos["bolsa"].id, cantidad=3, unidad="unidad",
+                               fecha_registro=date(2026, 10, 7), ubicacion="BRU2"),
+        ])
+        test_db.commit()
+        self._recibir(client, datos["bolsa"].id, 6)
+
+        data = client.get("/api/inventario/pivot").json()
+        fila = next(f for f in data["ingredientes"]
+                    if f["ingrediente_nombre"] == "200g BD Berraco")
+        semana = to_week_key(date(2026, 10, 9))
+        assert fila["fechas"][semana] == 11
+        assert fila["fechas_ubic"][semana] == {"BRU1": 8, "BRU2": 3}
+
+    def test_sin_historico_en_bru2_no_inventa_fila(self, client, test_db, datos):
+        test_db.add(InventarioRegistro(
+            ingrediente_id=datos["bolsa"].id, cantidad=2, unidad="unidad",
+            fecha_registro=date(2026, 10, 7), ubicacion="BRU1"))
+        test_db.commit()
+
+        self._recibir(client, datos["bolsa"].id, 6)
+
+        filas = self._filas(test_db, datos["bolsa"].id)
+        assert [(f.ubicacion, f.cantidad) for f in filas] == [("BRU1", 8)]
+
+    def test_te_tambien_entra_por_bru1(self, client, test_db, datos):
+        test_db.add_all([
+            InventarioRegistro(ingrediente_id=datos["chai"].id, cantidad=10, unidad="unidad",
+                               fecha_registro=date(2026, 10, 7), ubicacion="BRU1"),
+            InventarioRegistro(ingrediente_id=datos["chai"].id, cantidad=7, unidad="unidad",
+                               fecha_registro=date(2026, 10, 7), ubicacion="BRU2"),
+        ])
+        test_db.commit()
+
+        self._recibir(client, datos["chai"].id, 5)
+
+        porubi = {f.ubicacion: f.cantidad for f in self._filas(test_db, datos["chai"].id)}
+        assert porubi == {"BRU1": 15, "BRU2": 7}
+
+    def test_tubo_frozen_usa_la_tienda_de_su_ingrediente(self, client, test_db, datos):
+        """A line for "...Bru2" is Bru2 stock, never BRU1."""
+        test_db.add(InventarioRegistro(
+            ingrediente_id=datos["tubo_bru2"].id, cantidad=1, unidad="unidad",
+            fecha_registro=date(2026, 10, 7), ubicacion="BRU2"))
+        test_db.commit()
+
+        self._recibir(client, datos["tubo_bru2"].id, 5)
+
+        filas = self._filas(test_db, datos["tubo_bru2"].id)
+        assert [(f.ubicacion, f.cantidad) for f in filas] == [("BRU2", 6)]
+
+    def test_tubo_frozen_bru1_va_a_bru1(self, client, test_db, datos):
+        test_db.add(InventarioRegistro(
+            ingrediente_id=datos["tubo_bru1"].id, cantidad=2, unidad="unidad",
+            fecha_registro=date(2026, 10, 7), ubicacion="BRU1"))
+        test_db.commit()
+
+        self._recibir(client, datos["tubo_bru1"].id, 4)
+
+        filas = self._filas(test_db, datos["tubo_bru1"].id)
+        assert [(f.ubicacion, f.cantidad) for f in filas] == [("BRU1", 6)]
+
+    def test_cocina_sigue_sin_ubicacion(self, client, test_db, datos):
+        """Kitchen/bar are single-location; nothing about this may change."""
+        test_db.add(InventarioRegistro(
+            ingrediente_id=datos["leche"].id, cantidad=4, unidad="litro",
+            fecha_registro=date(2026, 10, 7)))
+        test_db.commit()
+
+        self._recibir(client, datos["leche"].id, 6, unidad="litro")
+
+        filas = self._filas(test_db, datos["leche"].id)
+        assert [(f.ubicacion, f.cantidad) for f in filas] == [(None, 10)]
+
+    def test_la_fila_de_bru2_no_cuenta_como_conteo(self, client, test_db, datos):
+        """The carried-forward BRU2 row must be marked as part of the delivery.
+        If it read as a manual count, the day would look counted at both shops
+        and _day_por_ubicacion would drop the BRU1 delivery row entirely."""
+        from app.services.consumo import _es_fila_de_pedido
+
+        test_db.add_all([
+            InventarioRegistro(ingrediente_id=datos["bolsa"].id, cantidad=2, unidad="unidad",
+                               fecha_registro=date(2026, 10, 7), ubicacion="BRU1"),
+            InventarioRegistro(ingrediente_id=datos["bolsa"].id, cantidad=3, unidad="unidad",
+                               fecha_registro=date(2026, 10, 7), ubicacion="BRU2"),
+        ])
+        test_db.commit()
+        self._recibir(client, datos["bolsa"].id, 6)
+
+        filas = self._filas(test_db, datos["bolsa"].id)
+        assert all(_es_fila_de_pedido(f) for f in filas)
+
+    def test_historial_sin_tienda_no_se_pisa(self, client, test_db, datos):
+        """Every Té+/Sibarist item has only NULL-ubicacion history until its
+        first count on the per-shop form. Reading just the per-shop rows gave
+        an empty baseline, so the delivery overwrote real stock instead of
+        adding to it (Prana Chai read 10, went to 6 on a delivery of 6)."""
+        from app.services.consumo import stock_actual
+
+        test_db.add(InventarioRegistro(
+            ingrediente_id=datos["chai"].id, cantidad=10, unidad="unidad",
+            fecha_registro=date(2026, 10, 7)))
+        test_db.commit()
+
+        self._recibir(client, datos["chai"].id, 6)
+
+        assert stock_actual(datos["chai"].id, test_db)["cantidad"] == 16
+        filas = self._filas(test_db, datos["chai"].id)
+        assert [(f.ubicacion, f.cantidad) for f in filas] == [("BRU1", 16)]
+
+    def test_entrega_antigua_combinada_no_se_cuenta_dos_veces(self, client, test_db, datos):
+        """A pre-2026-10-14 delivery row is tagged BRU1 but holds BOTH shops'
+        stock. Pairing it with an older BRU2 count booked BRU2 twice (Berraco
+        read 11, went to 20 on a delivery of 6 instead of 17). Both shops must
+        be read from the same date."""
+        from app.services.consumo import stock_actual
+
+        test_db.add_all([
+            InventarioRegistro(ingrediente_id=datos["bolsa"].id, cantidad=2, unidad="unidad",
+                               fecha_registro=date(2026, 10, 7), ubicacion="BRU1"),
+            InventarioRegistro(ingrediente_id=datos["bolsa"].id, cantidad=3, unidad="unidad",
+                               fecha_registro=date(2026, 10, 7), ubicacion="BRU2"),
+            # old-style receipt: one row, BRU1-tagged, holding 2 + 3 + 6
+            InventarioRegistro(ingrediente_id=datos["bolsa"].id, cantidad=11, unidad="unidad",
+                               fecha_registro=date(2026, 10, 9), ubicacion="BRU1",
+                               notas="Pedido #99 recibido"),
+        ])
+        test_db.commit()
+        assert stock_actual(datos["bolsa"].id, test_db)["cantidad"] == 11
+
+        self._recibir(client, datos["bolsa"].id, 6, fecha="2026-10-14")
+
+        assert stock_actual(datos["bolsa"].id, test_db)["cantidad"] == 17
+        filas = self._filas(test_db, datos["bolsa"].id, fecha=date(2026, 10, 14))
+        assert [(f.ubicacion, f.cantidad) for f in filas] == [("BRU1", 17)]
+
+    def test_el_stock_total_siempre_sube_lo_recibido(self, client, test_db, datos):
+        """The invariant that matters: whatever the history looks like,
+        stock after = stock before + delivered."""
+        from app.services.consumo import stock_actual
+
+        test_db.add_all([
+            InventarioRegistro(ingrediente_id=datos["bolsa"].id, cantidad=2, unidad="unidad",
+                               fecha_registro=date(2026, 10, 7), ubicacion="BRU1"),
+            InventarioRegistro(ingrediente_id=datos["bolsa"].id, cantidad=3, unidad="unidad",
+                               fecha_registro=date(2026, 10, 7), ubicacion="BRU2"),
+            InventarioRegistro(ingrediente_id=datos["chai"].id, cantidad=10, unidad="unidad",
+                               fecha_registro=date(2026, 10, 7)),
+            InventarioRegistro(ingrediente_id=datos["tubo_bru2"].id, cantidad=12, unidad="unidad",
+                               fecha_registro=date(2026, 10, 7), ubicacion="BRU2"),
+        ])
+        test_db.commit()
+
+        for clave in ("bolsa", "chai", "tubo_bru2"):
+            ing = datos[clave]
+            antes = stock_actual(ing.id, test_db)["cantidad"]
+            self._recibir(client, ing.id, 6, fecha="2026-10-14")
+            assert stock_actual(ing.id, test_db)["cantidad"] == antes + 6, clave

@@ -14,7 +14,13 @@ from app.models import (
     Pedido,
 )
 from app.services.conversiones import to_week_key
-from app.services.consumo import recomendacion_pedido, stock_base_recepcion_pedido
+from app.services.consumo import (
+    FROZEN_TUBE_UBICACION_BY_PARENT,
+    cafe_categoria_ids,
+    recomendacion_pedido,
+    stock_base_recepcion_pedido,
+    stock_por_tienda_recepcion,
+)
 from app.services.costes import crear_historial_precio
 from app.schemas import (
     LineaPedidoCreate,
@@ -423,23 +429,69 @@ def recibir_pedido(
     p.estado = "recibido"
     p.fecha_recepcion = fecha_recepcion
 
+    cafe_cat_ids = cafe_categoria_ids(db)
+    notas = f"Pedido #{p.id} recibido"
+
     for linea in p.lineas:
         if not linea.cantidad_recibida or linea.cantidad_recibida <= 0:
             continue
-        base = stock_base_recepcion_pedido(linea.ingrediente_id, db, as_of_fecha=fecha_recepcion)
+
+        ing = db.get(Ingrediente, linea.ingrediente_id)
+        # A frozen tube's ingredient already names its shop, so a line for
+        # "Frozen BD Blossom Bru2" is Bru2 stock no matter where the van
+        # unloaded. Orders routinely carry both halves of a flavour.
+        ubic_tubo = (
+            FROZEN_TUBE_UBICACION_BY_PARENT.get(ing.grupo_ingrediente_id) if ing else None
+        )
+        es_cafe = bool(ing and ing.categoria_id in cafe_cat_ids)
+
+        if es_cafe and not ubic_tubo:
+            # Deliveries land at BRU1. Bump BRU1 by what arrived and restate
+            # BRU2 as it stands: stock is read from the latest date only, so a
+            # lone BRU1 row that day would drop BRU2 out of the total.
+            por_tienda = stock_por_tienda_recepcion(
+                linea.ingrediente_id, db, as_of_fecha=fecha_recepcion, cafe_cat_ids=cafe_cat_ids
+            )
+            bru1 = por_tienda.get("BRU1")
+            bru2 = por_tienda.get("BRU2")
+            db.add(InventarioRegistro(
+                ingrediente_id=linea.ingrediente_id,
+                cantidad=(bru1["cantidad"] if bru1 else 0) + linea.cantidad_recibida,
+                unidad=(bru1 and bru1["unidad"]) or (bru2 and bru2["unidad"]) or linea.unidad,
+                fecha_registro=fecha_recepcion,
+                notas=notas,
+                ubicacion="BRU1",
+            ))
+            if bru2 is not None:
+                # Same notas on purpose: _es_fila_de_pedido must see this as
+                # part of the delivery, not as a count nobody took. A count
+                # here would make the day look counted at both shops and
+                # trigger _day_por_ubicacion into dropping the BRU1 row.
+                db.add(InventarioRegistro(
+                    ingrediente_id=linea.ingrediente_id,
+                    cantidad=bru2["cantidad"],
+                    unidad=bru2["unidad"] or linea.unidad,
+                    fecha_registro=fecha_recepcion,
+                    notas=notas,
+                    ubicacion="BRU2",
+                ))
+            continue
+
+        base = stock_base_recepcion_pedido(
+            linea.ingrediente_id, db, as_of_fecha=fecha_recepcion, cafe_cat_ids=cafe_cat_ids
+        )
         stock_actual = base["cantidad"] if base else 0
-        nueva_cantidad = stock_actual + linea.cantidad_recibida
-        unidad = (base and base.get("unidad")) or linea.unidad
-        # Inherit the leaf's last known ubicacion (instead of leaving it
-        # unset) so a manual count and a same-day delivery aren't summed as
-        # if they were two different locations in _day_total()/_batch_latest_stocks.
-        ubicacion = base and base.get("ubicacion")
+        # Frozen tubes take the shop from their parent; kitchen/bar items are
+        # single-location and keep inheriting the leaf's last known ubicacion
+        # (usually None) so a count and a same-day delivery aren't summed as
+        # if they were two different locations.
+        ubicacion = ubic_tubo or (base and base.get("ubicacion"))
         db.add(InventarioRegistro(
             ingrediente_id=linea.ingrediente_id,
-            cantidad=nueva_cantidad,
-            unidad=unidad,
+            cantidad=stock_actual + linea.cantidad_recibida,
+            unidad=(base and base.get("unidad")) or linea.unidad,
             fecha_registro=fecha_recepcion,
-            notas=f"Pedido #{p.id} recibido",
+            notas=notas,
             ubicacion=ubicacion,
         ))
 
