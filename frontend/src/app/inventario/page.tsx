@@ -181,6 +181,13 @@ function InventarioContent() {
 
   const setTab = useCallback((newTab: "registrar" | "historial" | "analisis") => {
     setTabState(newTab);
+    // The order-recommendation screen lives INSIDE the "registrar" tab and is
+    // gated on its own flag, which handleSave() turns on after every save. So
+    // pressing "Registrar Stock" while it was showing changed nothing — the
+    // tab was already "registrar" — and the counting form stayed hidden until
+    // you found "Volver a inventario". Pressing a tab now always shows that
+    // tab; "Ver recomendaciones" is still there to go back.
+    setShowRecomendaciones(false);
     syncUrl({ tab: newTab });
   }, [syncUrl]);
 
