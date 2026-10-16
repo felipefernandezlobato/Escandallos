@@ -1,0 +1,236 @@
+{
+ "ingredientes": [
+  {
+   "id": 16,
+   "nombre": "Naranja - Zumo",
+   "precio_compra": 1.816,
+   "cantidad_compra": 1.0,
+   "unidad_compra": "litro",
+   "proveedor": "Prodega"
+  },
+  {
+   "id": 77,
+   "nombre": "Bacon",
+   "precio_compra": 15.44,
+   "cantidad_compra": 1.0,
+   "unidad_compra": "kg",
+   "proveedor": "Prodega"
+  },
+  {
+   "id": 66,
+   "nombre": "Chocolate Maracaibo 66%",
+   "precio_compra": 21.26,
+   "cantidad_compra": 1.0,
+   "unidad_compra": "kg",
+   "proveedor": "Prodega"
+  },
+  {
+   "id": 143,
+   "nombre": "Mayonesa",
+   "precio_compra": 8.95,
+   "cantidad_compra": 1.0,
+   "unidad_compra": "kg",
+   "proveedor": "Prodega"
+  },
+  {
+   "id": 144,
+   "nombre": "Sirope de arce",
+   "precio_compra": 22.89,
+   "cantidad_compra": 1.0,
+   "unidad_compra": "litro",
+   "proveedor": "Prodega"
+  },
+  {
+   "id": 57,
+   "nombre": "Chía",
+   "precio_compra": 7.9207,
+   "cantidad_compra": 1.0,
+   "unidad_compra": "kg",
+   "proveedor": "Prodega"
+  },
+  {
+   "id": 60,
+   "nombre": "Harina",
+   "precio_compra": 1.1696,
+   "cantidad_compra": 1.0,
+   "unidad_compra": "kg",
+   "proveedor": "Prodega"
+  },
+  {
+   "id": 6,
+   "nombre": "Uva verde",
+   "precio_compra": 6.669,
+   "cantidad_compra": 1.0,
+   "unidad_compra": "kg",
+   "proveedor": "Pfaff"
+  },
+  {
+   "id": 119,
+   "nombre": "Leche de avena",
+   "precio_compra": 1.8776,
+   "cantidad_compra": 1.0,
+   "unidad_compra": "litro",
+   "proveedor": "Prodega"
+  },
+  {
+   "id": 120,
+   "nombre": "Leche entera",
+   "precio_compra": 1.5287,
+   "cantidad_compra": 1.0,
+   "unidad_compra": "litro",
+   "proveedor": "Prodega"
+  },
+  {
+   "id": 8,
+   "nombre": "Lima",
+   "precio_compra": 3.3857,
+   "cantidad_compra": 1.0,
+   "unidad_compra": "kg",
+   "proveedor": "Prodega"
+  },
+  {
+   "id": 52,
+   "nombre": "Nueces",
+   "precio_compra": 13.72,
+   "cantidad_compra": 1.0,
+   "unidad_compra": "kg",
+   "proveedor": "Prodega"
+  },
+  {
+   "id": 36,
+   "nombre": "Brotes de cebolla",
+   "precio_compra": 4.9248,
+   "cantidad_compra": 1.0,
+   "unidad_compra": "unidad (100g)",
+   "proveedor": "Pfaff"
+  },
+  {
+   "id": 97,
+   "nombre": "Yemas",
+   "precio_compra": 10.865,
+   "cantidad_compra": 1.0,
+   "unidad_compra": "kg",
+   "proveedor": "Prodega"
+  },
+  {
+   "id": 12,
+   "nombre": "Fresa",
+   "precio_compra": 14.6718,
+   "cantidad_compra": 1.0,
+   "unidad_compra": "kg",
+   "proveedor": "Pfaff"
+  },
+  {
+   "id": 151,
+   "nombre": "Aceite vegetal / Rapsöl",
+   "precio_compra": 4.39,
+   "cantidad_compra": 1.0,
+   "unidad_compra": "litro",
+   "proveedor": "Prodega"
+  },
+  {
+   "id": 132,
+   "nombre": "Halbhartkäse",
+   "precio_compra": 12.4038,
+   "cantidad_compra": 1.0,
+   "unidad_compra": "kg",
+   "proveedor": "Prodega"
+  },
+  {
+   "id": 126,
+   "nombre": "Philadelphia",
+   "precio_compra": 12.2808,
+   "cantidad_compra": 1.0,
+   "unidad_compra": "kg",
+   "proveedor": "Prodega"
+  },
+  {
+   "id": 122,
+   "nombre": "Yogur",
+   "precio_compra": 4.6071,
+   "cantidad_compra": 1.0,
+   "unidad_compra": "kg",
+   "proveedor": "Prodega"
+  },
+  {
+   "id": 245,
+   "nombre": "Uva morada",
+   "precio_compra": 6.669,
+   "cantidad_compra": 1.0,
+   "unidad_compra": "kg",
+   "proveedor": "Pfaff"
+  },
+  {
+   "id": 5,
+   "nombre": "Frambuesa",
+   "precio_compra": 28.3176,
+   "cantidad_compra": 1.0,
+   "unidad_compra": "kg",
+   "proveedor": "Pfaff"
+  },
+  {
+   "id": 53,
+   "nombre": "Anacardo",
+   "precio_compra": 14.69,
+   "cantidad_compra": 1.0,
+   "unidad_compra": "kg",
+   "proveedor": "Prodega"
+  },
+  {
+   "id": 3,
+   "nombre": "Blueberries",
+   "precio_compra": 18.468,
+   "cantidad_compra": 1.0,
+   "unidad_compra": "kg",
+   "proveedor": "Pfaff"
+  },
+  {
+   "id": 31,
+   "nombre": "Champiñones",
+   "precio_compra": 8.0028,
+   "cantidad_compra": 1.0,
+   "unidad_compra": "kg",
+   "proveedor": "Pfaff"
+  },
+  {
+   "id": 44,
+   "nombre": "Lechuga",
+   "precio_compra": 4.5333,
+   "cantidad_compra": 1.0,
+   "unidad_compra": "unidad",
+   "proveedor": "Prodega"
+  },
+  {
+   "id": 90,
+   "nombre": "Romer's Huusbrot",
+   "precio_compra": 4.5656,
+   "cantidad_compra": 1.0,
+   "unidad_compra": "unidad",
+   "proveedor": "Prodega"
+  },
+  {
+   "id": 59,
+   "nombre": "Peanut butter",
+   "precio_compra": 4.58,
+   "cantidad_compra": 1.0,
+   "unidad_compra": "unidad (340g)",
+   "proveedor": "Prodega"
+  },
+  {
+   "id": 159,
+   "nombre": "Alcaparras",
+   "precio_compra": 5.59,
+   "cantidad_compra": 1.0,
+   "unidad_compra": "kg",
+   "proveedor": "Prodega"
+  },
+  {
+   "id": 127,
+   "nombre": "Parmesano",
+   "precio_compra": 20.5918,
+   "cantidad_compra": 1.0,
+   "unidad_compra": "kg",
+   "proveedor": "Prodega"
+  }
+ ]
+}
