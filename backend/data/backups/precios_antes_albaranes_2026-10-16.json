@@ -1,0 +1,1842 @@
+{
+ "ingredientes": [
+  {
+   "id": 36,
+   "nombre": "Brotes de cebolla",
+   "precio_compra": 4.175,
+   "cantidad_compra": 1.0,
+   "unidad_compra": "unidad (100g)",
+   "unidad_uso": "unidad (100g)",
+   "proveedor": "Prodega"
+  },
+  {
+   "id": 6,
+   "nombre": "Uva verde",
+   "precio_compra": 5.08,
+   "cantidad_compra": 1.0,
+   "unidad_compra": "kg",
+   "unidad_uso": "kg",
+   "proveedor": "Prodega"
+  },
+  {
+   "id": 5,
+   "nombre": "Frambuesa",
+   "precio_compra": 26.6,
+   "cantidad_compra": 1.0,
+   "unidad_compra": "kg",
+   "unidad_uso": "kg",
+   "proveedor": "Prodega"
+  },
+  {
+   "id": 12,
+   "nombre": "Fresa",
+   "precio_compra": 12.46,
+   "cantidad_compra": 1.0,
+   "unidad_compra": "kg",
+   "unidad_uso": "kg",
+   "proveedor": "Prodega"
+  },
+  {
+   "id": 245,
+   "nombre": "Uva morada",
+   "precio_compra": 5.2,
+   "cantidad_compra": 1.0,
+   "unidad_compra": "kg",
+   "unidad_uso": "kg",
+   "proveedor": "Prodega"
+  },
+  {
+   "id": 29,
+   "nombre": "Cherry",
+   "precio_compra": 10.65,
+   "cantidad_compra": 1.0,
+   "unidad_compra": "kg",
+   "unidad_uso": "kg",
+   "proveedor": "Pfaff"
+  },
+  {
+   "id": 7,
+   "nombre": "Plátano",
+   "precio_compra": 2.9,
+   "cantidad_compra": 1.0,
+   "unidad_compra": "kg",
+   "unidad_uso": "kg",
+   "proveedor": "Pfaff"
+  },
+  {
+   "id": 46,
+   "nombre": "Patata",
+   "precio_compra": 2.1,
+   "cantidad_compra": 1.0,
+   "unidad_compra": "kg",
+   "unidad_uso": "kg",
+   "proveedor": "Pfaff"
+  },
+  {
+   "id": 10,
+   "nombre": "Naranja entera",
+   "precio_compra": 1.6,
+   "cantidad_compra": 1.0,
+   "unidad_compra": "kg",
+   "unidad_uso": "kg",
+   "proveedor": "Pfaff"
+  },
+  {
+   "id": 28,
+   "nombre": "Rúcola",
+   "precio_compra": 9.45,
+   "cantidad_compra": 1.0,
+   "unidad_compra": "kg",
+   "unidad_uso": "kg",
+   "proveedor": "Pfaff"
+  },
+  {
+   "id": 32,
+   "nombre": "Aguacate",
+   "precio_compra": 1.45,
+   "cantidad_compra": 1.0,
+   "unidad_compra": "unidad",
+   "unidad_uso": "unidad",
+   "proveedor": "Pfaff"
+  },
+  {
+   "id": 3,
+   "nombre": "Blueberries",
+   "precio_compra": 20.32,
+   "cantidad_compra": 1.0,
+   "unidad_compra": "kg",
+   "unidad_uso": "kg",
+   "proveedor": "Prodega"
+  },
+  {
+   "id": 129,
+   "nombre": "Burrata",
+   "precio_compra": 2.1,
+   "cantidad_compra": 1.0,
+   "unidad_compra": "unidad",
+   "unidad_uso": "unidad",
+   "proveedor": "Caporaso"
+  },
+  {
+   "id": 30,
+   "nombre": "Pepino",
+   "precio_compra": 2.4,
+   "cantidad_compra": 1.0,
+   "unidad_compra": "unidad",
+   "unidad_uso": "unidad",
+   "proveedor": "Pfaff"
+  },
+  {
+   "id": 19,
+   "nombre": "Cebolla morada",
+   "precio_compra": 1.95,
+   "cantidad_compra": 1.0,
+   "unidad_compra": "kg",
+   "unidad_uso": "kg",
+   "proveedor": "Prodega"
+  },
+  {
+   "id": 38,
+   "nombre": "Berenjena",
+   "precio_compra": 4.05,
+   "cantidad_compra": 1.0,
+   "unidad_compra": "kg",
+   "unidad_uso": "kg",
+   "proveedor": "Pfaff"
+  },
+  {
+   "id": 33,
+   "nombre": "Tomate",
+   "precio_compra": 3.95,
+   "cantidad_compra": 1.0,
+   "unidad_compra": "kg",
+   "unidad_uso": "kg",
+   "proveedor": "Prodega"
+  },
+  {
+   "id": 18,
+   "nombre": "Limón",
+   "precio_compra": 2.45,
+   "cantidad_compra": 1.0,
+   "unidad_compra": "kg",
+   "unidad_uso": "kg",
+   "proveedor": "Pfaff"
+  },
+  {
+   "id": 31,
+   "nombre": "Champiñones",
+   "precio_compra": 7.8,
+   "cantidad_compra": 1.0,
+   "unidad_compra": "kg",
+   "unidad_uso": "kg",
+   "proveedor": "Pfaff"
+  },
+  {
+   "id": 23,
+   "nombre": "Cebolla",
+   "precio_compra": 2.44,
+   "cantidad_compra": 1.0,
+   "unidad_compra": "kg",
+   "unidad_uso": "kg",
+   "proveedor": "Prodega"
+  },
+  {
+   "id": 39,
+   "nombre": "Zanahoria",
+   "precio_compra": 1.69,
+   "cantidad_compra": 1.0,
+   "unidad_compra": "kg",
+   "unidad_uso": "kg",
+   "proveedor": "Pfaff"
+  },
+  {
+   "id": 462,
+   "nombre": "Prosecco",
+   "precio_compra": 7.06,
+   "cantidad_compra": 1.0,
+   "unidad_compra": "unidad",
+   "unidad_uso": "unidad",
+   "proveedor": "Prodega"
+  }
+ ],
+ "precios_proveedor": [
+  {
+   "id": 90,
+   "ingrediente_id": 18,
+   "proveedor_id": 5,
+   "precio": 2.75,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 2.75,
+   "fecha": "2026-07-15",
+   "notas": null
+  },
+  {
+   "id": 69,
+   "ingrediente_id": 36,
+   "proveedor_id": 5,
+   "precio": 48.0,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 48.0,
+   "fecha": "2026-07-12",
+   "notas": null
+  },
+  {
+   "id": 196,
+   "ingrediente_id": 245,
+   "proveedor_id": 5,
+   "precio": 6.9,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 6.9,
+   "fecha": "2026-07-22",
+   "notas": "Lieferschein 803963"
+  },
+  {
+   "id": 197,
+   "ingrediente_id": 5,
+   "proveedor_id": 5,
+   "precio": 27.8,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 27.8,
+   "fecha": "2026-07-22",
+   "notas": "Lieferschein 803963"
+  },
+  {
+   "id": 202,
+   "ingrediente_id": 18,
+   "proveedor_id": 5,
+   "precio": 2.75,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 2.75,
+   "fecha": "2026-07-22",
+   "notas": "Lieferschein 803963"
+  },
+  {
+   "id": 241,
+   "ingrediente_id": 5,
+   "proveedor_id": 5,
+   "precio": 19.8,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 19.8,
+   "fecha": "2026-08-06",
+   "notas": "Himbeeren 250g → 4.95/0.25"
+  },
+  {
+   "id": 243,
+   "ingrediente_id": 18,
+   "proveedor_id": 5,
+   "precio": 2.45,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 2.45,
+   "fecha": "2026-08-06",
+   "notas": "Zitronen 6kg"
+  },
+  {
+   "id": 244,
+   "ingrediente_id": 31,
+   "proveedor_id": 5,
+   "precio": 7.8,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 7.8,
+   "fecha": "2026-08-06",
+   "notas": "Champignons weiss 1kg"
+  },
+  {
+   "id": 247,
+   "ingrediente_id": 3,
+   "proveedor_id": 5,
+   "precio": 16.4,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 16.4,
+   "fecha": "2026-08-06",
+   "notas": "Heidelbeeren 250g → 4.10/0.25"
+  },
+  {
+   "id": 248,
+   "ingrediente_id": 36,
+   "proveedor_id": 5,
+   "precio": 4.92,
+   "unidad": "unidad",
+   "cantidad": 1.0,
+   "precio_por_unidad": 4.92,
+   "fecha": "2026-08-06",
+   "notas": "Zwiebelsprossen 100g (4.80*1.026)"
+  },
+  {
+   "id": 225,
+   "ingrediente_id": 3,
+   "proveedor_id": 3,
+   "precio": 20.32,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 20.32,
+   "fecha": "2026-09-30",
+   "notas": "Proforma Prodega 24.07"
+  },
+  {
+   "id": 226,
+   "ingrediente_id": 5,
+   "proveedor_id": 3,
+   "precio": 26.6,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 26.6,
+   "fecha": "2026-09-30",
+   "notas": "Proforma Prodega 24.07"
+  },
+  {
+   "id": 224,
+   "ingrediente_id": 12,
+   "proveedor_id": 3,
+   "precio": 12.46,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 12.46,
+   "fecha": "2026-09-30",
+   "notas": "Proforma Prodega 24.07"
+  },
+  {
+   "id": 257,
+   "ingrediente_id": 3,
+   "proveedor_id": 3,
+   "precio": 10.9,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 10.9,
+   "fecha": "2026-08-06",
+   "notas": "Blueberries 500g → 5.45/0.5"
+  },
+  {
+   "id": 258,
+   "ingrediente_id": 5,
+   "proveedor_id": 3,
+   "precio": 26.8,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 26.8,
+   "fecha": "2026-08-06",
+   "notas": "Himbeeren 250g → 6.70/0.25"
+  },
+  {
+   "id": 168,
+   "ingrediente_id": 12,
+   "proveedor_id": 5,
+   "precio": 12.5,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 12.5,
+   "fecha": "2026-08-06",
+   "notas": "Erdbeeren 500g 6.25/0.5"
+  },
+  {
+   "id": 281,
+   "ingrediente_id": 3,
+   "proveedor_id": 3,
+   "precio": 13.2,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 13.2,
+   "fecha": "2026-09-02",
+   "notas": "Revision facturas Transgourmet 2026-09-02"
+  },
+  {
+   "id": 285,
+   "ingrediente_id": 23,
+   "proveedor_id": 3,
+   "precio": 2.44,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 2.44,
+   "fecha": "2026-09-02",
+   "notas": "Revision facturas Transgourmet 2026-09-02"
+  },
+  {
+   "id": 70,
+   "ingrediente_id": 36,
+   "proveedor_id": 3,
+   "precio": 42.17,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 42.17,
+   "fecha": "2026-07-12",
+   "notas": null
+  },
+  {
+   "id": 73,
+   "ingrediente_id": 28,
+   "proveedor_id": 3,
+   "precio": 13.18,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 13.18,
+   "fecha": "2026-07-12",
+   "notas": null
+  },
+  {
+   "id": 75,
+   "ingrediente_id": 7,
+   "proveedor_id": 3,
+   "precio": 3.13,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 3.13,
+   "fecha": "2026-07-12",
+   "notas": null
+  },
+  {
+   "id": 78,
+   "ingrediente_id": 3,
+   "proveedor_id": 5,
+   "precio": 5.95,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 5.95,
+   "fecha": "2026-07-12",
+   "notas": null
+  },
+  {
+   "id": 79,
+   "ingrediente_id": 3,
+   "proveedor_id": 3,
+   "precio": 12.58,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 12.58,
+   "fecha": "2026-07-12",
+   "notas": null
+  },
+  {
+   "id": 81,
+   "ingrediente_id": 5,
+   "proveedor_id": 3,
+   "precio": 18.8,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 18.8,
+   "fecha": "2026-07-12",
+   "notas": null
+  },
+  {
+   "id": 85,
+   "ingrediente_id": 10,
+   "proveedor_id": 3,
+   "precio": 2.32,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 2.32,
+   "fecha": "2026-07-12",
+   "notas": null
+  },
+  {
+   "id": 88,
+   "ingrediente_id": 6,
+   "proveedor_id": 5,
+   "precio": 6.67,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 6.67,
+   "fecha": "2026-07-12",
+   "notas": null
+  },
+  {
+   "id": 89,
+   "ingrediente_id": 6,
+   "proveedor_id": 3,
+   "precio": 7.2,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 7.2,
+   "fecha": "2026-07-12",
+   "notas": null
+  },
+  {
+   "id": 94,
+   "ingrediente_id": 38,
+   "proveedor_id": 5,
+   "precio": 3.03,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 3.03,
+   "fecha": "2026-07-12",
+   "notas": null
+  },
+  {
+   "id": 95,
+   "ingrediente_id": 38,
+   "proveedor_id": 3,
+   "precio": 4.47,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 4.47,
+   "fecha": "2026-07-12",
+   "notas": null
+  },
+  {
+   "id": 97,
+   "ingrediente_id": 32,
+   "proveedor_id": 3,
+   "precio": 1.52,
+   "unidad": "unidad",
+   "cantidad": 1.0,
+   "precio_por_unidad": 1.52,
+   "fecha": "2026-07-12",
+   "notas": null
+  },
+  {
+   "id": 98,
+   "ingrediente_id": 31,
+   "proveedor_id": 5,
+   "precio": 8.98,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 8.98,
+   "fecha": "2026-07-12",
+   "notas": null
+  },
+  {
+   "id": 99,
+   "ingrediente_id": 31,
+   "proveedor_id": 3,
+   "precio": 9.46,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 9.46,
+   "fecha": "2026-07-12",
+   "notas": null
+  },
+  {
+   "id": 101,
+   "ingrediente_id": 29,
+   "proveedor_id": 3,
+   "precio": 6.83,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 6.83,
+   "fecha": "2026-07-12",
+   "notas": null
+  },
+  {
+   "id": 103,
+   "ingrediente_id": 30,
+   "proveedor_id": 5,
+   "precio": 1.13,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 1.13,
+   "fecha": "2026-07-12",
+   "notas": null
+  },
+  {
+   "id": 104,
+   "ingrediente_id": 30,
+   "proveedor_id": 3,
+   "precio": 1.41,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 1.41,
+   "fecha": "2026-07-12",
+   "notas": null
+  },
+  {
+   "id": 105,
+   "ingrediente_id": 39,
+   "proveedor_id": 5,
+   "precio": 1.69,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 1.69,
+   "fecha": "2026-07-12",
+   "notas": null
+  },
+  {
+   "id": 106,
+   "ingrediente_id": 39,
+   "proveedor_id": 3,
+   "precio": 1.77,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 1.77,
+   "fecha": "2026-07-12",
+   "notas": null
+  },
+  {
+   "id": 107,
+   "ingrediente_id": 46,
+   "proveedor_id": 5,
+   "precio": 1.64,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 1.64,
+   "fecha": "2026-07-12",
+   "notas": null
+  },
+  {
+   "id": 108,
+   "ingrediente_id": 46,
+   "proveedor_id": 3,
+   "precio": 1.55,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 1.55,
+   "fecha": "2026-07-12",
+   "notas": null
+  },
+  {
+   "id": 72,
+   "ingrediente_id": 28,
+   "proveedor_id": 5,
+   "precio": 9.45,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 9.45,
+   "fecha": "2026-07-15",
+   "notas": null
+  },
+  {
+   "id": 74,
+   "ingrediente_id": 7,
+   "proveedor_id": 5,
+   "precio": 2.9,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 2.9,
+   "fecha": "2026-07-15",
+   "notas": null
+  },
+  {
+   "id": 91,
+   "ingrediente_id": 18,
+   "proveedor_id": 3,
+   "precio": 2.77,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 2.77,
+   "fecha": "2026-07-12",
+   "notas": null
+  },
+  {
+   "id": 115,
+   "ingrediente_id": 33,
+   "proveedor_id": 5,
+   "precio": 3.95,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 3.95,
+   "fecha": "2026-07-12",
+   "notas": null
+  },
+  {
+   "id": 116,
+   "ingrediente_id": 33,
+   "proveedor_id": 3,
+   "precio": 3.2,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 3.2,
+   "fecha": "2026-07-12",
+   "notas": null
+  },
+  {
+   "id": 119,
+   "ingrediente_id": 23,
+   "proveedor_id": 5,
+   "precio": 1.85,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 1.85,
+   "fecha": "2026-07-12",
+   "notas": null
+  },
+  {
+   "id": 120,
+   "ingrediente_id": 23,
+   "proveedor_id": 3,
+   "precio": 1.95,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 1.95,
+   "fecha": "2026-07-12",
+   "notas": null
+  },
+  {
+   "id": 121,
+   "ingrediente_id": 19,
+   "proveedor_id": 5,
+   "precio": 1.95,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 1.95,
+   "fecha": "2026-07-12",
+   "notas": null
+  },
+  {
+   "id": 122,
+   "ingrediente_id": 19,
+   "proveedor_id": 3,
+   "precio": 2.2,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 2.2,
+   "fecha": "2026-07-12",
+   "notas": null
+  },
+  {
+   "id": 80,
+   "ingrediente_id": 5,
+   "proveedor_id": 5,
+   "precio": 27.8,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 27.8,
+   "fecha": "2026-07-15",
+   "notas": null
+  },
+  {
+   "id": 84,
+   "ingrediente_id": 10,
+   "proveedor_id": 5,
+   "precio": 1.6,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 1.6,
+   "fecha": "2026-07-15",
+   "notas": null
+  },
+  {
+   "id": 96,
+   "ingrediente_id": 32,
+   "proveedor_id": 5,
+   "precio": 1.45,
+   "unidad": "unidad",
+   "cantidad": 1.0,
+   "precio_por_unidad": 1.45,
+   "fecha": "2026-07-15",
+   "notas": null
+  },
+  {
+   "id": 100,
+   "ingrediente_id": 29,
+   "proveedor_id": 5,
+   "precio": 9.65,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 9.65,
+   "fecha": "2026-07-15",
+   "notas": null
+  },
+  {
+   "id": 192,
+   "ingrediente_id": 38,
+   "proveedor_id": 5,
+   "precio": 4.05,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 4.05,
+   "fecha": "2026-08-06",
+   "notas": "Auberginen 5kg"
+  },
+  {
+   "id": 193,
+   "ingrediente_id": 29,
+   "proveedor_id": 5,
+   "precio": 10.65,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 10.65,
+   "fecha": "2026-08-06",
+   "notas": "Cherrytomaten MIX 3kg"
+  },
+  {
+   "id": 194,
+   "ingrediente_id": 46,
+   "proveedor_id": 5,
+   "precio": 2.1,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 2.1,
+   "fecha": "2026-08-06",
+   "notas": "Kartoffeln ANNABELLE 10kg"
+  },
+  {
+   "id": 195,
+   "ingrediente_id": 30,
+   "proveedor_id": 5,
+   "precio": 2.4,
+   "unidad": "unidad",
+   "cantidad": 1.0,
+   "precio_por_unidad": 2.4,
+   "fecha": "2026-08-06",
+   "notas": "Gurken 12 Stk"
+  },
+  {
+   "id": 198,
+   "ingrediente_id": 7,
+   "proveedor_id": 5,
+   "precio": 2.9,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 2.9,
+   "fecha": "2026-08-06",
+   "notas": "Bananen KI.I"
+  },
+  {
+   "id": 199,
+   "ingrediente_id": 28,
+   "proveedor_id": 5,
+   "precio": 9.45,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 9.45,
+   "fecha": "2026-08-06",
+   "notas": "Rucola lose 1kg"
+  },
+  {
+   "id": 201,
+   "ingrediente_id": 10,
+   "proveedor_id": 5,
+   "precio": 1.6,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 1.6,
+   "fecha": "2026-08-06",
+   "notas": "Orangen gross"
+  },
+  {
+   "id": 203,
+   "ingrediente_id": 32,
+   "proveedor_id": 5,
+   "precio": 1.45,
+   "unidad": "unidad",
+   "cantidad": 1.0,
+   "precio_por_unidad": 1.45,
+   "fecha": "2026-08-06",
+   "notas": "Avocados Hass 23.20/16"
+  },
+  {
+   "id": 263,
+   "ingrediente_id": 23,
+   "proveedor_id": 5,
+   "precio": 2.1,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 2.1,
+   "fecha": "2026-08-06",
+   "notas": "Zwiebeln gross"
+  },
+  {
+   "id": 264,
+   "ingrediente_id": 19,
+   "proveedor_id": 5,
+   "precio": 2.35,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 2.35,
+   "fecha": "2026-08-06",
+   "notas": "Zwiebeln rot"
+  },
+  {
+   "id": 268,
+   "ingrediente_id": 5,
+   "proveedor_id": 3,
+   "precio": 26.88,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 26.88,
+   "fecha": "2026-09-02",
+   "notas": "Revision facturas Transgourmet 2026-09-02"
+  },
+  {
+   "id": 321,
+   "ingrediente_id": 245,
+   "proveedor_id": 3,
+   "precio": 5.42,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 5.42,
+   "fecha": "2026-09-02",
+   "notas": "Revision facturas Transgourmet 2026-09-02"
+  },
+  {
+   "id": 322,
+   "ingrediente_id": 6,
+   "proveedor_id": 3,
+   "precio": 4.68,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 4.68,
+   "fecha": "2026-09-02",
+   "notas": "Revision facturas Transgourmet 2026-09-02"
+  },
+  {
+   "id": 327,
+   "ingrediente_id": 12,
+   "proveedor_id": 3,
+   "precio": 11.18,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 11.18,
+   "fecha": "2026-09-02",
+   "notas": "Revision facturas Transgourmet 2026-09-02"
+  },
+  {
+   "id": 330,
+   "ingrediente_id": 36,
+   "proveedor_id": 3,
+   "precio": 4.11,
+   "unidad": "unidad (100g)",
+   "cantidad": 1.0,
+   "precio_por_unidad": 4.11,
+   "fecha": "2026-09-02",
+   "notas": "Revision facturas Transgourmet 2026-09-02"
+  },
+  {
+   "id": 350,
+   "ingrediente_id": 462,
+   "proveedor_id": 3,
+   "precio": 7.06,
+   "unidad": "unidad",
+   "cantidad": 1.0,
+   "precio_por_unidad": 7.06,
+   "fecha": "2026-09-24",
+   "notas": "Casalforte Prosecco Extra Dry DOC 75cl. Precio Aktion 6.53 exkl (8.1% MWST)"
+  },
+  {
+   "id": 251,
+   "ingrediente_id": 36,
+   "proveedor_id": 3,
+   "precio": 4.175,
+   "unidad": "unidad (100g)",
+   "cantidad": 1.0,
+   "precio_por_unidad": 4.175,
+   "fecha": "2026-09-30",
+   "notas": "Zwiebelkeimlinge 2x100g → 8.35/2"
+  },
+  {
+   "id": 227,
+   "ingrediente_id": 6,
+   "proveedor_id": 3,
+   "precio": 5.08,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 5.08,
+   "fecha": "2026-09-30",
+   "notas": "Proforma Prodega 24.07"
+  },
+  {
+   "id": 228,
+   "ingrediente_id": 245,
+   "proveedor_id": 3,
+   "precio": 5.2,
+   "unidad": "kg",
+   "cantidad": 1.0,
+   "precio_por_unidad": 5.2,
+   "fecha": "2026-09-30",
+   "notas": "Proforma Prodega 24.07"
+  }
+ ],
+ "historial_precios": [
+  {
+   "id": 394,
+   "ingrediente_id": 12,
+   "precio_anterior": 11.18,
+   "precio_nuevo": 12.5,
+   "fecha_cambio": "2026-07-15",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 395,
+   "ingrediente_id": 5,
+   "precio_anterior": 22.78,
+   "precio_nuevo": 27.8,
+   "fecha_cambio": "2026-07-15",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 396,
+   "ingrediente_id": 7,
+   "precio_anterior": 2.98,
+   "precio_nuevo": 2.9,
+   "fecha_cambio": "2026-07-15",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 397,
+   "ingrediente_id": 28,
+   "precio_anterior": 10.47,
+   "precio_nuevo": 9.45,
+   "fecha_cambio": "2026-07-15",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 398,
+   "ingrediente_id": 29,
+   "precio_anterior": 5.23,
+   "precio_nuevo": 9.65,
+   "fecha_cambio": "2026-07-15",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 399,
+   "ingrediente_id": 10,
+   "precio_anterior": 1.9,
+   "precio_nuevo": 1.6,
+   "fecha_cambio": "2026-07-15",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 400,
+   "ingrediente_id": 32,
+   "precio_anterior": 1.49,
+   "precio_nuevo": 1.45,
+   "fecha_cambio": "2026-07-15",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 402,
+   "ingrediente_id": 36,
+   "precio_anterior": 53.35,
+   "precio_nuevo": 48.0,
+   "fecha_cambio": "2026-07-15",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 403,
+   "ingrediente_id": 18,
+   "precio_anterior": 2.77,
+   "precio_nuevo": 2.75,
+   "fecha_cambio": "2026-07-15",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 427,
+   "ingrediente_id": 38,
+   "precio_anterior": 3.03,
+   "precio_nuevo": 4.05,
+   "fecha_cambio": "2026-07-22",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 428,
+   "ingrediente_id": 29,
+   "precio_anterior": 9.65,
+   "precio_nuevo": 10.65,
+   "fecha_cambio": "2026-07-22",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 429,
+   "ingrediente_id": 46,
+   "precio_anterior": 1.64,
+   "precio_nuevo": 2.1,
+   "fecha_cambio": "2026-07-22",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 430,
+   "ingrediente_id": 30,
+   "precio_anterior": 1.13,
+   "precio_nuevo": 2.4,
+   "fecha_cambio": "2026-07-22",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 431,
+   "ingrediente_id": 245,
+   "precio_anterior": 6.67,
+   "precio_nuevo": 6.9,
+   "fecha_cambio": "2026-07-22",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 512,
+   "ingrediente_id": 5,
+   "precio_anterior": 27.8,
+   "precio_nuevo": 18.8,
+   "fecha_cambio": "2026-08-06",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 549,
+   "ingrediente_id": 5,
+   "precio_anterior": 19.8,
+   "precio_nuevo": 26.8,
+   "fecha_cambio": "2026-09-02",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 553,
+   "ingrediente_id": 5,
+   "precio_anterior": 26.8,
+   "precio_nuevo": 26.88,
+   "fecha_cambio": "2026-09-02",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 517,
+   "ingrediente_id": 36,
+   "precio_anterior": 48.0,
+   "precio_nuevo": 4.18,
+   "fecha_cambio": "2026-08-06",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 524,
+   "ingrediente_id": 3,
+   "precio_anterior": 5.95,
+   "precio_nuevo": 10.9,
+   "fecha_cambio": "2026-08-06",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 525,
+   "ingrediente_id": 5,
+   "precio_anterior": 18.8,
+   "precio_nuevo": 26.8,
+   "fecha_cambio": "2026-08-06",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 566,
+   "ingrediente_id": 3,
+   "precio_anterior": 10.9,
+   "precio_nuevo": 13.2,
+   "fecha_cambio": "2026-09-02",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 570,
+   "ingrediente_id": 23,
+   "precio_anterior": 1.85,
+   "precio_nuevo": 2.44,
+   "fecha_cambio": "2026-09-02",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 606,
+   "ingrediente_id": 245,
+   "precio_anterior": 6.9,
+   "precio_nuevo": 5.42,
+   "fecha_cambio": "2026-09-02",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 607,
+   "ingrediente_id": 6,
+   "precio_anterior": 6.67,
+   "precio_nuevo": 4.68,
+   "fecha_cambio": "2026-09-02",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 612,
+   "ingrediente_id": 12,
+   "precio_anterior": 12.5,
+   "precio_nuevo": 11.18,
+   "fecha_cambio": "2026-09-02",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 615,
+   "ingrediente_id": 36,
+   "precio_anterior": 4.18,
+   "precio_nuevo": 4.11,
+   "fecha_cambio": "2026-09-02",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 691,
+   "ingrediente_id": 6,
+   "precio_anterior": 4.8017,
+   "precio_nuevo": 5.08,
+   "fecha_cambio": "2026-09-30",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 692,
+   "ingrediente_id": 245,
+   "precio_anterior": 5.1916,
+   "precio_nuevo": 5.2,
+   "fecha_cambio": "2026-09-30",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 531,
+   "ingrediente_id": 5,
+   "precio_anterior": 26.8,
+   "precio_nuevo": 19.8,
+   "fecha_cambio": "2026-08-06",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 532,
+   "ingrediente_id": 18,
+   "precio_anterior": 2.75,
+   "precio_nuevo": 2.45,
+   "fecha_cambio": "2026-08-06",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 533,
+   "ingrediente_id": 29,
+   "precio_anterior": 10.65,
+   "precio_nuevo": 6.83,
+   "fecha_cambio": "2026-08-06",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 534,
+   "ingrediente_id": 30,
+   "precio_anterior": 2.4,
+   "precio_nuevo": 1.41,
+   "fecha_cambio": "2026-08-06",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 535,
+   "ingrediente_id": 31,
+   "precio_anterior": 8.98,
+   "precio_nuevo": 7.8,
+   "fecha_cambio": "2026-08-06",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 537,
+   "ingrediente_id": 46,
+   "precio_anterior": 2.1,
+   "precio_nuevo": 1.55,
+   "fecha_cambio": "2026-08-06",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 2,
+   "ingrediente_id": 3,
+   "precio_anterior": 16.4,
+   "precio_nuevo": 11.3,
+   "fecha_cambio": "2026-07-12",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 3,
+   "ingrediente_id": 5,
+   "precio_anterior": 29.0,
+   "precio_nuevo": 20.76,
+   "fecha_cambio": "2026-07-12",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 5,
+   "ingrediente_id": 6,
+   "precio_anterior": 7.9,
+   "precio_nuevo": 6.12,
+   "fecha_cambio": "2026-07-12",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 88,
+   "ingrediente_id": 3,
+   "precio_anterior": 12.38,
+   "precio_nuevo": 10.72,
+   "fecha_cambio": "2026-06-26",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 89,
+   "ingrediente_id": 3,
+   "precio_anterior": 10.72,
+   "precio_nuevo": 11.3,
+   "fecha_cambio": "2026-07-03",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 91,
+   "ingrediente_id": 6,
+   "precio_anterior": 5.78,
+   "precio_nuevo": 6.12,
+   "fecha_cambio": "2026-07-10",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 94,
+   "ingrediente_id": 32,
+   "precio_anterior": 2.0,
+   "precio_nuevo": 1.45,
+   "fecha_cambio": "2026-03-05",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 95,
+   "ingrediente_id": 32,
+   "precio_anterior": 1.45,
+   "precio_nuevo": 1.45,
+   "fecha_cambio": "2026-06-13",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 96,
+   "ingrediente_id": 12,
+   "precio_anterior": 6.4,
+   "precio_nuevo": 10.9,
+   "fecha_cambio": "2026-06-13",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 97,
+   "ingrediente_id": 5,
+   "precio_anterior": 8.6,
+   "precio_nuevo": 22.2,
+   "fecha_cambio": "2026-06-13",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 98,
+   "ingrediente_id": 28,
+   "precio_anterior": 10.5,
+   "precio_nuevo": 8.85,
+   "fecha_cambio": "2026-03-10",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 99,
+   "ingrediente_id": 30,
+   "precio_anterior": 2.1,
+   "precio_nuevo": 2.2,
+   "fecha_cambio": "2026-06-04",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 100,
+   "ingrediente_id": 29,
+   "precio_anterior": 5.7,
+   "precio_nuevo": 6.25,
+   "fecha_cambio": "2026-05-05",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 101,
+   "ingrediente_id": 38,
+   "precio_anterior": 5.2,
+   "precio_nuevo": 2.8,
+   "fecha_cambio": "2026-05-05",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 102,
+   "ingrediente_id": 23,
+   "precio_anterior": 2.02,
+   "precio_nuevo": 1.8,
+   "fecha_cambio": "2026-01-22",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 104,
+   "ingrediente_id": 36,
+   "precio_anterior": 41.1,
+   "precio_nuevo": 48.0,
+   "fecha_cambio": "2026-01-14",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 115,
+   "ingrediente_id": 3,
+   "precio_anterior": 11.3,
+   "precio_nuevo": 5.8,
+   "fecha_cambio": "2026-07-13",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 117,
+   "ingrediente_id": 6,
+   "precio_anterior": 6.12,
+   "precio_nuevo": 6.5,
+   "fecha_cambio": "2026-07-13",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 118,
+   "ingrediente_id": 10,
+   "precio_anterior": 1.6,
+   "precio_nuevo": 1.85,
+   "fecha_cambio": "2026-07-13",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 119,
+   "ingrediente_id": 18,
+   "precio_anterior": 3.15,
+   "precio_nuevo": 2.7,
+   "fecha_cambio": "2026-07-13",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 122,
+   "ingrediente_id": 28,
+   "precio_anterior": 8.85,
+   "precio_nuevo": 10.2,
+   "fecha_cambio": "2026-07-13",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 123,
+   "ingrediente_id": 29,
+   "precio_anterior": 6.25,
+   "precio_nuevo": 5.1,
+   "fecha_cambio": "2026-07-13",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 124,
+   "ingrediente_id": 30,
+   "precio_anterior": 2.2,
+   "precio_nuevo": 1.1,
+   "fecha_cambio": "2026-07-13",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 125,
+   "ingrediente_id": 31,
+   "precio_anterior": 7.8,
+   "precio_nuevo": 8.75,
+   "fecha_cambio": "2026-07-13",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 126,
+   "ingrediente_id": 33,
+   "precio_anterior": 3.12,
+   "precio_nuevo": 3.85,
+   "fecha_cambio": "2026-07-13",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 128,
+   "ingrediente_id": 36,
+   "precio_anterior": 48.0,
+   "precio_nuevo": 52.0,
+   "fecha_cambio": "2026-07-13",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 129,
+   "ingrediente_id": 38,
+   "precio_anterior": 2.8,
+   "precio_nuevo": 2.95,
+   "fecha_cambio": "2026-07-13",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 132,
+   "ingrediente_id": 46,
+   "precio_anterior": 1.8,
+   "precio_nuevo": 1.6,
+   "fecha_cambio": "2026-07-13",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 171,
+   "ingrediente_id": 3,
+   "precio_anterior": 5.8,
+   "precio_nuevo": 5.95,
+   "fecha_cambio": "2026-07-13",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 173,
+   "ingrediente_id": 5,
+   "precio_anterior": 22.2,
+   "precio_nuevo": 22.78,
+   "fecha_cambio": "2026-07-13",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 174,
+   "ingrediente_id": 6,
+   "precio_anterior": 6.5,
+   "precio_nuevo": 6.67,
+   "fecha_cambio": "2026-07-13",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 175,
+   "ingrediente_id": 7,
+   "precio_anterior": 2.9,
+   "precio_nuevo": 2.98,
+   "fecha_cambio": "2026-07-13",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 178,
+   "ingrediente_id": 10,
+   "precio_anterior": 1.85,
+   "precio_nuevo": 1.9,
+   "fecha_cambio": "2026-07-13",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 180,
+   "ingrediente_id": 12,
+   "precio_anterior": 10.9,
+   "precio_nuevo": 11.18,
+   "fecha_cambio": "2026-07-13",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 182,
+   "ingrediente_id": 18,
+   "precio_anterior": 2.7,
+   "precio_nuevo": 2.77,
+   "fecha_cambio": "2026-07-13",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 183,
+   "ingrediente_id": 19,
+   "precio_anterior": 1.9,
+   "precio_nuevo": 1.95,
+   "fecha_cambio": "2026-07-13",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 185,
+   "ingrediente_id": 23,
+   "precio_anterior": 1.8,
+   "precio_nuevo": 1.85,
+   "fecha_cambio": "2026-07-13",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 189,
+   "ingrediente_id": 28,
+   "precio_anterior": 10.2,
+   "precio_nuevo": 10.47,
+   "fecha_cambio": "2026-07-13",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 190,
+   "ingrediente_id": 29,
+   "precio_anterior": 5.1,
+   "precio_nuevo": 5.23,
+   "fecha_cambio": "2026-07-13",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 191,
+   "ingrediente_id": 30,
+   "precio_anterior": 1.1,
+   "precio_nuevo": 1.13,
+   "fecha_cambio": "2026-07-13",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 192,
+   "ingrediente_id": 31,
+   "precio_anterior": 8.75,
+   "precio_nuevo": 8.98,
+   "fecha_cambio": "2026-07-13",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 193,
+   "ingrediente_id": 32,
+   "precio_anterior": 1.45,
+   "precio_nuevo": 1.49,
+   "fecha_cambio": "2026-07-13",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 194,
+   "ingrediente_id": 33,
+   "precio_anterior": 3.85,
+   "precio_nuevo": 3.95,
+   "fecha_cambio": "2026-07-13",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 197,
+   "ingrediente_id": 36,
+   "precio_anterior": 52.0,
+   "precio_nuevo": 53.35,
+   "fecha_cambio": "2026-07-13",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 198,
+   "ingrediente_id": 38,
+   "precio_anterior": 2.95,
+   "precio_nuevo": 3.03,
+   "fecha_cambio": "2026-07-13",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 199,
+   "ingrediente_id": 39,
+   "precio_anterior": 1.65,
+   "precio_nuevo": 1.69,
+   "fecha_cambio": "2026-07-13",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 205,
+   "ingrediente_id": 46,
+   "precio_anterior": 1.6,
+   "precio_nuevo": 1.64,
+   "fecha_cambio": "2026-07-13",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 392,
+   "ingrediente_id": 129,
+   "precio_anterior": 1.33,
+   "precio_nuevo": 2.1,
+   "fecha_cambio": "2026-07-14",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 542,
+   "ingrediente_id": 30,
+   "precio_anterior": 1.41,
+   "precio_nuevo": 2.4,
+   "fecha_cambio": "2026-08-06",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 543,
+   "ingrediente_id": 29,
+   "precio_anterior": 6.83,
+   "precio_nuevo": 10.65,
+   "fecha_cambio": "2026-08-06",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 544,
+   "ingrediente_id": 46,
+   "precio_anterior": 1.55,
+   "precio_nuevo": 2.1,
+   "fecha_cambio": "2026-08-06",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 631,
+   "ingrediente_id": 3,
+   "precio_anterior": 13.2,
+   "precio_nuevo": 19.2272,
+   "fecha_cambio": "2026-09-24",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 632,
+   "ingrediente_id": 36,
+   "precio_anterior": 4.11,
+   "precio_nuevo": 4.1758,
+   "fecha_cambio": "2026-09-24",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 638,
+   "ingrediente_id": 5,
+   "precio_anterior": 26.88,
+   "precio_nuevo": 27.2916,
+   "fecha_cambio": "2026-09-24",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 639,
+   "ingrediente_id": 12,
+   "precio_anterior": 11.18,
+   "precio_nuevo": 11.3476,
+   "fecha_cambio": "2026-09-24",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 662,
+   "ingrediente_id": 245,
+   "precio_anterior": 5.42,
+   "precio_nuevo": 5.1916,
+   "fecha_cambio": "2026-09-24",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 663,
+   "ingrediente_id": 6,
+   "precio_anterior": 4.68,
+   "precio_nuevo": 4.8017,
+   "fecha_cambio": "2026-09-24",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 672,
+   "ingrediente_id": 3,
+   "precio_anterior": 19.2272,
+   "precio_nuevo": 20.32,
+   "fecha_cambio": "2026-09-30",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 673,
+   "ingrediente_id": 36,
+   "precio_anterior": 4.1758,
+   "precio_nuevo": 4.175,
+   "fecha_cambio": "2026-09-30",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 677,
+   "ingrediente_id": 5,
+   "precio_anterior": 27.2916,
+   "precio_nuevo": 26.6,
+   "fecha_cambio": "2026-09-30",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  },
+  {
+   "id": 678,
+   "ingrediente_id": 12,
+   "precio_anterior": 11.3476,
+   "precio_nuevo": 12.46,
+   "fecha_cambio": "2026-09-30",
+   "precio_eur_anterior": null,
+   "precio_eur_nuevo": null
+  }
+ ]
+}
